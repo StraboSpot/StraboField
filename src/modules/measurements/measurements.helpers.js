@@ -1,3 +1,4 @@
+import {MEASUREMENT_KEYS} from './measurements.constants';
 import {isEmpty} from '../../shared/helpers';
 
 export const equalsIgnoreOrder = (a, b) => {
@@ -11,12 +12,6 @@ export const equalsIgnoreOrder = (a, b) => {
   return true;
 };
 
-export const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
-  t => t.values?.type === 'linear_orientation' || t.type === 'linear_orientation');
-
-export const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
-  t => t.values?.type === 'planar_orientation' || t.values?.type === 'tabular_orientation' || t.type === 'planar_orientation');
-
 export const isEmptyMeasurement = (measurement) => {
   return isEmpty(measurement)
     || (!isEmpty(measurement) && ((Object.keys(measurement).length === 2 && measurement.id && measurement.type)
@@ -24,3 +19,6 @@ export const isEmptyMeasurement = (measurement) => {
         && measurement.associated_orientation
         && isEmpty(measurement.associated_orientation.filter(aO => !isEmptyMeasurement(aO))))));
 };
+
+// A tabular zone is a plane with a thickness, so it is read, labeled and edited as a planar orientation
+export const isPlanarType = type => type === MEASUREMENT_KEYS.PLANAR || type === MEASUREMENT_KEYS.TABULAR;

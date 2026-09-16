@@ -3,7 +3,8 @@ import {Text} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {FIRST_ORDER_CLASS_FIELDS, SECOND_ORDER_CLASS_FIELDS} from './measurements.constants';
+import {FIRST_ORDER_CLASS_FIELDS, MEASUREMENT_KEYS, SECOND_ORDER_CLASS_FIELDS} from './measurements.constants';
+import {isPlanarType} from './measurements.helpers';
 import useMeasurements from './useMeasurements';
 import {isEmpty, padWithLeadingZeros, toTitleCase} from '../../shared/helpers';
 import useForm from '../form/useForm';
@@ -20,7 +21,7 @@ const MeasurementLabel = ({isDetail, item}) => {
 
   const getMeasurementText = (measurement) => {
     let measurementText = '';
-    if (measurement.type === 'planar_orientation' || measurement.type === 'tabular_orientation') {
+    if (isPlanarType(measurement.type)) {
       if (measurementConvention === 'dip_direction_dip') {
         measurementText
           += (isEmpty(measurement.dip_direction) ? '?' : padWithLeadingZeros(measurement.dip_direction, 3)) + '/'
@@ -31,7 +32,7 @@ const MeasurementLabel = ({isDetail, item}) => {
           + (isEmpty(measurement.dip) ? '?' : padWithLeadingZeros(measurement.dip, 2));
       }
     }
-    if (measurement.type === 'linear_orientation') {
+    if (measurement.type === MEASUREMENT_KEYS.LINEAR) {
       measurementText += (isEmpty(measurement.plunge) ? '?' : padWithLeadingZeros(measurement.plunge, 2)) + '\u2192'
         + (isEmpty(measurement.trend) ? '?' : padWithLeadingZeros(measurement.trend, 3));
     }

@@ -18,6 +18,7 @@ import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
+import {getActiveTemplateList, getIsTemplateInUse} from '../templates/templates.helpers';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
 const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocation}) => {
@@ -58,9 +59,10 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
   // arrive and the page would hold the blank values it initialized with.
   useLayoutEffect(() => {
     console.log('ULE Notes [templates, selectedSpot id, initialNote]', templates);
-    if (!isReadOnly && isEmpty(initialNote) && templates.notes && templates.notes.isInUse
-      && !isEmpty(templates.notes.active)) {
-      const templatesNotes = templates.notes.active.map(t => t.values.note).join('\n');
+    const activeNoteTemplates = getActiveTemplateList(templates, PAGE_KEYS.NOTES);
+    if (!isReadOnly && isEmpty(initialNote) && getIsTemplateInUse(templates, PAGE_KEYS.NOTES)
+      && !isEmpty(activeNoteTemplates)) {
+      const templatesNotes = activeNoteTemplates.map(t => t.values.note).join('\n');
       setInitialNotesValues({note: templatesNotes});
     }
     else {

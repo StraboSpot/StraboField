@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import MeasurementDetail from './MeasurementDetail';
 import MeasurementItem from './MeasurementItem';
+import {MEASUREMENT_KEYS} from './measurements.constants';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import {isEmpty} from '../../shared/helpers';
@@ -44,17 +45,17 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   const SECTIONS = {
     PLANAR: {
       title: isReadOnly ? 'Planar Measurements' : 'Planar \nMeasurements',
-      keys: ['planar_orientation', 'tabular_orientation'],
+      keys: [MEASUREMENT_KEYS.PLANAR, MEASUREMENT_KEYS.TABULAR],
       compass_toggles: [COMPASS_TOGGLE_BUTTONS.PLANAR],
     },
     LINEAR: {
       title: isReadOnly ? 'Linear Measurements' : 'Linear \nMeasurements',
-      keys: ['linear_orientation'],
+      keys: [MEASUREMENT_KEYS.LINEAR],
       compass_toggles: [COMPASS_TOGGLE_BUTTONS.LINEAR],
     },
     PLANARLINEAR: {
       title: isReadOnly ? 'Planar + Linear Measurements' : 'Planar + Linear \nMeasurements',
-      keys: ['linear_orientation', 'planar_orientation', 'tabular_orientation'],
+      keys: [MEASUREMENT_KEYS.LINEAR, MEASUREMENT_KEYS.PLANAR, MEASUREMENT_KEYS.TABULAR],
       compass_toggles: [COMPASS_TOGGLE_BUTTONS.PLANAR, COMPASS_TOGGLE_BUTTONS.LINEAR],
     },
   };

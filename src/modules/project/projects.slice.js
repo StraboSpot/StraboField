@@ -2,6 +2,15 @@ import {createSlice} from '@reduxjs/toolkit';
 
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
 import {getNewId, isEmpty, isEqual, isSameId} from '../../shared/helpers';
+import {
+  deleteTemplateKey,
+  getActiveTemplateList,
+  getIsTemplateInUse,
+  getTemplateList,
+  setActiveTemplateList,
+  setIsTemplateInUse,
+  setTemplateList,
+} from '../templates/templates.helpers';
 
 // A memo used to stamp its edit time as updated_timestamp, while the rest of the project calls that
 // modified_timestamp. Renamed on the way in - server, import or device - and the old key dropped, so no
@@ -113,11 +122,7 @@ const projectSlice = createSlice({
     },
     addedTemplates(state, action) {
       const {key, templates} = action.payload;
-      if (key === 'measurementTemplates') state.project.templates.measurementTemplates = templates;
-      else {
-        if (!state.project.templates[key]) state.project.templates[key] = {};
-        state.project.templates[key].templates = templates;
-      }
+      setTemplateList(state.project.templates, key, templates);
       state.project.modified_timestamp = Date.now();
     },
     deletedDataset(state, action) {
@@ -204,30 +209,17 @@ const projectSlice = createSlice({
     },
     deletedTemplate(state, action) {
       const {key, template} = action.payload;
-      if (key === 'measurementTemplates') {
-        state.project.templates.measurementTemplates
-          = state.project.templates.measurementTemplates.filter(t => t.id !== template.id);
-        if (isEmpty(state.project.templates.measurementTemplates)) delete state.project.templates.measurementTemplates;
-
-        state.project.templates.activeMeasurementTemplates
-          = state.project.templates.activeMeasurementTemplates.filter(t => t.id !== template.id);
-        if (isEmpty(
-          state.project.templates.activeMeasurementTemplates)) delete state.project.templates.activeMeasurementTemplates;
-
-        if (state.project.templates.useMeasurementTemplates && !state.project.templates.activeMeasurementTemplates) {
-          delete state.project.templates.useMeasurementTemplates;
-        }
-      }
+      const templates = state.project.templates;
+      const remainingTemplates = (getTemplateList(templates, key) || []).filter(t => t.id !== template.id);
+      // The last template of a key takes its active list and in-use flag with it: both name templates that
+      // no longer exist.
+      if (isEmpty(remainingTemplates)) deleteTemplateKey(templates, key);
       else {
-        state.project.templates[key].templates
-          = state.project.templates[key].templates.filter(t => t.id !== template.id);
-        if (isEmpty(state.project.templates[key].templates)) delete state.project.templates[key];
-        else {
-          state.project.templates[key].active = state.project.templates[key].active.filter(t => t.id !== template.id);
-          if (state.project.templates[key].isInUse && isEmpty(state.project.templates[key].active)) {
-            state.project.templates[key].isInUse = false;
-          }
-        }
+        setTemplateList(templates, key, remainingTemplates);
+        const remainingActive = (getActiveTemplateList(templates, key) || []).filter(t => t.id !== template.id);
+        setActiveTemplateList(templates, key, remainingActive);
+        // Templates stay switched on only while there is an active one left to apply
+        if (getIsTemplateInUse(templates, key) && isEmpty(remainingActive)) setIsTemplateInUse(templates, key, false);
       }
       state.project.modified_timestamp = Date.now();
     },
@@ -279,14 +271,7 @@ const projectSlice = createSlice({
     },
     setActiveTemplates(state, action) {
       const {key, templates} = action.payload;
-      if (key === 'measurementTemplates') {
-        if (!state.project.templates.activeMeasurementTemplates) state.project.templates.activeMeasurementTemplates = [];
-        state.project.templates.activeMeasurementTemplates = templates;
-      }
-      else {
-        if (!state.project.templates[key]) state.project.templates[key] = {};
-        state.project.templates[key].active = templates;
-      }
+      setActiveTemplateList(state.project.templates, key, templates);
       state.project.modified_timestamp = Date.now();
     },
     setBackupFileName(state, action) {
@@ -318,11 +303,7 @@ const projectSlice = createSlice({
     },
     setUseTemplate(state, action) {
       const {key, bool} = action.payload;
-      if (key === 'measurementTemplates') state.project.templates.useMeasurementTemplates = bool;
-      else {
-        if (!state.project.templates[key]) state.project.templates[key] = {};
-        state.project.templates[key].isInUse = bool;
-      }
+      setIsTemplateInUse(state.project.templates, key, bool);
       state.project.modified_timestamp = Date.now();
     },
     updatedDatasetProperties(state, action) {

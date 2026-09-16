@@ -1,9 +1,10 @@
 import {useDispatch, useSelector} from 'react-redux';
 
-import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
+import {getActiveTemplateList, getTemplateList} from './templates.helpers';
 import forms from '../../assets/forms';
 import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
 import useForm from '../form/useForm';
+import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
 const useTemplates = () => {
@@ -39,7 +40,7 @@ const useTemplates = () => {
       return toTitleCase(key.replace('_', ' ')) + ' Rock';
     }
     else if (key === 'minerals') return 'Mineral';
-    else if (key === 'tabular_orientation') return 'Tabular Zone Orientation';
+    else if (key === MEASUREMENT_KEYS.TABULAR) return 'Tabular Zone Orientation';
     else if (key === 'pet') return 'Rocks & Minerals';
     else if (key) return toTitleCase(key.replaceAll('_', ' ').trim());
   };
@@ -67,8 +68,7 @@ const useTemplates = () => {
       'name': name,
       'values': templateValues,
     };
-    const templatesForKey = templateKey === MEASUREMENT_TEMPLATE_KEY ? templates[templateKey]
-      : templates[templateKey]?.templates;
+    const templatesForKey = getTemplateList(templates, templateKey);
     const existingTemplates = !isEmpty(templatesForKey) ? JSON.parse(JSON.stringify(templatesForKey)) : [];
     // Filtering covers both cases: an edit drops the copy being replaced, a new id matches nothing
     const updatedTemplates = [...existingTemplates.filter(t => t.id !== templateObject.id), templateObject]
@@ -76,9 +76,7 @@ const useTemplates = () => {
     dispatch(addedTemplates({key: templateKey, templates: updatedTemplates}));
 
     // Update active templates so updated template becomes active
-    const activeTemplatesForKey = templateKey === MEASUREMENT_TEMPLATE_KEY
-      ? templates.activeMeasurementTemplates || []
-      : templates[templateKey]?.active || [];
+    const activeTemplatesForKey = getActiveTemplateList(templates, templateKey) || [];
     const activeUpdated = activeTemplatesForKey.filter(t => t.id !== templateObject.id);
     dispatch(setActiveTemplates({key: templateKey, templates: [...activeUpdated, templateObject]}));
   };

@@ -19,6 +19,7 @@ import MainButtons from '../../form/MainButtons';
 import useForm from '../../form/useForm';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import {getActiveTemplateList, getIsTemplateInUse} from '../../templates/templates.helpers';
 import TemplatesNotebook from '../../templates/TemplatesNotebook';
 import usePetrology from '../usePetrology';
 
@@ -48,8 +49,9 @@ const AddMineralModal = () => {
 
   // Relevant fields for quick-entry modal
   const petKey = PAGE_KEYS.MINERALS;
-  const areMultipleTemplates = templates[petKey] && templates[petKey].isInUse && templates[petKey].active
-    && templates[petKey].active.length > 1;
+  // Active templates only count while the key's templates are switched on
+  const templatesInUse = getIsTemplateInUse(templates, petKey) ? getActiveTemplateList(templates, petKey) : undefined;
+  const areMultipleTemplates = templatesInUse?.length > 1;
   const formName = ['pet', petKey];
   const choices = getChoices(formName);
   const survey = getSurvey(formName);
@@ -60,10 +62,7 @@ const AddMineralModal = () => {
 
   useEffect(() => {
     console.log('UE AddMineralModal [templates]', templates);
-    if (templates[petKey] && templates[petKey].isInUse && templates[petKey].active
-      && templates[petKey].active[0] && templates[petKey].active[0].values) {
-      setInitialValues({...templates[petKey].active[0].values, id: getNewUUID()});
-    }
+    if (templatesInUse?.[0]?.values) setInitialValues({...templatesInUse[0].values, id: getNewUUID()});
     return () => dispatch(setModalValues({}));
   }, [templates]);
 
@@ -112,7 +111,7 @@ const AddMineralModal = () => {
   // over or closing the modal would then lose what was entered.
   const saveMineral = async () => {
     try {
-      if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templates[petKey].active);
+      if (areMultipleTemplates) savePetFeatureValuesFromTemplates(petKey, spot, templatesInUse);
       else await savePetFeature(petKey, spot, formRef.current);
       formRef.current?.setFieldValue('id', getNewUUID());
       if (SMALL_SCREEN) onCloseModalPressed();

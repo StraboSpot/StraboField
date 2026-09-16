@@ -15,7 +15,7 @@ import {
   MEASUREMENT_TYPES,
   PLANAR_COMPASS_FIELDS,
 } from './measurements.constants';
-import {equalsIgnoreOrder, getLinearTemplates, getPlanarTemplates} from './measurements.helpers';
+import {equalsIgnoreOrder} from './measurements.helpers';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
@@ -35,6 +35,13 @@ import useMapLocation from '../maps/view/useMapLocation';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
+import {MEASUREMENT_TEMPLATE_KEY} from '../templates/templates.constants';
+import {
+  getActiveTemplateList,
+  getIsTemplateInUse,
+  getLinearTemplates,
+  getPlanarTemplates,
+} from '../templates/templates.helpers';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 import {setUserData} from '../user/userProfile.slice';
 
@@ -115,12 +122,12 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
     prevValuesRef.current = {compassMeasurementTypes, templates};
     const typeObj = MEASUREMENT_TYPES.find(t => equalsIgnoreOrder(t.compass_toggles, compassMeasurementTypes));
     setSelectedTypeIndex(MEASUREMENT_TYPES.findIndex(t => t.key === typeObj.key));
-    // Get the templates for the measurement type
-    // (We're not using templates if there is already a selected attitude, like when adding an associated
-    // measurement to an existing attitude, so default to [] in that case)
-    const gotRelevantTemplates = !isSelectedAttitude && templates.measurementTemplates
-      && templates.useMeasurementTemplates && templates.activeMeasurementTemplates
-      && templates.activeMeasurementTemplates.filter(t => typeObj.form_keys.includes(t.values?.type || t.type)) || [];
+    // Get the templates for the measurement type. A selected attitude gets none, since it is already there -
+    // that is the case of adding an associated measurement to an existing attitude.
+    const activeMeasurementTemplates = !isSelectedAttitude && getIsTemplateInUse(templates, MEASUREMENT_TEMPLATE_KEY)
+      && getActiveTemplateList(templates, MEASUREMENT_TEMPLATE_KEY) || [];
+    const gotRelevantTemplates = activeMeasurementTemplates.filter(
+      t => typeObj.form_keys.includes(t.values?.type || t.type));
     setRelevantTemplates(gotRelevantTemplates);
     let initialValuesTemp = {
       id: getNewUUID(),

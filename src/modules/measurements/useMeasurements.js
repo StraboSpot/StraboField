@@ -1,5 +1,6 @@
 import {useDispatch, useSelector} from 'react-redux';
 
+import {MEASUREMENT_KEYS} from './measurements.constants';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
@@ -9,19 +10,22 @@ import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import useTags from '../tags/useTags';
+import {MEASUREMENT_TEMPLATE_KEY} from '../templates/templates.constants';
+import {getActiveTemplateList, getIsTemplateInUse} from '../templates/templates.helpers';
 
 const useMeasurements = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const activeMeasurementTemplates = useSelector(state => state.project.project?.templates?.activeMeasurementTemplates)
-    || [];
+  const activeMeasurementTemplates = useSelector(
+    state => getActiveTemplateList(state.project.project?.templates, MEASUREMENT_TEMPLATE_KEY)) || [];
   const compassMeasurements = useSelector(state => state.compass.measurements);
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
+  const isUsingMeasurementTemplates = useSelector(
+    state => getIsTemplateInUse(state.project.project?.templates, MEASUREMENT_TEMPLATE_KEY));
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel} = useForm();
-  const useMeasurementTemplates = useSelector(state => state.project.project?.templates?.useMeasurementTemplates);
   const {deleteFeatureTags} = useTags();
 
   /* Internal Functions */
@@ -58,18 +62,18 @@ const useMeasurements = () => {
   const createNewMeasurement = () => {
     let measurements = [];
     if (compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR)) {
-      let newPlanarMeasurement = {type: 'planar_orientation'};
-      if (useMeasurementTemplates && !isEmpty(activeMeasurementTemplates)) {
-        const planarTemplate = activeMeasurementTemplates.find(t => t.values?.type === 'planar_orientation'
-          || t.type === 'planar_orientation');
+      let newPlanarMeasurement = {type: MEASUREMENT_KEYS.PLANAR};
+      if (isUsingMeasurementTemplates && !isEmpty(activeMeasurementTemplates)) {
+        const planarTemplate = activeMeasurementTemplates.find(t => t.values?.type === MEASUREMENT_KEYS.PLANAR
+          || t.type === MEASUREMENT_KEYS.PLANAR);
         if (!isEmpty(planarTemplate)) Object.assign(newPlanarMeasurement, planarTemplate.values);
         else {
-          const tabularTemplate = activeMeasurementTemplates.find(t => t.values?.type === 'tabular_orientation'
-            || t.subType === 'tabular_orientation');
+          const tabularTemplate = activeMeasurementTemplates.find(t => t.values?.type === MEASUREMENT_KEYS.TABULAR
+            || t.subType === MEASUREMENT_KEYS.TABULAR);
           if (!isEmpty(tabularTemplate)) {
             Object.assign(newPlanarMeasurement, tabularTemplate.values);
             // Set after the template, since one matched on its subType can carry a different type of its own
-            newPlanarMeasurement.type = 'tabular_orientation';
+            newPlanarMeasurement.type = MEASUREMENT_KEYS.TABULAR;
           }
         }
       }
@@ -87,10 +91,10 @@ const useMeasurements = () => {
       measurements.push(newPlanarMeasurement);
     }
     if (compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR)) {
-      let newLinearMeasurement = {type: 'linear_orientation'};
-      if (useMeasurementTemplates && !isEmpty(activeMeasurementTemplates)) {
-        const linearTemplate = activeMeasurementTemplates.find(t => t.values?.type === 'linear_orientation'
-          || t.type === 'linear_orientation');
+      let newLinearMeasurement = {type: MEASUREMENT_KEYS.LINEAR};
+      if (isUsingMeasurementTemplates && !isEmpty(activeMeasurementTemplates)) {
+        const linearTemplate = activeMeasurementTemplates.find(t => t.values?.type === MEASUREMENT_KEYS.LINEAR
+          || t.type === MEASUREMENT_KEYS.LINEAR);
         if (!isEmpty(linearTemplate)) Object.assign(newLinearMeasurement, linearTemplate.values);
       }
       // The reading goes on last, for the same reason as the planar measurement above

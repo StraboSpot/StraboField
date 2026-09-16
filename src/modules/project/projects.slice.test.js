@@ -1,14 +1,19 @@
 import projectReducer, {
   addedProjectFromServer,
+  addedTemplates,
   deletedSpotIdFromDataset,
   deletedSpotIdFromDatasets,
   deletedSpotIdFromReports,
   deletedSpotIdFromTags,
+  deletedTemplate,
   migrateReportTimestamps,
   movedSpotIdBetweenDatasets,
+  setActiveTemplates,
+  setUseTemplate,
   updatedModifiedTimestampsBySpotsIds,
   updatedProjectPreference,
 } from './projects.slice';
+import {MEASUREMENT_TEMPLATE_KEY} from '../templates/templates.constants';
 
 // Spot ids are stored as numbers, but a Spot deleted by a caller holding a string id has to come out just the same
 const spotId = 1756000000001;
@@ -274,5 +279,91 @@ describe('migrateReportTimestamps on malformed data', () => {
 
   it('takes an empty list', () => {
     expect(migrateReportTimestamps([])).toEqual([]);
+  });
+});
+
+// Measurement templates are stored as three flat keys while every other kind is stored as one bucket, so the
+// reducers write through templates.helpers rather than indexing `templates` themselves. These pin the shape
+// that reaches the server: a project is shared with collaborators who may be on an older build, so a reducer
+// quietly writing the other shape would look fine here and only show up as missing templates over there.
+describe('template reducers', () => {
+  const planar = {id: 'a', name: 'Bedding', values: {type: 'planar_orientation'}};
+  const linear = {id: 'b', name: 'Lineation', values: {type: 'linear_orientation'}};
+  const note = {id: 'c', name: 'Daily', values: {note: 'Sunny'}};
+
+  const getState = (templates = {}) => ({project: {modified_timestamp: 1, templates: templates}});
+
+  const applyActions = (state, actions) => actions.reduce((acc, action) => projectReducer(acc, action), state);
+
+  describe('a measurement key, stored as flat siblings', () => {
+    it('writes the list, the active list and the in-use flag to their own keys', () => {
+      const {project} = applyActions(getState(), [
+        addedTemplates({key: MEASUREMENT_TEMPLATE_KEY, templates: [planar, linear]}),
+        setActiveTemplates({key: MEASUREMENT_TEMPLATE_KEY, templates: [planar]}),
+        setUseTemplate({key: MEASUREMENT_TEMPLATE_KEY, bool: true}),
+      ]);
+      expect(project.templates).toEqual({
+        measurementTemplates: [planar, linear],
+        activeMeasurementTemplates: [planar],
+        useMeasurementTemplates: true,
+      });
+    });
+
+    // Emptying these rather than deleting them is the one deliberate change of the accessor pass: the flat
+    // measurement keys used to be deleted here while every other key kept an empty active list and a false
+    // flag. No reader can tell the two apart - all of them default an absent value - so they now match.
+    it('drops a deleted template from both lists and switches templates off with the last active one', () => {
+      const state = getState({
+        measurementTemplates: [planar, linear],
+        activeMeasurementTemplates: [planar],
+        useMeasurementTemplates: true,
+      });
+      const {project} = projectReducer(state, deletedTemplate({key: MEASUREMENT_TEMPLATE_KEY, template: planar}));
+      expect(project.templates).toEqual({
+        measurementTemplates: [linear],
+        activeMeasurementTemplates: [],
+        useMeasurementTemplates: false,
+      });
+    });
+
+    it('takes the active list and the in-use flag with the last template', () => {
+      const state = getState({
+        measurementTemplates: [planar],
+        activeMeasurementTemplates: [planar],
+        useMeasurementTemplates: true,
+      });
+      const {project} = projectReducer(state, deletedTemplate({key: MEASUREMENT_TEMPLATE_KEY, template: planar}));
+      expect(project.templates).toEqual({});
+    });
+  });
+
+  describe('every other key, stored as one bucket', () => {
+    it('writes the list, the active list and the in-use flag into a bucket it creates', () => {
+      const {project} = applyActions(getState(), [
+        addedTemplates({key: 'notes', templates: [note]}),
+        setActiveTemplates({key: 'notes', templates: [note]}),
+        setUseTemplate({key: 'notes', bool: true}),
+      ]);
+      expect(project.templates).toEqual({notes: {templates: [note], active: [note], isInUse: true}});
+    });
+
+    it('leaves the other keys alone', () => {
+      const state = getState({measurementTemplates: [planar]});
+      const {project} = projectReducer(state, addedTemplates({key: 'notes', templates: [note]}));
+      expect(project.templates).toEqual({measurementTemplates: [planar], notes: {templates: [note]}});
+    });
+
+    it('takes the whole bucket with the last template', () => {
+      const state = getState({notes: {templates: [note], active: [note], isInUse: true}});
+      const {project} = projectReducer(state, deletedTemplate({key: 'notes', template: note}));
+      expect(project.templates).toEqual({});
+    });
+  });
+
+  // deletedTemplate was the one template reducer that did not do this, so a deletion could sit unsynced
+  it('marks the project as modified on a delete, like the other template reducers do', () => {
+    const state = getState({notes: {templates: [note], active: [note], isInUse: true}});
+    const {project} = projectReducer(state, deletedTemplate({key: 'notes', template: note}));
+    expect(project.modified_timestamp).toBeGreaterThan(1);
   });
 });

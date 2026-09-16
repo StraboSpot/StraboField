@@ -5,7 +5,13 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
-import {getLinearTemplates, getPlanarTemplates} from './templates.helpers';
+import {
+  getActiveTemplateList,
+  getIsTemplateInUse,
+  getLinearTemplates,
+  getPlanarTemplates,
+  getTemplateList,
+} from './templates.helpers';
 import useTemplates from './useTemplates';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
@@ -21,6 +27,7 @@ import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import formStyles from '../form/form.styles';
 import MeasurementDetail from '../measurements/MeasurementDetail';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
+import {isPlanarType} from '../measurements/measurements.helpers';
 import NoteForm from '../notes/NoteForm';
 import BasicPageDetail from '../page/BasicPageDetail';
 import {MODALS, PET_PAGES, SED_PAGES} from '../page/page.constants';
@@ -72,28 +79,19 @@ const TemplatesNotebook = ({
 
   useEffect(() => {
     console.log('UE TemplatesNotebook [templates, templateKey, typeKey]', templates, templateKey, typeKey);
-    if (templateKey === MEASUREMENT_TEMPLATE_KEY) {
-      setIsTemplateInUse(templates.useMeasurementTemplates || false);
-      let activeTemplatesTemp = templates.activeMeasurementTemplates || [];
-      let templatesForKeyTemp = templates.measurementTemplates || [];
-      setTemplatesForKey(templatesForKeyTemp);
-      setActiveTemplatesForKey(activeTemplatesTemp);
-    }
-    else {
-      setIsTemplateInUse(templates[templateKey] && templates[templateKey].isInUse);
-      setTemplatesForKey((templates[templateKey] && templates[templateKey].templates) || []);
-      setActiveTemplatesForKey((templates[templateKey] && templates[templateKey].active) || []);
-    }
+    setIsTemplateInUse(getIsTemplateInUse(templates, templateKey) || false);
+    setTemplatesForKey(getTemplateList(templates, templateKey) || []);
+    setActiveTemplatesForKey(getActiveTemplateList(templates, templateKey) || []);
   }, [templates, templateKey, typeKey]);
 
   /* Logic Helpers */
 
   const clearTemplate = () => {
-    if (templateType === 'planar_orientation') {
+    if (templateType === MEASUREMENT_KEYS.PLANAR) {
       const activeLinearTemplates = getLinearTemplates(activeTemplatesForKey);
       dispatch(setActiveTemplates({key: templateKey, templates: activeLinearTemplates}));
     }
-    else if (templateType === 'linear_orientation') {
+    else if (templateType === MEASUREMENT_KEYS.LINEAR) {
       const activePlanarTabularTemplates = getPlanarTemplates(activeTemplatesForKey);
       dispatch(setActiveTemplates({key: templateKey, templates: activePlanarTabularTemplates}));
     }
@@ -302,11 +300,11 @@ const TemplatesNotebook = ({
   const renderTemplateSelection = (type) => {
     let activeTemplates = activeTemplatesForKey;
     let label = page.label_singular || toTitleCase(page.label).slice(0, -1) || 'Unknown';
-    if (type === 'planar_orientation' || type === 'tabular_orientation') {
+    if (isPlanarType(type)) {
       activeTemplates = getPlanarTemplates(activeTemplatesForKey);
       label = 'Planar';
     }
-    else if (type === 'linear_orientation') {
+    else if (type === MEASUREMENT_KEYS.LINEAR) {
       activeTemplates = getLinearTemplates(activeTemplatesForKey);
       label = 'Linear';
     }
@@ -359,11 +357,11 @@ const TemplatesNotebook = ({
       : page.label_singular || toTitleCase(page.label).slice(0, -1) || 'Unknown';
 
     let relevantTemplates = templatesForKey;
-    if (templateType === 'planar_orientation') {
+    if (templateType === MEASUREMENT_KEYS.PLANAR) {
       relevantTemplates = getPlanarTemplates(relevantTemplates);
       label = 'Planar';
     }
-    else if (templateType === 'linear_orientation') {
+    else if (templateType === MEASUREMENT_KEYS.LINEAR) {
       relevantTemplates = getLinearTemplates(relevantTemplates);
       label = 'Linear';
     }
@@ -390,8 +388,8 @@ const TemplatesNotebook = ({
       if (!typeKey || (typeKey && typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR)) {
         return (
           <>
-            {renderTemplateSelection('planar_orientation')}
-            {renderTemplateSelection('linear_orientation')}
+            {renderTemplateSelection(MEASUREMENT_KEYS.PLANAR)}
+            {renderTemplateSelection(MEASUREMENT_KEYS.LINEAR)}
           </>
         );
       }

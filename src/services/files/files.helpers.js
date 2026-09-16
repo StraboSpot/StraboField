@@ -1,4 +1,5 @@
 import {PAGE_KEYS} from '../../modules/page/pageKeys.constants';
+import {getTemplateKeys, getTemplateList, setTemplateList} from '../../modules/templates/templates.helpers';
 
 export const getImageIds = (images) => {
   const imageIds = [];
@@ -18,13 +19,11 @@ export const getTagsToBackup = (tags, isGeologicUnits) => {
 };
 
 // Keeps only the template lists themselves — which templates are active is a per-project preference, not a template.
+// Built through setTemplateList so a backup file keeps the shape of the templates it came from.
 export const getTemplatesToBackup = (templates) => {
-  return Object.entries(templates || {}).reduce((acc, [key, value]) => {
-    if (key === 'activeMeasurementTemplates' || key === 'useMeasurementTemplates') return acc;
-    if (key === 'measurementTemplates') return {...acc, measurementTemplates: value};
-    if (value && typeof value === 'object' && Array.isArray(value.templates)) {
-      return {...acc, [key]: {templates: value.templates}};
-    }
+  return getTemplateKeys(templates).reduce((acc, key) => {
+    const templatesForKey = getTemplateList(templates, key);
+    if (Array.isArray(templatesForKey)) setTemplateList(acc, key, templatesForKey);
     return acc;
   }, {});
 };

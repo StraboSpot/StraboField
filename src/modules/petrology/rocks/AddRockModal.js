@@ -11,7 +11,12 @@ import AddRockMetamorphicModal from './AddRockMetamorphicModal';
 import AddRockSedimentaryModal from './AddRockSedimentaryModal';
 import {IGNEOUS_ROCK_CLASSES} from './rocks.constants';
 import {getNewUUID, isEmpty, toTitleCase} from '../../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../../shared/styles.constants';
+import {
+  PRIMARY_ACCENT_COLOR,
+  PRIMARY_TEXT_COLOR,
+  SMALL_SCREEN,
+  SMALL_TEXT_SIZE,
+} from '../../../shared/styles.constants';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import Form from '../../form/Form';
 import FormikWrapper from '../../form/FormikWrapper';
@@ -19,6 +24,7 @@ import useForm from '../../form/useForm';
 import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import useSed from '../../sed/useSed';
+import {getActiveTemplateList, getIsTemplateInUse} from '../../templates/templates.helpers';
 import TemplatesNotebook from '../../templates/TemplatesNotebook';
 import usePetrology from '../usePetrology';
 
@@ -48,8 +54,9 @@ const AddRockModal = ({modalKey}) => {
 
   /* Derived Variables */
 
-  const areMultipleTemplates = templates[rockKey] && templates[rockKey].isInUse && templates[rockKey].active
-    && templates[rockKey].active.length > 1;
+  // Active templates only count while the key's templates are switched on
+  const templatesInUse = getIsTemplateInUse(templates, rockKey) ? getActiveTemplateList(templates, rockKey) : undefined;
+  const areMultipleTemplates = templatesInUse?.length > 1;
   const groupKey = modalKey === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? 'sed' : 'pet';
   const pageKey = modalKey === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : modalKey;
 
@@ -64,11 +71,9 @@ const AddRockModal = ({modalKey}) => {
       setSelectedTypeIndex(Object.values(IGNEOUS_ROCK_CLASSES).indexOf(rockKeyUpdated));
     }
     setRockKey(rockKeyUpdated);
-    if (templates[rockKeyUpdated] && templates[rockKeyUpdated].isInUse
-      && templates[rockKeyUpdated].active && templates[rockKeyUpdated].active[0]
-      && templates[rockKeyUpdated].active[0].values) {
-      setInitialValues({...templates[rockKeyUpdated].active[0].values, id: getNewUUID()});
-    }
+    const updatedTemplatesInUse = getIsTemplateInUse(templates, rockKeyUpdated)
+      ? getActiveTemplateList(templates, rockKeyUpdated) : undefined;
+    if (updatedTemplatesInUse?.[0]?.values) setInitialValues({...updatedTemplatesInUse[0].values, id: getNewUUID()});
     else {
       const initialValuesTemp = !isEmpty(modalValues) ? modalValues
         : pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? {id: getNewUUID(), igneous_rock_class: rockKeyUpdated}
@@ -115,8 +120,8 @@ const AddRockModal = ({modalKey}) => {
   const saveRock = async () => {
     try {
       if (areMultipleTemplates) {
-        if (groupKey === 'pet') savePetFeatureValuesFromTemplates(pageKey, spot, templates[rockKey].active);
-        else if (groupKey === 'sed') saveSedFeatureValuesFromTemplates(pageKey, spot, templates[rockKey].active);
+        if (groupKey === 'pet') savePetFeatureValuesFromTemplates(pageKey, spot, templatesInUse);
+        else if (groupKey === 'sed') saveSedFeatureValuesFromTemplates(pageKey, spot, templatesInUse);
       }
       else {
         if (groupKey === 'pet') await savePetFeature(pageKey, spot, formRef.current);
