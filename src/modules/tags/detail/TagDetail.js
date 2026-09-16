@@ -37,43 +37,45 @@ const TagDetail = ({
   const {getSpotById, getSpotWithThisSample, isSpotReadOnly} = useSpots();
   const {getAllTaggedFeatures, getFeatureDisplayComponent, getReportsWithThisTag} = useTags();
 
-  /* Render Functions */
+  /* Derived Variables */
 
-  const renderSamples = () => {
-    const sampleSpots = selectedTag.spots?.reduce((acc, spotId) => {
-      const spot = spots[spotId];
-      if (spot?.properties?.isSample) {
-        const parentSpot = getSpotWithThisSample(spotId);
-        if (!parentSpot) {
-          console.error('Couldn\'t find parent Spot. Was this Sample deleted?', spot);
-          // dispatch(deletedSpotIdFromTags(spotId));  // Uncomment this to clean up Samples
-          return acc;
-        }
-        const parentSpotId = parentSpot?.properties?.id;
-        return acc[parentSpotId] ? {...acc, [parentSpotId]: [...acc[parentSpotId], spot]}
-          : {...acc, [parentSpotId]: [spot]};
-      }
-      else if (!isEmpty(spot?.properties?.samples)) {
-        return {...acc, [spot.properties.id]: spot.properties.samples};
-      }
-      else return acc;
-    }, {});
+  const isGeologicUnit = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS;
+  const spotsLabel = isGeologicUnit ? 'Spots With\nGeologic Unit' : 'Tagged Spots';
+  const samplesLabel = isGeologicUnit ? 'Samples W/Geologic Unit' : 'Tagged Samples';
 
-    let dataSectioned = [];
-    if (!isEmpty(sampleSpots)) {
-      dataSectioned = Object.keys(sampleSpots).map((parentId) => {
-        const parentSpot = spots[parentId];
-        return {title: parentSpot.properties.name, data: sampleSpots[parentId], spot: parentSpot};
-      });
+  // Gathered here rather than inside the lists, so each heading can count exactly what its section goes on to show
+  const taggedSpotsIds = selectedTag.spots?.filter(
+    spotId => spots[spotId] && !spots[spotId].properties.isSample) || [];
+  const taggedFeatures = getAllTaggedFeatures(selectedTag);
+  const taggedReports = getReportsWithThisTag(selectedTag);
+
+  // The tagged samples, grouped under the Spot each was taken at, which is how the section list wants them. Only
+  // a sample that has become a Spot of its own can carry a tag: one still held inside its Spot is tagged only in
+  // the sense that the Spot is, and is listed under Tagged Spots instead
+  const sampleSpots = selectedTag.spots?.reduce((acc, spotId) => {
+    const spot = spots[spotId];
+    if (!spot?.properties?.isSample) return acc;
+    const parentSpot = getSpotWithThisSample(spotId);
+    if (!parentSpot) {
+      console.error('Couldn\'t find parent Spot. Was this Sample deleted?', spot);
+      // dispatch(deletedSpotIdFromTags(spotId));  // Uncomment this to clean up Samples
+      return acc;
     }
-    return (
-      <SamplesSectionList
-        dataSectioned={dataSectioned}
-        listEmptyText={'No Samples'}
-        openSpotInNotebook={openSpotInNotebook}
-      />
-    );
-  };
+    const parentSpotId = parentSpot.properties.id;
+    return {...acc, [parentSpotId]: [...(acc[parentSpotId] || []), spot]};
+  }, {});
+  const sampleSections = isEmpty(sampleSpots) ? []
+    : Object.keys(sampleSpots).map(parentId => (
+      {title: spots[parentId].properties.name, data: sampleSpots[parentId], spot: spots[parentId]}
+    ));
+  const taggedSamplesCount = sampleSections.reduce((acc, section) => acc + section.data.length, 0);
+
+  /* Logic Helpers */
+
+  // A section holding nothing says so in the row beneath, leaving a (0) beside its heading nothing to add
+  const getDividerText = (label, count) => count > 0 ? `${label} (${count})` : label;
+
+  /* Render Functions */
 
   const renderSpotFeatureItem = ({item: feature}) => {
     const spot = getSpotById(feature.parentSpotId);
@@ -117,7 +119,7 @@ const TagDetail = ({
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No Features'}/>}
-        data={getAllTaggedFeatures(selectedTag)}
+        data={taggedFeatures}
         extraData={selectedTag}
         keyExtractor={item => 'Feature' + item.id.toString()}
         listKey={'features'}
@@ -131,7 +133,7 @@ const TagDetail = ({
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No Memos'}/>}
-        data={getReportsWithThisTag(selectedTag)}
+        data={taggedReports}
         extraData={selectedTag}
         keyExtractor={report => 'Memo' + report.id}
         listKey={'memos'}
@@ -148,7 +150,7 @@ const TagDetail = ({
         <>
           <SectionDividerWithRightButton
             buttonTitle={'View/Edit'}
-            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Unit Info' : 'Tag Info'}
+            dividerText={isGeologicUnit ? 'Geologic Unit Info' : 'Tag Info'}
             onPress={openDetailModal}
           />
           {selectedTag && <TagDetailSummaryText onPress={openDetailModal}/>}
@@ -156,13 +158,13 @@ const TagDetail = ({
           {/* Spots with this Tag */}
           <SectionDividerWithRightButton
             buttonTitle={'Add/Remove'}
-            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Spots With\nGeologic Unit' : 'Tagged Spots'}
+            dividerText={getDividerText(spotsLabel, taggedSpotsIds.length)}
             onPress={addRemoveSpots}
           />
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
             ListEmptyComponent={<ListEmptyText text={'No Spots'}/>}
-            data={selectedTag.spots?.filter(spotId => spots[spotId] && !spots[spotId].properties.isSample)}
+            data={taggedSpotsIds}
             keyExtractor={item => 'Spot' + item.toString()}
             listKey={'spots'}
             renderItem={renderSpotItem}
@@ -171,25 +173,29 @@ const TagDetail = ({
           {/* Samples with this Tag */}
           <SectionDividerWithRightButton
             buttonTitle={'Add/Remove'}
-            dividerText={selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? 'Samples W/Geologic Unit' : 'Tagged Samples'}
+            dividerText={getDividerText(samplesLabel, taggedSamplesCount)}
             onPress={addRemoveSampleSpots}
           />
-          {renderSamples()}
+          <SamplesSectionList
+            dataSectioned={sampleSections}
+            listEmptyText={'No Samples'}
+            openSpotInNotebook={openSpotInNotebook}
+          />
 
           {/* Features and Memos with this Tag. Neither applies to a geologic unit: one is never attached to a
               single feature, and the memo tag picker leaves geologic units out */}
-          {selectedTag.type !== PAGE_KEYS.GEOLOGIC_UNITS && (
+          {!isGeologicUnit && (
             <>
               <SectionDividerWithRightButton
                 buttonTitle={'Add/Remove'}
-                dividerText={'Tagged Features'}
+                dividerText={getDividerText('Tagged Features', taggedFeatures.length)}
                 onPress={addRemoveFeatures}
               />
               {renderTaggedFeaturesList()}
 
               <SectionDividerWithRightButton
                 buttonTitle={'Add/Remove'}
-                dividerText={'Tagged Memos'}
+                dividerText={getDividerText('Tagged Memos', taggedReports.length)}
                 onPress={addRemoveReports}
               />
               {renderTaggedMemosList()}

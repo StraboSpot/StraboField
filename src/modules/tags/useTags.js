@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Text} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -31,11 +31,18 @@ const useTags = () => {
   const reports = useSelector(state => state.project.project?.reports) || [];
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
-  const spots = useSelector(state => state.spot.spots);
+  const spots = useSelector(state => state.spot.spots) || {};
   const straboUserId = useSelector(state => state.user?.straboUserId);
   const tags = useSelector(state => state.project.project?.tags) || [];
 
   const {getLabel} = useForm();
+
+  /* Derived Variables */
+
+  // The sample ids some Spot still holds, gathered once: searching per sample would walk every Spot again for
+  // every tag on screen
+  const heldSamplesIds = useMemo(() => new Set(Object.values(spots).flatMap(
+    spot => spot.properties?.isSample ? [] : (spot.properties?.samples || []).map(sample => sample.id))), [spots]);
 
   /* Internal Functions */
 
@@ -215,15 +222,11 @@ const useTags = () => {
     return tagsAtSpot.filter(tag => tag.type !== TAG_TYPES.GEOLOGIC_UNIT);
   };
 
-  const getSamplesWithThisTag = (tag) => {
-    return isEmpty(tag.spots) ? []
-      : tag.spots.filter((spotId) => {
-        const spot = spots[spotId];
-        if (!spot) return false;
-        if (spot.properties?.isSample) return true;
-        return spot.properties?.samples?.some(s => !spots[s.id]);
-      });
-  };
+  // Only a sample that has become a Spot of its own can carry a tag: one still held inside its Spot is tagged
+  // only in the sense that the Spot is, and belongs to that Spot's count. Nor does a sample no Spot holds count,
+  // there being no way left to reach it
+  const getSamplesWithThisTag = tag => (tag.spots || []).filter(
+    spotId => spots[spotId]?.properties?.isSample && heldSamplesIds.has(spotId));
 
   // Filtered the way the Memos list is, so a memo its author keeps to themselves is neither listed nor counted
   const getReportsWithThisTag = tag => getReportsToList(getReportsWithTag(reports, tag.id), straboUserId);

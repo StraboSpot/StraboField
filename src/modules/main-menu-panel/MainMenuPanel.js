@@ -224,7 +224,7 @@ const MainMenuPanel = forwardRef(({
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_REPORTS:
         return <AddRemoveTagReports/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SAMPLE_SPOTS:
-        return <AddRemoveTagSampleSpots/>;
+        return <AddRemoveTagSampleSpots openSpotInNotebook={openSpotInNotebook}/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS:
         return <AddRemoveTagSpots/>;
       case SIDE_PANEL_VIEWS.TAG_DETAIL:
