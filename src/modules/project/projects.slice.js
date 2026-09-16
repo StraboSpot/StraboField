@@ -229,6 +229,7 @@ const projectSlice = createSlice({
           }
         }
       }
+      state.project.modified_timestamp = Date.now();
     },
     doesBackupDirectoryExist(state, action) {
       state.deviceBackUpDirectoryExists = action.payload;
