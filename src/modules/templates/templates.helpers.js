@@ -19,6 +19,31 @@ const MEASUREMENT_FIELD_NAMES = {
 const getTemplateField = (templates, key, field) => key === MEASUREMENT_TEMPLATE_KEY
   ? templates?.[MEASUREMENT_FIELD_NAMES[field]] : templates?.[key]?.[field];
 
+// Folds one key's imported templates into the ones already there. A template matched by id keeps every value
+// it already has and gains the ones it was missing, so an import can fill a template in but never overwrite it.
+const mergeTemplateList = (existing, imported) => {
+  const merged = [...existing];
+  let newCount = 0;
+  let mergedCount = 0;
+  for (const importedTemplate of imported) {
+    const existingIndex = merged.findIndex(t => t.id === importedTemplate.id);
+    if (existingIndex >= 0) {
+      const matchedTemplate = merged[existingIndex];
+      const mergedValues = {...importedTemplate.values};
+      for (const [valueKey, value] of Object.entries(matchedTemplate.values || {})) {
+        if (value !== undefined && value !== null) mergedValues[valueKey] = value;
+      }
+      merged[existingIndex] = {...importedTemplate, ...matchedTemplate, values: mergedValues};
+      mergedCount++;
+    }
+    else {
+      merged.push(importedTemplate);
+      newCount++;
+    }
+  }
+  return {merged, newCount, mergedCount};
+};
+
 // Writes into the caller's own `templates` - a Redux draft, a shallow copy being merged into, a backup being
 // built up - so it writes in place, replacing a bucket rather than mutating one a shallow copy still shares.
 const setTemplateField = (templates, key, field, value) => {
@@ -40,8 +65,6 @@ export const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
   t => t.values?.type === MEASUREMENT_KEYS.LINEAR || t.type === MEASUREMENT_KEYS.LINEAR);
 
 export const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
-  t => t.values?.type === 'planar_orientation' || t.values?.type === 'tabular_orientation'
-    || t.type === 'planar_orientation');
   t => isPlanarType(t.values?.type) || t.type === MEASUREMENT_KEYS.PLANAR);
 
 // The keys of `templates` that name a template bucket - Object.keys would also hand back the two measurement
@@ -50,6 +73,31 @@ export const getTemplateKeys = templates => Object.keys(templates || {}).filter(
   key => key !== MEASUREMENT_FIELD_NAMES.active && key !== MEASUREMENT_FIELD_NAMES.isInUse);
 
 export const getTemplateList = (templates, key) => getTemplateField(templates, key, 'templates');
+
+// Merges a whole imported `templates` object into the project's own, counting what was added and what was
+// filled in. Hands back a new object, leaving `existing` as it found it - that is still the live state.
+export const mergeTemplates = (existing, imported) => {
+  const mergedTemplates = {...existing};
+  let newCount = 0;
+  let mergedCount = 0;
+  for (const key of getTemplateKeys(imported)) {
+    const importedForKey = getTemplateList(imported, key);
+    if (!Array.isArray(importedForKey)) continue;
+    const {merged, newCount: newForKey, mergedCount: mergedForKey}
+      = mergeTemplateList(getTemplateList(existing, key) || [], importedForKey);
+    setTemplateList(mergedTemplates, key, merged);
+    // An active template is a full copy of the template, not a reference, so the copy has to be refreshed
+    // too - otherwise a template that gained values here keeps prefilling forms with the ones it had before.
+    const activeForKey = getActiveTemplateList(existing, key);
+    if (!isEmpty(activeForKey)) {
+      setActiveTemplateList(mergedTemplates, key,
+        activeForKey.map(active => merged.find(t => t.id === active.id) || active));
+    }
+    newCount += newForKey;
+    mergedCount += mergedForKey;
+  }
+  return {mergedTemplates, newCount, mergedCount};
+};
 
 export const setActiveTemplateList = (templates, key, value) => setTemplateField(templates, key, 'active', value);
 
