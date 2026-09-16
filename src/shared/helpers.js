@@ -111,6 +111,16 @@ export const csvToArray = (strData, strDelimiter) => {
   return (arrData);
 };
 
+// Deep copy an object, minting a new UUID for every nested object that carries an id.
+export const deepCopyWithNewIds = (value) => {
+  if (Array.isArray(value)) return value.map(item => deepCopyWithNewIds(item));
+  if (value === null || typeof value !== 'object') return value;
+  let copy = {};
+  for (const prop in value) copy[prop] = deepCopyWithNewIds(value[prop]);
+  if (copy.id) copy.id = getNewUUID();
+  return copy;
+};
+
 export const deepFindFeatureById = (obj, id) => {
   //Early return
   if (isEmpty(obj)) return null;

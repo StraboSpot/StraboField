@@ -26,7 +26,7 @@ import {
   restoredSpots,
   setSelectedSpot,
 } from './spots.slice';
-import {getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
+import {deepCopyWithNewIds, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import {clearedStratSection, setCurrentImageBasemap, setStratSection} from '../maps/maps.slice';
@@ -264,6 +264,11 @@ const useSpots = () => {
       const {strat_section, ...restSed} = copiedSpot.properties.sed;
       copiedSpot.properties = {...copiedSpot.properties, sed: restSed};
     }
+    // A deep copy, both to unshare the nested values the rest element above left pointing at the source Spot and to
+    // mint the copy's own feature ids. Sharing them does no harm today - a feature id is only ever looked up within
+    // one Spot, as tag.features[spotId] and deepFindFeatureTypeById(spot.properties, ...) do - but it leaves every
+    // future cross-Spot view of features having to carry a Spot alongside the id to tell two features apart.
+    copiedSpot.properties = deepCopyWithNewIds(copiedSpot.properties);
     const newSpot = await createSpot(copiedSpot);
     dispatch(setSelectedSpot(newSpot));
     console.log('Spot Copied. New Spot', newSpot);
