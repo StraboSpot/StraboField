@@ -1,0 +1,8 @@
+StraboField 2.31.2
+
+• Compass: Works without GPS; Hold-aware readings; Clearer calibration; Smoother, more accurate compass
+• Samples & IGSN: Steadier SESAR; IGSN required fields; Sample dates; Richer Samples; Add Sample screen; IGSN registration; Keep IGSNs in sync
+• Small touches: Custom map details scroll properly on smaller screens; Battery status; Conventions remembered; Checkbox selection
+• Maps: Import progress
+
+Full notes: https://github.com/StraboSpot/StraboField/releases/tag/v2.31.2

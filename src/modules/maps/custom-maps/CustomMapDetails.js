@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {FlatList, Platform, Text, TextInput, View} from 'react-native';
+import {Platform, ScrollView, Text, TextInput, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -238,12 +238,13 @@ const CustomMapDetails = () => {
         subtitle={'If you wish to save a new MapWarper map please download the .tiff file from Mapwarper.net and'
           + ' upload it into your Strabo MyMaps account.'}
       />
-      <FlatList
-        ItemSeparatorComponent={FlatListItemSeparator}
-        data={CUSTOM_MAP_TYPES}
-        keyExtractor={item => item.source}
-        renderItem={({item}) => renderCustomMapName(item, formProps)}
-      />
+      {/* Rendered with map rather than a FlatList so it can live inside the ScrollView without nesting a VirtualizedList */}
+      {CUSTOM_MAP_TYPES.map((item, index) => (
+        <React.Fragment key={item.source}>
+          {index > 0 && <FlatListItemSeparator/>}
+          {renderCustomMapName(item, formProps)}
+        </React.Fragment>
+      ))}
       {/* A list has no field label to carry an asterisk, so the message is all it has to say it is needed */}
       {!!formProps.errors.source && (
         <Text style={[formStyles.fieldError, customMapStyles.mapTypeErrorMessage]}>{formProps.errors.source}</Text>
@@ -329,10 +330,16 @@ const CustomMapDetails = () => {
         <>
           <View style={{flex: 1}}>
             {renderSidePanelHeader(formProps)}
-            {renderTitle()}
-            {renderOverlaySection(formProps)}
-            {isEmpty(customMapToEdit) && renderMapTypeList(formProps)}
-            {!isEmpty(formProps.values.source) && renderMapDetails(formProps)}
+            <ScrollView
+              contentContainerStyle={{flexGrow: 1}}
+              keyboardShouldPersistTaps={'handled'}
+              style={{flex: 1}}
+            >
+              {renderTitle()}
+              {renderOverlaySection(formProps)}
+              {isEmpty(customMapToEdit) && renderMapTypeList(formProps)}
+              {!isEmpty(formProps.values.source) && renderMapDetails(formProps)}
+            </ScrollView>
             <View style={customMapStyles.bottomButtonsContainer}>
               <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
                 <View>
