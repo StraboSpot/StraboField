@@ -176,23 +176,23 @@ const TagDetail = ({
           />
           {renderSamples()}
 
-          {/* Memos and Features with this Tag. Neither applies to a geologic unit: the memo tag picker leaves
-              geologic units out, and one is never attached to a single feature */}
+          {/* Features and Memos with this Tag. Neither applies to a geologic unit: one is never attached to a
+              single feature, and the memo tag picker leaves geologic units out */}
           {selectedTag.type !== PAGE_KEYS.GEOLOGIC_UNITS && (
             <>
-              <SectionDividerWithRightButton
-                buttonTitle={'Add/Remove'}
-                dividerText={'Tagged Memos'}
-                onPress={addRemoveReports}
-              />
-              {renderTaggedMemosList()}
-
               <SectionDividerWithRightButton
                 buttonTitle={'Add/Remove'}
                 dividerText={'Tagged Features'}
                 onPress={addRemoveFeatures}
               />
               {renderTaggedFeaturesList()}
+
+              <SectionDividerWithRightButton
+                buttonTitle={'Add/Remove'}
+                dividerText={'Tagged Memos'}
+                onPress={addRemoveReports}
+              />
+              {renderTaggedMemosList()}
             </>
           )}
         </>
