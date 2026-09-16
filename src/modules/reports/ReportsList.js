@@ -3,6 +3,7 @@ import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getReportsToList} from './reports.helpers';
 import ReportsListItem from './ReportsListItem';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
@@ -20,12 +21,7 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
 
   /* Derived Variables */
 
-  // A memo marked only_me is its author's alone. One saved before authorship was recorded names no author,
-  // so there is nobody to keep it from and it stays listed
-  const reportsToList = (reportsSubset ?? reports).filter(
-    r => r.report_privacy !== 'only_me' || !r.straboUserId || r.straboUserId === straboUserId);
-  const reportsToListSorted = [...reportsToList].sort(
-    (a, b) => new Date(b.modified_timestamp) - new Date(a.modified_timestamp));
+  const reportsToListSorted = getReportsToList(reportsSubset ?? reports, straboUserId);
 
   /* Event Handlers */
 

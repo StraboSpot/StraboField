@@ -3,6 +3,7 @@ import {Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getReportsAtSpot} from './reports.helpers';
 import ReportsList from './ReportsList';
 import commonStyles from '../../shared/common.styles';
 import AddButton from '../../shared/ui/buttons/AddButton';
@@ -21,10 +22,7 @@ const ReportsPage = ({page}) => {
 
   /* Derived Variables */
 
-  const reportsUsingThisSpot = reports.reduce((acc, report) => {
-    const doesThisReportUseThisSpot = report?.spots?.find(id => id === spot.properties.id);
-    return doesThisReportUseThisSpot ? [...acc, report] : acc;
-  }, []);
+  const reportsUsingThisSpot = getReportsAtSpot(reports, spot.properties.id);
 
   /* Logic Helpers */
 
