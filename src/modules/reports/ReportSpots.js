@@ -13,12 +13,19 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import imageStyles from '../images/image.styles';
+import Samples from '../samples/Samples';
 import SpotsList from '../spots/SpotsList';
 import SpotsListItem from '../spots/SpotsListItem';
 
 // The Spots a memo references, or with isSamples the samples among them. A sample is a Spot carrying isSample, so
-// the memo keeps one list of ids and the two sections divide it, each showing and picking only its own kind.
-const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isReadOnly, isSamples}) => {
+// the memo keeps one list of ids and the two sections divide it, each showing only its own kind.
+const ReportSpots = ({
+                       checkedSpotsIds,
+                       handleChecked,
+                       handleSpotPressed,
+                       isReadOnly,
+                       isSamples,
+                     }) => {
   /* Data Hooks */
 
   const spots = useSelector(state => state.spot.spots);
@@ -42,6 +49,22 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isR
   /* Logic Helpers */
 
   const addAssociatedSpots = () => setIsSpotsListModalVisible(true);
+
+  /* Render Functions */
+
+  // Samples come from the Samples list, which groups them under the Spot each was taken at and includes the ones
+  // still held inside it. Those cannot go on a memo, so handleChecked answers for them rather than the list
+  // leaving them out and looking like the sample is gone
+  const renderPicker = () => {
+    const pickerProps = {
+      // Picking writes the id to the memo and never to the record, so a locked dataset has no say in it
+      canPickReadOnly: true,
+      checkedItems: checkedSpotsIds,
+      isCheckedList: true,
+      onChecked: handleChecked,
+    };
+    return isSamples ? <Samples {...pickerProps}/> : <SpotsList {...pickerProps}/>;
+  };
 
   /* View */
 
@@ -88,29 +111,8 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isR
           showCancelButton={false}
           showCloseButton
         >
-          {Platform.OS === 'web' ? (
-            <ScrollView>
-              <SpotsList
-                checkedItems={checkedSpotsIds}
-                ignoreReadOnly={true}
-                isCheckedList={true}
-                isSamplesList={isSamples}
-                onChecked={handleSpotChecked}
-              />
-            </ScrollView>
-          ) : (
-            <FlatList
-              ListHeaderComponent={
-                <SpotsList
-                  checkedItems={checkedSpotsIds}
-                  ignoreReadOnly={true}
-                  isCheckedList={true}
-                  isSamplesList={isSamples}
-                  onChecked={handleSpotChecked}
-                />
-              }
-            />
-          )}
+          {Platform.OS === 'web' ? <ScrollView>{renderPicker()}</ScrollView>
+            : <FlatList ListHeaderComponent={renderPicker()}/>}
         </ModalWrapper>
       )}
     </>

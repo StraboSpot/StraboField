@@ -8,7 +8,7 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SpotQuery from '../spots/SpotQuery';
 import useSpots from '../spots/useSpots';
 
-const Samples = ({checkedItems, isCheckedList, openSpotInNotebook}) => {
+const Samples = ({canPickReadOnly, checkedItems, isCheckedList, onChecked, openSpotInNotebook}) => {
   /* Data Hooks */
 
   const {getActiveSpotsObj} = useSpots();
@@ -53,10 +53,12 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook}) => {
             {filterPrefix}{samplesCount + (samplesCount === 1 ? ' Sample' : ' Samples')}{scopeSuffix}
           </Text>
           <SamplesSectionList
+            canPickReadOnly={canPickReadOnly}
             checkedItems={checkedItems}
             dataSectioned={dataSectioned}
             isCheckedList={isCheckedList}
             listEmptyText={`No Samples${scopeSuffix}`}
+            onChecked={onChecked}
             openSpotInNotebook={openSpotInNotebook}
           />
         </View>

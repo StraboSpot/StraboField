@@ -18,11 +18,13 @@ import useSpots from '../spots/useSpots';
 import useTags from '../tags/useTags';
 
 const SampleListItem = ({
+                          canPickReadOnly,
                           isCheckedList,
                           isItemChecked,
                           isShowAvatar,
                           isShowIGSN,
                           isShowSubtitle,
+                          onChecked,
                           onPress,
                           parentSpot,
                           sample,
@@ -37,7 +39,7 @@ const SampleListItem = ({
 
   /* Derived Variables */
 
-  const isReadOnly = isSpotReadOnly(parentSpot);
+  const isReadOnly = !canPickReadOnly && isSpotReadOnly(parentSpot);
   const sampleMetadata = sample.properties?.isSample ? (sample.properties.samples?.[0] ?? {id: sample.properties.id}) : sample;
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 
@@ -52,7 +54,10 @@ const SampleListItem = ({
     else setIsIGSNModalVisible(true);
   };
 
+  // A caller with its own onChecked takes the press instead of the tag write, and gets the parent Spot too
+  // since a legacy sample carries no id of its own that means anything outside it
   const handleCheckBoxPressed = () => {
+    if (onChecked) return onChecked(sample, parentSpot);
     return addRemoveSpotFromTag(sample.properties?.isSample ? sample.properties.id : parentSpot.properties.id,
       selectedTag);
   };

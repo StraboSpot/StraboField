@@ -24,6 +24,7 @@ const ReportModal = ({openSpotInNotebook}) => {
     confirmCloseModal,
     deleteReport,
     formRef,
+    handleSampleChecked,
     handleSavePressed,
     handleSpotChecked,
     handleSpotPressed,
@@ -102,14 +103,14 @@ const ReportModal = ({openSpotInNotebook}) => {
               <View style={{paddingTop: 10}}/>
               <ReportSpots
                 checkedSpotsIds={checkedSpotsIds}
-                handleSpotChecked={handleSpotChecked}
+                handleChecked={handleSpotChecked}
                 handleSpotPressed={handleSpotPressed}
                 isReadOnly={isReadOnly}
               />
               <View style={{paddingTop: 10}}/>
               <ReportSpots
                 checkedSpotsIds={checkedSpotsIds}
-                handleSpotChecked={handleSpotChecked}
+                handleChecked={handleSampleChecked}
                 handleSpotPressed={handleSpotPressed}
                 isReadOnly={isReadOnly}
                 isSamples
