@@ -94,6 +94,9 @@ const useReportModal = ({openSpotInNotebook}) => {
 
   const closeModal = () => dispatch(setModalVisible({modal: null}));
 
+  // The memo asks about the record just tapped, so it calls it what the user sees rather than Spot for both
+  const getSpotLabel = spot => spot.properties?.isSample ? 'Sample' : 'Spot';
+
   const goToSpot = (spot) => {
     console.log('Going to Spot', spot);
     closeModal();
@@ -110,7 +113,7 @@ const useReportModal = ({openSpotInNotebook}) => {
     else dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.TAGS}));
   };
 
-  const handleSpotPressedCont = spot => checkReportChanged('Spot', () => goToSpot(spot));
+  const handleSpotPressedCont = spot => checkReportChanged(getSpotLabel(spot), () => goToSpot(spot));
 
   const handleTagPressedCont = tag => checkReportChanged('Tag', () => goToTag(tag));
 
@@ -172,7 +175,7 @@ const useReportModal = ({openSpotInNotebook}) => {
     else setCheckedSpotsIds([...checkedSpotsIds, spotId]);
   };
 
-  const handleSpotPressed = spot => alertLeaveReport('Spot', () => handleSpotPressedCont(spot));
+  const handleSpotPressed = spot => alertLeaveReport(getSpotLabel(spot), () => handleSpotPressedCont(spot));
 
   const handleTagChecked = (tagId) => {
     console.log('Tag', tagId, checkedTagsIds);

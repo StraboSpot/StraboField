@@ -107,6 +107,14 @@ const ReportModal = ({openSpotInNotebook}) => {
                 isReadOnly={isReadOnly}
               />
               <View style={{paddingTop: 10}}/>
+              <ReportSpots
+                checkedSpotsIds={checkedSpotsIds}
+                handleSpotChecked={handleSpotChecked}
+                handleSpotPressed={handleSpotPressed}
+                isReadOnly={isReadOnly}
+                isSamples
+              />
+              <View style={{paddingTop: 10}}/>
               <ReportTags
                 checkedTagsIds={checkedTagsIds}
                 handleTagChecked={handleTagChecked}

@@ -609,6 +609,9 @@ const useSpots = () => {
 
   const getSampleSpotIconSource = () => require('../../assets/icons/SampleRound.png');
 
+  // The counterpart to getVisibleSpots, which leaves samples out: they are browsed and picked as samples
+  const getSampleSpots = () => Object.values(getActiveSpotsObj()).filter(spot => spot.properties?.isSample);
+
   const getSpotById = (spotId) => {
     if (spots[spotId]) return spots[spotId];
     else Sentry.captureMessage(`Missing Spot ${spotId}`);
@@ -737,6 +740,7 @@ const useSpots = () => {
     getRootSpot,
     getRootSpotGeoCoords,
     getSampleSpotIconSource,
+    getSampleSpots,
     getSpotById,
     getSpotByImageId,
     getSpotGeometryIconSource,

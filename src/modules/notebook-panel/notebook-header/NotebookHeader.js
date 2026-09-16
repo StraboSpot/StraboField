@@ -67,6 +67,9 @@ const NotebookHeader = ({
 
   const isLegacySample = selectedAttributes?.[0]?.sample_id_name;
   const headerTitle = isLegacySample ? selectedAttributes?.[0]?.sample_id_name : spot.properties.name || 'Unknown';
+  // Whatever the header is naming, so a message about it calls the record what the user sees. A sample is a
+  // Spot underneath, and nothing the user reads should give that away
+  const spotLabel = spot.properties?.isSample || isLegacySample ? 'Sample' : 'Spot';
   const spotWithThisImageBasemap = spot.properties?.image_basemap
     && getSpotWithThisImageBasemap(spot.properties.image_basemap);
   const parentSpot = spot.properties?.isSample ? getSpotWithThisSample(spot.properties.id)
@@ -91,8 +94,9 @@ const NotebookHeader = ({
 
   const getCoordText = (lat, lng) => isUtmDisplay ? getUtmDisplayString([lng, lat]) : getLatLngText(lat, lng);
 
-  // Name the dataset to unlock AND why this Spot is affected by it. Without the reason, someone looking at a
-  // Spot in their own open dataset is told to go unlock a dataset that Spot is not even in.
+  // Name the dataset to unlock AND why the record being read is affected by it. Without the reason, someone
+  // looking at a Spot in their own open dataset is told to go unlock a dataset that Spot is not even in.
+  // Only that record takes spotLabel: every other Spot named here is a different record, and a Spot either way.
   const getReadOnlyReasonText = () => {
     const reason = getReadOnlyReason(spot);
     if (isEmpty(reason)) return 'Unlock its dataset from the Datasets page.';  // the modal title says the rest
@@ -102,14 +106,14 @@ const NotebookHeader = ({
     // Any Spot on a section locks it, not only an interval, and a reorder moves everything on the section
     if (cause === 'stratSection') {
       const sectionText = spot.properties?.strat_section_id ? 'Another Spot on this strat section is Read Only'
-        : 'This Spot\'s strat section holds a Read Only Spot';
+        : `This ${spotLabel}'s strat section holds a Read Only Spot`;
       return `${sectionText}, so the whole section is locked. ${unlockText}`;
     }
     if (cause === 'map') {
       const mapText = spot.properties?.image_basemap ? 'image basemap' : 'strat section';
-      return `The ${mapText} this Spot is on belongs to a Read Only Spot. ${unlockText}`;
+      return `The ${mapText} this ${spotLabel} is on belongs to a Read Only Spot. ${unlockText}`;
     }
-    return `This Spot is in a Read Only dataset. ${unlockText}`;
+    return `This ${spotLabel} is in a Read Only dataset. ${unlockText}`;
   };
 
   const getSpotCoordText = () => {
@@ -180,7 +184,7 @@ const NotebookHeader = ({
   // than a toast's few seconds can carry - so it goes in the message modal, which waits to be dismissed and
   // can be re-read.
   const goToDatasetsPage = () => {
-    dispatch(openedMessageModal({message: getReadOnlyReasonText(), title: 'Spot is Read Only'}));
+    dispatch(openedMessageModal({message: getReadOnlyReasonText(), title: `${spotLabel} is Read Only`}));
     dispatch(setSidePanelVisible({bool: false}));
     dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
     if (openMainMenuPanel) openMainMenuPanel();

@@ -23,6 +23,8 @@ const ReportsPage = ({page}) => {
   /* Derived Variables */
 
   const reportsUsingThisSpot = getReportsAtSpot(reports, spot.properties.id);
+  // This page serves a sample too, so it names whichever is being read
+  const spotLabel = spot.properties?.isSample ? 'Sample' : 'Spot';
 
   /* Logic Helpers */
 
@@ -36,9 +38,9 @@ const ReportsPage = ({page}) => {
   return (
     <View style={{flex: 1}}>
       <PageHeader pageTitle={page.label}/>
-      <AddButton onPress={addReport} title={'Create New Memo with this Spot'}/>
+      <AddButton onPress={addReport} title={'Create New Memo with this ' + spotLabel}/>
       <Text style={[commonStyles.listItemTitle, commonStyles.textBold, {paddingLeft: 10}]}>
-        Memos referencing this Spot:
+        Memos referencing this {spotLabel}:
       </Text>
       <ReportsList reportsSubset={reportsUsingThisSpot}/>
     </View>
