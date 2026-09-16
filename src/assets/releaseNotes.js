@@ -18,6 +18,37 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 
 const RELEASE_NOTES = [
   {
+    version: '2.31.2',
+    groups: [
+      {
+        title: 'Compass',
+        items: [
+          {text: 'Works without GPS: uses magnetic declination on devices with no GPS fix', commit: 'd645effd7'},
+          {text: 'Hold-aware readings: trend/plunge adjust for landscape and tablet orientation', commit: 'bf0a6c903'},
+          {
+            text: 'Clearer calibration: improved calibration alerts and more consistent behavior across platforms',
+            commit: '4b6e2fbca',
+          },
+        ],
+      },
+      {
+        title: 'Samples & IGSN',
+        items: [
+          {
+            text: 'Steadier SESAR: better session handling, offline warnings, and clearer error feedback when registering IGSNs',
+            commit: 'cdbb1ee75',
+          },
+        ],
+      },
+      {
+        title: 'Small touches',
+        items: [
+          {text: 'Custom map details scroll properly on smaller screens', commit: '23f3f0858'},
+        ],
+      },
+    ],
+  },
+  {
     version: '2.31.1',
     groups: [
       {
@@ -75,7 +106,7 @@ const RELEASE_NOTES = [
             commit: '3ce140926',
           },
           {
-            text: 'Get an IGSN: register and manage IGSNs end-to-end, with a Get IGSN button and an upload progress bar',
+            text: 'IGSN registration: updated registration UI, with a Get IGSN button and an upload progress bar',
             commit: '25dadd71b',
           },
           {
@@ -164,9 +195,8 @@ const RELEASE_NOTES = [
         ],
       },
       {
-        title: 'Compass & measurements',
+        title: 'Measurements',
         items: [
-          {text: 'Compass: redesigned dial with animated headings and tick marks', commit: 'a90dd586b'},
           {
             text: 'Measurement mode that sticks: your manual vs. compass preference now syncs and is remembered',
             commit: 'bc7146942',
