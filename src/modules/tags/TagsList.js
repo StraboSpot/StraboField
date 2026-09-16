@@ -30,8 +30,8 @@ const TagsList = ({activeFilters = [], tagsSorted, type}) => {
   const tags = useSelector(state => state.project.project?.tags) || [];
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
 
-  const {getTagFeaturesCount, getSamplesWithThisTag, getSpotsWithThisTagCount, toggleContinuousTagging} = useTags();
   const {
+    getReportsWithThisTag,
     getSamplesWithThisTag,
     getSpotsWithThisTagCount,
     getTagFeaturesCount,
@@ -78,6 +78,7 @@ const TagsList = ({activeFilters = [], tagsSorted, type}) => {
       {key: 'samples', count: getSamplesWithThisTag(tag).length, icon: 'pickaxe'},
       ...(type === PAGE_KEYS.GEOLOGIC_UNITS ? [] : [
         {key: 'features', count: getTagFeaturesCount(tag), icon: 'circle-double'},
+        {key: 'memos', count: getReportsWithThisTag(tag).length, icon: 'note'},
       ]),
     ].filter(c => c.count > 0);
     if (isEmpty(counts)) return null;

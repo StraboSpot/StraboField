@@ -6,3 +6,10 @@ export const getReportsAtSpot = (reports, spotId) => (reports || []).filter(r =>
 export const getReportsToList = (reports, straboUserId) => (reports || [])
   .filter(r => r.report_privacy !== 'only_me' || !r.straboUserId || r.straboUserId === straboUserId)
   .sort((a, b) => new Date(b.modified_timestamp) - new Date(a.modified_timestamp));
+
+// The memos carrying a tag. A memo holds its own tag ids - the reverse of a tag, which holds its Spots - so a
+// tag's memos are found by scanning the memos rather than by reading the tag
+export const getReportsWithTag = (reports, tagId) => {
+  const idText = tagId?.toString();
+  return (reports || []).filter(report => report.tags?.some(id => id.toString() === idText));
+};

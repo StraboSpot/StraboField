@@ -10,8 +10,10 @@ import {deepFindFeatureTypeById, isEmpty} from '../../../shared/helpers';
 import NotebookPageAvatar from '../../../shared/ui/avatars/NotebookPageAvatar';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
+import SectionDivider from '../../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import ReportsListItem from '../../reports/ReportsListItem';
 import SamplesSectionList from '../../samples/SamplesSectionList';
 import SpotsListItem from '../../spots/SpotsListItem';
 import useSpots from '../../spots/useSpots';
@@ -23,6 +25,7 @@ const TagDetail = ({
                      addRemoveSpots,
                      openDetailModal,
                      openFeatureDetail,
+                     openReport,
                      openSpot,
                      openSpotInNotebook,
                    }) => {
@@ -32,7 +35,7 @@ const TagDetail = ({
   const spots = useSelector(state => state.spot.spots);
 
   const {getSpotById, getSpotWithThisSample, isSpotReadOnly} = useSpots();
-  const {getAllTaggedFeatures, getFeatureDisplayComponent} = useTags();
+  const {getAllTaggedFeatures, getFeatureDisplayComponent, getReportsWithThisTag} = useTags();
 
   /* Render Functions */
 
@@ -123,6 +126,20 @@ const TagDetail = ({
     );
   };
 
+  const renderTaggedMemosList = () => {
+    return (
+      <FlatList
+        ItemSeparatorComponent={FlatListItemSeparator}
+        ListEmptyComponent={<ListEmptyText text={'No Memos'}/>}
+        data={getReportsWithThisTag(selectedTag)}
+        extraData={selectedTag}
+        keyExtractor={report => 'Memo' + report.id}
+        listKey={'memos'}
+        renderItem={({item}) => <ReportsListItem onPress={() => openReport(item)} report={item}/>}
+      />
+    );
+  };
+
   /* View */
 
   return (
@@ -159,9 +176,14 @@ const TagDetail = ({
           />
           {renderSamples()}
 
-          {/* Features with this Tag */}
+          {/* Memos and Features with this Tag. Neither applies to a geologic unit: the memo tag picker leaves
+              geologic units out, and one is never attached to a single feature */}
           {selectedTag.type !== PAGE_KEYS.GEOLOGIC_UNITS && (
             <>
+              {/* No Add/Remove here - a memo holds its own tags, so they are edited from the memo */}
+              <SectionDivider dividerText={'Tagged Memos'}/>
+              {renderTaggedMemosList()}
+
               <SectionDividerWithRightButton
                 buttonTitle={'Add/Remove'}
                 dividerText={'Tagged Features'}

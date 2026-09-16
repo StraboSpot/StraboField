@@ -17,6 +17,7 @@ import {
   setSelectedTag,
   updatedProject,
 } from '../project/projects.slice';
+import {getReportsToList, getReportsWithTag} from '../reports/reports.helpers';
 import {setSelectedAttributes} from '../spots/spots.slice';
 import ThreeDStructureLabel from '../three-d-structures/ThreeDStructureLabel';
 
@@ -26,9 +27,11 @@ const useTags = () => {
   const dispatch = useDispatch();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const modalVisible = useSelector(state => state.home.modalVisible);
+  const reports = useSelector(state => state.project.project?.reports) || [];
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
+  const straboUserId = useSelector(state => state.user?.straboUserId);
   const tags = useSelector(state => state.project.project?.tags) || [];
 
   const {getLabel} = useForm();
@@ -215,6 +218,9 @@ const useTags = () => {
       });
   };
 
+  // Filtered the way the Memos list is, so a memo its author keeps to themselves is neither listed nor counted
+  const getReportsWithThisTag = tag => getReportsToList(getReportsWithTag(reports, tag.id), straboUserId);
+
   const getSpotsWithThisTagCount = (tag) => {
     const validSpots = isEmpty(tag.spots) ? []
       : tag.spots.filter(spotId => spots[spotId] && !spots[spotId].properties?.isSample);
@@ -300,6 +306,7 @@ const useTags = () => {
     getGeologicUnitTagsAtSpot,
     getNonGeologicUnitFeatureTagsAtSpot,
     getNonGeologicUnitTagsAtSpot,
+    getReportsWithThisTag,
     getSamplesWithThisTag,
     getSpotsWithThisTagCount,
     getTagFeaturesCount,
