@@ -99,6 +99,23 @@ const projectSlice = createSlice({
     addedProjectDescription(state, action) {
       state.project = action.payload;
     },
+    // A memo holds its own tag ids, so tagging one from the tag's own page writes to the memo. Mapped in place,
+    // since an edited memo has to stay where it is in the list
+    addedRemovedTagIdOnReport(state, action) {
+      const {reportId, tagId} = action.payload;
+      const tagIdText = tagId?.toString();
+      state.project.reports = (state.project.reports || []).map((report) => {
+        if (report.id !== reportId) return report;
+        const updatedReport = JSON.parse(JSON.stringify(report));
+        const tagIds = updatedReport.tags || [];
+        updatedReport.tags = tagIds.some(id => id.toString() === tagIdText)
+          ? tagIds.filter(id => id.toString() !== tagIdText) : [...tagIds, tagId];
+        if (isEmpty(updatedReport.tags)) delete updatedReport.tags;
+        updatedReport.modified_timestamp = Date.now();
+        return updatedReport;
+      });
+      state.project.modified_timestamp = Date.now();
+    },
     addedSpotToTags(state, action) {
       const {spotId, tagIds} = action.payload;
       if (!isEmpty(state.project.tags)) {
@@ -363,6 +380,7 @@ export const {
   addedProject,
   addedProjectDescription,
   addedProjectFromServer,
+  addedRemovedTagIdOnReport,
   addedSpotToTags,
   addedTagToSelectedSpot,
   addedTemplates,

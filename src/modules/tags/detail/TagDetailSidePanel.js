@@ -62,6 +62,9 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
           addRemoveFeatures={() => {
             dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES}));
           }}
+          addRemoveReports={() => {
+            dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_REPORTS}));
+          }}
           addRemoveSampleSpots={() => {
             dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SAMPLE_SPOTS}));
           }}

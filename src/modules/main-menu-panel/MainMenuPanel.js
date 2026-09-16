@@ -38,6 +38,7 @@ import ReportsMenu from '../reports/ReportsMenu';
 import Samples from '../samples/Samples';
 import SpotsList from '../spots/SpotsList';
 import AddRemoveTagFeatures from '../tags/AddRemoveTagFeatures';
+import AddRemoveTagReports from '../tags/AddRemoveTagReports';
 import AddRemoveTagSampleSpots from '../tags/AddRemoveTagSampleSpots';
 import AddRemoveTagSpots from '../tags/AddRemoveTagSpots';
 import TagDetailSidePanel from '../tags/detail/TagDetailSidePanel';
@@ -220,6 +221,8 @@ const MainMenuPanel = forwardRef(({
         return <OpenProject closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:
         return <AddRemoveTagFeatures/>;
+      case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_REPORTS:
+        return <AddRemoveTagReports/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SAMPLE_SPOTS:
         return <AddRemoveTagSampleSpots/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SPOTS:

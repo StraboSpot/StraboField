@@ -11,6 +11,7 @@ import MeasurementLabel from '../measurements/MeasurementLabel';
 import OtherFeatureLabel from '../other-features/OtherFeatureLabel';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {
+  addedRemovedTagIdOnReport,
   addedSpotToTags,
   addedTagToSelectedSpot,
   deletedTagIdFromReports,
@@ -73,6 +74,12 @@ const useTags = () => {
   };
 
   /* Exported Functions */
+
+  // The counterpart to addRemoveSpotFromTag for a memo, which writes to the memo rather than to the tag: a tag
+  // holds its Spots, but a memo holds its own tag ids
+  const addRemoveReportFromTag = (report, tag) => {
+    dispatch(addedRemovedTagIdOnReport({reportId: report.id, tagId: tag.id}));
+  };
 
   // Attach or detach one tag on a single feature of a Spot.
   const addRemoveSpotFeatureFromTag = (tag, feature, spotId) => {
@@ -291,6 +298,7 @@ const useTags = () => {
   };
 
   return {
+    addRemoveReportFromTag,
     addRemoveSpotFeatureFromTag,
     addRemoveSpotFromTag,
     addRemoveTag,

@@ -10,7 +10,6 @@ import {deepFindFeatureTypeById, isEmpty} from '../../../shared/helpers';
 import NotebookPageAvatar from '../../../shared/ui/avatars/NotebookPageAvatar';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
-import SectionDivider from '../../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import ReportsListItem from '../../reports/ReportsListItem';
@@ -21,6 +20,7 @@ import useTags from '../useTags';
 
 const TagDetail = ({
                      addRemoveFeatures,
+                     addRemoveReports,
                      addRemoveSampleSpots,
                      addRemoveSpots,
                      openDetailModal,
@@ -180,8 +180,11 @@ const TagDetail = ({
               geologic units out, and one is never attached to a single feature */}
           {selectedTag.type !== PAGE_KEYS.GEOLOGIC_UNITS && (
             <>
-              {/* No Add/Remove here - a memo holds its own tags, so they are edited from the memo */}
-              <SectionDivider dividerText={'Tagged Memos'}/>
+              <SectionDividerWithRightButton
+                buttonTitle={'Add/Remove'}
+                dividerText={'Tagged Memos'}
+                onPress={addRemoveReports}
+              />
               {renderTaggedMemosList()}
 
               <SectionDividerWithRightButton

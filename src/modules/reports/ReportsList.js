@@ -10,7 +10,7 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
-const ReportsList = ({isCheckedList, reportsSubset}) => {
+const ReportsList = ({checkedItems, isCheckedList, isPreSorted, onChecked, reportsSubset}) => {
   console.log('Rendering ReportsList...');
 
   /* Data Hooks */
@@ -21,7 +21,10 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
 
   /* Derived Variables */
 
-  const reportsToListSorted = getReportsToList(reportsSubset ?? reports, straboUserId);
+  // A caller that put its own order on the memos keeps it - sorting by edit time would reshuffle a list being
+  // checked through, since checking a memo edits it
+  const reportsToListSorted = isPreSorted ? reportsSubset
+    : getReportsToList(reportsSubset ?? reports, straboUserId);
 
   /* Event Handlers */
 
@@ -43,6 +46,8 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
           <ReportsListItem
             doShowTags={true}
             isCheckedList={isCheckedList}
+            isItemChecked={checkedItems?.some(id => id.toString() === item.id.toString())}
+            onChecked={onChecked}
             onPress={() => onShowReport(item)}
             report={item}
           />

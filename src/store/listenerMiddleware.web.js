@@ -8,6 +8,7 @@ import {canceledIntervalDrag, savedIntervalDragReordering} from '../modules/maps
 import {
   addedCustomFeatureTypes,
   addedDataset,
+  addedRemovedTagIdOnReport,
   addedTemplates,
   deletedDataset,
   movedSpotIdBetweenDatasets,
@@ -348,8 +349,8 @@ listenerMiddleware.startListening({actionCreator: movedSpotIdBetweenDatasets, ef
 
 // Project Only Updates to Send to Server
 listenerMiddleware.startListening({
-  matcher: isAnyOf(addedCustomFeatureTypes, addedTemplates, setActiveTemplates, setUseContinuousTagging,
-    setUseTemplate, updatedProject),
+  matcher: isAnyOf(addedCustomFeatureTypes, addedRemovedTagIdOnReport, addedTemplates, setActiveTemplates,
+    setUseContinuousTagging, setUseTemplate, updatedProject),
   effect: updateProjectListener,
 });
 
