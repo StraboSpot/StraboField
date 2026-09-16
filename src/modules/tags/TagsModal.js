@@ -18,7 +18,7 @@ import Loading from '../../shared/ui/Loading';
 import modalStyles from '../../shared/ui/modals/modal.styles';
 import FormikWrapper from '../form/FormikWrapper';
 import SelectInputField from '../form/inputs/SelectInputField';
-import {setLoadingStatus, setModalVisible} from '../home/home.slice';
+import {setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
@@ -106,7 +106,6 @@ const TagsModal = ({
   const save = async () => {
     setIsSaving(true);
     try {
-      dispatch(setLoadingStatus({view: 'home', bool: true}));
       let tagsToUpdate = [];
       if (isShortcutTagging) {
         // Awaited, so the spinner covers the wait for a location and a failure reaches the catch below. Left
@@ -123,7 +122,6 @@ const TagsModal = ({
       }
       else addSpotsToTags(checkedTagsTemp, selectedSpotsForTagging);
       dispatch(setModalVisible({modal: null}));
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
       // After the zoom, which raises a full-screen spinner the toast would otherwise sit behind for most of its
       // life - the reason only shortcut saves looked too fast
       if (isShortcutTagging) await zoomToCurrentLocation();
@@ -133,7 +131,6 @@ const TagsModal = ({
     }
     catch (err) {
       console.error('Error saving Tag', err);
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
       toast.show('Tags Saved Error!', {type: 'danger'});
     }
     finally {
