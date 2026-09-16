@@ -130,8 +130,10 @@ npm run remove:packages    # clean node_modules + iOS Pods
 
 1. **Start RC:** cut `rc-{version}` from `dev` → bump version → push. A GitHub Action auto-creates a **draft release**.
 2. **Stabilize:** bug fixes land directly on `rc-{version}`; each push auto-updates the draft. No manual changelog.
-3. **Cut it:** when the version is finalized, `npm run cut-rc` tags `v{version}-rc` and **freezes that version's draft** —
-   commits after it collect into the next version's draft. This marker (not the `package.json` version) is what the draft
+3. **Cut it:** when the version is finalized, `npm run cut-rc` tags `v{version}-rc` and **freezes that version's draft
+   ** —
+   commits after it collect into the next version's draft. This marker (not the `package.json` version) is what the
+   draft
    workflow slices on, so merging `master` (the 2.29.x hotfix line) into the rc branch no longer scrambles the boundary.
 4. **Publish:** merge `rc-{version}` → `master` and push → `git tag v{version}` on master →
    `git push origin v{version}`. The Action publishes the official release + changelog.
@@ -187,6 +189,9 @@ track sync state. Check network via `ConnectionStatus` before any server call.
 ESLint (`.eslintrc.js`) enforces: single quotes; Stroustrup braces (else/catch on new line); import order (React/RN →
 external → internal, alphabetical); alphabetized JSX props and StyleSheet keys; no unused vars (except function args).
 Run `npm run lint:fix` before committing.
+
+- **Language:** Use American English (e.g., behavior, optimize, initialize) for all commit messages, code comments, and
+  documentation.
 
 **Naming:** Components PascalCase; hooks `use`-prefixed camelCase; `*.slice.js`, `*.constants.js`, `*.styles.js`
 suffixes; `.web.js` for web overrides.

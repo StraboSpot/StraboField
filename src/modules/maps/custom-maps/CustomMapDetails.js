@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Platform, Text, View} from 'react-native';
+import {Platform, ScrollView, Text, View} from 'react-native';
 
 import {Icon, Input, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -206,12 +206,12 @@ const CustomMapDetails = () => {
           file from Mapwarper.net and upload it into your Strabo MyMaps account.
         </Text>
       </View>
-      <FlatList
-        ItemSeparatorComponent={FlatListItemSeparator}
-        data={CUSTOM_MAP_TYPES}
-        keyExtractor={item => item.source}
-        renderItem={({item, index}) => renderCustomMapName(item, index)}
-      />
+      {CUSTOM_MAP_TYPES.map((item, index) => (
+        <React.Fragment key={item.source}>
+          {index > 0 && <FlatListItemSeparator/>}
+          {renderCustomMapName(item, index)}
+        </React.Fragment>
+      ))}
       {editableCustomMapData?.source === ''
         && <Text style={customMapStyles.requiredMessage}>Map type is required</Text>}
     </View>
@@ -306,11 +306,17 @@ const CustomMapDetails = () => {
     <>
       <View style={{flex: 1}}>
         {renderSidePanelHeader()}
-        {renderTitle()}
-        {renderOverlaySection()}
-        {isEmpty(customMapToEdit) ? renderMapTypeList() : renderMapTypeOverview()}
-        {(editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
-          || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          keyboardShouldPersistTaps={'handled'}
+          style={{flex: 1}}
+        >
+          {renderTitle()}
+          {renderOverlaySection()}
+          {isEmpty(customMapToEdit) ? renderMapTypeList() : renderMapTypeOverview()}
+          {(editableCustomMapData?.source === 'mapbox_styles' || editableCustomMapData?.source === 'map_warper'
+            || editableCustomMapData?.source === 'strabospot_mymaps') && renderMapDetails()}
+        </ScrollView>
         <View style={customMapStyles.bottomButtonsContainer}>
           <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
             <View>

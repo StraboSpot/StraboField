@@ -47,7 +47,7 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
 
   useEffect(() => {
     console.log('UE InitialProjectLoadModal [isOnline]', isOnline);
-    dispatch(setStatusMessageModalTitle('Welcome to StraboSpot'));
+    dispatch(setStatusMessageModalTitle('Welcome to StraboField'));
   }, [isOnline]);
 
   /* Event Handlers */
@@ -71,7 +71,7 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
         break;
       default:
         setVisibleInitialSection('none');
-        dispatch(setStatusMessageModalTitle('Welcome to StraboSpot'));
+        dispatch(setStatusMessageModalTitle('Welcome to StraboField'));
     }
   };
 
@@ -85,7 +85,7 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
   const goBackToMain = () => {
     if (visibleInitialSection !== 'none') {
       setVisibleInitialSection('none');
-      dispatch(setStatusMessageModalTitle('Welcome to StraboSpot'));
+      dispatch(setStatusMessageModalTitle('Welcome to StraboField'));
     }
   };
 
