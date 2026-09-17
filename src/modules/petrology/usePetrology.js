@@ -50,8 +50,9 @@ const usePetrology = () => {
       else {
         let editedPetData = spot.properties.pet ? JSON.parse(JSON.stringify(spot.properties.pet)) : {};
         if (!editedPetData[key] || !Array.isArray(editedPetData[key])) editedPetData[key] = [];
-        editedPetData[key] = editedPetData[key].filter(type => type.id !== editedFeatureData.id);
-        editedPetData[key].push(editedFeatureData);
+        const i = editedPetData[key].findIndex(type => type.id === editedFeatureData.id);
+        if (i === -1) editedPetData[key].push(editedFeatureData);
+        else editedPetData[key].splice(i, 1, editedFeatureData);
         dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
         dispatch(editedSpotProperties({field: 'pet', value: editedPetData, spotId: spotId}));
       }

@@ -97,9 +97,9 @@ const spotSlice = createSlice({
         return spot.properties.images && spot.properties.images.find(image => image.id === action.payload.id);
       });
       if (foundSpot) {
-        const imagesFiltered = foundSpot.properties.images.filter(image => image.id !== action.payload.id);
-        imagesFiltered.push(action.payload);
-        foundSpot.properties.images = imagesFiltered;
+        // Replaced where it sits: the Spot was found by holding this image, so it is always there to replace
+        const i = foundSpot.properties.images.findIndex(image => image.id === action.payload.id);
+        foundSpot.properties.images.splice(i, 1, action.payload);
         const selectedSpotCopy = isEmpty(state.selectedSpot)
         || state.selectedSpot.properties.id === foundSpot.properties.id ? foundSpot : state.selectedSpot;
         console.log('Edit Image for selectedSpot', selectedSpotCopy);

@@ -259,8 +259,9 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
               editedMeasurementData.associated_orientation.push(
                 {...t.values, ...newAssocMeasurement, id: getNewUUID()});
             });
-            editedMeasurementsData = editedMeasurementsData.filter(d => d.id !== editedMeasurementData.id);
-            editedMeasurementsData.push(editedMeasurementData);
+            const i = editedMeasurementsData.findIndex(d => d.id === editedMeasurementData.id);
+            if (i === -1) editedMeasurementsData.push(editedMeasurementData);
+            else editedMeasurementsData.splice(i, 1, editedMeasurementData);
           }
           // If an associated measurement from the Quick Entry Modal with multiple templates
           else {
@@ -287,8 +288,9 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
       }
       else {
         if (isSelectedAttitude) {
-          editedMeasurementsData = editedMeasurementsData.filter(d => d.id !== editedMeasurementData.id);
-          editedMeasurementsData.push(editedMeasurementData);
+          const i = editedMeasurementsData.findIndex(d => d.id === editedMeasurementData.id);
+          if (i === -1) editedMeasurementsData.push(editedMeasurementData);
+          else editedMeasurementsData.splice(i, 1, editedMeasurementData);
         }
         else editedMeasurementsData.push({...editedMeasurementData, id: getNewUUID()});
         console.log('editedMeasurementData', editedMeasurementData);

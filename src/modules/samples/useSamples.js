@@ -79,8 +79,9 @@ const useSamples = () => {
     let editedSample = {id: selectedSample.id};
     let samplesCopy = JSON.parse(JSON.stringify(spot.properties[PAGE_KEYS.SAMPLES] || []));
     console.log('Saving Sample data', editedSample, 'to Spot samples:', samplesCopy);
-    samplesCopy = samplesCopy.filter(f => f.id !== selectedSample.id);
-    samplesCopy.push(editedSample);
+    const i = samplesCopy.findIndex(f => f.id === selectedSample.id);
+    if (i === -1) samplesCopy.push(editedSample);
+    else samplesCopy.splice(i, 1, editedSample);
     const spotId = spot.properties.id;
     dispatch(updatedModifiedTimestampsBySpotsIds([newEnrichedSample.properties.id, spotId]));
     dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: samplesCopy, spotId: spotId}));
