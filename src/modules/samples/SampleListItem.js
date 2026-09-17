@@ -73,8 +73,9 @@ const SampleListItem = ({
     >
       {isShowAvatar && (
         <AvatarWrapper
+          containerStyle={sample.properties?.isSample ? sampleStyles.richSampleAvatar : undefined}
           size={20}
-          source={getSampleSpotIconSource()}
+          source={sample.properties?.isSample ? require('../../assets/icons/Sample.png') : getSampleSpotIconSource()}
         />
       )}
       <ListItem.Content style={sampleStyles.listContentContainer}>
