@@ -179,11 +179,14 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
 
   return (
     <ModalWrapper
+      // Render as a plain fullscreen View, NOT a native <Modal>. This screen is presented from a react-native-screens
+      // screen (RNSViewController), and dismissing it (isProjectLoadSelectionModalVisible -> false) re-renders and
+      // reparents the whole home tree in the same beat. A native modal dismiss overlapping that reparent trips
+      // UIViewControllerHierarchyInconsistency (a fatal crash — Sentry STRABOSPOT-2-6JN / -75C). A View overlay has no
+      // UIViewController presentation to break. On iPhone (SMALL_SCREEN) it was already fullscreen, so the UX matches.
+      doesRenderAsView
+      fullscreen
       headerTitle={statusMessageModalTitle}
-      overlayStyleOverride={{
-        justifyContent: 'center',
-        height: visibleInitialSection === 'none' ? 'auto' : '80%',
-      }}
       showActionButton={false}
       showCancelButton={false}
     >

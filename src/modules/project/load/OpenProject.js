@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -9,6 +9,7 @@ import {MAX_SAVES} from '../../../services/files/useAutoSave';
 import useImport from '../../../services/files/useImport';
 import commonStyles from '../../../shared/common.styles';
 import * as themes from '../../../shared/styles.constants';
+import {MODAL_TRANSITION_DELAY} from '../../../shared/ui/modals/modal.constants';
 import {
   addedStatusMessage,
   clearedStatusMessages,
@@ -53,6 +54,11 @@ const OpenProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
     closeNotebookPanel();
     closeConfirmOverwriteModal();
     if (isProjectLoadSelectionModalVisible) dispatch(setIsProjectLoadSelectionModalVisible(false));
+    // A native modal is animating out right now — either the project-load modal (dismissed just above) or the
+    // overwrite-confirm modal (closed at the top of this function). On iOS, presenting the status modal in the same
+    // beat runs a native present and dismiss at once and trips UIViewControllerHierarchyInconsistency (Sentry
+    // STRABOSPOT-2-6JN). Let it finish dismissing first.
+    if (Platform.OS === 'ios') await new Promise(resolve => setTimeout(resolve, MODAL_TRANSITION_DELAY));
     dispatch(setLoadingStatus({view: 'modal', bool: true}));
     dispatch(setIsStatusMessagesModalVisible(true));
     try {

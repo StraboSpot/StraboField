@@ -1,11 +1,13 @@
-import React, {forwardRef} from 'react';
+import React, {forwardRef, useEffect} from 'react';
 import {Platform} from 'react-native';
 
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import Dialog from './Dialog';
+import {applyPendingModal} from './home.slice';
 import LoadingSpinner from '../../shared/ui/Loading';
 import {MessageModal, StatusModal} from '../../shared/ui/modals';
+import {MODAL_TRANSITION_DELAY} from '../../shared/ui/modals/modal.constants';
 import SaveMapsModal from '../maps/offline-maps/SaveMapsModal';
 import InitialProjectLoadModal from '../project/load/InitialProjectLoadModal';
 import ReauthModal from '../sign-in/ReauthModal';
@@ -22,10 +24,21 @@ const OverlaysContainer = forwardRef(({
                                         openSpotInNotebook,
                                         zoomToCurrentLocation,
                                       }, mapComponentRef) => {
+  const dispatch = useDispatch();
   const isHomeLoading = useSelector(state => state.home.loading.home);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const modalVisible = useSelector(state => state.home.modalVisible);
+  const pendingModal = useSelector(state => state.home.pendingModal);
+
+  // Drive the second phase of an iOS modal switch: once a modal is queued (and the outgoing one is dismissing), wait
+  // out the dismiss transition, then show it. Guaranteed to fire even for Dialog-driven modals, which unmount rather
+  // than toggle `visible` and so never deliver an onDismiss to JS. Re-running on pendingModal cancels a stale timer.
+  useEffect(() => {
+    if (!pendingModal) return;
+    const timer = setTimeout(() => dispatch(applyPendingModal()), MODAL_TRANSITION_DELAY);
+    return () => clearTimeout(timer);
+  }, [pendingModal]);
 
   return (
     <>

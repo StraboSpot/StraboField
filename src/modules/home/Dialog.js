@@ -24,19 +24,14 @@ const Dialog = ({
 
   const modalHandler = (modalKey) => {
     if (isNotebookPanelVisible || SMALL_SCREEN) {
-      if (isNotebookPanelVisible) {
-        closeNotebookPanel();
-        if (modalVisible && !Object.keys(MODAL_KEYS.SHORTCUTS).find(s => s.key === modalVisible)) {
-          dispatch(setModalVisible({modal: null}));
-        }
-      }
+      if (isNotebookPanelVisible) closeNotebookPanel();
       if (Object.values(MODAL_KEYS.SHORTCUTS).includes(modalKey)) dispatch(clearedSelectedSpots());
       dispatch(setModalVisible({modal: modalKey}));
     }
     else {
-      if (modalVisible !== MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS) dispatch(setModalVisible({modal: null}));
       openNotebookPanel(modalKey);
       if (modalKey !== PAGE_KEYS.NOTES) dispatch(setModalVisible({modal: modalKey}));
+      else if (modalVisible !== MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS) dispatch(setModalVisible({modal: null}));
     }
   };
 
