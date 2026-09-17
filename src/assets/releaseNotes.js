@@ -18,6 +18,17 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 
 const RELEASE_NOTES = [
   {
+    version: '2.31.3',
+    groups: [
+      {
+        title: 'Stability',
+        items: [
+          {text: 'Fewer crashes: fixed iOS crashes that could occur when switching between modal screens', commit: '94e61003c'},
+        ],
+      },
+    ],
+  },
+  {
     version: '2.31.2',
     groups: [
       {

@@ -1,0 +1,5 @@
+StraboField 2.31.3
+
+• Stability: Fewer crashes
+
+Thanks for using StraboSpot!
