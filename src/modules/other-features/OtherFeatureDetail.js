@@ -198,6 +198,7 @@ const OtherFeatureDetail = ({
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <TextInputField
+                    editable={!isReadOnly}
                     label={'Label'}
                     name={'label'}
                   />
@@ -206,6 +207,7 @@ const OtherFeatureDetail = ({
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <TextInputField
+                    editable={!isReadOnly}
                     isRequired={true}
                     label={'Name'}
                     name={'name'}
@@ -215,7 +217,9 @@ const OtherFeatureDetail = ({
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <SelectInputField
-                    choices={featureTypes.map(featureType => ({label: featureType, value: featureType}))}
+                    choices={featureTypes.map(
+                      featureType => ({disabled: isReadOnly, label: featureType, value: featureType}))}
+                    isReadOnly={isReadOnly}
                     isRequired={true}
                     isSingleSelect={true}
                     label={'Feature Type'}
@@ -227,6 +231,7 @@ const OtherFeatureDetail = ({
                 <ListItem containerStyle={commonStyles.listItemFormField}>
                   <ListItem.Content>
                     <TextInputField
+                      editable={!isReadOnly}
                       isRequired={true}
                       label={'Other Feature Type'}
                       name={'otherType'}
@@ -238,6 +243,7 @@ const OtherFeatureDetail = ({
                 <ListItem.Content>
                   <TextInputField
                     appearance={'multiline'}
+                    editable={!isReadOnly}
                     label={'Feature Description'}
                     name={'description'}
                   />
