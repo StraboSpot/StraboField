@@ -173,8 +173,6 @@ const uploadProjectDatasetDeleteSpotListener = async (action, listenerApi) => {
   let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
   console.log('Action:', action, 'Deleted Spot Id:', action.payload);
 
-  listenerApi.cancelActiveListeners();      // Can cancel other running instances
-
   const newState = listenerApi.getState();
   console.log('New State:', newState);
 
@@ -210,8 +208,6 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
   }
 
   console.log('Action:', action, 'Spot edited:', action.payload);
-
-  listenerApi.cancelActiveListeners();      // Can cancel other running instances
 
   const newState = listenerApi.getState();
   console.log('New State:', newState);
