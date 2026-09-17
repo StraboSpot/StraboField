@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -17,7 +17,7 @@ import {
 import useSpots from './useSpots';
 import {isEmpty} from '../../shared/helpers';
 import ListQueryBar from '../../shared/ui/ListQueryBar';
-import {setListFilters} from '../main-menu-panel/mainMenuPanel.slice';
+import {setListFilters, setListSort} from '../main-menu-panel/mainMenuPanel.slice';
 import {isOnGeoMap} from '../maps/maps.helpers';
 import {setIsMapExtentFilterActive} from '../maps/maps.slice';
 
@@ -33,6 +33,7 @@ const SpotQuery = ({
   const dispatch = useDispatch();
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const listFilters = useSelector(state => state.mainMenu.listFilters);
+  const listSorts = useSelector(state => state.mainMenu.listSorts);
   const recentViews = useSelector(state => state.spot.recentViews);
   const spots = useSelector(state => state.spot.spots);
   const spotsInMapExtentIds = useSelector(state => state.map.spotsInMapExtentIds);
@@ -48,9 +49,7 @@ const SpotQuery = ({
 
   /* Local State */
 
-  const [isReverseSort, setIsReverseSort] = useState(false);
   const [searchState, setSearchState] = useState('');
-  const [sortOrder, setSortOrder] = useState('Date Created');
   const [spotsFiltered, setSpotsFiltered] = useState(activeSpots);
 
   /* Derived Variables */
@@ -102,10 +101,15 @@ const SpotQuery = ({
   // one place, so its filters combine as a union; stored as an array of view keys (empty = all).
   const pageFilter = listFilters?.[pageKey];
   const activeFilters = Array.isArray(pageFilter) ? pageFilter : [];
+  // The sort is kept per page in Redux too, so the list comes back in the same order.
+  const isReverseSort = !!listSorts?.[pageKey]?.isReverse;
+  const sortOrder = listSorts?.[pageKey]?.order || SORT_ORDER.DATE_CREATED;
 
   /* Side Effects */
 
-  useEffect(() => {
+  // A layout effect so the filtered, sorted list replaces the parent's unsorted initial list before the first paint,
+  // rather than flashing the list in its unsorted order.
+  useLayoutEffect(() => {
     let gotSpotsFiltered = activeSpots;
     // Each active filter narrows the set further, so the result is the intersection of them all.
     if (activeFilters.includes(FILTERS.MAP_EXTENT)) {
@@ -269,7 +273,7 @@ gotSpotsFiltered.forEach((spot) => {
 
   const toggleReverseSort = () => {
     const newReverse = !isReverseSort;
-    setIsReverseSort(newReverse);
+    dispatch(setListSort({page: pageKey, value: {isReverse: newReverse, order: sortOrder}}));
     setSpotsSorted(getSortedSpots(sortOrder, getSearchedSpots(searchState, spotsFiltered), newReverse));
   };
 
@@ -279,7 +283,7 @@ gotSpotsFiltered.forEach((spot) => {
   };
 
   const updateSort = (sort = sortOrder) => {
-    setSortOrder(sort);
+    dispatch(setListSort({page: pageKey, value: {isReverse: isReverseSort, order: sort}}));
     setSpotsSorted(getSortedSpots(sort, getSearchedSpots(searchState, spotsFiltered), isReverseSort));
   };
 
