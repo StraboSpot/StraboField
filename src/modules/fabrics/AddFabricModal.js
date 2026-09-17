@@ -15,6 +15,8 @@ import Form from '../form/Form';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import {resolveLabelOnSave} from '../page/featureLabels.helpers';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -25,7 +27,7 @@ const AddFabricModal = () => {
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getRelevantFields, getSurvey, submitAndShowErrors} = useForm();
+  const {getChoices, getLabel, getLabels, getRelevantFields, getSurvey, submitAndShowErrors} = useForm();
 
   /* Local State */
 
@@ -79,7 +81,9 @@ const AddFabricModal = () => {
 
   const saveFabric = async () => {
     try {
-      const {values: editedFabricData} = await submitAndShowErrors(formRef.current);
+      const {values} = await submitAndShowErrors(formRef.current);
+      const editedFabricData = await resolveLabelOnSave(
+        {pageKey: PAGE_KEYS.FABRICS, values: values, getLabel: getLabel, getLabels: getLabels});
       console.log('Saving fabric data to Spot ...');
       let editedFabricsData = spot.properties.fabrics ? JSON.parse(JSON.stringify(spot.properties.fabrics)) : [];
       editedFabricsData.push({...editedFabricData, id: getNewUUID()});

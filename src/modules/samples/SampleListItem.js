@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import IGSNLogo from './igsn/IGSNLogo';
 import IGSNModal from './igsn/IGSNModal';
+import {getSampleMetadata, getSampleTitle} from './samples.helpers';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
@@ -40,7 +41,7 @@ const SampleListItem = ({
   /* Derived Variables */
 
   const isReadOnly = !canPickReadOnly && isSpotReadOnly(parentSpot);
-  const sampleMetadata = sample.properties?.isSample ? (sample.properties.samples?.[0] ?? {id: sample.properties.id}) : sample;
+  const sampleMetadata = getSampleMetadata(sample);
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 
   /* Local State */
@@ -80,7 +81,7 @@ const SampleListItem = ({
       <ListItem.Content style={sampleStyles.listContentContainer}>
         <View>
           <ListItem.Title style={{...commonStyles.listItemTitle, textAlign: 'left'}}>
-            {sampleMetadata.sample_id_name || 'Unknown'}
+            {getSampleTitle(sample)}
           </ListItem.Title>
           {isShowSubtitle && (
             <ListItem.Subtitle>

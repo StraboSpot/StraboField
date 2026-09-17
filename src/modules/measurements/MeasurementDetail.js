@@ -26,8 +26,9 @@ import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {setModalVisible} from '../home/home.slice';
+import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import PageHeader from '../page/PageHeader';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
@@ -45,7 +46,7 @@ const MeasurementDetail = ({
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {submitAndShowErrors} = useForm();
+  const {getLabel, getLabels, submitAndShowErrors} = useForm();
   const {deleteMeasurements} = useMeasurements();
   const toast = useToast();
 
@@ -273,6 +274,12 @@ const MeasurementDetail = ({
     try {
       let {errors, values: formValues} = await submitAndShowErrors(formRef.current || formCurrent,
         isLeavingPage);
+      // A bulk edit leaves the label out below, along with everything else that names one measurement rather
+      // than the group, so only a single measurement is labeled here
+      if (selectedAttributes.length === 1) {
+        formValues = await resolveLabelOnSave({pageKey: PAGE_KEYS.MEASUREMENTS,
+          previousFeature: selectedMeasurement, values: formValues, getLabel: getLabel, getLabels: getLabels});
+      }
       console.log('Saving form data to Spot ...');
       let orientationDataCopy = JSON.parse(JSON.stringify(spot.properties.orientation_data));
       let editedSelectedMeasurements = [];
@@ -343,7 +350,9 @@ const MeasurementDetail = ({
 
   const saveTemplateForm = async (formCurrent) => {
     const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
-    await saveTemplate(formValues);
+    // A template is copied into every measurement made from it, so a label would be shared by all of them
+    const {label, ...templateValues} = formValues;
+    await saveTemplate(templateValues);
   };
 
   // Switch between Planar and Tabular Zone

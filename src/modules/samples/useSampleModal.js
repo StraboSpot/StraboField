@@ -10,6 +10,7 @@ import {SMALL_SCREEN} from '../../shared/styles.constants';
 import useForm from '../form/useForm';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
+import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedProject} from '../project/projects.slice';
 import useSpots from '../spots/useSpots';
@@ -27,7 +28,7 @@ const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCur
   const {createRichSample} = useSamples();
   const {checkSampleName, getNewSpotName} = useSpots();
   const {addSpotToTags} = useTags();
-  const {submitAndShowErrors} = useForm();
+  const {getLabel, getLabels, submitAndShowErrors} = useForm();
   const toast = useToast();
 
   /* Local State */
@@ -106,7 +107,9 @@ const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCur
 
       // The values the survey validates and cleans, rather than what is sitting in the inputs: numbers converted
       // from text, text trimmed, and the fields a choice has made irrelevant left out of the sample
-      const {values: sampleValues} = await submitAndShowErrors(formRefCurrent);
+      const {values} = await submitAndShowErrors(formRefCurrent);
+      const sampleValues = await resolveLabelOnSave(
+        {pageKey: PAGE_KEYS.SAMPLES, values: values, getLabel: getLabel, getLabels: getLabels});
       const date = new Date().toISOString();
       const newId = getNewId();
       const newSample = {

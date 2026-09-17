@@ -10,6 +10,13 @@
     },
     {
       "type": "text",
+      "name": "label",
+      "label": "Label",
+      "hint": "If a label is not specified a default label will be given.",
+      "required": "false"
+    },
+    {
+      "type": "text",
       "name": "reactions",
       "label": "Reactions",
       "hint": "use mineral abbreviations, no spaces (e.g. Ab=Jd+Qz)",

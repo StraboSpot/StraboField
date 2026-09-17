@@ -28,6 +28,7 @@ import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -41,7 +42,7 @@ const AddEarthquakeModal = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getRelevantFields, getSurvey, isRelevant, submitAndShowErrors} = useForm();
+  const {getChoices, getLabel, getLabels, getRelevantFields, getSurvey, isRelevant, submitAndShowErrors} = useForm();
 
   /* Local State */
 
@@ -78,7 +79,9 @@ const AddEarthquakeModal = () => {
 
   const saveEarthquake = async () => {
     try {
-      const {values: editedEarthquakeData} = await submitAndShowErrors(formRef.current);
+      const {values} = await submitAndShowErrors(formRef.current);
+      const editedEarthquakeData = await resolveLabelOnSave(
+        {pageKey: pageKey, values: values, getLabel: getLabel, getLabels: getLabels});
       console.log('Saving earthquake data to Spot ...');
       let editedEarthquakesData = spot.properties.earthquakes
         ? JSON.parse(JSON.stringify(spot.properties.earthquakes))

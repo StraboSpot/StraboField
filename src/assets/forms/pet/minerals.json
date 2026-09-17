@@ -10,6 +10,13 @@
     },
     {
       "type": "text",
+      "name": "label",
+      "label": "Label",
+      "hint": "If a label is not specified a default label will be given.",
+      "required": "false"
+    },
+    {
+      "type": "text",
       "name": "mineral_abbrev",
       "label": "Mineral Name Abbreviation",
       "hint": "Enter mineral name abbreviation",

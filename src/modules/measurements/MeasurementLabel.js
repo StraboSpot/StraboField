@@ -3,10 +3,9 @@ import {Text} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import {FIRST_ORDER_CLASS_FIELDS, MEASUREMENT_KEYS, SECOND_ORDER_CLASS_FIELDS} from './measurements.constants';
-import {isPlanarType} from './measurements.helpers';
-import useMeasurements from './useMeasurements';
-import {isEmpty, padWithLeadingZeros, toTitleCase} from '../../shared/helpers';
+import {MEASUREMENT_KEYS} from './measurements.constants';
+import {getMeasurementTypeText, isPlanarType} from './measurements.helpers';
+import {isEmpty, padWithLeadingZeros} from '../../shared/helpers';
 import useForm from '../form/useForm';
 
 const MeasurementLabel = ({isDetail, item}) => {
@@ -15,7 +14,6 @@ const MeasurementLabel = ({isDetail, item}) => {
   const measurementConvention = useSelector(state => state.user?.measurement_convention);
 
   const {getLabel} = useForm();
-  const {getMeasurementLabel} = useMeasurements();
 
   /* Logic Helpers */
 
@@ -39,17 +37,9 @@ const MeasurementLabel = ({isDetail, item}) => {
     return measurementText === '' ? '?' : measurementText;
   };
 
-  const getTypeText = (measurement) => {
-    let firstOrderClass = FIRST_ORDER_CLASS_FIELDS.find(firstOrderClassField => measurement[firstOrderClassField]);
-    let secondOrderClass = SECOND_ORDER_CLASS_FIELDS.find(secondOrderClassField => measurement[secondOrderClassField]);
-    let firstOrderClassLabel = firstOrderClass
-      ? toTitleCase(getLabel(measurement[firstOrderClass], ['measurement']))
-      : 'Unknown';
-    firstOrderClassLabel = firstOrderClassLabel.replace('Orientation', 'Feature');
-    if (firstOrderClassLabel === 'Tabular Feature') firstOrderClassLabel = 'Planar Feature (TZ)';
-    const secondOrderClassLabel = secondOrderClass && getMeasurementLabel(measurement[secondOrderClass]).toUpperCase();
-    return firstOrderClassLabel + (secondOrderClass ? ' - ' + secondOrderClassLabel : '');
-  };
+  // The orientation numbers are always read off the measurement, so they keep following the measurement
+  // convention setting; a label only ever stands in for the descriptive half
+  const getTypeText = measurement => measurement.label || getMeasurementTypeText(measurement, getLabel);
 
   /* View */
 

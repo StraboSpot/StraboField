@@ -1,5 +1,5 @@
-import {MEASUREMENT_KEYS} from './measurements.constants';
-import {isEmpty} from '../../shared/helpers';
+import {FIRST_ORDER_CLASS_FIELDS, MEASUREMENT_KEYS, SECOND_ORDER_CLASS_FIELDS} from './measurements.constants';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 
 export const equalsIgnoreOrder = (a, b) => {
   if (a.length !== b.length) return false;
@@ -10,6 +10,23 @@ export const equalsIgnoreOrder = (a, b) => {
     if (aCount !== bCount) return false;
   }
   return true;
+};
+
+// The descriptive half of a measurement's title - what kind of feature it is, without the orientation numbers,
+// which are read off the measurement at render time so they follow the user's measurement convention.
+// getLabel is passed in because a plain helper cannot call useForm.
+export const getMeasurementTypeText = (measurement, getLabel) => {
+  const firstOrderClass = FIRST_ORDER_CLASS_FIELDS.find(firstOrderClassField => measurement[firstOrderClassField]);
+  const secondOrderClass = SECOND_ORDER_CLASS_FIELDS.find(
+    secondOrderClassField => measurement[secondOrderClassField]);
+  let firstOrderClassLabel = firstOrderClass
+    ? toTitleCase(getLabel(measurement[firstOrderClass], ['measurement']))
+    : 'Unknown';
+  firstOrderClassLabel = firstOrderClassLabel.replace('Orientation', 'Feature');
+  if (firstOrderClassLabel === 'Tabular Feature') firstOrderClassLabel = 'Planar Feature (TZ)';
+  const secondOrderClassLabel = secondOrderClass
+    && getLabel(measurement[secondOrderClass], ['measurement']).toUpperCase();
+  return firstOrderClassLabel + (secondOrderClass ? ' - ' + secondOrderClassLabel : '');
 };
 
 export const isEmptyMeasurement = (measurement) => {

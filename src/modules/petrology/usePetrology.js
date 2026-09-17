@@ -2,6 +2,7 @@ import {useDispatch} from 'react-redux';
 
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import useForm from '../form/useForm';
+import {getDefaultLabel, resolveLabelOnSave} from '../page/featureLabels.helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -11,7 +12,7 @@ const usePetrology = () => {
 
   const dispatch = useDispatch();
 
-  const {getSurvey, submitAndShowErrors} = useForm();
+  const {getLabel, getLabels, getSurvey, submitAndShowErrors} = useForm();
 
   /* Exported Functions */
 
@@ -34,9 +35,11 @@ const usePetrology = () => {
     dispatch(editedSpotProperties({field: 'pet', value: editedPetData}));
   };
 
-  const savePetFeature = async (key, spot, formCurrent, isLeavingPage) => {
+  const savePetFeature = async (key, spot, formCurrent, isLeavingPage, previousFeature) => {
     try {
-      const {errors, values: editedFeatureData} = await submitAndShowErrors(formCurrent, isLeavingPage);
+      const {errors, values} = await submitAndShowErrors(formCurrent, isLeavingPage);
+      const editedFeatureData = await resolveLabelOnSave(
+        {pageKey: key, previousFeature: previousFeature, values: values, getLabel: getLabel, getLabels: getLabels});
       console.log('Saving', key, 'data to Spot ...');
       const spotId = spot.properties.id;
       if (editedFeatureData.rock_type && (key === PAGE_KEYS.ROCK_TYPE_IGNEOUS
@@ -65,7 +68,11 @@ const usePetrology = () => {
   const savePetFeatureValuesFromTemplates = (key, spot, activeTemplates) => {
     let editedPetData = spot.properties.pet ? JSON.parse(JSON.stringify(spot.properties.pet)) : {};
     if (!editedPetData[key] || !Array.isArray(editedPetData[key])) editedPetData[key] = [];
-    activeTemplates.forEach(t => editedPetData[key].push({...t.values, id: getNewUUID()}));
+    activeTemplates.forEach((t) => {
+      const feature = {...t.values, id: getNewUUID()};
+      feature.label = getDefaultLabel(key, feature, getLabel, getLabels);
+      editedPetData[key].push(feature);
+    });
     console.log('editedPetData', editedPetData);
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'pet', value: editedPetData}));

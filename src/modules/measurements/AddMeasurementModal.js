@@ -15,7 +15,7 @@ import {
   MEASUREMENT_TYPES,
   PLANAR_COMPASS_FIELDS,
 } from './measurements.constants';
-import {equalsIgnoreOrder} from './measurements.helpers';
+import {equalsIgnoreOrder, getMeasurementTypeText} from './measurements.helpers';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
@@ -57,7 +57,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
   const templates = useSelector(state => state.project.project?.templates) || {};
 
   const {lockToCurrentOrientation, unlockOrientation} = useDeviceOrientation();
-  const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
+  const {getChoices, getLabel, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
 
@@ -199,6 +199,14 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
 
   /* Logic Helpers */
 
+  // A measurement and each orientation associated with it are separate rows, so each is named for itself
+  const withDefaultLabel = measurement => ({
+    ...measurement,
+    label: measurement.label || getMeasurementTypeText(measurement, getLabel),
+    ...(measurement.associated_orientation
+      && {associated_orientation: measurement.associated_orientation.map(withDefaultLabel)}),
+  });
+
   const saveMeasurement = async () => {
     const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
     && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
@@ -286,6 +294,11 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
         console.log('editedMeasurementData', editedMeasurementData);
         console.log('Saving Measurement data to Spot ...', editedMeasurementsData);
       }
+      // Labeled last, once every branch above has finished building the measurements: a measurement is titled
+      // by its feature_type or, failing that, its type, and an associated orientation is only told it is linear
+      // part way through. Only an empty label is filled in, so nothing already named is touched.
+      editedMeasurementsData = editedMeasurementsData.map(withDefaultLabel);
+
       // The shortcut's new Spot has to be selected before the write below, so that editedSpotProperties is what
       // leaves it selected: spotToUpdate is the copy taken before the measurement went in, and handing that back
       // afterwards would blank the page being opened.
