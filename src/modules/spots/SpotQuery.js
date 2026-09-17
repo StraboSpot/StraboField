@@ -17,6 +17,7 @@ import useSpots from './useSpots';
 import {isEmpty} from '../../shared/helpers';
 import ListQueryBar from '../../shared/ui/ListQueryBar';
 import {setListFilters} from '../main-menu-panel/mainMenuPanel.slice';
+import {isOnGeoMap} from '../maps/maps.helpers';
 import {setIsMapExtentFilterActive} from '../maps/maps.slice';
 
 const SpotQuery = ({
@@ -65,12 +66,13 @@ const SpotQuery = ({
     filterTitle = 'Sample Filters';
   }
 
-  // Recent Views stays ungrouped at the top; the Map group filters by where a Spot is mapped and the
+  // Recent Views and Map Extent stay ungrouped at the top; the Map group filters by where a Spot is mapped and the
   // Spot Data group by what it contains. QA/QC is the only testing-only member of either group.
   const mapFilters = [
-    FILTER_LABELS[FILTERS.MAP_EXTENT],
+    FILTER_LABELS[FILTERS.MAPPED_ON_GEOGRAPHIC_MAP],
     FILTER_LABELS[FILTERS.MAPPED_ON_IMAGE_BASEMAP],
     FILTER_LABELS[FILTERS.MAPPED_ON_STRAT_SECTION],
+    FILTER_LABELS[FILTERS.NOT_MAPPED],
   ];
   const spotDataFilters = SPOT_DATA_FILTERS
     .filter(filter => filter !== FILTERS.QAQC || isTestingMode)
@@ -82,7 +84,7 @@ const SpotQuery = ({
   let filterOptions = [FILTER_LABELS[FILTERS.RECENT_VIEWS], FILTER_LABELS[FILTERS.MAP_EXTENT]];
   if (pageKey === PICKER_KEYS.SPOTS) {
     filterOptions = [
-      FILTER_LABELS[FILTERS.RECENT_VIEWS],
+      ...filterOptions,
       {header: 'Map'},
       ...mapFilters,
       {header: 'Spot Data'},
@@ -95,7 +97,8 @@ const SpotQuery = ({
   else if (pageKey === PICKER_KEYS.SAMPLES) {
     filterOptions = [...filterOptions, {header: 'Sample Data'}, ...sampleDataFilters];
   }
-  // Filters are multi-select and combine as an intersection; stored as an array of view keys (empty = all).
+  // Filters are multi-select and combine as an intersection, except the Map group, where a Spot is mapped in only
+  // one place, so its filters combine as a union; stored as an array of view keys (empty = all).
   const pageFilter = listFilters?.[pageKey];
   const activeFilters = Array.isArray(pageFilter) ? pageFilter : [];
 
@@ -112,13 +115,23 @@ const SpotQuery = ({
       const recentIds = new Set(getRecentSpots().filter(Boolean).map(s => s.properties.id.toString()));
       gotSpotsFiltered = gotSpotsFiltered.filter(s => recentIds.has(s.properties.id.toString()));
     }
+    // Map filters keep Spots mapped in any of the checked places.
+    const mapFilterPredicates = {
+      [FILTERS.MAPPED_ON_GEOGRAPHIC_MAP]: s => !isEmpty(s.geometry) && isOnGeoMap(s),
+      [FILTERS.MAPPED_ON_IMAGE_BASEMAP]: s => !isEmpty(s.properties?.image_basemap),
+      [FILTERS.MAPPED_ON_STRAT_SECTION]: s => !isEmpty(s.properties?.strat_section_id),
+      [FILTERS.NOT_MAPPED]: s => isEmpty(s.geometry),
+    };
+    const activeMapPredicates = Object.entries(mapFilterPredicates)
+      .filter(([filter]) => activeFilters.includes(filter)).map(([, predicate]) => predicate);
+    if (!isEmpty(activeMapPredicates)) {
+      gotSpotsFiltered = gotSpotsFiltered.filter(s => activeMapPredicates.some(predicate => predicate(s)));
+    }
     // Spot Data filters each keep only Spots that contain that kind of data; QA/QC applies in testing mode only.
     const dataFilterPredicates = {
       [FILTERS.MEASUREMENTS]: s => !isEmpty(s.properties?.orientation_data),
       [FILTERS.NOTES]: s => !isEmpty(s.properties?.notes),
       [FILTERS.STRAT_SECTIONS]: s => !isEmpty(s.properties?.sed?.strat_section),
-      [FILTERS.MAPPED_ON_STRAT_SECTION]: s => !isEmpty(s.properties?.strat_section_id),
-      [FILTERS.MAPPED_ON_IMAGE_BASEMAP]: s => !isEmpty(s.properties?.image_basemap),
       [FILTERS.QAQC]: s => !isEmpty(s.properties?.qaqc),
     };
     Object.entries(dataFilterPredicates).forEach(([filter, predicate]) => {
@@ -168,7 +181,7 @@ const SpotQuery = ({
     else if (activeFilters.length === 1) {
       const filter = activeFilters[0];
       const label = FILTER_LABELS[filter];
-      if (/^(In|On) /.test(label)) scopeText = label.charAt(0).toLowerCase() + label.slice(1);
+      if (/^(In|Not|On) /.test(label)) scopeText = label.charAt(0).toLowerCase() + label.slice(1);
       else if ([...SPOT_DATA_FILTERS, ...IMAGE_DATA_FILTERS, ...SAMPLE_DATA_FILTERS].includes(filter)) {
         // Child-level (image/sample) filters narrow to matching children, so use a singular phrase for a lone match.
         let childCount = 0;
