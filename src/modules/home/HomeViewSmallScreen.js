@@ -109,6 +109,7 @@ const HomeViewSmallScreen = forwardRef(({
       {isShowingSpotNavigator && !isNotebookPanelVisible ? (
         <SpotNavigator
           closeSpotsNavigator={toggleSpotNavigator}
+          openMainMenuPanel={openMainMenuPanel}
           openNotebookPanel={openNotebookPanel}
           openSpotInNotebook={openSpotInNotebook}
         />

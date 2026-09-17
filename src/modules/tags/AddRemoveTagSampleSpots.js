@@ -7,8 +7,8 @@ import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
-import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
+import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
+import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../main-menu-panel/side-panel/SidePanelHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import Samples from '../samples/Samples';
@@ -46,6 +46,11 @@ const AddRemoveTagSampleSpots = ({openSpotInNotebook}) => {
     );
   };
 
+  const openDatasetsPage = () => {
+    dispatch(setSidePanelVisible({bool: false}));
+    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+  };
+
   /* View */
 
   return (
@@ -60,6 +65,7 @@ const AddRemoveTagSampleSpots = ({openSpotInNotebook}) => {
           checkedItems={selectedTag?.spots || []}
           isCheckedList
           onChecked={handleSampleChecked}
+          openDatasetsPage={openDatasetsPage}
         />
       </View>
     </View>

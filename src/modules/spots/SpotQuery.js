@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -168,7 +169,10 @@ const SpotQuery = ({
         gotSpotsFiltered = gotSpotsFiltered.reduce((acc, spot) => {
           const matchingSamples = spot.properties.samples?.filter(
             sample => activeSamplePredicates.every(predicate => predicate(sample))) || [];
-          if (!isEmpty(matchingSamples)) acc.push({...spot, properties: {...spot.properties, samples: matchingSamples}});
+          if (!isEmpty(matchingSamples)) {
+acc.push(
+            {...spot, properties: {...spot.properties, samples: matchingSamples}});
+}
           return acc;
         }, []);
       }
@@ -185,8 +189,16 @@ const SpotQuery = ({
       else if ([...SPOT_DATA_FILTERS, ...IMAGE_DATA_FILTERS, ...SAMPLE_DATA_FILTERS].includes(filter)) {
         // Child-level (image/sample) filters narrow to matching children, so use a singular phrase for a lone match.
         let childCount = 0;
-        if (isImagesSearch) gotSpotsFiltered.forEach((spot) => {childCount += spot.properties.images?.length || 0;});
-        else if (isSamplesSearch) gotSpotsFiltered.forEach((spot) => {childCount += spot.properties.samples?.length || 0;});
+        if (isImagesSearch) {
+gotSpotsFiltered.forEach((spot) => {
+          childCount += spot.properties.images?.length || 0;
+        });
+}
+        else if (isSamplesSearch) {
+gotSpotsFiltered.forEach((spot) => {
+          childCount += spot.properties.samples?.length || 0;
+        });
+}
         const singularLabel = FILTER_LABELS_SINGULAR[filter];
         if (IMAGE_TYPE_FILTERS.includes(filter)) {
           scopeText = childCount === 1 ? `that is ${singularLabel}` : `that are ${label}`;
@@ -276,19 +288,21 @@ const SpotQuery = ({
   return (
     <>
       {!isEmpty(activeSpots) && (
-        <ListQueryBar
-          filterOptions={filterOptions}
-          filterTitle={filterTitle}
-          filterValues={activeFilters.map(filter => FILTER_LABELS[filter])}
-          onFilterClear={clearFilter}
-          onFilterToggle={toggleFilter}
-          onReversePress={toggleReverseSort}
-          onSearchChange={updateSearch}
-          onSortSelect={updateSort}
-          searchValue={searchState}
-          sortOptions={Object.values(SORT_ORDER)}
-          sortValue={sortOrder}
-        />
+        <View style={{paddingBottom: 10}}>
+          <ListQueryBar
+            filterOptions={filterOptions}
+            filterTitle={filterTitle}
+            filterValues={activeFilters.map(filter => FILTER_LABELS[filter])}
+            onFilterClear={clearFilter}
+            onFilterToggle={toggleFilter}
+            onReversePress={toggleReverseSort}
+            onSearchChange={updateSearch}
+            onSortSelect={updateSort}
+            searchValue={searchState}
+            sortOptions={Object.values(SORT_ORDER)}
+            sortValue={sortOrder}
+          />
+        </View>
       )}
     </>
   );

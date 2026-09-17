@@ -15,6 +15,7 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {setModalVisible} from '../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
+import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 import Overview from '../page/Overview';
 import {NOTEBOOK_PAGES, SUBPAGES} from '../page/page.constants';
@@ -93,6 +94,12 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       else dispatch(setModalVisible({modal: page.key}));
     }
     else dispatch(setModalVisible({modal: null}));
+  };
+
+  const openDatasetsPage = () => {
+    dispatch(setSidePanelVisible({bool: false}));
+    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+    if (openMainMenuPanel) openMainMenuPanel();
   };
 
   /* Render Functions */
@@ -181,7 +188,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
             </Text>
           </View>
         </View>
-        <SpotsList onPress={handleSpotSelected}/>
+        <SpotsList onPress={handleSpotSelected} openDatasetsPage={openDatasetsPage}/>
         {!SMALL_SCREEN && (
           <ClearButton
             onPress={closeNotebookPanel}

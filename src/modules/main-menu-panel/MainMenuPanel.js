@@ -1,9 +1,10 @@
 import React, {forwardRef, useEffect, useState} from 'react';
 import {KeyboardAvoidingView, Platform, View} from 'react-native';
 
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from './mainMenu.constants';
+import {setMenuSelectionPage} from './mainMenuPanel.slice';
 import mainMenuPanelStyles from './mainMenuPanel.styles';
 import MainMenuPanelHeader from './MainMenuPanelHeader';
 import MainMenuPanelList from './MainMenuPanelList';
@@ -58,6 +59,7 @@ const MainMenuPanel = forwardRef(({
 
   /* Data Hooks */
 
+  const dispatch = useDispatch();
   const isSidePanelVisible = useSelector(state => state.mainMenu.isSidePanelVisible);
   const mainMenuPageVisible = useSelector(state => state.mainMenu.mainMenuPageVisible);
   const sidePanelView = useSelector(state => state.mainMenu.sidePanelView);
@@ -78,6 +80,10 @@ const MainMenuPanel = forwardRef(({
     setSearchState('');
     setIsTagsOverflowMenuVisible(false);
   }, [mainMenuPageVisible]);
+
+  /* Logic Helpers */
+
+  const openDatasetsPage = () => dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
 
   /* Render Functions */
 
@@ -120,17 +126,20 @@ const MainMenuPanel = forwardRef(({
         return (
           <SpotsList
             onPress={openSpotInNotebook}
+            openDatasetsPage={openDatasetsPage}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.IMAGES:
         return (
           <ImageGallery
+            openDatasetsPage={openDatasetsPage}
             openSpotInNotebook={openSpotInNotebook}
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.SAMPLES:
         return (
           <Samples
+            openDatasetsPage={openDatasetsPage}
             openSpotInNotebook={openSpotInNotebook}
           />
         );
@@ -152,7 +161,7 @@ const MainMenuPanel = forwardRef(({
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.STRAT_SECTIONS :
-        return <StratSectionsList closeManMenuPanel={closeMainMenuPanel}/>;
+        return <StratSectionsList closeManMenuPanel={closeMainMenuPanel} openDatasetsPage={openDatasetsPage}/>;
       case MAIN_MENU_ITEMS.PROJECT_DATA.DAILY_NOTES:
         return <DailyNotes/>;
 
@@ -160,7 +169,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.MAPS.CUSTOM:
         return <ManageCustomMaps zoomToCustomMap={mapComponentRef?.current?.zoomToCustomMap}/>;
       case MAIN_MENU_ITEMS.MAPS.IMAGE_BASEMAPS :
-        return <ImageBasemapsList closeManMenuPanel={closeMainMenuPanel}/>;
+        return <ImageBasemapsList closeManMenuPanel={closeMainMenuPanel} openDatasetsPage={openDatasetsPage}/>;
       case MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS:
         return (
           <ManageOfflineMapsMenu
