@@ -1,6 +1,7 @@
 import {createSlice, current} from '@reduxjs/toolkit';
 
 import {getUniqueTitle, isEmpty} from '../../shared/helpers';
+import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 
 // The placeholder editedSpotImages gives an image that arrives with no title of its own
 const UNTITLED_TITLE = /^Untitled \d+$/;
@@ -191,6 +192,16 @@ const spotSlice = createSlice({
       state.recentViews = recentViewsArr;
       state.selectedAttributes = [];
     },
+  },
+  extraReducers: (builder) => {
+    // A selected feature belongs to the page it was selected on, so leaving that page drops it. Without this a
+    // page opened after one with something selected read that selection at mount - it is in the store before the
+    // new page first renders - and opened a detail view over a record belonging to the page just left, which
+    // then saved that record's fields into this page's data. Opening a feature from another page's list
+    // therefore has to set the page before the feature - see openFeatureInNotebook.
+    builder.addCase(setNotebookPageVisible, (state) => {
+      state.selectedAttributes = [];
+    });
   },
 });
 

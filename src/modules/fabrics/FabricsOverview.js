@@ -7,8 +7,8 @@ import {DEPRECATED_FABRIC_TYPE, FABRICS_GROUP_KEY} from './fabric.constants';
 import FabricListItem from './FabricListItem';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import {openFeatureInNotebook} from '../notebook-panel/notebook.helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {setSelectedAttributes} from '../spots/spots.slice';
 
 const FabricsOverview = ({page}) => {
   /* Data Hooks */
@@ -23,10 +23,7 @@ const FabricsOverview = ({page}) => {
 
   /* Event Handlers */
 
-  const onFabricPressed = (fabric) => {
-    dispatch(setSelectedAttributes([fabric]));
-    dispatch(setNotebookPageVisible(page.key));
-  };
+  const onFabricPressed = fabric => openFeatureInNotebook(dispatch, page.key, fabric);
 
   /* View */
 

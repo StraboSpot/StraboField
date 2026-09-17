@@ -5,7 +5,7 @@ import {getNewUUID, isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import useForm from '../form/useForm';
-import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import {openFeatureInNotebook} from '../notebook-panel/notebook.helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
@@ -125,10 +125,7 @@ const useMeasurements = () => {
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'orientation_data', value: orientations}));
 
-      if (compassMeasurements.manual) {
-        dispatch(setSelectedAttributes([newOrientation]));
-        dispatch(setNotebookPageVisible(PAGE_KEYS.MEASUREMENTS));
-      }
+      if (compassMeasurements.manual) openFeatureInNotebook(dispatch, PAGE_KEYS.MEASUREMENTS, newOrientation);
     }
     else alert('No Measurement Type', 'Please select a measurement type using the toggles.');
   };

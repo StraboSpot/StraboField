@@ -6,8 +6,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import MeasurementItem from './MeasurementItem';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import {openFeatureInNotebook} from '../notebook-panel/notebook.helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {setSelectedAttributes} from '../spots/spots.slice';
 
 const MeasurementsOverview = ({page}) => {
   /* Data Hooks */
@@ -17,10 +17,7 @@ const MeasurementsOverview = ({page}) => {
 
   /* Event Handlers */
 
-  const onMeasurementPressed = (item) => {
-    dispatch(setSelectedAttributes([item]));
-    dispatch(setNotebookPageVisible(page.key));
-  };
+  const onMeasurementPressed = item => openFeatureInNotebook(dispatch, page.key, item);
 
   /* View */
 

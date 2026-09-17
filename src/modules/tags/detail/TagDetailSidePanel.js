@@ -36,8 +36,9 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
 
   const openFeatureDetail = (spot, feature, featureType) => {
     dispatch(setSelectedSpot(spot));
-    dispatch(setSelectedAttributes([feature]));
+    // The panel opens the page, so the feature is selected after it, the same way openFeatureInNotebook does
     openNotebookPanel(featureType);
+    dispatch(setSelectedAttributes([feature]));
   };
 
   // The memo modal is rendered at the app level off modalVisible, so it opens over the panel as it does from the
