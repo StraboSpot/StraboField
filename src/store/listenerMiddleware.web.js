@@ -209,8 +209,6 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
     return;
   }
 
-  Toast.hideAll();
-  let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
   console.log('Action:', action, 'Spot edited:', action.payload);
 
   listenerApi.cancelActiveListeners();      // Can cancel other running instances
@@ -251,10 +249,7 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
     // Get dataset for spot
     let dataset = datasets.find(d => d.spotIds?.some(id => isSameId(id, spotId)));
     // Nothing to send while the Spot belongs to no dataset, as above, and no sibling Spot to send it with here
-    if (!dataset) {
-      Toast.hideAll();
-      return;
-    }
+    if (!dataset) return;
     dataset = {...dataset, spots: turf.featureCollection([spot])};
 
     // Create object to send to server
@@ -266,6 +261,11 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
     objectToSend = {project: {...project, datasets: cleanDatasets(datasets)}};
   }
   const jsonToSend = JSON.parse(JSON.stringify(objectToSend));
+
+  // Shown only once there is something to send. Toast.show puts the toast up on the next frame, so a Toast.hideAll
+  // on this one runs before it exists and leaves it saying 'Saving changes...' for its full duration.
+  Toast.hideAll();
+  let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
 
   try {
     // Send object to server
