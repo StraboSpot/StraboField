@@ -18,7 +18,7 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 
 const RELEASE_NOTES = [
   {
-    version: '2.32.1',
+    version: '2.32.0',
     groups: [
       {
         title: 'Stability',

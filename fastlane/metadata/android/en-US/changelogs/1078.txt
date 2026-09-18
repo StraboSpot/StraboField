@@ -1,4 +1,4 @@
-StraboField 2.32.1
+StraboField 2.32.0
 
 • Stability: Crash fix; Fewer crashes
 • Forms & validation: Live form validation; Find the problem field; Auto dip direction; Negative numbers on iOS
@@ -7,4 +7,4 @@ StraboField 2.32.1
 • Tags: Memos on tags; Cleaner tag counts; Sample tagging
 • Memos: Memo authorship; Associated samples; Memos in Overview
 
-Full notes: https://github.com/StraboSpot/StraboField/releases/tag/v2.32.1
+Full notes: https://github.com/StraboSpot/StraboField/releases/tag/v2.32.0
