@@ -9,8 +9,14 @@ import CompassModule from './CompassModule';
 import useMapCoords from '../../modules/maps/view/useMapCoords';
 import useMapLocation from '../../modules/maps/view/useMapLocation';
 import {updatedProject} from '../../modules/project/projects.slice';
+import {isOnGeoMap} from '../../modules/spots/spots.helpers';
+import useSpots from '../../modules/spots/useSpots';
 import {isEmpty, roundToDecimalPlaces} from '../../shared/helpers';
 import {store} from '../../store/ConfigureStore';
+
+// Where a resolved declination came from, in priority order. null means it could not be resolved and the
+// compass should be disabled for the measurement.
+export const DECLINATION_SOURCE = {CENTROID: 'centroid', GPS: 'gps', PROJECT: 'project'};
 
 const useCompassCore = () => {
   /* Data Hooks */
@@ -19,10 +25,12 @@ const useCompassCore = () => {
 
   const {getCentroidOfSelectedSpot} = useMapCoords();
   const {getCurrentLocation} = useMapLocation();
+  const {getRootSpotGeoCoords} = useSpots();
 
   /* Local State */
 
   const calibrationSubscription = useRef(null);
+  const declinationSource = useRef(null); // which fallback the applied declination came from, recorded on the measurement
   const imageCapturedDeclination = useRef(0);
   const imageCaptureReference = useRef(null); // 'true' | 'magnetic' — reference frame of the captured matrix (iOS)
   const imageCaptureSubscription = useRef(null);
@@ -76,6 +84,7 @@ const useCompassCore = () => {
     const dipDirection = mod(strike + 90, 360);
     setCompassData({
       declination: declination.toFixed(2),
+      declination_source: declinationSource.current,
       dip: roundToDecimalPlaces(dip, 0),
       dip_direction: roundToDecimalPlaces(dipDirection, 0),
       magHeading: roundToDecimalPlaces(magneticHeading, 0),
@@ -138,27 +147,64 @@ const useCompassCore = () => {
 
   /* Exported Functions */
 
+  // Resolve the declination to apply to a measurement, following the fallback order:
+  //   1. Live device GPS - matches exactly where the measurement is taken.
+  //   2. A declination recorded on the project (e.g. manually entered on a GPS-less device).
+  //   3. The centroid of the Spot itself, or its nearest geographic parent - less precise, so the caller
+  //      warns that the feature's creation location is being used.
+  //   4. Nothing to derive from - the caller disables the compass until a location or declination exists.
+  // Returns {declination, source}; source is null (declination null) only in the disabled case.
   const fetchDeclination = async () => {
-    // A declination already on the project — manually entered on a GPS-less device, or auto-recorded on a
-    // previous fetch — is the source of truth: use it and skip the location lookup, which fails when there's
-    // no GPS. This is what lets Wi-Fi-only iPads/tablets work by manual entry.
+    // 1. Live GPS. Stay silent when location is blocked/unavailable - we have fallbacks and shouldn't nag a
+    // GPS-less device on every compass open.
+    try {
+      const {longitude, latitude} = await getCurrentLocation({showBlockedAlert: false});
+      const declination = declinationAtCoords([longitude, latitude]);
+      magneticDeclination.current = declination;
+      declinationSource.current = DECLINATION_SOURCE.GPS;
+      recordDeclinationToProject(declination); // seed the project reference while it is still empty
+      return {declination, source: DECLINATION_SOURCE.GPS};
+    }
+    catch (err) {
+      console.log('No live GPS for declination; trying fallbacks', err);
+    }
+
+    // 2. A declination already recorded on the project.
     const projectDeclination = getProjectDeclination();
     if (projectDeclination !== null) {
       magneticDeclination.current = projectDeclination;
-      return projectDeclination;
+      declinationSource.current = DECLINATION_SOURCE.PROJECT;
+      return {declination: projectDeclination, source: DECLINATION_SOURCE.PROJECT};
     }
-    let longitude, latitude;
-    if (!isEmpty(selectedSpot)) [longitude, latitude] = getCentroidOfSelectedSpot();
-    else {
-      const locationData = await getCurrentLocation();
-      longitude = locationData.longitude;
-      latitude = locationData.latitude;
+
+    // 3. Centroid of the selected Spot or its nearest geographic parent.
+    const geoCoords = getSpotGeoCoords();
+    if (geoCoords) {
+      const declination = declinationAtCoords(geoCoords);
+      magneticDeclination.current = declination;
+      declinationSource.current = DECLINATION_SOURCE.CENTROID;
+      recordDeclinationToProject(declination);
+      return {declination, source: DECLINATION_SOURCE.CENTROID};
     }
+
+    // 4. Nothing available - the compass can't produce a true-north reading for this measurement.
+    declinationSource.current = null;
+    return {declination: null, source: null};
+  };
+
+  const declinationAtCoords = ([longitude, latitude]) => {
     const result = geomagnetism.model().point([latitude, longitude]);
     console.log('MagDeclination', result);
-    magneticDeclination.current = result.decl;
-    recordDeclinationToProject(result.decl);
-    return result.decl;
+    return roundToDecimalPlaces(result.decl, 2);
+  };
+
+  // Real-world [lng, lat] for the selected Spot: its own centroid when it's on the geographic map, otherwise
+  // the nearest parent Spot's location (a Spot on an image basemap or strat section has pixel coordinates, not
+  // lng/lat). Returns undefined when neither the Spot nor any parent has a geographic location.
+  const getSpotGeoCoords = () => {
+    if (isEmpty(selectedSpot)) return undefined;
+    if (isOnGeoMap(selectedSpot)) return isEmpty(selectedSpot.geometry) ? undefined : getCentroidOfSelectedSpot();
+    return getRootSpotGeoCoords(selectedSpot.properties.image_basemap, selectedSpot.properties.strat_section_id);
   };
 
   // The declination currently stored on the project, or null when it hasn't been set. A blank field
@@ -170,9 +216,9 @@ const useCompassCore = () => {
     return Number.isFinite(value) && value !== 0 ? value : null;
   };
 
-  // Auto-fill the Project Description's Magnetic Declination from the location-derived value, but only when
-  // it hasn't been set yet. A value the user typed (or a prior auto-fill) always wins, so the field stays
-  // freely editable and we never clobber a manual entry. Read live from the store rather than a hook
+  // Record the location-derived declination on the Project Description as a reference value, but only when
+  // the field hasn't been set yet. A value the user typed (or a prior auto-fill) always wins, so the field
+  // stays freely editable and we never clobber a manual entry. Read live from the store rather than a hook
   // selector so an async caller doesn't persist against a stale project.
   const recordDeclinationToProject = (declination) => {
     const project = store.getState().project.project;
@@ -198,7 +244,8 @@ const useCompassCore = () => {
 
   const startCameraAnglesCapture = async () => {
     try {
-      imageCapturedDeclination.current = await fetchDeclination();
+      const {declination} = await fetchDeclination();
+      imageCapturedDeclination.current = declination ?? 0;
       const CompassEvents = new NativeEventEmitter(CompassModule);
       imageCaptureSubscription.current = CompassEvents.addListener('rotationMatrix', (matrixData) => {
         matrixRawData.current = Platform.OS === 'ios' ? matrixData.matrix : matrixData;
