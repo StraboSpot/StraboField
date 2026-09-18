@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
+import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -16,7 +17,8 @@ import {
 import useSpots from './useSpots';
 import {isEmpty} from '../../shared/helpers';
 import ListQueryBar from '../../shared/ui/ListQueryBar';
-import {setListFilters} from '../main-menu-panel/mainMenuPanel.slice';
+import {setListFilters, setListSort} from '../main-menu-panel/mainMenuPanel.slice';
+import {isOnGeoMap} from '../maps/maps.helpers';
 import {setIsMapExtentFilterActive} from '../maps/maps.slice';
 
 const SpotQuery = ({
@@ -31,6 +33,7 @@ const SpotQuery = ({
   const dispatch = useDispatch();
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const listFilters = useSelector(state => state.mainMenu.listFilters);
+  const listSorts = useSelector(state => state.mainMenu.listSorts);
   const recentViews = useSelector(state => state.spot.recentViews);
   const spots = useSelector(state => state.spot.spots);
   const spotsInMapExtentIds = useSelector(state => state.map.spotsInMapExtentIds);
@@ -46,9 +49,7 @@ const SpotQuery = ({
 
   /* Local State */
 
-  const [isReverseSort, setIsReverseSort] = useState(false);
   const [searchState, setSearchState] = useState('');
-  const [sortOrder, setSortOrder] = useState('Date Created');
   const [spotsFiltered, setSpotsFiltered] = useState(activeSpots);
 
   /* Derived Variables */
@@ -65,12 +66,13 @@ const SpotQuery = ({
     filterTitle = 'Sample Filters';
   }
 
-  // Recent Views stays ungrouped at the top; the Map group filters by where a Spot is mapped and the
+  // Recent Views and Map Extent stay ungrouped at the top; the Map group filters by where a Spot is mapped and the
   // Spot Data group by what it contains. QA/QC is the only testing-only member of either group.
   const mapFilters = [
-    FILTER_LABELS[FILTERS.MAP_EXTENT],
+    FILTER_LABELS[FILTERS.MAPPED_ON_GEOGRAPHIC_MAP],
     FILTER_LABELS[FILTERS.MAPPED_ON_IMAGE_BASEMAP],
     FILTER_LABELS[FILTERS.MAPPED_ON_STRAT_SECTION],
+    FILTER_LABELS[FILTERS.NOT_MAPPED],
   ];
   const spotDataFilters = SPOT_DATA_FILTERS
     .filter(filter => filter !== FILTERS.QAQC || isTestingMode)
@@ -82,7 +84,7 @@ const SpotQuery = ({
   let filterOptions = [FILTER_LABELS[FILTERS.RECENT_VIEWS], FILTER_LABELS[FILTERS.MAP_EXTENT]];
   if (pageKey === PICKER_KEYS.SPOTS) {
     filterOptions = [
-      FILTER_LABELS[FILTERS.RECENT_VIEWS],
+      ...filterOptions,
       {header: 'Map'},
       ...mapFilters,
       {header: 'Spot Data'},
@@ -95,13 +97,19 @@ const SpotQuery = ({
   else if (pageKey === PICKER_KEYS.SAMPLES) {
     filterOptions = [...filterOptions, {header: 'Sample Data'}, ...sampleDataFilters];
   }
-  // Filters are multi-select and combine as an intersection; stored as an array of view keys (empty = all).
+  // Filters are multi-select and combine as an intersection, except the Map group, where a Spot is mapped in only
+  // one place, so its filters combine as a union; stored as an array of view keys (empty = all).
   const pageFilter = listFilters?.[pageKey];
   const activeFilters = Array.isArray(pageFilter) ? pageFilter : [];
+  // The sort is kept per page in Redux too, so the list comes back in the same order.
+  const isReverseSort = !!listSorts?.[pageKey]?.isReverse;
+  const sortOrder = listSorts?.[pageKey]?.order || SORT_ORDER.DATE_CREATED;
 
   /* Side Effects */
 
-  useEffect(() => {
+  // A layout effect so the filtered, sorted list replaces the parent's unsorted initial list before the first paint,
+  // rather than flashing the list in its unsorted order.
+  useLayoutEffect(() => {
     let gotSpotsFiltered = activeSpots;
     // Each active filter narrows the set further, so the result is the intersection of them all.
     if (activeFilters.includes(FILTERS.MAP_EXTENT)) {
@@ -112,13 +120,23 @@ const SpotQuery = ({
       const recentIds = new Set(getRecentSpots().filter(Boolean).map(s => s.properties.id.toString()));
       gotSpotsFiltered = gotSpotsFiltered.filter(s => recentIds.has(s.properties.id.toString()));
     }
+    // Map filters keep Spots mapped in any of the checked places.
+    const mapFilterPredicates = {
+      [FILTERS.MAPPED_ON_GEOGRAPHIC_MAP]: s => !isEmpty(s.geometry) && isOnGeoMap(s),
+      [FILTERS.MAPPED_ON_IMAGE_BASEMAP]: s => !isEmpty(s.properties?.image_basemap),
+      [FILTERS.MAPPED_ON_STRAT_SECTION]: s => !isEmpty(s.properties?.strat_section_id),
+      [FILTERS.NOT_MAPPED]: s => isEmpty(s.geometry),
+    };
+    const activeMapPredicates = Object.entries(mapFilterPredicates)
+      .filter(([filter]) => activeFilters.includes(filter)).map(([, predicate]) => predicate);
+    if (!isEmpty(activeMapPredicates)) {
+      gotSpotsFiltered = gotSpotsFiltered.filter(s => activeMapPredicates.some(predicate => predicate(s)));
+    }
     // Spot Data filters each keep only Spots that contain that kind of data; QA/QC applies in testing mode only.
     const dataFilterPredicates = {
       [FILTERS.MEASUREMENTS]: s => !isEmpty(s.properties?.orientation_data),
       [FILTERS.NOTES]: s => !isEmpty(s.properties?.notes),
       [FILTERS.STRAT_SECTIONS]: s => !isEmpty(s.properties?.sed?.strat_section),
-      [FILTERS.MAPPED_ON_STRAT_SECTION]: s => !isEmpty(s.properties?.strat_section_id),
-      [FILTERS.MAPPED_ON_IMAGE_BASEMAP]: s => !isEmpty(s.properties?.image_basemap),
       [FILTERS.QAQC]: s => !isEmpty(s.properties?.qaqc),
     };
     Object.entries(dataFilterPredicates).forEach(([filter, predicate]) => {
@@ -155,7 +173,10 @@ const SpotQuery = ({
         gotSpotsFiltered = gotSpotsFiltered.reduce((acc, spot) => {
           const matchingSamples = spot.properties.samples?.filter(
             sample => activeSamplePredicates.every(predicate => predicate(sample))) || [];
-          if (!isEmpty(matchingSamples)) acc.push({...spot, properties: {...spot.properties, samples: matchingSamples}});
+          if (!isEmpty(matchingSamples)) {
+acc.push(
+            {...spot, properties: {...spot.properties, samples: matchingSamples}});
+}
           return acc;
         }, []);
       }
@@ -168,12 +189,20 @@ const SpotQuery = ({
     else if (activeFilters.length === 1) {
       const filter = activeFilters[0];
       const label = FILTER_LABELS[filter];
-      if (/^(In|On) /.test(label)) scopeText = label.charAt(0).toLowerCase() + label.slice(1);
+      if (/^(In|Not|On) /.test(label)) scopeText = label.charAt(0).toLowerCase() + label.slice(1);
       else if ([...SPOT_DATA_FILTERS, ...IMAGE_DATA_FILTERS, ...SAMPLE_DATA_FILTERS].includes(filter)) {
         // Child-level (image/sample) filters narrow to matching children, so use a singular phrase for a lone match.
         let childCount = 0;
-        if (isImagesSearch) gotSpotsFiltered.forEach((spot) => {childCount += spot.properties.images?.length || 0;});
-        else if (isSamplesSearch) gotSpotsFiltered.forEach((spot) => {childCount += spot.properties.samples?.length || 0;});
+        if (isImagesSearch) {
+gotSpotsFiltered.forEach((spot) => {
+          childCount += spot.properties.images?.length || 0;
+        });
+}
+        else if (isSamplesSearch) {
+gotSpotsFiltered.forEach((spot) => {
+          childCount += spot.properties.samples?.length || 0;
+        });
+}
         const singularLabel = FILTER_LABELS_SINGULAR[filter];
         if (IMAGE_TYPE_FILTERS.includes(filter)) {
           scopeText = childCount === 1 ? `that is ${singularLabel}` : `that are ${label}`;
@@ -244,7 +273,7 @@ const SpotQuery = ({
 
   const toggleReverseSort = () => {
     const newReverse = !isReverseSort;
-    setIsReverseSort(newReverse);
+    dispatch(setListSort({page: pageKey, value: {isReverse: newReverse, order: sortOrder}}));
     setSpotsSorted(getSortedSpots(sortOrder, getSearchedSpots(searchState, spotsFiltered), newReverse));
   };
 
@@ -254,7 +283,7 @@ const SpotQuery = ({
   };
 
   const updateSort = (sort = sortOrder) => {
-    setSortOrder(sort);
+    dispatch(setListSort({page: pageKey, value: {isReverse: isReverseSort, order: sort}}));
     setSpotsSorted(getSortedSpots(sort, getSearchedSpots(searchState, spotsFiltered), isReverseSort));
   };
 
@@ -263,19 +292,21 @@ const SpotQuery = ({
   return (
     <>
       {!isEmpty(activeSpots) && (
-        <ListQueryBar
-          filterOptions={filterOptions}
-          filterTitle={filterTitle}
-          filterValues={activeFilters.map(filter => FILTER_LABELS[filter])}
-          onFilterClear={clearFilter}
-          onFilterToggle={toggleFilter}
-          onReversePress={toggleReverseSort}
-          onSearchChange={updateSearch}
-          onSortSelect={updateSort}
-          searchValue={searchState}
-          sortOptions={Object.values(SORT_ORDER)}
-          sortValue={sortOrder}
-        />
+        <View style={{paddingBottom: 10}}>
+          <ListQueryBar
+            filterOptions={filterOptions}
+            filterTitle={filterTitle}
+            filterValues={activeFilters.map(filter => FILTER_LABELS[filter])}
+            onFilterClear={clearFilter}
+            onFilterToggle={toggleFilter}
+            onReversePress={toggleReverseSort}
+            onSearchChange={updateSearch}
+            onSortSelect={updateSort}
+            searchValue={searchState}
+            sortOptions={Object.values(SORT_ORDER)}
+            sortValue={sortOrder}
+          />
+        </View>
       )}
     </>
   );

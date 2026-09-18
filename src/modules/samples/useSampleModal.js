@@ -10,12 +10,13 @@ import {SMALL_SCREEN} from '../../shared/styles.constants';
 import useForm from '../form/useForm';
 import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
+import {resolveLabelOnSave} from '../page/featureLabels.helpers';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedProject} from '../project/projects.slice';
 import useSpots from '../spots/useSpots';
 import useTags from '../tags/useTags';
 
-const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
+const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCurrentLocation}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -27,7 +28,7 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
   const {createRichSample} = useSamples();
   const {checkSampleName, getNewSpotName} = useSpots();
   const {addSpotToTags} = useTags();
-  const {submitAndShowErrors} = useForm();
+  const {getLabel, getLabels, submitAndShowErrors} = useForm();
   const toast = useToast();
 
   /* Local State */
@@ -106,7 +107,9 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
 
       // The values the survey validates and cleans, rather than what is sitting in the inputs: numbers converted
       // from text, text trimmed, and the fields a choice has made irrelevant left out of the sample
-      const {values: sampleValues} = await submitAndShowErrors(formRefCurrent);
+      const {values} = await submitAndShowErrors(formRefCurrent);
+      const sampleValues = await resolveLabelOnSave(
+        {pageKey: PAGE_KEYS.SAMPLES, values: values, getLabel: getLabel, getLabels: getLabels});
       const date = new Date().toISOString();
       const newId = getNewId();
       const newSample = {
@@ -120,10 +123,15 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
         const pointSetAtCurrentLocation = await setPointAtCurrentLocation();
         pointSetAtCurrentLocation.properties.samples = [newSample];
         console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
-        createRichSample(pointSetAtCurrentLocation, newSample, sampleImages);
-        toastRef.current?.show('Sample Saved!', {duration: 2000, placement: 'top', type: 'success'});
+        const sampleSpot = createRichSample(pointSetAtCurrentLocation, newSample, sampleImages);
         setIsLoading(false);
+        // No target dataset means no Sample Spot to open
+        if (sampleSpot) openSpotInNotebook(sampleSpot, PAGE_KEYS.SAMPLES);
+        closeModal();
         await zoomToCurrentLocation();
+        // The app's own toast, after the modal has gone and the zoom has finished. The modal's Toast unmounts
+        // with it, and is only ever mounted on a small screen, so it showed briefly or not at all.
+        if (Platform.OS !== 'web') toast.show('Sample Saved!', {duration: 2000, placement: 'top', type: 'success'});
       }
       else {
         dispatch(setModalVisible({modal: null}));
@@ -132,7 +140,7 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
           field: 'preferences',
           value: {...preferences, starting_sample_number: namePostfix ? startingNumber : startingNumber + 1},
         }));
-        toast.show('Sample Saved!', {duration: 2000, placement: 'top', type: 'success'});
+        if (Platform.OS !== 'web') toast.show('Sample Saved!', {duration: 2000, placement: 'top', type: 'success'});
         setIsLoading(false);
       }
 
@@ -140,7 +148,6 @@ const useSampleModal = ({setIsWarningModalVisible, zoomToCurrentLocation}) => {
 
       dispatch(setLoadingStatus({bool: false, view: 'home'}));
       await formRefCurrent.resetForm();
-      if (modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) closeModal();
 
       if (newSample.sample_id_name) {
         const foundDuplicateName = await checkSampleName(newSample.sample_id_name);

@@ -4,7 +4,7 @@ import {FlatList, Text, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {ADD_REACTION_TEXTURE_KEYS} from './reactionTextures.constants';
-import {getNewId, isEmpty} from '../../../shared/helpers';
+import {getNewUUID, isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
@@ -78,7 +78,7 @@ const AddReactionTextureModal = () => {
   const saveReactionTexture = async () => {
     try {
       await savePetFeature(petKey, spot, formRef.current);
-      formRef.current?.setFieldValue('id', getNewId());
+      formRef.current?.setFieldValue('id', getNewUUID());
       if (SMALL_SCREEN) closeModal();
     }
     catch (err) {
@@ -103,7 +103,7 @@ const AddReactionTextureModal = () => {
             <View style={{flex: 1}}>
               <FormikWrapper
                 formName={formName}
-                initialValues={{id: getNewId()}}
+                initialValues={{id: getNewUUID()}}
                 innerRef={formRef}
               >
                 {formProps => (

@@ -4,7 +4,7 @@ import {FlatList, Image, Linking, Pressable, SectionList, Text, View} from 'reac
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {PAGES_IN_MENU_ORDER, PRIMARY_PAGES, SAMPLE_OVERVIEW_DEFAULT_PAGES} from './page.constants';
+import {getOverviewSections} from './page.helpers';
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
 import usePage from './usePage';
@@ -62,20 +62,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
 
   /* Derived Variables */
 
-  const defaultPagesKeys = spot.properties?.isSample ? SAMPLE_OVERVIEW_DEFAULT_PAGES : PRIMARY_PAGES.map(p => p.key);
-  const visiblePagesKeys = [...new Set([...defaultPagesKeys, ...getPopulatedPagesKeys(spot)])];
-  // List the sections in the same order as the notebook's More Pages menu, except on a sample, where
-  // Samples leads
-  const orderedPages = spot.properties?.isSample ? [...PAGES_IN_MENU_ORDER.filter(p => p.key === PAGE_KEYS.SAMPLES),
-      ...PAGES_IN_MENU_ORDER.filter(p => p.key !== PAGE_KEYS.SAMPLES)]
-    : PAGES_IN_MENU_ORDER;
-  const sections = orderedPages.reduce((acc, page) => {
-    if (visiblePagesKeys.includes(page.key) && page.overview_component) {
-      const sectionOverview = {title: page, data: [page]};
-      return [...acc, sectionOverview];
-    }
-    else return acc;
-  }, []);
+  const sections = getOverviewSections(getPopulatedPagesKeys(spot), spot.properties?.isSample);
 
   /* Side Effects */
 

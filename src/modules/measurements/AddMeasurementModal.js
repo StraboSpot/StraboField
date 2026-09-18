@@ -2,7 +2,6 @@ import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
-import {Formik} from 'formik';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -16,10 +15,11 @@ import {
   MEASUREMENT_TYPES,
   PLANAR_COMPASS_FIELDS,
 } from './measurements.constants';
-import {equalsIgnoreOrder, getLinearTemplates, getPlanarTemplates} from './measurements.helpers';
+import {equalsIgnoreOrder, getMeasurementTypeText} from './measurements.helpers';
 import commonStyles from '../../shared/common.styles';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../shared/styles.constants';
+import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SliderBar from '../../shared/ui/SliderBar';
 import SwitchWrapper from '../../shared/ui/SwitchWrapper';
@@ -27,17 +27,25 @@ import Compass from '../compass/Compass';
 import {setCompassMeasurementTypes} from '../compass/compass.slice';
 import compassStyles from '../compass/compass.styles';
 import Form from '../form/Form';
+import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import useMapLocation from '../maps/view/useMapLocation';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
+import {MEASUREMENT_TEMPLATE_KEY} from '../templates/templates.constants';
+import {
+  getActiveTemplateList,
+  getIsTemplateInUse,
+  getLinearTemplates,
+  getPlanarTemplates,
+} from '../templates/templates.helpers';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 import {setUserData} from '../user/userProfile.slice';
 
-const AddMeasurementModal = ({onPress}) => {
+const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -49,7 +57,7 @@ const AddMeasurementModal = ({onPress}) => {
   const templates = useSelector(state => state.project.project?.templates) || {};
 
   const {lockToCurrentOrientation, unlockOrientation} = useDeviceOrientation();
-  const {getChoices, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
+  const {getChoices, getLabel, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
 
@@ -62,6 +70,8 @@ const AddMeasurementModal = ({onPress}) => {
   const [choices, setChoices] = useState({});
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [initialValues, setInitialValues] = useState({id: getNewUUID()});
+  const [isFormInvalid, setIsFormInvalid] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [measurementTypeForForm, setMeasurementTypeForForm] = useState(null);
   const [relevantTemplates, setRelevantTemplates] = useState([]);
@@ -73,6 +83,9 @@ const AddMeasurementModal = ({onPress}) => {
 
   // Is an attitude already selected (like when adding an associated measurement to an already existing attitude)
   const isSelectedAttitude = !isEmpty(selectedAttributes) && selectedAttributes?.length > 0;
+
+  // The shortcut makes its own Spot at the current location, where the Notebook is editing the Spot it is open on
+  const isShortcutMeasurement = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT;
 
   // Web has no Compass input and no toggle to leave Manual, so Manual is always on there whatever the preference
   // says. Everywhere else follow the shared user preference, so this toggle and the one in User Conventions stay in
@@ -109,12 +122,12 @@ const AddMeasurementModal = ({onPress}) => {
     prevValuesRef.current = {compassMeasurementTypes, templates};
     const typeObj = MEASUREMENT_TYPES.find(t => equalsIgnoreOrder(t.compass_toggles, compassMeasurementTypes));
     setSelectedTypeIndex(MEASUREMENT_TYPES.findIndex(t => t.key === typeObj.key));
-    // Get the templates for the measurement type
-    // (We're not using templates if there is already a selected attitude, like when adding an associated
-    // measurement to an existing attitude, so default to [] in that case)
-    const gotRelevantTemplates = !isSelectedAttitude && templates.measurementTemplates
-      && templates.useMeasurementTemplates && templates.activeMeasurementTemplates
-      && templates.activeMeasurementTemplates.filter(t => typeObj.form_keys.includes(t.values?.type || t.type)) || [];
+    // Get the templates for the measurement type. A selected attitude gets none, since it is already there -
+    // that is the case of adding an associated measurement to an existing attitude.
+    const activeMeasurementTemplates = !isSelectedAttitude && getIsTemplateInUse(templates, MEASUREMENT_TEMPLATE_KEY)
+      && getActiveTemplateList(templates, MEASUREMENT_TEMPLATE_KEY) || [];
+    const gotRelevantTemplates = activeMeasurementTemplates.filter(
+      t => typeObj.form_keys.includes(t.values?.type || t.type));
     setRelevantTemplates(gotRelevantTemplates);
     let initialValuesTemp = {
       id: getNewUUID(),
@@ -186,6 +199,14 @@ const AddMeasurementModal = ({onPress}) => {
 
   /* Logic Helpers */
 
+  // A measurement and each orientation associated with it are separate rows, so each is named for itself
+  const withDefaultLabel = measurement => ({
+    ...measurement,
+    label: measurement.label || getMeasurementTypeText(measurement, getLabel),
+    ...(measurement.associated_orientation
+      && {associated_orientation: measurement.associated_orientation.map(withDefaultLabel)}),
+  });
+
   const saveMeasurement = async () => {
     const typeKey = MEASUREMENT_TYPES[selectedTypeIndex]
     && MEASUREMENT_TYPES[selectedTypeIndex].key === MEASUREMENT_KEYS.PLANAR_LINEAR ? MEASUREMENT_KEYS.PLANAR_LINEAR
@@ -197,18 +218,13 @@ const AddMeasurementModal = ({onPress}) => {
           formRef.current.values.associated_orientation?.[0]?.label);
       }
     }
+    // Saving is slow enough to look like nothing happened, so say so on the button. ModalWrapper also shuts its
+    // exits while this is set, hence the finally - without it the modal would have no way out.
+    setIsSaving(true);
     try {
       await formRef.current.submitForm();
       let editedMeasurementData = showErrors(formRef.current);
-      // If plane with associated line validate associated line data
-      if (typeKey === MEASUREMENT_KEYS.PLANAR_LINEAR && editedMeasurementData.associated_orientation) {
-        validateForm({
-          formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
-          values: editedMeasurementData.associated_orientation[0],
-        });
-      }
-      const spotToUpdate = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? await setPointAtCurrentLocation()
-        : spot;
+      const spotToUpdate = isShortcutMeasurement ? await setPointAtCurrentLocation() : spot;
       let editedMeasurementsData = spotToUpdate.properties.orientation_data
         ? JSON.parse(JSON.stringify(spotToUpdate.properties.orientation_data)) : [];
 
@@ -243,8 +259,9 @@ const AddMeasurementModal = ({onPress}) => {
               editedMeasurementData.associated_orientation.push(
                 {...t.values, ...newAssocMeasurement, id: getNewUUID()});
             });
-            editedMeasurementsData = editedMeasurementsData.filter(d => d.id !== editedMeasurementData.id);
-            editedMeasurementsData.push(editedMeasurementData);
+            const i = editedMeasurementsData.findIndex(d => d.id === editedMeasurementData.id);
+            if (i === -1) editedMeasurementsData.push(editedMeasurementData);
+            else editedMeasurementsData.splice(i, 1, editedMeasurementData);
           }
           // If an associated measurement from the Quick Entry Modal with multiple templates
           else {
@@ -268,29 +285,49 @@ const AddMeasurementModal = ({onPress}) => {
             t => editedMeasurementsData.push({...t.values, ...editedMeasurementData, id: getNewUUID()}));
         }
         console.log('editedMeasurementData', editedMeasurementsData);
-        dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
-        dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
       }
       else {
         if (isSelectedAttitude) {
-          editedMeasurementsData = editedMeasurementsData.filter(d => d.id !== editedMeasurementData.id);
-          editedMeasurementsData.push(editedMeasurementData);
+          const i = editedMeasurementsData.findIndex(d => d.id === editedMeasurementData.id);
+          if (i === -1) editedMeasurementsData.push(editedMeasurementData);
+          else editedMeasurementsData.splice(i, 1, editedMeasurementData);
         }
         else editedMeasurementsData.push({...editedMeasurementData, id: getNewUUID()});
         console.log('editedMeasurementData', editedMeasurementData);
         console.log('Saving Measurement data to Spot ...', editedMeasurementsData);
-        dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
-        dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
       }
+      // Labeled last, once every branch above has finished building the measurements: a measurement is titled
+      // by its feature_type or, failing that, its type, and an associated orientation is only told it is linear
+      // part way through. Only an empty label is filled in, so nothing already named is touched.
+      editedMeasurementsData = editedMeasurementsData.map(withDefaultLabel);
+
+      // The shortcut's new Spot has to be selected before the write below, so that editedSpotProperties is what
+      // leaves it selected: spotToUpdate is the copy taken before the measurement went in, and handing that back
+      // afterwards would blank the page being opened.
+      if (isShortcutMeasurement) openSpotInNotebook(spotToUpdate, PAGE_KEYS.MEASUREMENTS);
+
+      dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
+      dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
+
       if (isSelectedAttitude) {
         dispatch(setSelectedAttributes([editedMeasurementData]));
         onCloseButton();
       }
-      toast.show('Measurement Saved!', {type: 'success', duration: 2000});
-      SMALL_SCREEN && dispatch(setModalVisible({modal: null}));
+      // The shortcut always steps aside; from the Notebook the modal only does so on a small screen, where it
+      // covers the page it just saved to. Both before the toast, which a modal on top would paint over.
+      if (isShortcutMeasurement || SMALL_SCREEN) dispatch(setModalVisible({modal: null}));
+      // After the zoom, which raises a full-screen spinner the toast would otherwise sit behind for most of its
+      // life - the reason only shortcut saves looked too fast
+      if (isShortcutMeasurement) await zoomToCurrentLocation();
+      // Web reports the real outcome itself - 'Saving changes...' then saved or not saved, from the server - so
+      // a local 'Saved!' there would be both redundant and, on a failed upload, wrong
+      if (Platform.OS !== 'web') toast.show('Measurement Saved!', {type: 'success', duration: 2000});
     }
     catch (err) {
       console.error('Error submitting form', err);
+    }
+    finally {
+      setIsSaving(false);
     }
   };
 
@@ -311,6 +348,21 @@ const AddMeasurementModal = ({onPress}) => {
       });
     }
     saveMeasurement().catch(console.error);
+  };
+
+  // Formik validates the survey for the measurement's own type, but a planar+linear measurement carries a linear
+  // half under associated_orientation[0], which is a survey of its own and went unchecked - its required fields
+  // and the constraints on trend, plunge and rake with it. Formik names those fields by path, so their errors are
+  // keyed the same way to reach the field and to be labelled by both halves when they are reported.
+  const validateMeasurement = (values) => {
+    const {errors} = validateForm({formName: [MEASUREMENT_GROUP_KEY, measurementTypeForForm], values: values});
+    if (isEmpty(values.associated_orientation?.[0])) return errors;
+    const {errors: associatedErrors} = validateForm({
+      formName: [MEASUREMENT_GROUP_KEY, MEASUREMENT_KEYS.LINEAR],
+      values: values.associated_orientation[0],
+    });
+    return Object.entries(associatedErrors).reduce(
+      (acc, [name, message]) => ({...acc, ['associated_orientation[0].' + name]: message}), errors);
   };
 
   /* Render Functions */
@@ -418,6 +470,8 @@ const AddMeasurementModal = ({onPress}) => {
       <ModalWrapper
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseButton}
+        disabled={isFormInvalid}
+        isLoading={isSaving}
         onActionPressed={saveMeasurement}
         onFooterButtonPress={onPress}
         overlayStyleOverride={{height: '80%'}}
@@ -429,23 +483,23 @@ const AddMeasurementModal = ({onPress}) => {
           {measurementTypeForForm && (
             <FlatList
               ListHeaderComponent={
-                <Formik
+                <FormikWrapper
                   enableReinitialize={true}
-                  initialStatus={{formName: formName}}
+                  formName={formName}
                   initialValues={initialValues}
                   innerRef={formRef}
-                  onSubmit={values => console.log('Submitting form...', values)}
-                  validate={values => validateForm({formName: formName, values: values})}
-                  validateOnChange={false}
+                  setIsFormInvalid={setIsFormInvalid}
+                  validate={validateMeasurement}
                 >
                   {formProps => choicesViewKey ? renderSubform(formProps)
                     : assocChoicesViewKey ? renderSubformAssoc(formProps) : renderForm(formProps)}
-                </Formik>
+                </FormikWrapper>
               }
               bounces={false}
               listKey={'form'}
             />
           )}
+          <Loading isLoading={isSaving}/>
         </>
       </ModalWrapper>
     );

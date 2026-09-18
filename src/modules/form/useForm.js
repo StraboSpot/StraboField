@@ -189,8 +189,11 @@ const useForm = () => {
           cleanedValues[key] = isNaN(parseFloat(cleanedValues[key])) ? undefined : parseFloat(cleanedValues[key]);
         }
         // A date range in the wrong order is one mistake across two fields, so mark both rather than only the
-        // one the survey happens to define it on - whichever of them was just edited has to be able to say so
-        if (key === 'end_date' && Date.parse(cleanedValues.start_date) > Date.parse(cleanedValues.end_date)) {
+        // one the survey happens to define it on - whichever of them was just edited has to be able to say so.
+        // Compared by calendar day, not raw timestamp: the fields are picked and shown as dates (MM/DD/YYYY) but
+        // stored with the time-of-day they were set, so an equal start and end day would otherwise fail on the clock.
+        if (key === 'end_date' && !isEmpty(cleanedValues.start_date)
+          && moment(cleanedValues.start_date).isAfter(moment(cleanedValues.end_date), 'day')) {
           errors.start_date = fieldModel.constraint_message;
           errors[key] = fieldModel.constraint_message;
         }

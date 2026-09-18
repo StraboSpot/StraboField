@@ -1,3 +1,5 @@
+import {Platform} from 'react-native';
+
 import {createSlice} from '@reduxjs/toolkit';
 
 const initialHomeState = {
@@ -20,6 +22,8 @@ const initialHomeState = {
   messageModal: {isVisible: false, message: '', title: ''},
   modalValues: {},
   modalVisible: null,
+  // The next modal to show once the current one has finished dismissing (iOS two-phase switch). See setModalVisible.
+  pendingModal: null,
   hiddenWarnings: {},
   isBackupModalVisible: false,
   isStatusMessagesModalVisible: false,
@@ -122,8 +126,29 @@ const homeSlice = createSlice({
     setModalValues(state, action) {
       state.modalValues = action.payload;
     },
+    // iOS presents every RN <Modal> as a native UIViewController transition. Swapping one modal for another in a
+    // single commit runs a present and a dismiss concurrently, which trips UIViewControllerHierarchyInconsistency
+    // (a fatal crash, Sentry STRABOSPOT-2-6JN) or silently drops the incoming modal. Two-phase it on iOS: dismiss the
+    // current modal now and stash the next key in pendingModal, then let applyPendingModal show it once the dismiss
+    // transition has finished (driven centrally in OverlaysContainer, with ModalWrapper's onDismiss as a fast path).
+    // Other platforms have no such race, so they swap directly.
     setModalVisible(state, action) {
-      state.modalVisible = action.payload.modal;
+      const next = action.payload.modal;
+      if (Platform.OS === 'ios' && next && state.modalVisible && next !== state.modalVisible) {
+        state.pendingModal = next;
+        state.modalVisible = null;
+      }
+      else {
+        state.pendingModal = null;
+        state.modalVisible = next;
+      }
+    },
+    // Show the modal queued by a two-phase switch, once the outgoing modal has dismissed. A no-op when nothing is
+    // queued, so it is safe to fire from both the transition timer and onDismiss.
+    applyPendingModal(state) {
+      if (state.pendingModal == null) return;
+      state.modalVisible = state.pendingModal;
+      state.pendingModal = null;
     },
     setShortcutSwitchPositions(state, action) {
       // A payload carrying a value sets the switch to it; one without still toggles, so a caller that
@@ -145,6 +170,7 @@ const homeSlice = createSlice({
 
 export const {
   addedStatusMessage,
+  applyPendingModal,
   clearedStatusMessages,
   closedMessageModal,
   openedMessageModal,

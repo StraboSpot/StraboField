@@ -18,8 +18,15 @@ import {
   sortSpotsByDateCreated,
   sortSpotsByDateLastModified,
 } from './spots.helpers';
-import {deletedSpot, editedOrCreatedSpot, editedOrCreatedSpots, restoredSpots, setSelectedSpot} from './spots.slice';
-import {getNewCopyId, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
+import {
+  clearedSelectedSpots,
+  deletedSpot,
+  editedOrCreatedSpot,
+  editedOrCreatedSpots,
+  restoredSpots,
+  setSelectedSpot,
+} from './spots.slice';
+import {deepCopyWithNewIds, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
 import {clearedStratSection, setCurrentImageBasemap, setStratSection} from '../maps/maps.slice';
@@ -33,6 +40,7 @@ import {
   restoredSpotReferences,
   updatedModifiedTimestampsBySpotsIds,
   updatedProject,
+  updatedProjectPreference,
 } from '../project/projects.slice';
 import useProject from '../project/useProject';
 import useTags from '../tags/useTags';
@@ -256,6 +264,11 @@ const useSpots = () => {
       const {strat_section, ...restSed} = copiedSpot.properties.sed;
       copiedSpot.properties = {...copiedSpot.properties, sed: restSed};
     }
+    // A deep copy, both to unshare the nested values the rest element above left pointing at the source Spot and to
+    // mint the copy's own feature ids. Sharing them does no harm today - a feature id is only ever looked up within
+    // one Spot, as tag.features[spotId] and deepFindFeatureTypeById(spot.properties, ...) do - but it leaves every
+    // future cross-Spot view of features having to carry a Spot alongside the id to tell two features apart.
+    copiedSpot.properties = deepCopyWithNewIds(copiedSpot.properties);
     const newSpot = await createSpot(copiedSpot);
     dispatch(setSelectedSpot(newSpot));
     console.log('Spot Copied. New Spot', newSpot);
@@ -282,7 +295,7 @@ const useSpots = () => {
           coordinates: [feature.geometry.coordinates[0] + randomLongOffset, feature.geometry.coordinates[1] + randomLatOffset],
         },
         properties: {
-          id: getNewCopyId(),
+          id: getNewId(),
           date: d.toISOString(),
           time: d.toISOString(),
           modified_timestamp: Date.now(),
@@ -330,20 +343,13 @@ const useSpots = () => {
     }
     await checkSpotName(newSpot.properties.name);
 
-    if (newSpot.geometry && (currentImageBasemap || stratSection)) { //newSpot geometry is unavailable when spot is copied.
-      const rootSpot = currentImageBasemap ? getRootSpot(currentImageBasemap.id)
-        : getSpotWithThisStratSection(stratSection.strat_section_id);
-      if (rootSpot && rootSpot.geometry) {
-        if (!isEmpty(rootSpot.properties.lng) && !isEmpty(rootSpot.properties.lat)) {
-          newSpot.properties.lng = rootSpot.properties.lng;
-          newSpot.properties.lat = rootSpot.properties.lat;
-        }
-        else if (isOnGeoMap(rootSpot)) {
-          const center = rootSpot.geometry.type === 'Point' ? rootSpot.geometry.coordinates
-            : turf.centroid(rootSpot).geometry.coordinates;
-          newSpot.properties.lng = center[0];
-          newSpot.properties.lat = center[1];
-        }
+    // A Spot created on an image basemap or strat section gets pixel coordinates, so record its real world location
+    // alongside them. A copy arrives with no geometry (see copySpot), so it has no place on this map to record yet.
+    if (newSpot.geometry && (currentImageBasemap || stratSection)) {
+      const geoCoords = getRootSpotGeoCoords(currentImageBasemap?.id, stratSection?.strat_section_id);
+      if (geoCoords) {
+        newSpot.properties.lng = geoCoords[0];
+        newSpot.properties.lat = geoCoords[1];
       }
     }
     // Continuous tagging
@@ -398,6 +404,16 @@ const useSpots = () => {
         type: 'undo',
       });
     }
+  };
+
+  // Takes back a Spot made ahead of content that never arrived. Unlike deleteSpot it says nothing and offers no
+  // undo, since the user cancelled rather than deleted. References go with it, as does the Spot number it took -
+  // safe to hand back only because callers hold the screen meanwhile, so nothing else can have claimed it.
+  const discardSpot = (spotToDiscard, spotNumberToRestore) => {
+    console.log('Discarding unused Spot ID', spotToDiscard.properties.id, '...');
+    removeSpotAndReferences(spotToDiscard.properties.id);
+    dispatch(updatedProjectPreference({key: 'starting_number_for_spot', value: spotNumberToRestore}));
+    dispatch(clearedSelectedSpots());
   };
 
   const getActiveImageBasemaps = () => {
@@ -569,6 +585,28 @@ const useSpots = () => {
     return rootSpot;
   };
 
+  // Real world coordinates of the Spot holding an image basemap or strat section. Neither map is georeferenced -
+  // their coordinates are pixels in a space of their own - so that Spot's location is the only real one a Spot on
+  // either map has. A map can hang off a Spot that is itself on another map, so keep walking up until one records
+  // its own lng/lat or stands on the geo map, a holder still on a pixel map having pixels for coordinates itself.
+  const getRootSpotGeoCoords = (imageBasemapId, stratSectionId) => {
+    const visitedSpotIds = new Set();   // a map held by a Spot on itself would otherwise loop forever
+    let rootSpot = getSpotWithThisMap(imageBasemapId, stratSectionId);
+    while (!isEmpty(rootSpot) && !visitedSpotIds.has(rootSpot.properties.id)) {
+      visitedSpotIds.add(rootSpot.properties.id);
+      if (!isEmpty(rootSpot.properties.lng) && !isEmpty(rootSpot.properties.lat)) {
+        return [rootSpot.properties.lng, rootSpot.properties.lat];
+      }
+      if (isOnGeoMap(rootSpot)) {
+        if (!rootSpot.geometry) return undefined;
+        return rootSpot.geometry.type === 'Point' ? rootSpot.geometry.coordinates
+          : turf.centroid(rootSpot).geometry.coordinates;
+      }
+      rootSpot = getSpotWithThisMap(rootSpot.properties.image_basemap, rootSpot.properties.strat_section_id);
+    }
+    return undefined;
+  };
+
   const getSampleSpotIconSource = () => require('../../assets/icons/SampleRound.png');
 
   const getSpotById = (spotId) => {
@@ -683,6 +721,7 @@ const useSpots = () => {
     createRandomSpots,
     createSpot,
     deleteSpot,
+    discardSpot,
     getActiveImageBasemaps,
     getActiveIntervalSpotsOnStratSection,
     getActiveSpotsObj,
@@ -696,6 +735,7 @@ const useSpots = () => {
     getReadOnlyReason,
     getRecentSpots,
     getRootSpot,
+    getRootSpotGeoCoords,
     getSampleSpotIconSource,
     getSpotById,
     getSpotByImageId,

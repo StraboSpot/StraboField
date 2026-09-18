@@ -1,5 +1,9 @@
-import {IMAGE_OVERLAY_SIZE_KEYS, LITHOLOGY_INTERVAL_CHARACTERS} from './sed.constants';
-import {isEmpty} from '../../shared/helpers';
+import {
+  IMAGE_OVERLAY_SIZE_KEYS,
+  LITHOLOGY_INTERVAL_CHARACTERS,
+  ROCK_SECOND_ORDER_TYPE_FIELDS,
+} from './sed.constants';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {isStratInterval} from '../spots/spots.helpers';
 
 export const getBasicLithologyIndex = (lithology) => {
@@ -10,6 +14,10 @@ export const getBasicLithologyIndex = (lithology) => {
   else if (lithology.dunham_classification) return 5;
   return 0;
 };
+
+// getLabels is passed in because a plain helper cannot call useForm
+export const getBeddingTitle = (bedding, getLabels) => getLabels(bedding.package_geometry, ['sed', 'bedding'])
+  || 'Unknown Bed';
 
 // The overlay fields are typed as text, so read the numbers out of them for saving. Everything but the image id is
 // a number: a width or height is kept only as a pair of positive numbers, and anything that is not a number at all
@@ -40,6 +48,21 @@ export const getRequiredLithologyKeys = (lithology, spot) => {
     requiredKeys.push('dunham_classification');
   }
   return requiredKeys.filter(Boolean);
+};
+
+// getLabel and getLabels are passed in because a plain helper cannot call useForm
+export const getSedRockTitle = (rock, getLabel, getLabels) => {
+  const formName = ['sed', 'lithologies'];
+  const mainLabel = getLabel(rock.primary_lithology, formName);
+  const labelsArr = ROCK_SECOND_ORDER_TYPE_FIELDS.reduce((acc, fieldName) => {
+    if (rock[fieldName]) {
+      const choiceLabel = getLabels(rock[fieldName], formName);
+      return [...acc, choiceLabel.toUpperCase()];
+    }
+    else return acc;
+  }, []);
+  if (isEmpty(labelsArr)) return toTitleCase(mainLabel);
+  else return toTitleCase(mainLabel) + ' - ' + labelsArr.join(', ');
 };
 
 export const getSiliciclasticGrainSize = lithology => lithology[getSiliciclasticGrainSizeKey(

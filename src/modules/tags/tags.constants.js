@@ -1,3 +1,5 @@
+import {SMALL_TEXT_SIZE} from '../../shared/styles.constants';
+
 export const TAG_SECTIONS = {
   GEOLOGIC_UNITS: [
     {title: 'Geologic Units', key: 'geologic_unit'},
@@ -21,3 +23,7 @@ export const TAG_FORM_NAMES = {
   GEOLOGIC_UNIT: ['project', 'geologic_unit'],
   TAGS: ['project', 'tags'],
 };
+
+// The count chips stand where a subtitle would, so their icons are sized to that line of text rather than to the
+// 20px a Spot row gives the icons on a line of their own
+export const TAG_COUNT_ICON_SIZE = SMALL_TEXT_SIZE + 2;

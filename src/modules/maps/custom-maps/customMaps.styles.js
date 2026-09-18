@@ -30,9 +30,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   bottomButtonsContainer: {
-    flex: 1,
     justifyContent: 'flex-end',
     paddingBottom: 10,
+    paddingTop: 10,
   },
   itemContainer: {
     alignItems: 'center',

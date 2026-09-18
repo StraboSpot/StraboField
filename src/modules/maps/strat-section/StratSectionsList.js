@@ -6,16 +6,18 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
+import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import {setLoadingStatus} from '../../home/home.slice';
+import ActiveDatasetsSummary from '../../project/datasets/ActiveDatasetsSummary';
 import {setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 import {setStratSection} from '../maps.slice';
 
-const StratSectionsList = ({closeManMenuPanel}) => {
+const StratSectionsList = ({closeManMenuPanel, openDatasetsPage}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -73,6 +75,13 @@ const StratSectionsList = ({closeManMenuPanel}) => {
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
         ListEmptyComponent={<ListEmptyText text={'No Strat Sections in Active Datasets'}/>}
+        ListHeaderComponent={(
+          <ActiveDatasetsSummary
+            countText={!isEmpty(spotsWithStratSection)
+              && `${spotsWithStratSection.length} ${spotsWithStratSection.length === 1 ? 'Strat Section' : 'Strat Sections'}`}
+            openDatasetsPage={openDatasetsPage}
+          />
+        )}
         data={spotsWithStratSection}
         keyExtractor={spot => spot.properties.id.toString()}
         renderItem={({item}) => renderStratSectionItem(item)}

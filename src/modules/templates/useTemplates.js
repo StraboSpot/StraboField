@@ -1,8 +1,10 @@
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getActiveTemplateList, getTemplateList} from './templates.helpers';
 import forms from '../../assets/forms';
 import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
 import useForm from '../form/useForm';
+import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
 const useTemplates = () => {
@@ -38,55 +40,52 @@ const useTemplates = () => {
       return toTitleCase(key.replace('_', ' ')) + ' Rock';
     }
     else if (key === 'minerals') return 'Mineral';
-    else if (key === 'tabular_orientation') return 'Tabular Zone Orientation';
+    else if (key === MEASUREMENT_KEYS.TABULAR) return 'Tabular Zone Orientation';
     else if (key === 'pet') return 'Rocks & Minerals';
     else if (key) return toTitleCase(key.replaceAll('_', ' ').trim());
   };
 
+  // Saves the form on screen as a template. The half TemplatesNotebook also needs is in saveTemplateValues.
   const saveTemplate = async (formCurrent, templateKey, selectedTemplate, name) => {
-    let templateObject;
     // The form holds Save until the name is filled in, so this is a backstop. It throws rather than returns
     // because the caller leaves the page on a save that comes back.
     if (isEmpty(name?.trim())) throw Error('Template name is empty.');
-    else {
-      const {values: values} = await submitAndShowErrors(formCurrent);
-      const templatesForKey = templateKey === 'measurementTemplates' ? templates[templateKey]
-        : templates[templateKey]?.templates;
-      let existingTemplatesCopy = !isEmpty(templatesForKey) ? JSON.parse(JSON.stringify(templatesForKey)) : [];
-      if (!isEmpty(selectedTemplate.id)) {
-        templateObject = {
-          'id': selectedTemplate.id,
-          'name': name,
-          'values': values,
-        };
-        existingTemplatesCopy = existingTemplatesCopy.filter(templateId => templateObject.id !== templateId.id);
-      }
-      else {
-        templateObject = {
-          'id': getNewUUID(),
-          'name': name,
-          'values': values,
-        };
-      }
-      existingTemplatesCopy.push(templateObject);
-      existingTemplatesCopy = existingTemplatesCopy.sort(
-        (templateA, templateB) => templateA.name.localeCompare(templateB.name));
-      dispatch(addedTemplates({key: templateKey, templates: existingTemplatesCopy}));
+    const {values: values} = await submitAndShowErrors(formCurrent);
+    saveTemplateValues(templateKey, selectedTemplate, name, values);
+    // Saving from a detail page turns templates on for that key. TemplatesNotebook deliberately does not -
+    // it shows the user a switch for this instead.
+    dispatch(setUseTemplate({key: templateKey, bool: true}));
+  };
 
-      // Update active templates so updated template becomes active
-      const activeTemplatesForKey = templateKey === 'measurementTemplates'
-        ? templates.activeMeasurementTemplates || []
-        : templates[templateKey]?.active || [];
-      const templatesUpdated = activeTemplatesForKey?.filter(t => t.id !== templateObject.id) || [];
-      dispatch(setActiveTemplates({key: templateKey, templates: [...templatesUpdated, templateObject]}));
-      dispatch(setUseTemplate({key: templateKey, bool: true}));
-    }
+  // Writes a template into the project and makes it the active one for its key, whether it is new or an edit
+  // of an existing one. Both save paths go through here so they cannot drift apart.
+  const saveTemplateValues = (templateKey, selectedTemplate, name, values) => {
+    // A template holds only what was typed into the template form, so an id has no business in it. Stripped
+    // in case an older one arrived carrying a stale feature id; consumers mint a fresh id from it regardless.
+    const {id, ...templateValues} = values;
+    const templateObject = {
+      'id': isEmpty(selectedTemplate?.id) ? getNewUUID() : selectedTemplate.id,
+      'name': name,
+      'values': templateValues,
+    };
+    const templatesForKey = getTemplateList(templates, templateKey);
+    const existingTemplates = !isEmpty(templatesForKey) ? JSON.parse(JSON.stringify(templatesForKey)) : [];
+    // Filtering covers both cases: an edit drops the copy being replaced, a new id matches nothing
+    const updatedTemplates = [...existingTemplates.filter(t => t.id !== templateObject.id), templateObject]
+      .sort((templateA, templateB) => templateA.name.localeCompare(templateB.name));
+    dispatch(addedTemplates({key: templateKey, templates: updatedTemplates}));
+
+    // Update active templates so updated template becomes active
+    const activeTemplatesForKey = getActiveTemplateList(templates, templateKey) || [];
+    const activeUpdated = activeTemplatesForKey.filter(t => t.id !== templateObject.id);
+    dispatch(setActiveTemplates({key: templateKey, templates: [...activeUpdated, templateObject]}));
   };
 
   return {
     getNewTemplatesList,
     getTemplateTitle,
     saveTemplate,
+    saveTemplateValues,
   };
 };
 

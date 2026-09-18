@@ -122,9 +122,15 @@ const ProjectList = ({backupType, doRefresh, onProjectPress, source}) => {
   const renderProjectsList = () => {
     if (!isEmpty(userData)) {
       const allProjects = projectsArr.projects || [];
+      // A halted collaboration leaves the owner their own project back, so it belongs in this list - the server
+      // returns one only to its owner and never as read only. A live collaboration is still left out: read only
+      // arrives on the project and its datasets but nothing here enforces it, so a shared project would open
+      // fully editable. Asked three ways rather than one so no single flag is enough to let one through.
+      const isDownloadableProject = p => !p.isCollaborativeProject
+        || (p.isCollaborationHalted && p.isOwner && !p.isReadOnly);
       const filteredProjects = source === 'device'
         ? allProjects.filter(p => backupType === 'auto' ? p.isAutoBackup : !p.isAutoBackup)
-        : allProjects.filter(p => !p.isCollaborativeProject);
+        : allProjects.filter(isDownloadableProject);
       return (
         <View style={{flex: 1}}>
           {source === 'server' && !isConnectionAvailable && (

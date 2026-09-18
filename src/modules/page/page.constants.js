@@ -39,6 +39,7 @@ import QAQCPage from '../qaqc/QAQC';
 import QAQCOverview from '../qaqc/QAQCOverview';
 import ReportModal from '../reports/ReportModal';
 import ReportsListModal from '../reports/ReportsListModal';
+import ReportsOverview from '../reports/ReportsOverview';
 import ReportsPage from '../reports/ReportsPage';
 import IGSNPage from '../samples/igsn/IGSNPage';
 import SampleModal from '../samples/SampleModal';
@@ -196,6 +197,7 @@ export const SUPPLEMENTAL_PAGES = [
     label: 'Memos',
     icon_src: require('../../assets/icons/Reports.png'),
     icon_pressed_src: require('../../assets/icons/Reports_pressed.png'),
+    overview_component: ReportsOverview,
     page_component: ReportsPage,
     modal_component: ReportModal,
   }, {

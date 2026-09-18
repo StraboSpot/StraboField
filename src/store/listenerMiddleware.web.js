@@ -8,6 +8,7 @@ import {canceledIntervalDrag, savedIntervalDragReordering} from '../modules/maps
 import {
   addedCustomFeatureTypes,
   addedDataset,
+  addedRemovedTagIdOnReport,
   addedTemplates,
   deletedDataset,
   movedSpotIdBetweenDatasets,
@@ -172,8 +173,6 @@ const uploadProjectDatasetDeleteSpotListener = async (action, listenerApi) => {
   let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
   console.log('Action:', action, 'Deleted Spot Id:', action.payload);
 
-  listenerApi.cancelActiveListeners();      // Can cancel other running instances
-
   const newState = listenerApi.getState();
   console.log('New State:', newState);
 
@@ -208,11 +207,7 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
     return;
   }
 
-  Toast.hideAll();
-  let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
   console.log('Action:', action, 'Spot edited:', action.payload);
-
-  listenerApi.cancelActiveListeners();      // Can cancel other running instances
 
   const newState = listenerApi.getState();
   console.log('New State:', newState);
@@ -232,8 +227,7 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
       // the target dataset); it goes up with the dataset it joins, so skip it here
       if (!dataset) return acc;
       const datasetId = dataset.id;
-      if (Object.keys(acc).includes(datasetId.toString())) return {...acc, [datasetId]: [...acc[datasetId], spotId]};
-      else return {...acc, [datasetId]: [spotId]};
+      return {...acc, [datasetId]: [...(acc[datasetId] || []), spotId]};
     }, {});
     const datasetsToSend = Object.entries(spotIdsGroupedByDatasetId).reduce((acc, [datasetId, spotIdsInDataset]) => {
       const spots = spotIdsInDataset.map(spotIdInDataset => newState.spot.spots[spotIdInDataset]);
@@ -251,10 +245,7 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
     // Get dataset for spot
     let dataset = datasets.find(d => d.spotIds?.some(id => isSameId(id, spotId)));
     // Nothing to send while the Spot belongs to no dataset, as above, and no sibling Spot to send it with here
-    if (!dataset) {
-      Toast.hideAll();
-      return;
-    }
+    if (!dataset) return;
     dataset = {...dataset, spots: turf.featureCollection([spot])};
 
     // Create object to send to server
@@ -266,6 +257,11 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
     objectToSend = {project: {...project, datasets: cleanDatasets(datasets)}};
   }
   const jsonToSend = JSON.parse(JSON.stringify(objectToSend));
+
+  // Shown only once there is something to send. Toast.show puts the toast up on the next frame, so a Toast.hideAll
+  // on this one runs before it exists and leaves it saying 'Saving changes...' for its full duration.
+  Toast.hideAll();
+  let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
 
   try {
     // Send object to server
@@ -299,8 +295,7 @@ const intervalDragModeEndedListener = async (action, listenerApi) => {
     const dataset = datasets.find(d => d.spotIds?.some(id => isSameId(id, spotId)));
     if (!dataset) return acc;
     const datasetId = dataset.id;
-    if (Object.keys(acc).includes(datasetId.toString())) return {...acc, [datasetId]: [...acc[datasetId], spotId]};
-    else return {...acc, [datasetId]: [spotId]};
+    return {...acc, [datasetId]: [...(acc[datasetId] || []), spotId]};
   }, {});
 
   const datasetsToSend = Object.entries(spotIdsGroupedByDatasetId).reduce((acc, [datasetId, spotIdsInDataset]) => {
@@ -350,8 +345,8 @@ listenerMiddleware.startListening({actionCreator: movedSpotIdBetweenDatasets, ef
 
 // Project Only Updates to Send to Server
 listenerMiddleware.startListening({
-  matcher: isAnyOf(addedCustomFeatureTypes, addedTemplates, setActiveTemplates, setUseContinuousTagging,
-    setUseTemplate, updatedProject),
+  matcher: isAnyOf(addedCustomFeatureTypes, addedRemovedTagIdOnReport, addedTemplates, setActiveTemplates,
+    setUseContinuousTagging, setUseTemplate, updatedProject),
   effect: updateProjectListener,
 });
 

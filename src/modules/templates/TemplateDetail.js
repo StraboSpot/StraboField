@@ -4,6 +4,7 @@ import {Text, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
+import {MEASUREMENT_TEMPLATE_KEY, MEASUREMENT_TEMPLATE_TYPES} from './templates.constants';
 import useTemplates from './useTemplates';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
@@ -14,8 +15,10 @@ import Form from '../form/Form';
 import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
 import TextInputField from '../form/inputs/TextInputField';
+import {MEASUREMENT_GROUP_KEY} from '../measurements/measurements.constants';
 import NoteForm from '../notes/NoteForm';
 import {PET_PAGES, SED_PAGES} from '../page/page.constants';
+import {IGNEOUS_ROCK_CLASSES} from '../petrology/rocks/rocks.constants';
 import {deletedTemplate} from '../project/projects.slice';
 
 const TemplateDetail = ({goBack, template, templateType}) => {
@@ -37,13 +40,14 @@ const TemplateDetail = ({goBack, template, templateType}) => {
 
   /* Derived Variables */
 
-  const isPet = PET_PAGES.find(p => p.key === templateType)
-    || templateType === 'plutonic' || templateType === 'volcanic';
-  const isSed = SED_PAGES.find(p => p.key === templateType);
+  // Igneous rocks are a pet page split in two by rock class, so their template types are the classes themselves
+  const isPet = PET_PAGES.some(p => p.key === templateType)
+    || Object.values(IGNEOUS_ROCK_CLASSES).includes(templateType);
+  const isSed = SED_PAGES.some(p => p.key === templateType);
   const groupKey = isPet ? 'pet' : isSed ? 'sed' : 'general';
-  const formName = template.values.type ? ['measurement', template.values.type] : [groupKey, templateType];
-  const templateKey = templateType === 'planar_orientation' || templateType === 'linear_orientation'
-    || templateType === 'tabular_orientation' ? 'measurementTemplates' : templateType;
+  // A measurement template names its own orientation in values.type; every other kind is named by its page
+  const formName = template.values.type ? [MEASUREMENT_GROUP_KEY, template.values.type] : [groupKey, templateType];
+  const templateKey = MEASUREMENT_TEMPLATE_TYPES.includes(templateType) ? MEASUREMENT_TEMPLATE_KEY : templateType;
 
   /* Event Handlers */
 

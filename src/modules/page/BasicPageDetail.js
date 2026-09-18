@@ -4,6 +4,7 @@ import {Platform, Text, View} from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {resolveLabelOnSave} from './featureLabels.helpers';
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty, isEqual, toTitleCase} from '../../shared/helpers';
@@ -53,7 +54,7 @@ const BasicPageDetail = ({
   const {sesar} = useSelector(state => state.user);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {showErrors, submitAndShowErrors, validateForm} = useForm();
+  const {getLabel, getLabels, showErrors, submitAndShowErrors, validateForm} = useForm();
   const {deletePetFeature, savePetFeature} = usePetrology();
   const {deleteSedFeature, saveSedBedFeature, saveSedFeature, setSedFieldValue} = useSed();
   const {checkSampleName} = useSpots();
@@ -249,8 +250,12 @@ const BasicPageDetail = ({
 
   const saveFeature = async (formCurrent, isLeavingPage) => {
     try {
-      const {errors, values: editedFeatureData} = await submitAndShowErrors(formRef.current || formCurrent,
-        isLeavingPage);
+      const {errors, values} = await submitAndShowErrors(formRef.current || formCurrent, isLeavingPage);
+      // page.key rather than pageKey: a deprecated fabric is stored with the 3D structures but is still titled
+      // as a fabric
+      const editedFeatureData = await resolveLabelOnSave(
+        {pageKey: page.key, previousFeature: selectedFeature, values: values, getLabel: getLabel,
+          getLabels: getLabels});
       console.log('Saving', page.label, 'data', editedFeatureData, 'to Spot', pageData);
       let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
       const i = editedPageData.findIndex(f => f.id === editedFeatureData.id);
@@ -303,13 +308,16 @@ const BasicPageDetail = ({
       }
       let errors;
       if (groupKey === 'pet') {
-        errors = await savePetFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage);
+        errors = await savePetFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage,
+          selectedFeature);
       }
       else if (groupKey === 'sed' && pageKey === 'bedding') {
-        errors = await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage);
+        errors = await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage,
+          selectedFeature);
       }
       else if (groupKey === 'sed') {
-        errors = await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage);
+        errors = await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage, undefined,
+          selectedFeature);
       }
       else errors = await saveFeature(formCurrent, isLeavingPage);
       savedValuesRef.current = {...(formRef.current || formCurrent).values};
@@ -326,7 +334,10 @@ const BasicPageDetail = ({
 
   const saveTemplateForm = async (formCurrent) => {
     const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
-    saveTemplate(formValues);
+    // A template's values are copied wholesale into every feature made from it, so a label would be shared by
+    // all of them. Each feature is labeled for itself as it is created instead.
+    const {label, ...templateValues} = formValues;
+    saveTemplate(templateValues);
   };
 
   const updateIGSNAndShowModal = async (formCurrent) => {

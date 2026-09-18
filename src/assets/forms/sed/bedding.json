@@ -1,6 +1,13 @@
 {
   "survey": [
     {
+      "type": "text",
+      "name": "label",
+      "label": "Label",
+      "hint": "If a label is not specified a default label will be given.",
+      "required": "false"
+    },
+    {
       "type": "select_multiple wj4dz28",
       "name": "package_geometry",
       "label": "Bed Geometry",

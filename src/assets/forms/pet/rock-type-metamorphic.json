@@ -9,6 +9,13 @@
       "name": "end"
     },
     {
+      "type": "text",
+      "name": "label",
+      "label": "Label",
+      "hint": "If a label is not specified a default label will be given.",
+      "required": "false"
+    },
+    {
       "type": "select_one yp0qh77",
       "name": "metamorphic_rock_type",
       "label": "Metamorphic Rock Type",

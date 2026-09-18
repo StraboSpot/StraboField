@@ -3,6 +3,7 @@ import {createSlice} from '@reduxjs/toolkit';
 const initialMainMenuState = {
   isSidePanelVisible: false,
   listFilters: {}, // keyed by page (spots/images/samples/tags/geologic_units) so each list filters independently
+  listSorts: {}, // keyed by page like listFilters, each {isReverse, order}, so a list keeps its order when reopened
   mainMenuPageVisible: null,
   sectionsCollapsed: [],
   sidePanelView: null,
@@ -18,6 +19,9 @@ const mainMenuSlice = createSlice({
     },
     setListFilters(state, action) {
       state.listFilters[action.payload.page] = action.payload.value;
+    },
+    setListSort(state, action) {
+      state.listSorts[action.payload.page] = action.payload.value;
     },
     setSectionsCollapsed(state, action) {
       const title = action.payload;
@@ -36,6 +40,7 @@ const mainMenuSlice = createSlice({
 
 export const {
   setListFilters,
+  setListSort,
   setMenuSelectionPage,
   setSectionsCollapsed,
   setSidePanelVisible,

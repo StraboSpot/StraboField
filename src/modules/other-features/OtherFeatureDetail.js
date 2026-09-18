@@ -4,6 +4,7 @@ import {FlatList, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getEnteredLabel} from './otherFeatures.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
@@ -13,7 +14,9 @@ import FormikWrapper from '../form/FormikWrapper';
 import SelectInputField from '../form/inputs/SelectInputField';
 import TextInputField from '../form/inputs/TextInputField';
 import useForm from '../form/useForm';
+import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {addedCustomFeatureTypes, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 import useTags from '../tags/useTags';
@@ -31,7 +34,7 @@ const OtherFeatureDetail = ({
   const projectFeatures = useSelector(state => state.project.project?.other_features);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {submitAndShowErrors} = useForm();
+  const {getLabel, getLabels, submitAndShowErrors} = useForm();
   const {deleteFeatureTags} = useTags();
 
   /* Local State */
@@ -111,7 +114,7 @@ const OtherFeatureDetail = ({
   // been cleared yet - guessing it wrong refuses an edit whole that was meant to keep all but its bad field
   const saveForm = async (formCurrent, isLeavingPage) => {
     try {
-      let {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent, isLeavingPage);
+      const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent, isLeavingPage);
       let featureToEdit;
       let otherFeatures = spot.properties.other_features;
       if (otherFeatures && otherFeatures.length > 0) {
@@ -129,7 +132,7 @@ const OtherFeatureDetail = ({
         otherFeatures = [];
         featureToEdit = selectedFeature;
       }
-      if (updateFeature(featureToEdit, otherFeatures, formValues)) {
+      if (await updateFeature(featureToEdit, otherFeatures, formValues)) {
         savedValuesRef.current = {...formRef.current.values};
         await formRef.current.resetForm();
         hideFeatureDetail();
@@ -140,8 +143,7 @@ const OtherFeatureDetail = ({
     }
   };
 
-  const updateFeature = (feature, otherFeatures, formValues) => {
-    feature.label = formValues.label || formValues.name;
+  const updateFeature = async (feature, otherFeatures, formValues) => {
     feature.name = formValues.name;
     if (formValues.type === 'other') {
       // Leaving the page rolls a field in error back to what it was, so the new type can still be missing here
@@ -152,6 +154,12 @@ const OtherFeatureDetail = ({
     }
     else feature.type = formValues.type;
     feature.description = formValues.description;
+    // Labeled last, since the title is built from the type and a custom type only arrives here
+    feature.label = (await resolveLabelOnSave({
+      pageKey: PAGE_KEYS.OTHER_FEATURES,
+      previousFeature: selectedFeature, values: {...feature, label: formValues.label},
+      getLabel: getLabel, getLabels: getLabels,
+    })).label;
     otherFeatures.push(feature);
     const spotId = spot.properties.id;
     dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
@@ -177,7 +185,7 @@ const OtherFeatureDetail = ({
     };
 
     const initialFeatureValues = {
-      label: selectedFeature.label,
+      label: getEnteredLabel(selectedFeature),
       name: selectedFeature.name,
       type: selectedFeature.type,
       otherType: '',
@@ -198,6 +206,7 @@ const OtherFeatureDetail = ({
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <TextInputField
+                    editable={!isReadOnly}
                     label={'Label'}
                     name={'label'}
                   />
@@ -206,6 +215,7 @@ const OtherFeatureDetail = ({
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <TextInputField
+                    editable={!isReadOnly}
                     isRequired={true}
                     label={'Name'}
                     name={'name'}
@@ -215,7 +225,9 @@ const OtherFeatureDetail = ({
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <SelectInputField
-                    choices={featureTypes.map(featureType => ({label: featureType, value: featureType}))}
+                    choices={featureTypes.map(
+                      featureType => ({disabled: isReadOnly, label: featureType, value: featureType}))}
+                    isReadOnly={isReadOnly}
                     isRequired={true}
                     isSingleSelect={true}
                     label={'Feature Type'}
@@ -227,6 +239,7 @@ const OtherFeatureDetail = ({
                 <ListItem containerStyle={commonStyles.listItemFormField}>
                   <ListItem.Content>
                     <TextInputField
+                      editable={!isReadOnly}
                       isRequired={true}
                       label={'Other Feature Type'}
                       name={'otherType'}
@@ -238,6 +251,7 @@ const OtherFeatureDetail = ({
                 <ListItem.Content>
                   <TextInputField
                     appearance={'multiline'}
+                    editable={!isReadOnly}
                     label={'Feature Description'}
                     name={'description'}
                   />

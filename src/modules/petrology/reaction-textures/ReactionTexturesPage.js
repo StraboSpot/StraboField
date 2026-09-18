@@ -10,9 +10,11 @@ import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
+import useForm from '../../form/useForm';
 import {setModalVisible} from '../../home/home.slice';
 import BasicListItem from '../../page/BasicListItem';
 import BasicPageDetail from '../../page/BasicPageDetail';
+import {getFeatureTitle} from '../../page/featureLabels.helpers';
 import PageHeader from '../../page/PageHeader';
 import {setSelectedAttributes} from '../../spots/spots.slice';
 import {getMineralTitle} from '../minerals/minerals.helpers';
@@ -23,6 +25,8 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+
+  const {getLabel, getLabels} = useForm();
 
   /* Local State */
 
@@ -110,7 +114,8 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
           }
           data={spot.properties.pet && spot.properties.pet[page.key]
             && spot.properties.pet[page.key].slice().sort(
-              (a, b) => (a[page.key] || 'Unknown').localeCompare((b[page.key] || 'Unknown')))}
+              (a, b) => getFeatureTitle(page.key, a, getLabel, getLabels)
+                .localeCompare(getFeatureTitle(page.key, b, getLabel, getLabels)))}
           keyExtractor={item => item.id.toString()}
           renderItem={({item}) => <BasicListItem editItem={editReaction} item={item} page={page}/>}
         />

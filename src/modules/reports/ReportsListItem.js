@@ -14,6 +14,8 @@ import useTags from '../tags/useTags';
 const ReportsListItem = ({
                            doShowTags,
                            isCheckedList,
+                           isItemChecked,
+                           onChecked,
                            onPress,
                            report,
                          }) => {
@@ -35,6 +37,22 @@ const ReportsListItem = ({
   /* Derived Variables */
 
   const reportTypeLabel = report.report_type ? getLabel(report.report_type, REPORT_FORM_NAME) : 'No Type';
+  // A caller with its own onChecked is picking memos for something and says which are checked. Without one the
+  // list is the Add Spots to Memo flow, which checks a memo as it writes the Spots into it and is done with it
+  const isChecked = onChecked ? !!isItemChecked : selectedReports.includes(report.id);
+  // A picker's box stays put; the Add Spots to Memo list turns it into a chevron once the Spots are written
+  const isShowCheckBox = isCheckedList && (!!onChecked || !isChecked);
+
+  /* Event Handlers */
+
+  const handleCheckBoxPressed = () => onChecked ? onChecked(report) : addSpotsToReports();
+
+  // A picker checks and unchecks from the row as well as the box. The Add Spots to Memo list instead opens a memo
+  // it has already written the Spots into, and ignores a press on one it has not
+  const handlePressed = () => {
+    if (onChecked) handleCheckBoxPressed();
+    else if (!isCheckedList || isChecked) onPress(report);
+  };
 
   /* Logic Helpers */
 
@@ -44,7 +62,7 @@ const ReportsListItem = ({
     reportSpotsIds = [... new Set([...reportSpotsIds, ...selectedSpots.map(s=>s.properties.id)])];
     console.log('Add selected spot ids', reportSpotsIds, 'to report', report);
     const editedReport = JSON.parse(JSON.stringify(report));
-    editedReport.updated_timestamp = Date.now();
+    editedReport.modified_timestamp = Date.now();
     editedReport.spots = reportSpotsIds;
     let updatedReports = reports.filter(r => r.id !== editedReport.id);
     updatedReports.push({...editedReport});
@@ -56,8 +74,8 @@ const ReportsListItem = ({
   const renderCheckboxes = () => {
     return (
       <ListItem.CheckBox
-        checked={selectedReports.includes(report.id)}
-        onPress={addSpotsToReports}
+        checked={isChecked}
+        onPress={handleCheckBoxPressed}
       />
     );
   };
@@ -74,7 +92,7 @@ const ReportsListItem = ({
     <ListItem
       containerStyle={commonStyles.listItem}
       keyExtractor={(item, index) => item?.id || index.toString()}
-      onPress={() => (!isCheckedList || (isCheckedList && selectedReports.includes(report.id))) && onPress(report)}
+      onPress={handlePressed}
     >
       <ListItem.Content>
         <ListItem.Title style={[commonStyles.listItemTitle, {fontWeight: 'bold'}]}>{reportTypeLabel}</ListItem.Title>
@@ -83,7 +101,7 @@ const ReportsListItem = ({
         </ListItem.Subtitle>
         {doShowTags && report && renderTags()}
       </ListItem.Content>
-      {isCheckedList && !selectedReports.includes(report.id) ? renderCheckboxes() : report && <ListItem.Chevron/>}
+      {isShowCheckBox ? renderCheckboxes() : report && <ListItem.Chevron/>}
     </ListItem>
   );
 };

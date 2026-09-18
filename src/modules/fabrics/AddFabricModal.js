@@ -8,13 +8,15 @@ import {DEFAULT_FABRIC_TYPE, FABRICS_GROUP_KEY, FABRIC_TYPES} from './fabric.con
 import IgneousFabric from './IgneousFabric';
 import MetamorphicFabric from './MetamorphicFabric';
 import StructuralFabric from './StructuralFabric';
-import {getNewId, isEmpty} from '../../shared/helpers';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import Form from '../form/Form';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import {resolveLabelOnSave} from '../page/featureLabels.helpers';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -25,7 +27,7 @@ const AddFabricModal = () => {
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getRelevantFields, getSurvey, submitAndShowErrors} = useForm();
+  const {getChoices, getLabel, getLabels, getRelevantFields, getSurvey, submitAndShowErrors} = useForm();
 
   /* Local State */
 
@@ -49,7 +51,7 @@ const AddFabricModal = () => {
 
   useEffect(() => {
     console.log('UE AddFabricModal [modalValues]', modalValues);
-    const initialValues = isEmpty(modalValues) ? {id: getNewId(), type: DEFAULT_FABRIC_TYPE} : modalValues;
+    const initialValues = isEmpty(modalValues) ? {id: getNewUUID(), type: DEFAULT_FABRIC_TYPE} : modalValues;
     formRef.current?.setValues(initialValues);
     setSelectedTypeIndex(types.indexOf(initialValues.type));
     const formName = [FABRICS_GROUP_KEY, initialValues.type];
@@ -79,10 +81,12 @@ const AddFabricModal = () => {
 
   const saveFabric = async () => {
     try {
-      const {values: editedFabricData} = await submitAndShowErrors(formRef.current);
+      const {values} = await submitAndShowErrors(formRef.current);
+      const editedFabricData = await resolveLabelOnSave(
+        {pageKey: PAGE_KEYS.FABRICS, values: values, getLabel: getLabel, getLabels: getLabels});
       console.log('Saving fabric data to Spot ...');
       let editedFabricsData = spot.properties.fabrics ? JSON.parse(JSON.stringify(spot.properties.fabrics)) : [];
-      editedFabricsData.push({...editedFabricData, id: getNewId()});
+      editedFabricsData.push({...editedFabricData, id: getNewUUID()});
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: FABRICS_GROUP_KEY, value: editedFabricsData}));
       if (SMALL_SCREEN) closeModal();

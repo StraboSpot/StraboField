@@ -4,9 +4,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import SampleDetailOverview from './SampleDetailOverview';
 import SamplesList from './SamplesList';
+import {openFeatureInNotebook} from '../notebook-panel/notebook.helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
+import {setSelectedSpot} from '../spots/spots.slice';
 
 const SamplesOverview = ({openMainMenuPanel, page}) => {
   /* Data Hooks */
@@ -21,10 +22,7 @@ const SamplesOverview = ({openMainMenuPanel, page}) => {
       dispatch(setSelectedSpot(item));
       dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
-    else {
-      dispatch(setSelectedAttributes([item]));
-      dispatch(setNotebookPageVisible(page.key));
-    }
+    else openFeatureInNotebook(dispatch, page.key, item);
   };
 
   /* View */
