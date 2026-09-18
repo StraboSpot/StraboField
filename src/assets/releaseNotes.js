@@ -18,6 +18,127 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 
 const RELEASE_NOTES = [
   {
+    version: '2.32.0',
+    groups: [
+      {
+        title: 'Forms & validation',
+        items: [
+          {
+            text: 'Live form validation: errors show as you type and Save stays disabled until they\'re fixed',
+            commit: '4c79a313f',
+          },
+          {text: 'Find the problem field: the tab holding an unanswered field is marked so you know where to look', commit: 'cdcf10eb1'},
+          {text: 'Auto dip direction: entering a strike fills in the matching dip direction wherever you type one', commit: '3daf75261'},
+          {text: 'Negative numbers on iOS: type negative values, with a keyboard matched to the field', commit: '37f4bd19b'},
+        ],
+      },
+      {
+        title: 'Compass',
+        items: [
+          {
+            text: 'Automatic declination: magnetic declination is recorded and kept up to date in your project data',
+            commit: 'af79623cf',
+          },
+          {text: 'Compass over template: a fresh compass reading now takes priority over an active template', commit: 'e8935e8ae'},
+        ],
+      },
+      {
+        title: 'Measurements',
+        items: [
+          {text: 'Hide from map: hide individual measurements from the map', commit: '52da123ae'},
+          {
+            text: 'Bulk strike/dip: calculate missing strikes and dip directions for every record that holds a plane',
+            commit: 'f851e2dbd',
+          },
+          {text: 'Steadier validation: planar+linear and 3D-structure measurements are checked and hinted more reliably', commit: '52a0b2c2d'},
+        ],
+      },
+      {
+        title: 'Tags',
+        items: [
+          {text: 'Memos on tags: add, remove, count, and list a tag\'s memos from its detail page', commit: '0075f7468'},
+          {text: 'Cleaner tag counts: a tag\'s counts show as icon chips instead of a legend', commit: '336086e36'},
+          {text: 'Sample tagging: only samples that have their own Spot can be tagged', commit: '74bd5d3af'},
+        ],
+      },
+      {
+        title: 'Memos',
+        items: [
+          {text: 'Memo authorship: memos record who wrote them and when', commit: '7c50d6792'},
+          {text: 'Associated samples: link samples to a memo, including legacy samples, from the Memo modal', commit: '621c63738'},
+          {text: 'Memos in Overview: a Spot\'s memos now show in its notebook Overview', commit: 'f2c4ec72b'},
+        ],
+      },
+      {
+        title: 'Notebook & pages',
+        items: [
+          {text: 'Feature labels: every feature list shows a label, filled in on save', commit: '0f264290d'},
+          {text: 'Full Spots list: see the full Spots list when no Spot is selected', commit: '290258006'},
+          {text: 'Collapsible More Pages: the More Pages sections collapse like the main menu\'s', commit: '63286a2b7'},
+        ],
+      },
+      {
+        title: 'Lists & datasets',
+        items: [
+          {
+            text: 'Remembered sort: each list keeps its sort order and reverse sort, applied before the first paint',
+            commit: '43fe4b115',
+          },
+          {text: 'Active dataset names: lists name the active datasets at the top, with a shortcut to open Datasets', commit: '4da0e2c21'},
+          {text: 'Map filter for Spots: filter Spots by whether they\'re on the geographic map or not mapped', commit: '7cddc4a4d'},
+        ],
+      },
+      {
+        title: 'Read-only datasets',
+        items: [
+          {
+            text: 'Read-only everywhere: read-only status now carries through image basemaps, strat sections, and forms',
+            commit: '1d7af9f55',
+          },
+          {text: 'Protected moves: a Spot can\'t be moved into or out of a read-only dataset', commit: 'dacb7848c'},
+        ],
+      },
+      {
+        title: 'Strat sections',
+        items: [
+          {text: 'Image overlays: set up, save, and draw image overlays under a strat section in the right order', commit: '521f1f1ec'},
+          {text: 'Open with intervals: opening a section activates the datasets holding its intervals', commit: '6252cf94b'},
+        ],
+      },
+      {
+        title: 'Samples & IGSN',
+        items: [
+          {text: 'Steadier SESAR: improved login and token handling for IGSN registration', commit: '340bbda00'},
+          {text: 'Safer saves: Save is disabled when SESAR registration can\'t go through', commit: 'eed4069c7'},
+          {text: 'Correct sample location: a sample from an image-basemap Spot gets a real-world location', commit: 'c8bf57cce'},
+        ],
+      },
+      {
+        title: 'Shortcuts',
+        items: [
+          {text: 'Straight to the Notebook: each shortcut opens its new Spot in the Notebook', commit: 'f23e9d0b8'},
+          {text: 'No empty Spots: canceling a photo or sketch no longer leaves an empty Spot behind', commit: 'c260154ca'},
+        ],
+      },
+      {
+        title: 'Maps',
+        items: [
+          {text: 'Accurate Spot placement: a Spot lands on the map it was set in, sized to the view', commit: 'a3956a1b2'},
+          {text: 'Remembered map view: the map view is saved once the camera settles', commit: 'ae29924cc'},
+          {text: 'Single name label: a Spot with multiple measurements draws its name label once', commit: '28772ecd6'},
+        ],
+      },
+      {
+        title: 'Small touches',
+        items: [
+          {text: 'Copied Spots: a copied Spot gets its own feature ids', commit: '4bc897794'},
+          {text: 'Mineral lookup: mineral data you already entered is kept when a mineral is looked up', commit: '25b763f5c'},
+          {text: 'Project visibility: an owner\'s project is listed again once its collaboration is halted', commit: '3cde7a4b4'},
+        ],
+      },
+    ],
+  },
+  {
     version: '2.31.3',
     groups: [
       {
