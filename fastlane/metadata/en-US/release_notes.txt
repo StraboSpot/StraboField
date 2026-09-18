@@ -1,6 +1,5 @@
 STABILITY
 • Crash fix: loading or switching projects no longer crashes the app on iOS
-• Fewer crashes: fixed iOS crashes that could occur when switching between modal screens
 
 FORMS & VALIDATION
 • Live form validation: errors show as you type and Save stays disabled until they're fixed
@@ -10,6 +9,7 @@ FORMS & VALIDATION
 
 COMPASS
 • Automatic declination: magnetic declination is recorded and kept up to date in your project data
+• Declination without GPS: falls back through your project location and nearby Spots to stay corrected, with clearer warnings when it can't
 • Compass over template: a fresh compass reading now takes priority over an active template
 
 MEASUREMENTS

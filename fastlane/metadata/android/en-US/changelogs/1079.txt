@@ -1,0 +1,9 @@
+StraboField 2.32.0
+
+• Stability: Crash fix
+• Forms & validation: Live form validation; Find the problem field; Auto dip direction; Negative numbers on iOS
+• Compass: Automatic declination; Declination without GPS; Compass over template
+• Measurements: Hide from map; Bulk strike/dip; Steadier validation
+• Tags: Memos on tags; Cleaner tag counts; Sample tagging
+
+Full notes: https://github.com/StraboSpot/StraboField/releases/tag/v2.32.0

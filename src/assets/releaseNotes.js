@@ -45,6 +45,10 @@ const RELEASE_NOTES = [
             text: 'Automatic declination: magnetic declination is recorded and kept up to date in your project data',
             commit: 'af79623cf',
           },
+          {
+            text: 'Declination without GPS: falls back through your project location and nearby Spots to stay corrected, with clearer warnings when it can\'t',
+            commit: 'cbf505d88',
+          },
           {text: 'Compass over template: a fresh compass reading now takes priority over an active template', commit: 'e8935e8ae'},
         ],
       },
