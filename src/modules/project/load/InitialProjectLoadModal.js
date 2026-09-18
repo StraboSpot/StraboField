@@ -9,7 +9,7 @@ import LoadProjectButtons from './LoadProjectButtons';
 import NewProjectForm from './NewProjectForm';
 import OpenProject from './OpenProject';
 import {isEmpty, truncateText} from '../../../shared/helpers';
-import {PRIMARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
+import {PRIMARY_BACKGROUND_COLOR, SMALL_SCREEN} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import useResetState from '../../../store/useResetState';
@@ -179,14 +179,19 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
 
   return (
     <ModalWrapper
-      // Render as a plain fullscreen View, NOT a native <Modal>. This screen is presented from a react-native-screens
-      // screen (RNSViewController), and dismissing it (isProjectLoadSelectionModalVisible -> false) re-renders and
-      // reparents the whole home tree in the same beat. A native modal dismiss overlapping that reparent trips
-      // UIViewControllerHierarchyInconsistency (a fatal crash — Sentry STRABOSPOT-2-6JN / -75C). A View overlay has no
-      // UIViewController presentation to break. On iPhone (SMALL_SCREEN) it was already fullscreen, so the UX matches.
+      // Render as a plain View, NOT a native <Modal>. This screen is presented from a react-native-screens screen
+      // (RNSViewController), and dismissing it (isProjectLoadSelectionModalVisible -> false) re-renders and reparents
+      // the whole home tree in the same beat. A native modal dismiss overlapping that reparent trips
+      // UIViewControllerHierarchyInconsistency (a fatal crash — Sentry STRABOSPOT-2-6JN / -75C); a View overlay has no
+      // UIViewController presentation to break. Fullscreen on small screens (matches the old iPhone look), a centered
+      // box on regular/large screens.
       doesRenderAsView
-      fullscreen
+      fullscreen={SMALL_SCREEN}
       headerTitle={statusMessageModalTitle}
+      overlayStyleOverride={{
+        height: visibleInitialSection === 'none' ? 'auto' : '80%',
+        justifyContent: 'center',
+      }}
       showActionButton={false}
       showCancelButton={false}
     >
