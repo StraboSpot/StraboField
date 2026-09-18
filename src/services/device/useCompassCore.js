@@ -201,13 +201,14 @@ const useCompassCore = () => {
     return getRootSpotGeoCoords(selectedSpot.properties.image_basemap, selectedSpot.properties.strat_section_id);
   };
 
-  // The declination currently stored on the project, or null when it hasn't been set. A blank field
-  // defaults to 0, which we treat as unset — the agonic line (a true 0) is vanishingly rare and still
-  // reads as 0, so nothing is lost by re-deriving it from location when GPS is available.
+  // The declination stored on the project, or null when the field is empty (never set, or the user cleared it).
+  // 0 is a valid value — the agonic line — and must stay distinct from empty, so only an absent/blank field reads
+  // as unset. Guard the empty cases before Number(), which turns '' and null into 0 and would mask a cleared field.
   const getProjectDeclination = () => {
     const {magnetic_declination: stored} = store.getState().project.project?.description ?? {};
+    if (stored === undefined || stored === null || stored === '') return null;
     const value = Number(stored);
-    return Number.isFinite(value) && value !== 0 ? value : null;
+    return Number.isFinite(value) ? value : null;
   };
 
   // Record the location-derived declination on the Project Description as a reference value, but only when
