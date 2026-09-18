@@ -30,7 +30,6 @@ const useCompassCore = () => {
   /* Local State */
 
   const calibrationSubscription = useRef(null);
-  const declinationSource = useRef(null); // which fallback the applied declination came from, recorded on the measurement
   const imageCapturedDeclination = useRef(0);
   const imageCaptureReference = useRef(null); // 'true' | 'magnetic' — reference frame of the captured matrix (iOS)
   const imageCaptureSubscription = useRef(null);
@@ -84,7 +83,6 @@ const useCompassCore = () => {
     const dipDirection = mod(strike + 90, 360);
     setCompassData({
       declination: declination.toFixed(2),
-      declination_source: declinationSource.current,
       dip: roundToDecimalPlaces(dip, 0),
       dip_direction: roundToDecimalPlaces(dipDirection, 0),
       magHeading: roundToDecimalPlaces(magneticHeading, 0),
@@ -161,7 +159,6 @@ const useCompassCore = () => {
       const {longitude, latitude} = await getCurrentLocation({showBlockedAlert: false});
       const declination = declinationAtCoords([longitude, latitude]);
       magneticDeclination.current = declination;
-      declinationSource.current = DECLINATION_SOURCE.GPS;
       recordDeclinationToProject(declination); // seed the project reference while it is still empty
       return {declination, source: DECLINATION_SOURCE.GPS};
     }
@@ -173,7 +170,6 @@ const useCompassCore = () => {
     const projectDeclination = getProjectDeclination();
     if (projectDeclination !== null) {
       magneticDeclination.current = projectDeclination;
-      declinationSource.current = DECLINATION_SOURCE.PROJECT;
       return {declination: projectDeclination, source: DECLINATION_SOURCE.PROJECT};
     }
 
@@ -182,13 +178,11 @@ const useCompassCore = () => {
     if (geoCoords) {
       const declination = declinationAtCoords(geoCoords);
       magneticDeclination.current = declination;
-      declinationSource.current = DECLINATION_SOURCE.CENTROID;
       recordDeclinationToProject(declination);
       return {declination, source: DECLINATION_SOURCE.CENTROID};
     }
 
     // 4. Nothing available - the compass can't produce a true-north reading for this measurement.
-    declinationSource.current = null;
     return {declination: null, source: null};
   };
 
