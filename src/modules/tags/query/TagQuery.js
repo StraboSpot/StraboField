@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useLayoutEffect, useState} from 'react';
 
 import {TAG_FILTER_LABELS, TAG_SORT_ORDER} from './tagQuery.constants';
 import {sortTagsByOrder} from './tagQuery.helpers';
@@ -6,12 +6,20 @@ import {isEmpty} from '../../../shared/helpers';
 import ListQueryBar from '../../../shared/ui/ListQueryBar';
 import {getTagTitle} from '../tags.helpers';
 
-const TagQuery = ({activeFilters, isGeologicUnits, setActiveFilters, setTagsSorted, tags}) => {
+// The parent keeps the filters and sort per page in Redux, so the list looks the same when reopened.
+const TagQuery = ({
+                    activeFilters,
+                    isGeologicUnits,
+                    isReverseSort,
+                    setActiveFilters,
+                    setSort,
+                    setTagsSorted,
+                    sortOrder = isGeologicUnits ? TAG_SORT_ORDER.TEMPORAL : TAG_SORT_ORDER.ALPHABETICAL,
+                    tags,
+                  }) => {
   /* Local State */
 
-  const [isReverseSort, setIsReverseSort] = useState(false);
   const [searchState, setSearchState] = useState('');
-  const [sortOrder, setSortOrder] = useState(isGeologicUnits ? TAG_SORT_ORDER.TEMPORAL : TAG_SORT_ORDER.ALPHABETICAL);
   const [tagsFiltered, setTagsFiltered] = useState(tags);
 
   /* Derived Variables */
@@ -23,7 +31,8 @@ const TagQuery = ({activeFilters, isGeologicUnits, setActiveFilters, setTagsSort
 
   /* Side Effects */
 
-  useEffect(() => {
+  // A layout effect so the sorted list replaces the parent's empty initial list before the first paint.
+  useLayoutEffect(() => {
     const filtered = applySearch(searchState, tags);
     setTagsFiltered(filtered);
     setTagsSorted(sortTagsByOrder(filtered, sortOrder, isReverseSort));
@@ -47,7 +56,7 @@ const TagQuery = ({activeFilters, isGeologicUnits, setActiveFilters, setTagsSort
 
   const toggleReverseSort = () => {
     const newReverse = !isReverseSort;
-    setIsReverseSort(newReverse);
+    setSort({isReverse: newReverse, order: sortOrder});
     setTagsSorted(sortTagsByOrder(tagsFiltered, sortOrder, newReverse));
   };
 
@@ -59,7 +68,7 @@ const TagQuery = ({activeFilters, isGeologicUnits, setActiveFilters, setTagsSort
   };
 
   const updateSort = (sort) => {
-    setSortOrder(sort);
+    setSort({isReverse: isReverseSort, order: sort});
     setTagsSorted(sortTagsByOrder(tagsFiltered, sort, isReverseSort));
   };
 

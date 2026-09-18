@@ -52,6 +52,9 @@ else {
       //   Sentry.mobileReplayIntegration(),
     ],
   });
+  // TEMP diagnostic: proves which JS bundle is running. If a crash event carries this tag, the modal-serialization
+  // changes are loaded; if it is absent, the app is running a stale bundle. Remove once the modal crash is confirmed fixed.
+  Sentry.setTag('js_modal_fix', 'loadmodal-asview-1');
 }
 
 NetInfo.configure({

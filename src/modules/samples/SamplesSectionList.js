@@ -11,7 +11,15 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
-const SamplesSectionList = ({checkedItems, dataSectioned, isCheckedList, listEmptyText, openSpotInNotebook}) => {
+const SamplesSectionList = ({
+                              canPickReadOnly,
+                              checkedItems,
+                              dataSectioned,
+                              isCheckedList,
+                              listEmptyText,
+                              onChecked,
+                              openSpotInNotebook,
+                            }) => {
   /* Data Hooks */
 
   const spots = useSelector(state => state.spot.spots);
@@ -23,6 +31,15 @@ const SamplesSectionList = ({checkedItems, dataSectioned, isCheckedList, listEmp
     else openSpotInNotebook(parentSpot, PAGE_KEYS.SAMPLES, [sample]);
   };
 
+  /* Logic Helpers */
+
+  // A caller with its own onChecked is picking the sample itself, so only one that has become a Spot can be
+  // checked. A tag instead falls back to the parent Spot, a legacy sample having no Spot of its own to tag
+  const getIsItemChecked = (sample, parentSpot) => {
+    if (sample.properties?.isSample) return !!checkedItems?.some(i => i === sample.properties.id);
+    return !onChecked && !!checkedItems?.some(i => i === parentSpot?.properties?.id);
+  };
+
   /* Render Functions */
 
   const renderSampleListItem = (sample, parentSpot) => {
@@ -30,10 +47,11 @@ const SamplesSectionList = ({checkedItems, dataSectioned, isCheckedList, listEmp
     sample = isEmpty(richSample) ? sample : richSample;
     return (
       <SampleListItem
+        canPickReadOnly={canPickReadOnly}
         isCheckedList={isCheckedList}
-        isItemChecked={checkedItems?.find(
-          i => sample.properties?.isSample ? i === sample.properties.id : i === parentSpot?.properties?.id)}
+        isItemChecked={getIsItemChecked(sample, parentSpot)}
         isShowAvatar
+        onChecked={onChecked}
         onPress={() => handleSamplePress(sample, parentSpot)}
         parentSpot={parentSpot}
         sample={sample}

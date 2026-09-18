@@ -31,6 +31,9 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
 
   let sampleDetail = JSON.parse(JSON.stringify(sampleValues ?? {}));
   delete sampleDetail.id;
+  // A label is filled in with the sample's own name on save, so unless it has been typed over it would repeat
+  // the row below it - and only ten rows are shown, so it would cost one of them to say nothing
+  if (sampleDetail.label === sampleDetail.sample_id_name) delete sampleDetail.label;
 
   const formName = ['general', 'samples'];
   // Order fields to match sample form survey order

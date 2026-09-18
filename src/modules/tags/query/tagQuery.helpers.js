@@ -1,11 +1,15 @@
+import {getTimestampFromId} from '../../../shared/helpers';
 import {getTagTitle} from '../tags.helpers';
 import {TAG_SORT_ORDER, TEMPORAL_FIELD_GROUPS, TEMPORAL_VALUE_RANGES} from './tagQuery.constants';
 
 export const sortTagsAlphabetically = tagsToSort =>
   [...tagsToSort].sort((a, b) => getTagTitle(a).localeCompare(getTagTitle(b)));
 
+// A tag predating created_timestamp has its creation time in its old numeric id; a UUID has none, so it sorts oldest
+const getCreatedTimestamp = tag => tag.created_timestamp || getTimestampFromId(tag.id) || 0;
+
 export const sortTagsByDateCreated = tagsToSort =>
-  [...tagsToSort].sort((a, b) => b.id - a.id);
+  [...tagsToSort].sort((a, b) => getCreatedTimestamp(b) - getCreatedTimestamp(a));
 
 // Fractions are measured from the old end (max) toward the young end (min):
 // early = 1/4 through the period (close to old), late = 3/4 through (close to young)

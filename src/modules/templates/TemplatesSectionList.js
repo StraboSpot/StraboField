@@ -4,6 +4,8 @@ import {SectionList} from 'react-native';
 import {useSelector} from 'react-redux';
 
 import TemplateListItem from './TemplateListItem';
+import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
+import {getTemplateKeys, getTemplateList} from './templates.helpers';
 import TemplateSectionHeader from './TemplateSectionHeader';
 import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -16,12 +18,13 @@ const TemplatesSectionList = ({handleTemplatePressed}) => {
 
   /* Derived Variables */
 
-  const templatesSectioned = Object.entries(templates).reduce((acc, [key, value]) => {
-    if (isEmpty(value) || (value.templates && isEmpty(value.templates))) return acc;
-    else if (key === 'activeMeasurementTemplates' || key === 'useMeasurementTemplates') return acc;
-    else if (key === 'measurementTemplates') {
-      // Split measurement templates into planar, tabular and linear
-      const measurementsGroupedByType = value.reduce((acc1, v) => {
+  const templatesSectioned = getTemplateKeys(templates).reduce((acc, key) => {
+    const templatesForKey = getTemplateList(templates, key);
+    if (isEmpty(templatesForKey)) return acc;
+    // Measurements are the one key whose templates are not all of a kind - planar, tabular and linear share a
+    // bucket and are told apart by type - so they get a section each rather than one for the key.
+    else if (key === MEASUREMENT_TEMPLATE_KEY) {
+      const measurementsGroupedByType = templatesForKey.reduce((acc1, v) => {
         const type = v.values.type;
         if (!acc1[type]) acc1[type] = [];
         acc1[type].push(v);
@@ -30,8 +33,7 @@ const TemplatesSectionList = ({handleTemplatePressed}) => {
       // console.log('measurementsGroupedByType', measurementsGroupedByType);
       return [...acc, ...Object.entries(measurementsGroupedByType).map(([k, v]) => ({title: k, data: v}))];
     }
-    else if (value.templates) return [...acc, {title: key, data: value?.templates}];
-    else return acc;
+    else return [...acc, {title: key, data: templatesForKey}];
   }, []);
 
   const templatesSectionedSorted = templatesSectioned.map(section => ({

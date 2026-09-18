@@ -6,10 +6,11 @@ import {useDispatch, useSelector} from 'react-redux';
 import TagDetail from './TagDetail';
 import TagDetailModal from './TagDetailModal';
 import {isEmpty} from '../../../shared/helpers';
+import {setModalValues, setModalVisible} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
-import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import {MODAL_KEYS, PAGE_KEYS} from '../../page/pageKeys.constants';
 import {setSelectedAttributes, setSelectedSpot} from '../../spots/spots.slice';
 
 const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
@@ -35,8 +36,16 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
 
   const openFeatureDetail = (spot, feature, featureType) => {
     dispatch(setSelectedSpot(spot));
-    dispatch(setSelectedAttributes([feature]));
+    // The panel opens the page, so the feature is selected after it, the same way openFeatureInNotebook does
     openNotebookPanel(featureType);
+    dispatch(setSelectedAttributes([feature]));
+  };
+
+  // The memo modal is rendered at the app level off modalVisible, so it opens over the panel as it does from the
+  // Memos list
+  const openReport = (report) => {
+    dispatch(setModalValues(report));
+    dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
   };
 
   /* View */
@@ -54,6 +63,9 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
           addRemoveFeatures={() => {
             dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES}));
           }}
+          addRemoveReports={() => {
+            dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_REPORTS}));
+          }}
           addRemoveSampleSpots={() => {
             dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_SAMPLE_SPOTS}));
           }}
@@ -62,6 +74,7 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
           }}
           openDetailModal={openDetailModal}
           openFeatureDetail={openFeatureDetail}
+          openReport={openReport}
           openSpot={(spot) => {
             dispatch(setSelectedSpot(spot));
             openNotebookPanel();

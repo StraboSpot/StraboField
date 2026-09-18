@@ -3,7 +3,7 @@ import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewId, isEmpty, toTitleCase} from '../../../shared/helpers';
+import {getNewUUID, getTimestampFromId, isEmpty, toTitleCase} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import Form from '../../form/Form';
@@ -92,7 +92,12 @@ const TagDetailModal = ({closeModal}) => {
       const {values: formValues} = await submitAndShowErrors(formRef.current);
       console.log('Saving tag data to Project ...', formValues);
       let updatedTag = formValues;
-      if (!updatedTag.id) updatedTag.id = getNewId();
+      if (!updatedTag.id) {
+        updatedTag.id = getNewUUID();
+        updatedTag.created_timestamp = Date.now();
+      }
+      // A tag made before created_timestamp existed has its creation time in its old numeric id
+      else if (!updatedTag.created_timestamp) updatedTag.created_timestamp = getTimestampFromId(updatedTag.id);
       if (tempColor) updatedTag.color = tempColor;
       else delete updatedTag.color;
       if (addTagToSelectedSpot) {

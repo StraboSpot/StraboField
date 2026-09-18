@@ -1,6 +1,13 @@
 {
   "survey": [
     {
+      "type": "text",
+      "name": "label",
+      "label": "Label",
+      "hint": "If a label is not specified a default label will be given.",
+      "required": "false"
+    },
+    {
       "type": "begin_group",
       "name": "group_wo9iu92",
       "label": "Architecture Interpretation",

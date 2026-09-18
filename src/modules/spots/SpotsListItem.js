@@ -13,9 +13,9 @@ import CheckboxList from '../../shared/ui/CheckboxList';
 import useTags from '../tags/useTags';
 
 const SpotsListItem = ({
+                         canPickReadOnly,
                          doShowSamples,
                          doShowTags,
-                         ignoreReadOnly,
                          isCheckedList,
                          isItemChecked,
                          isSample,
@@ -35,7 +35,7 @@ const SpotsListItem = ({
 
   /* Derived Variables */
 
-  const isReadOnly = !ignoreReadOnly && isSpotReadOnly(spot);
+  const isReadOnly = !canPickReadOnly && isSpotReadOnly(spot);
 
   /* Event Handlers */
 

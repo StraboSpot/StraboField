@@ -2,12 +2,13 @@ import {useEffect, useRef, useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewId, isEmpty, isEqual} from '../../shared/helpers';
+import {getNewUUID, getTimestampFromId, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, updatedProject} from '../project/projects.slice';
 
 const useReportModal = ({openSpotInNotebook}) => {
@@ -60,6 +61,21 @@ const useReportModal = ({openSpotInNotebook}) => {
 
   /* Internal Functions */
 
+  // A legacy sample is data inside its Spot rather than a Spot of its own, so a memo has nothing to reference it
+  // by. Add Data to Sample in the notebook footer is what gives it one, so offer to go there
+  const alertConvertSample = (sample, parentSpot) => {
+    alert(
+      'Add Data to Sample First',
+      `${sample.sample_id_name || 'This sample'} can't be added to a memo until it holds its own data. `
+      + 'Continue to the sample, press Add Data to Sample at the bottom of the notebook, then add it here.',
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {text: 'Open Sample', onPress: () => checkReportChanged('Sample', () => goToSample(sample, parentSpot))},
+      ],
+      {cancelable: false},
+    );
+  };
+
   const alertLeaveReport = (itemText, cont) => {
     alert(
       'Leave Memo',
@@ -97,6 +113,15 @@ const useReportModal = ({openSpotInNotebook}) => {
 
   const closeModal = () => dispatch(setModalVisible({modal: null}));
 
+  // The memo asks about the record just tapped, so it calls it what the user sees rather than Spot for both
+  const getSpotLabel = spot => spot.properties?.isSample ? 'Sample' : 'Spot';
+
+  // A legacy sample is read on its Spot's Samples page, which is also where the footer offers to give it a Spot
+  const goToSample = (sample, parentSpot) => {
+    closeModal();
+    openSpotInNotebook(parentSpot, PAGE_KEYS.SAMPLES, [sample]);
+  };
+
   const goToSpot = (spot) => {
     console.log('Going to Spot', spot);
     closeModal();
@@ -113,7 +138,7 @@ const useReportModal = ({openSpotInNotebook}) => {
     else dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.TAGS}));
   };
 
-  const handleSpotPressedCont = spot => checkReportChanged('Spot', () => goToSpot(spot));
+  const handleSpotPressedCont = spot => checkReportChanged(getSpotLabel(spot), () => goToSpot(spot));
 
   const handleTagPressedCont = tag => checkReportChanged('Tag', () => goToTag(tag));
 
@@ -123,14 +148,17 @@ const useReportModal = ({openSpotInNotebook}) => {
     try {
       console.log('Saving report ...');
       let {values: editedReport} = await submitAndShowErrors(formRef.current);
-      if (!editedReport.id) editedReport.id = getNewId();
+      if (!editedReport.id) editedReport.id = getNewUUID();
       // Stamped once, on the first save - an edit by anyone else leaves the original author in place
       if (!editedReport.straboUserId || !editedReport.created_by) {
         editedReport.straboUserId = straboUserId;
         editedReport.created_by = userName;
       }
-      if (!editedReport.created_timestamp) editedReport.created_timestamp = Date.now();
-      editedReport.updated_timestamp = Date.now();
+      // A memo made before created_timestamp existed has its creation time in its old numeric id
+      if (!editedReport.created_timestamp) {
+        editedReport.created_timestamp = getTimestampFromId(editedReport.id) || Date.now();
+      }
+      editedReport.modified_timestamp = Date.now();
       editedReport.comments = comments;
       editedReport.images = updatedImages;
       editedReport.spots = checkedSpotsIds;
@@ -163,10 +191,16 @@ const useReportModal = ({openSpotInNotebook}) => {
     dispatch(updatedProject({field: 'reports', value: updatedReports}));
   };
 
+  // The picker lists every sample, so the ones a memo cannot hold yet are visible rather than quietly missing
+  const handleSampleChecked = (sample, parentSpot) => {
+    if (sample.properties?.isSample) handleSpotChecked(sample.properties.id);
+    else alertConvertSample(sample, parentSpot);
+  };
+
   const handleSaveComment = (text) => {
     const newComment = {
       created_timestamp: Date.now(),
-      id: getNewId(),
+      id: getNewUUID(),
       name: userName,
       straboUserId: straboUserId,
       text: text,
@@ -175,7 +209,7 @@ const useReportModal = ({openSpotInNotebook}) => {
     setComments(newComments);
     if (report?.id) {
       const updatedReports = reports.map(
-        r => r.id === report.id ? {...r, comments: newComments, updated_timestamp: Date.now()} : r);
+        r => r.id === report.id ? {...r, comments: newComments, modified_timestamp: Date.now()} : r);
       dispatch(updatedProject({field: 'reports', value: updatedReports}));
     }
   };
@@ -190,7 +224,7 @@ const useReportModal = ({openSpotInNotebook}) => {
     else setCheckedSpotsIds([...checkedSpotsIds, spotId]);
   };
 
-  const handleSpotPressed = spot => alertLeaveReport('Spot', () => handleSpotPressedCont(spot));
+  const handleSpotPressed = spot => alertLeaveReport(getSpotLabel(spot), () => handleSpotPressedCont(spot));
 
   const handleTagChecked = (tagId) => {
     console.log('Tag', tagId, checkedTagsIds);
@@ -208,6 +242,7 @@ const useReportModal = ({openSpotInNotebook}) => {
     confirmCloseModal,
     deleteReport,
     formRef,
+    handleSampleChecked,
     handleSaveComment,
     handleSavePressed,
     handleSpotChecked,

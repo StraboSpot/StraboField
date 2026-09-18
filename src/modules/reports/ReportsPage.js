@@ -3,6 +3,7 @@ import {Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getReportsAtSpot} from './reports.helpers';
 import ReportsList from './ReportsList';
 import commonStyles from '../../shared/common.styles';
 import AddButton from '../../shared/ui/buttons/AddButton';
@@ -22,10 +23,9 @@ const ReportsPage = ({page}) => {
 
   /* Derived Variables */
 
-  const reportsUsingThisSpot = reports.reduce((acc, report) => {
-    const doesThisReportUseThisSpot = report?.spots?.find(id => id === spot.properties.id);
-    return doesThisReportUseThisSpot ? [...acc, report] : acc;
-  }, []);
+  const reportsUsingThisSpot = getReportsAtSpot(reports, spot.properties.id);
+  // This page serves a sample too, so it names whichever is being read
+  const spotLabel = spot.properties?.isSample ? 'Sample' : 'Spot';
 
   /* Logic Helpers */
 
@@ -39,9 +39,9 @@ const ReportsPage = ({page}) => {
   return (
     <View style={{flex: 1}}>
       <PageHeader pageTitle={page.label}/>
-      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Memo with this Spot'}/>}
+      {!isReadOnlyProject && <AddButton onPress={addReport} title={'Create New Memo with this ' + spotLabel}/>}
       <Text style={[commonStyles.listItemTitle, commonStyles.textBold, {paddingLeft: 10}]}>
-        Memos referencing this Spot:
+        Memos referencing this {spotLabel}:
       </Text>
       <ReportsList reportsSubset={reportsUsingThisSpot}/>
     </View>

@@ -6,7 +6,8 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import MeasurementItem from './MeasurementItem';
-import {isEmptyMeasurement} from './measurements.helpers';
+import {MEASUREMENT_KEYS} from './measurements.constants';
+import {isEmptyMeasurement, isPlanarType} from './measurements.helpers';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import commonStyles from '../../shared/common.styles';
@@ -25,8 +26,9 @@ import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {setModalVisible} from '../home/home.slice';
+import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import PageHeader from '../page/PageHeader';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
@@ -44,7 +46,7 @@ const MeasurementDetail = ({
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {submitAndShowErrors} = useForm();
+  const {getLabel, getLabels, submitAndShowErrors} = useForm();
   const {deleteMeasurements} = useMeasurements();
   const toast = useToast();
 
@@ -92,10 +94,9 @@ const MeasurementDetail = ({
     if (!isEmpty(compassMeasurements)) {
       console.log('New compass measurement recorded AND DETAIL OPEN.', compassMeasurements);
       if (!isEmpty(selectedMeasurement) && selectedMeasurement.type) {
-        const fieldsToUpdate = selectedMeasurement.type === 'linear_orientation'
+        const fieldsToUpdate = selectedMeasurement.type === MEASUREMENT_KEYS.LINEAR
           ? ['trend', 'plunge', 'rake', 'rake_calculated', 'quality']
-          : selectedMeasurement.type === 'planar_orientation' || selectedMeasurement.type === 'tabular_orientation'
-            ? ['strike', 'dip', 'dip_direction', 'quality']
+          : isPlanarType(selectedMeasurement.type) ? ['strike', 'dip', 'dip_direction', 'quality']
             : [];
         fieldsToUpdate.forEach(field => formRef.current.setFieldValue(field, compassMeasurements[field]));
       }
@@ -107,7 +108,7 @@ const MeasurementDetail = ({
   useEffect(() => {
     console.log('UE MeasurementDetail [selectedMeasurement]', selectedMeasurement);
     if (!isTemplate && !isEmpty(selectedMeasurement) && selectedMeasurement.type) {
-      if (selectedMeasurement.type === 'planar_orientation' || selectedMeasurement.type === 'tabular_orientation') {
+      if (isPlanarType(selectedMeasurement.type)) {
         dispatch(setCompassMeasurementTypes([COMPASS_TOGGLE_BUTTONS.PLANAR]));
       }
       else dispatch(setCompassMeasurementTypes([COMPASS_TOGGLE_BUTTONS.LINEAR]));
@@ -145,9 +146,9 @@ const MeasurementDetail = ({
   // Confirm switch between Planar and Tabular Zone
   const onSwitchPlanarTabular = (i) => {
     const currentType = formRef.current.values.type;
-    if ((i === 0 && currentType === 'tabular_orientation') || (i === 1 && currentType === 'planar_orientation')) {
-      const newType = currentType === 'tabular_orientation' ? 'planar_orientation' : 'tabular_orientation';
-      const typeText = newType === 'tabular_orientation' ? 'Tabular Zone' : 'Planar Orientation';
+    if ((i === 0 && currentType === MEASUREMENT_KEYS.TABULAR) || (i === 1 && currentType === MEASUREMENT_KEYS.PLANAR)) {
+      const newType = currentType === MEASUREMENT_KEYS.TABULAR ? MEASUREMENT_KEYS.PLANAR : MEASUREMENT_KEYS.TABULAR;
+      const typeText = newType === MEASUREMENT_KEYS.TABULAR ? 'Tabular Zone' : 'Planar Orientation';
       const alertTextEnd = selectedAttributes.length === 1 ? 'this measurement to a ' + typeText + '? You will '
         + 'lose all data for this measurement not relevant to ' + typeText + '.'
         : 'these measurements to ' + typeText + '? You will lose all data for these measurements not relevant to '
@@ -189,7 +190,7 @@ const MeasurementDetail = ({
   /* Logic Helpers */
 
   const addAssociatedMeasurement = () => {
-    const types = selectedAttitude.type === 'linear_orientation' ? [COMPASS_TOGGLE_BUTTONS.PLANAR]
+    const types = selectedAttitude.type === MEASUREMENT_KEYS.LINEAR ? [COMPASS_TOGGLE_BUTTONS.PLANAR]
       : [COMPASS_TOGGLE_BUTTONS.LINEAR];
     dispatch(setCompassMeasurementTypes(types));
     dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.MEASUREMENTS}));
@@ -259,7 +260,7 @@ const MeasurementDetail = ({
 
   const getPageTitle = () => {
     if (selectedMeasurement?.type) {
-      if (selectedMeasurement.type === 'tabular_orientation') return 'Tabular Zone Detail';
+      if (selectedMeasurement.type === MEASUREMENT_KEYS.TABULAR) return 'Tabular Zone Detail';
       else return toTitleCase(selectedMeasurement.type.replace('_', ' ').replace('orientation', 'feature')) + ' Detail';
     }
     else return 'Measurement Detail';
@@ -273,6 +274,12 @@ const MeasurementDetail = ({
     try {
       let {errors, values: formValues} = await submitAndShowErrors(formRef.current || formCurrent,
         isLeavingPage);
+      // A bulk edit leaves the label out below, along with everything else that names one measurement rather
+      // than the group, so only a single measurement is labeled here
+      if (selectedAttributes.length === 1) {
+        formValues = await resolveLabelOnSave({pageKey: PAGE_KEYS.MEASUREMENTS,
+          previousFeature: selectedMeasurement, values: formValues, getLabel: getLabel, getLabels: getLabels});
+      }
       console.log('Saving form data to Spot ...');
       let orientationDataCopy = JSON.parse(JSON.stringify(spot.properties.orientation_data));
       let editedSelectedMeasurements = [];
@@ -343,7 +350,9 @@ const MeasurementDetail = ({
 
   const saveTemplateForm = async (formCurrent) => {
     const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
-    await saveTemplate(formValues);
+    // A template is copied into every measurement made from it, so a label would be shared by all of them
+    const {label, ...templateValues} = formValues;
+    await saveTemplate(templateValues);
   };
 
   // Switch between Planar and Tabular Zone
@@ -362,7 +371,7 @@ const MeasurementDetail = ({
   /* Render Functions */
 
   const renderAssociatedMeasurements = () => {
-    const addButtonText = selectedAttitude && selectedAttitude.type === 'linear_orientation'
+    const addButtonText = selectedAttitude && selectedAttitude.type === MEASUREMENT_KEYS.LINEAR
       ? 'Add Associated Plane' : 'Add Associated Line';
     console.log('selected id', selectedMeasurement.id);
     return (
@@ -440,12 +449,12 @@ const MeasurementDetail = ({
   };
 
   const renderMultiMeasurementsBar = () => {
-    const mainText = selectedAttitude.type === 'linear_orientation' ? 'Multiple Lines' : 'Multiple Planes';
-    const propertyText = selectedAttitude.type === 'linear_orientation' ? 'Plunge -> Trend' : 'Strike/Dip';
+    const mainText = selectedAttitude.type === MEASUREMENT_KEYS.LINEAR ? 'Multiple Lines' : 'Multiple Planes';
+    const propertyText = selectedAttitude.type === MEASUREMENT_KEYS.LINEAR ? 'Plunge -> Trend' : 'Strike/Dip';
     const hasAssociated = selectedAttitude.associated_orientation && selectedAttitude.associated_orientation.length > 0;
-    const mainText2 = hasAssociated && selectedAttitude.associated_orientation[0].type === 'linear_orientation'
+    const mainText2 = hasAssociated && selectedAttitude.associated_orientation[0].type === MEASUREMENT_KEYS.LINEAR
       ? 'Multiple Lines' : 'Multiple Planes';
-    const propertyText2 = hasAssociated && selectedAttitude.associated_orientation[0].type === 'linear_orientation'
+    const propertyText2 = hasAssociated && selectedAttitude.associated_orientation[0].type === MEASUREMENT_KEYS.LINEAR
       ? 'Plunge -> Trend' : 'Strike/Dip';
 
     return (
@@ -510,7 +519,7 @@ const MeasurementDetail = ({
         containerStyle={styles.measurementDetailSwitches}
         onPress={i => onSwitchPlanarTabular(i)}
         selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
-        selectedIndex={selectedMeasurement.type === 'planar_orientation' ? 0 : 1}
+        selectedIndex={selectedMeasurement.type === MEASUREMENT_KEYS.PLANAR ? 0 : 1}
         textStyle={{color: PRIMARY_ACCENT_COLOR, fontSize: SMALL_TEXT_SIZE}}
       />
     );
@@ -529,9 +538,8 @@ const MeasurementDetail = ({
               <View>
                 {!isTemplate && selectedMeasurement && selectedAttributes.length === 1 && renderAssociatedMeasurements()}
                 {!isTemplate && selectedMeasurement && selectedAttributes.length > 1 && renderMultiMeasurementsBar()}
-                {!isReadOnly && selectedMeasurement && selectedMeasurement.type
-                  && (selectedMeasurement.type === 'planar_orientation'
-                    || selectedMeasurement.type === 'tabular_orientation') && renderPlanarTabularSwitches()}
+                {!isReadOnly && selectedMeasurement && isPlanarType(selectedMeasurement.type)
+                  && renderPlanarTabularSwitches()}
                 <View>
                   {!isEmpty(formName) && renderFormFields()}
                 </View>

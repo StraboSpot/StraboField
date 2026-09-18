@@ -6,8 +6,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import OtherFeatureItem from './OtherFeatureItem';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import {openFeatureInNotebook} from '../notebook-panel/notebook.helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {setSelectedAttributes} from '../spots/spots.slice';
 
 const OtherFeaturesOverview = ({page}) => {
   /* Data Hooks */
@@ -20,10 +20,7 @@ const OtherFeaturesOverview = ({page}) => {
   const renderFeature = (feature) => {
     return (
       <OtherFeatureItem
-        editFeature={() => {
-          dispatch(setNotebookPageVisible(page.key));
-          dispatch(setSelectedAttributes([feature]));
-        }}
+        editFeature={() => openFeatureInNotebook(dispatch, page.key, feature)}
         feature={feature}
       />
     );

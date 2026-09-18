@@ -10,13 +10,15 @@ import AddOther from './AddOther';
 import AddTensor from './AddTensor';
 import FoldGeometryChoices from './fold-geometry/FoldGeometryChoices';
 import {THREE_D_STRUCTURE_TYPES} from './threeDStructures.constants';
-import {getNewId, isEmpty, toTitleCase} from '../../shared/helpers';
+import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, PRIMARY_TEXT_COLOR, SMALL_SCREEN, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import Form from '../form/Form';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
+import {resolveLabelOnSave} from '../page/featureLabels.helpers';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -30,7 +32,7 @@ const AddThreeDStructureModal = () => {
   const modalValues = useSelector(state => state.home.modalValues);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {getChoices, getRelevantFields, getSurvey, submitAndShowErrors} = useForm();
+  const {getChoices, getLabel, getLabels, getRelevantFields, getSurvey, submitAndShowErrors} = useForm();
 
   /* Local State */
 
@@ -51,7 +53,7 @@ const AddThreeDStructureModal = () => {
 
   useEffect(() => {
     console.log('UE AddThreeDStructureModal [modalValues]', modalValues);
-    const initialValues = isEmpty(modalValues) ? {id: getNewId(), type: THREE_D_STRUCTURE_TYPES.FOLD} : modalValues;
+    const initialValues = isEmpty(modalValues) ? {id: getNewUUID(), type: THREE_D_STRUCTURE_TYPES.FOLD} : modalValues;
     formRef.current?.setValues(initialValues);
     setSelectedTypeIndex(types.indexOf(initialValues.type));
     const formName = [groupKey, initialValues.type];
@@ -79,11 +81,13 @@ const AddThreeDStructureModal = () => {
 
   const save3DStructure = async () => {
     try {
-      const {values: edited3DStructureData} = await submitAndShowErrors(formRef.current);
+      const {values} = await submitAndShowErrors(formRef.current);
+      const edited3DStructureData = await resolveLabelOnSave(
+        {pageKey: PAGE_KEYS.THREE_D_STRUCTURES, values: values, getLabel: getLabel, getLabels: getLabels});
       console.log('Saving 3D Structure data to Spot ...');
       let edited3DStructuresData = spot.properties[groupKey] ? JSON.parse(JSON.stringify(spot.properties[groupKey]))
         : [];
-      edited3DStructuresData.push({...edited3DStructureData, id: getNewId()});
+      edited3DStructuresData.push({...edited3DStructureData, id: getNewUUID()});
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: groupKey, value: edited3DStructuresData}));
       if (SMALL_SCREEN) closeModal();

@@ -1,10 +1,13 @@
 import React from 'react';
+import {View} from 'react-native';
 
+import {isEmpty} from '../../shared/helpers';
 import ImagesList from '../images/ImagesList';
 import useImages from '../images/useImages';
+import ActiveDatasetsSummary from '../project/datasets/ActiveDatasetsSummary';
 import useSpots from '../spots/useSpots';
 
-const ImageBasemapsList = ({closeManMenuPanel}) => {
+const ImageBasemapsList = ({closeManMenuPanel, openDatasetsPage}) => {
   console.log('Rendering ImageBasemaps...');
 
   /* Data Hooks */
@@ -25,7 +28,16 @@ const ImageBasemapsList = ({closeManMenuPanel}) => {
 
   /* View */
 
-  return <ImagesList images={imageBasemaps} isThumbnailOnly onOpenImage={handleOpenImage}/>;
+  return (
+    <View style={{flex: 1}}>
+      <ActiveDatasetsSummary
+        countText={!isEmpty(imageBasemaps)
+          && `${imageBasemaps.length} ${imageBasemaps.length === 1 ? 'Image Basemap' : 'Image Basemaps'}`}
+        openDatasetsPage={openDatasetsPage}
+      />
+      <ImagesList images={imageBasemaps} isThumbnailOnly onOpenImage={handleOpenImage}/>
+    </View>
+  );
 };
 
 export default ImageBasemapsList;

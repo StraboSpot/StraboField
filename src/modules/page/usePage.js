@@ -3,6 +3,7 @@ import {useSelector} from 'react-redux';
 import {NOTEBOOK_PAGES, PAGES_HIDDEN_IN_SAMPLE, PAGES_SECTIONS, PET_PAGES, SED_PAGES} from './page.constants';
 import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty} from '../../shared/helpers';
+import {getReportsAtSpot, getReportsToList} from '../reports/reports.helpers';
 import useTags from '../tags/useTags';
 
 const usePage = () => {
@@ -11,6 +12,8 @@ const usePage = () => {
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const reports = useSelector(state => state.project.project?.reports) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+  const {owner_straboUserId} = useSelector(state => state.project.project) || {};
+  const {straboUserId} = useSelector(state => state.user);
 
   const {getTagsAtSpot} = useTags();
 
@@ -30,10 +33,10 @@ const usePage = () => {
       let isPopulated = false;
       switch (page.key) {
         case PAGE_KEYS.REPORTS: {
-          if (!isEmpty(reports)
-            && !isEmpty(reports.filter(report => report.spots && report.spots.includes(spot.properties.id)))) {
-            isPopulated = true;
-          }
+          // Filtered the same way the Memos list is, so a memo kept private by its author doesn't leave this
+          // Spot an empty Memos section
+          const reportsAtSpot = getReportsAtSpot(reports, spot.properties.id);
+          if (!isEmpty(getReportsToList(reportsAtSpot, straboUserId, owner_straboUserId))) isPopulated = true;
           break;
         }
         case PAGE_KEYS.TAGS: {

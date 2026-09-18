@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, Platform, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
@@ -14,10 +14,11 @@ import ActionButton from '../../shared/ui/buttons/ActionButton';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import Loading from '../../shared/ui/Loading';
 import modalStyles from '../../shared/ui/modals/modal.styles';
 import FormikWrapper from '../form/FormikWrapper';
 import SelectInputField from '../form/inputs/SelectInputField';
-import {setLoadingStatus, setModalVisible} from '../home/home.slice';
+import {setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
@@ -28,6 +29,7 @@ const TagsModal = ({
                      checkedTagsIds,
                      handleTagChecked,
                      isFeatureLevelTagging,
+                     openSpotInNotebook,
                      zoomToCurrentLocation,
                    }) => {
   /* Data Hooks */
@@ -53,6 +55,7 @@ const TagsModal = ({
 
   const [checkedTagsTemp, setCheckedTagsTemp] = useState([]);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [searchText, setSearchText] = useState('');
 
   /* Derived Variables */
@@ -64,6 +67,10 @@ const TagsModal = ({
     ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
   const label = page.label;
+  // Tagging from a shortcut makes its own Spot at the current location, where every other caller tags Spots
+  // that already exist
+  const isShortcutTagging = modalVisible === MODAL_KEYS.SHORTCUTS.TAG
+    || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS;
   const isSaveButtonVisible = !isEmpty(tags)
     && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
     && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS
@@ -98,29 +105,37 @@ const TagsModal = ({
   };
 
   const save = async () => {
+    setIsSaving(true);
     try {
-      dispatch(setLoadingStatus({view: 'home', bool: true}));
       let tagsToUpdate = [];
-      if (modalVisible === MODAL_KEYS.SHORTCUTS.TAG || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS) {
-        setPointAtCurrentLocation().then((spot) => {
-          checkedTagsTemp.map((tag) => {
-            if (isEmpty(tag.spots)) tag.spots = [];
-            tag.spots.push(spot.properties.id);
-            tagsToUpdate.push(tag);
-          });
-          saveTag(tagsToUpdate);
-          zoomToCurrentLocation();
+      if (isShortcutTagging) {
+        // Awaited, so the spinner covers the wait for a location and a failure reaches the catch below. Left
+        // unawaited, the close and the toast ran while this was still pending - the toast from behind a modal
+        // that had not gone yet - and a location failure had nowhere to land.
+        const spot = await setPointAtCurrentLocation();
+        checkedTagsTemp.map((tag) => {
+          if (isEmpty(tag.spots)) tag.spots = [];
+          tag.spots.push(spot.properties.id);
+          tagsToUpdate.push(tag);
         });
+        saveTag(tagsToUpdate);
+        openSpotInNotebook(spot, pageKey);
       }
       else addSpotsToTags(checkedTagsTemp, selectedSpotsForTagging);
       dispatch(setModalVisible({modal: null}));
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
-      toast.show('Tags Saved!', {type: 'success'});
+      // After the zoom, which raises a full-screen spinner the toast would otherwise sit behind for most of its
+      // life - the reason only shortcut saves looked too fast
+      if (isShortcutTagging) await zoomToCurrentLocation();
+      // Web reports the real outcome itself - 'Saving changes...' then saved or not saved, from the server - so
+      // a local 'Saved!' there would be both redundant and, on a failed upload, wrong
+      if (Platform.OS !== 'web') toast.show('Tags Saved!', {type: 'success'});
     }
     catch (err) {
       console.error('Error saving Tag', err);
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
       toast.show('Tags Saved Error!', {type: 'danger'});
+    }
+    finally {
+      setIsSaving(false);
     }
   };
 
@@ -225,6 +240,7 @@ const TagsModal = ({
           )}
         </View>
         {isDetailModalVisible && <TagDetailModal closeModal={closeTagDetailModal}/>}
+        <Loading isLoading={isSaving}/>
       </>
     );
   };

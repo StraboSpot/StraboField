@@ -9,9 +9,10 @@ import {PAGE_KEYS} from './pageKeys.constants';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import {openFeatureInNotebook} from '../notebook-panel/notebook.helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
+import {editedSpotProperties} from '../spots/spots.slice';
 
 const BasicOverviewList = ({page}) => {
   /* Data Hooks */
@@ -30,8 +31,7 @@ const BasicOverviewList = ({page}) => {
     if (isSed && !item.id && page.key !== PAGE_KEYS.STRAT_SECTION && page.key !== PAGE_KEYS.INTERVAL) {
       addIdForSS1ImportedSedData(item, i);
     }
-    else dispatch(setSelectedAttributes([item]));
-    dispatch(setNotebookPageVisible(page.key));
+    else openFeatureInNotebook(dispatch, page.key, item);
   };
 
   /* Logic Helpers */
@@ -44,7 +44,7 @@ const BasicOverviewList = ({page}) => {
     else editedSedData[page.key].splice(i, 1, item);
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
-    dispatch(setSelectedAttributes([item]));
+    openFeatureInNotebook(dispatch, page.key, item);
   };
 
   const getData = () => {

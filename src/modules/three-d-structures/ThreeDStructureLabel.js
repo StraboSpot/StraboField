@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text} from 'react-native';
 
-import {toTitleCase} from '../../shared/helpers';
+import {getThreeDStructureTitle} from './threeDStructures.helpers';
 import useForm from '../form/useForm';
 
 const ThreeDStructureLabel = ({item}) => {
@@ -9,19 +9,10 @@ const ThreeDStructureLabel = ({item}) => {
 
   const {getLabel} = useForm();
 
-  /* Logic Helpers */
-
-  const getTitle = (threeDStructure) => {
-    const firstClassTitle = toTitleCase(threeDStructure.type || '3D Structure');
-    const secondClassTitle = getLabel(threeDStructure.feature_type || threeDStructure.fault_or_sz_type,
-      ['_3d_structures', threeDStructure.type]).toUpperCase();
-    return firstClassTitle + ' - ' + secondClassTitle;
-  };
-
   /* View */
 
   return (
-    <Text>{getTitle(item)}</Text>
+    <Text>{item.label || getThreeDStructureTitle(item, getLabel)}</Text>
   );
 };
 export default ThreeDStructureLabel;

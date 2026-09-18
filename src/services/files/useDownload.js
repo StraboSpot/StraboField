@@ -29,6 +29,7 @@ import {
 import {addedSpotsFromServer} from '../../modules/spots/spots.slice';
 import {setUserData} from '../../modules/user/userProfile.slice';
 import {isEmpty, toError} from '../../shared/helpers';
+import {MODAL_TRANSITION_DELAY} from '../../shared/ui/modals/modal.constants';
 import useResetState from '../../store/useResetState';
 import useDevice from '../device/useDevice';
 import useServerRequests from '../network/useServerRequests';
@@ -351,6 +352,11 @@ const useDownload = () => {
       const projectName = selectedProject.name || selectedProject?.description?.project_name || 'Unknown';
       dispatch(setStatusMessageModalTitle(projectName));
       dispatch(clearedStatusMessages());
+      // A native modal is animating out right now — either the project-load modal (dismissed just above) or the
+      // overwrite-confirm modal (closed before this ran). On iOS, presenting the status modal in the same beat runs a
+      // native present and dismiss at once and trips UIViewControllerHierarchyInconsistency (Sentry STRABOSPOT-2-6JN).
+      // Let it finish dismissing first.
+      if (Platform.OS === 'ios') await new Promise(resolve => setTimeout(resolve, MODAL_TRANSITION_DELAY));
       dispatch(setIsStatusMessagesModalVisible(true));
       dispatch(setLoadingStatus({view: 'modal', bool: true}));
       dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));

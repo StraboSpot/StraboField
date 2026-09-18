@@ -53,7 +53,7 @@ const ReportImages = ({isReadOnly, setUpdatedImages, updatedImages}) => {
   const deleteImageFromReport = async (imageId) => {
     const filteredImages = report.images.filter(i => i.id !== imageId);
     const editedReport = JSON.parse(JSON.stringify(report));
-    editedReport.updated_timestamp = Date.now();
+    editedReport.modified_timestamp = Date.now();
     if (isEmpty(filteredImages)) delete editedReport.images;
     else editedReport.images = filteredImages;
     let updatedReports = reports.filter(r => r.id !== editedReport.id);

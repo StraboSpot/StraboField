@@ -1,15 +1,15 @@
 import React, {useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import SpotQuery from './SpotQuery';
 import SpotsListItem from './SpotsListItem';
 import useSpots from './useSpots';
-import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import ActiveDatasetsSummary from '../project/datasets/ActiveDatasetsSummary';
 
-const SpotsList = ({checkedItems, ignoreReadOnly, isCheckedList, onChecked, onPress}) => {
+const SpotsList = ({canPickReadOnly, checkedItems, isCheckedList, onChecked, onPress, openDatasetsPage}) => {
   // console.log('Rendering SpotsList...');
 
   /* Data Hooks */
@@ -25,7 +25,7 @@ const SpotsList = ({checkedItems, ignoreReadOnly, isCheckedList, onChecked, onPr
 
   /* Derived Variables */
 
-  const spotsNoSamples = spotsSorted.reduce((acc, s) => !s.properties?.isSample ? [...acc, s] : acc, []);
+  const countText = `${spotsSorted.length} ${spotsSorted.length === 1 ? 'Spot' : 'Spots'}`;
   const scopeSuffix = scopeText ? ` ${scopeText}` : '';
   const filterPrefix = scopeText ? 'Filtered Results: ' : '';
 
@@ -42,18 +42,18 @@ const SpotsList = ({checkedItems, ignoreReadOnly, isCheckedList, onChecked, onPr
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={<ListEmptyText text={`No Spots${scopeSuffix}`}/>}
-          ListHeaderComponent={!isEmpty(spotsNoSamples) && (
-            <Text
-              style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
-              {filterPrefix}{spotsNoSamples.length + (spotsNoSamples.length === 1 ? ' Spot' : ' Spots')}{scopeSuffix}
-            </Text>
+          ListHeaderComponent={(
+            <ActiveDatasetsSummary
+              countText={!isEmpty(spotsSorted) && `${filterPrefix}${countText}${scopeSuffix}`}
+              openDatasetsPage={openDatasetsPage}
+            />
           )}
-          data={spotsNoSamples}
+          data={spotsSorted}
           keyExtractor={spot => spot.properties.id.toString()}
           renderItem={({item}) => (
             <SpotsListItem
+              canPickReadOnly={canPickReadOnly}
               doShowTags={true}
-              ignoreReadOnly={ignoreReadOnly}
               isCheckedList={isCheckedList}
               isItemChecked={checkedItems && checkedItems.find(i => i === item?.properties?.id)}
               onChecked={onChecked}

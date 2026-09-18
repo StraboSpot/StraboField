@@ -1,4 +1,6 @@
-import spotReducer, {editedOrCreatedSpots, restoredIntervalDragSnapshot} from './spots.slice';
+import spotReducer, {editedOrCreatedSpots, restoredIntervalDragSnapshot, setSelectedAttributes} from './spots.slice';
+import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 describe('editedOrCreatedSpots', () => {
   const spot = {properties: {id: 1756000000001, name: 'Spot 1', orientation_data: [{id: 'm1', strike: 45}]}};
@@ -48,5 +50,27 @@ describe('restoredIntervalDragSnapshot', () => {
     const state = {selectedSpot: otherSpot, spots: {[otherSpot.properties.id]: otherSpot}};
     const {selectedSpot} = spotReducer(state, restoredIntervalDragSnapshot([spot]));
     expect(selectedSpot).toEqual(otherSpot);
+  });
+});
+
+// The notebook swaps one page component for another, so a page mounts reading whatever is in the store and used
+// to open a detail view over a record belonging to the page just left - which then saved that record's fields
+// into this page's data, since a save only strips the fields its own survey declares.
+describe('selectedAttributes on changing the notebook page', () => {
+  const measurement = {id: 'm1', label: 'Planar Feature - BEDDING', strike: 45};
+
+  it('drops the features selected on the page being left', () => {
+    const state = {selectedAttributes: [measurement]};
+    const {selectedAttributes} = spotReducer(state, setNotebookPageVisible(PAGE_KEYS.DIAGENESIS));
+    expect(selectedAttributes).toEqual([]);
+  });
+
+  // Opening a feature from another page's list sets the page first and the feature second, so the clear lands
+  // before the selection rather than wiping it
+  it('keeps a feature selected after the page it belongs to is opened', () => {
+    let state = {selectedAttributes: [{id: 'old'}]};
+    state = spotReducer(state, setNotebookPageVisible(PAGE_KEYS.MEASUREMENTS));
+    state = spotReducer(state, setSelectedAttributes([measurement]));
+    expect(state.selectedAttributes).toEqual([measurement]);
   });
 });

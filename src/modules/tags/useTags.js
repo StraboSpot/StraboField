@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {Text} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -11,12 +11,14 @@ import MeasurementLabel from '../measurements/MeasurementLabel';
 import OtherFeatureLabel from '../other-features/OtherFeatureLabel';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {
+  addedRemovedTagIdOnReport,
   addedSpotToTags,
   addedTagToSelectedSpot,
   deletedTagIdFromReports,
   setSelectedTag,
   updatedProject,
 } from '../project/projects.slice';
+import {getReportsToList, getReportsWithTag} from '../reports/reports.helpers';
 import {setSelectedAttributes} from '../spots/spots.slice';
 import ThreeDStructureLabel from '../three-d-structures/ThreeDStructureLabel';
 
@@ -26,12 +28,22 @@ const useTags = () => {
   const dispatch = useDispatch();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const modalVisible = useSelector(state => state.home.modalVisible);
+  const owner_straboUserId = useSelector(state => state.project.project?.owner_straboUserId);
+  const reports = useSelector(state => state.project.project?.reports) || [];
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
-  const spots = useSelector(state => state.spot.spots);
+  const spots = useSelector(state => state.spot.spots) || {};
+  const straboUserId = useSelector(state => state.user?.straboUserId);
   const tags = useSelector(state => state.project.project?.tags) || [];
 
   const {getLabel} = useForm();
+
+  /* Derived Variables */
+
+  // The sample ids some Spot still holds, gathered once: searching per sample would walk every Spot again for
+  // every tag on screen
+  const heldSamplesIds = useMemo(() => new Set(Object.values(spots).flatMap(
+    spot => spot.properties?.isSample ? [] : (spot.properties?.samples || []).map(sample => sample.id))), [spots]);
 
   /* Internal Functions */
 
@@ -70,6 +82,12 @@ const useTags = () => {
   };
 
   /* Exported Functions */
+
+  // The counterpart to addRemoveSpotFromTag for a memo, which writes to the memo rather than to the tag: a tag
+  // holds its Spots, but a memo holds its own tag ids
+  const addRemoveReportFromTag = (report, tag) => {
+    dispatch(addedRemovedTagIdOnReport({reportId: report.id, tagId: tag.id}));
+  };
 
   // Attach or detach one tag on a single feature of a Spot.
   const addRemoveSpotFeatureFromTag = (tag, feature, spotId) => {
@@ -160,7 +178,9 @@ const useTags = () => {
       features.forEach((featureId) => {
         const feature = getFeature(spotId, featureId);
         if (feature) {
-          feature.parentSpotId = spotId;
+          // Object.entries stringifies the key, and the same field is set from spot.properties.id - a number -
+          // in useSpots getAllFeatures, so convert back rather than leaving parentSpotId typed two ways
+          feature.parentSpotId = Number(spotId);
           feature.label = getFeatureLabel(feature);
           allTaggedFeatures.push(feature);
         }
@@ -203,15 +223,15 @@ const useTags = () => {
     return tagsAtSpot.filter(tag => tag.type !== TAG_TYPES.GEOLOGIC_UNIT);
   };
 
-  const getSamplesWithThisTag = (tag) => {
-    return isEmpty(tag.spots) ? []
-      : tag.spots.filter((spotId) => {
-        const spot = spots[spotId];
-        if (!spot) return false;
-        if (spot.properties?.isSample) return true;
-        return spot.properties?.samples?.some(s => !spots[s.id]);
-      });
-  };
+  // Only a sample that has become a Spot of its own can carry a tag: one still held inside its Spot is tagged
+  // only in the sense that the Spot is, and belongs to that Spot's count. Nor does a sample no Spot holds count,
+  // there being no way left to reach it
+  const getSamplesWithThisTag = tag => (tag.spots || []).filter(
+    spotId => spots[spotId]?.properties?.isSample && heldSamplesIds.has(spotId));
+
+  // Filtered the way the Memos list is, so a memo its author keeps to themselves is neither listed nor counted
+  const getReportsWithThisTag = tag => getReportsToList(
+    getReportsWithTag(reports, tag.id), straboUserId, owner_straboUserId);
 
   const getSpotsWithThisTagCount = (tag) => {
     const validSpots = isEmpty(tag.spots) ? []
@@ -251,15 +271,16 @@ const useTags = () => {
   };
 
   const saveTag = (tagToSave) => {
+    const timestamp = Date.now();
     let updatedTags;
     if (!Array.isArray(tagToSave)) {
       updatedTags = tags.filter(tag => tag.id !== tagToSave.id);
-      updatedTags.push(tagToSave);
+      updatedTags.push({...tagToSave, modified_timestamp: timestamp});
     }
     else {
       const tagIdsToSave = new Set(tagToSave.map(tag => tag.id));
       updatedTags = tags.filter(tag => !tagIdsToSave.has(tag.id));
-      updatedTags = tagToSave.concat(updatedTags);
+      updatedTags = tagToSave.map(tag => ({...tag, modified_timestamp: timestamp})).concat(updatedTags);
     }
     updatedTags = updatedTags.sort((tagA, tagB) => tagA.name.localeCompare(tagB.name));
     dispatch(updatedProject({field: 'tags', value: updatedTags}));
@@ -282,6 +303,7 @@ const useTags = () => {
   };
 
   return {
+    addRemoveReportFromTag,
     addRemoveSpotFeatureFromTag,
     addRemoveSpotFromTag,
     addRemoveTag,
@@ -297,6 +319,7 @@ const useTags = () => {
     getGeologicUnitTagsAtSpot,
     getNonGeologicUnitFeatureTagsAtSpot,
     getNonGeologicUnitTagsAtSpot,
+    getReportsWithThisTag,
     getSamplesWithThisTag,
     getSpotsWithThisTagCount,
     getTagFeaturesCount,

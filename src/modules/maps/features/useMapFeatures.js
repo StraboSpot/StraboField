@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 
 import {isEmpty, isEqualUnordered} from '../../../shared/helpers';
+import {getVisibleMeasurements} from '../../measurements/measurements.helpers';
 import useSpots from '../../spots/useSpots';
 import {setMapSymbols} from '../maps.slice';
 import {isLabelOffsetFurtherRight} from '../symbology/mapSymbology.helpers';
@@ -124,8 +125,10 @@ const useMapFeatures = () => {
     spotsToFeatures.forEach((spot) => {
       if ((spot.geometry.type === 'Point' || spot.geometry.type === 'MultiPoint')
         && !isEmpty(spot.properties.orientation_data)) {
-        const measurements = isShowOnly1stMeas ? [spot.properties.orientation_data[0]]
-          : spot.properties.orientation_data;
+        // Hiding wins over the map setting, so Only 1st Measurements draws the first measurement still
+        // visible rather than a blank where a hidden one used to be
+        const visibleMeasurements = getVisibleMeasurements(spot.properties.orientation_data);
+        const measurements = isShowOnly1stMeas ? visibleMeasurements.slice(0, 1) : visibleMeasurements;
         const {orientation_data: _od, ...baseProps} = spot.properties;
         measurements.forEach((orientation) => {
           if (!isEmpty(orientation)) {
@@ -138,6 +141,9 @@ const useMapFeatures = () => {
           }
           else console.log('Stupid spot', spot.properties.id);
         });
+        // Hiding every measurement is not hiding the Spot - it stays on the map, drawn plainly like a Spot
+        // that never had one
+        if (isEmpty(measurements)) mappedFeatures.push({...spot, properties: baseProps});
       }
       else if (spot.geometry.type === 'GeometryCollection') {
         spot.geometry.geometries.forEach((g, i) => {
@@ -165,16 +171,17 @@ const useMapFeatures = () => {
 
     const spotsWithGeometry = getMappableSpots();      // Spots with geometry
     const featureTypes = spotsWithGeometry.reduce((acc, spot) => {
-      const spotFeatureTypes = spot.properties.orientation_data
-        && spot.properties.orientation_data.reduce((acc1, orientation) => {
-          // Include associated orientations, which are rendered as their own point symbols, so any feature type not
-          // already registered by a non-associated measurement gets a toggle instead of being un-hideable
-          const associatedFeatureTypes = (orientation?.associated_orientation || []).map(
-            associatedOrientation => associatedOrientation?.feature_type ? associatedOrientation.feature_type : 'unspecified');
-          return [...new Set(
-            [...acc1, orientation?.feature_type ? orientation.feature_type : 'unspecified', ...associatedFeatureTypes])];
-        }, []);
-      return [...new Set([...acc, ...(spotFeatureTypes ? spotFeatureTypes : ['unspecified'])])];
+      // A hidden measurement draws nothing, so it brings no feature type to the menu
+      const spotFeatureTypes = getVisibleMeasurements(spot.properties.orientation_data).reduce((acc1, orientation) => {
+        // Include associated orientations, which are rendered as their own point symbols, so any feature type not
+        // already registered by a non-associated measurement gets a toggle instead of being un-hideable
+        const associatedFeatureTypes = (orientation?.associated_orientation || []).map(
+          associatedOrientation => associatedOrientation?.feature_type ? associatedOrientation.feature_type : 'unspecified');
+        return [...new Set(
+          [...acc1, orientation?.feature_type ? orientation.feature_type : 'unspecified', ...associatedFeatureTypes])];
+      }, []);
+      // A Spot left with nothing visible draws as a plain point, which the menu covers under unspecified
+      return [...new Set([...acc, ...(isEmpty(spotFeatureTypes) ? ['unspecified'] : spotFeatureTypes)])];
     }, []);
 
     if (!isEqualUnordered(mapSymbols, featureTypes)) {

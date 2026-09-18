@@ -12,6 +12,7 @@
       "type": "text",
       "name": "label",
       "label": "Label",
+      "hint": "If a label is not specified a default label will be given.",
       "required": "false"
     },
     {

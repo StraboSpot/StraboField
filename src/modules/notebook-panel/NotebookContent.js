@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {FlatList, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -7,18 +7,22 @@ import NotebookFooter from './notebook-footer/NotebookFooter';
 import NotebookHeader from './notebook-header/NotebookHeader';
 import {setNotebookPageVisible} from './notebook.slice';
 import notebookStyles from './notebook.styles';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, truncateText} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {setModalVisible} from '../home/home.slice';
+import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
+import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
+import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 import Overview from '../page/Overview';
 import {NOTEBOOK_PAGES, SUBPAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import usePage from '../page/usePage';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
+import SpotsList from '../spots/SpotsList';
 import SpotsListItem from '../spots/SpotsListItem';
 import useSpots from '../spots/useSpots';
 
@@ -32,17 +36,15 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
+  const projectName = useSelector(state => state.project.project?.description?.project_name);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getAllRelevantPages, getPopulatedPagesKeys} = usePage();
   const {
-    getActiveSpotsObj,
-    getRecentSpots,
     getRootSpot,
     getSpotWithThisImageBasemap,
     handleSpotSelected,
     isSpotReadOnly,
-    sortSpotsByDateCreated,
   } = useSpots();
 
   /* Local State */
@@ -74,6 +76,10 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       || getAllRelevantPages().some(p => p.key === pageVisible)
       || SUBPAGES.some(p => p.key === pageVisible);
     if (!isRelevantPage) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    // A selected sample belongs to the Spot and page it was picked on, and isSample above reads it, so leaving it
+    // set makes every later Spot render as that sample - parent row, sample name and all - long after it is gone.
+    // SamplesPage keeps it right while it is the page showing, so only drop it off that page.
+    if (pageVisible !== PAGE_KEYS.SAMPLES) setSelectedSample({});
   }, [pageVisible, spot]);
 
   /* Logic Helpers */
@@ -88,6 +94,12 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       else dispatch(setModalVisible({modal: page.key}));
     }
     else dispatch(setModalVisible({modal: null}));
+  };
+
+  const openDatasetsPage = () => {
+    dispatch(setSidePanelVisible({bool: false}));
+    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+    if (openMainMenuPanel) openMainMenuPanel();
   };
 
   /* Render Functions */
@@ -137,7 +149,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const renderNotebookContentNoSpot = () => {
     return (
       <View style={notebookStyles.centerContainer}>
-        {renderRecentSpotsList()}
+        {renderSpotsList()}
       </View>
     );
   };
@@ -164,33 +176,19 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     );
   };
 
-  const renderRecentSpotsList = () => {
-    let spotsList = getRecentSpots();
-    spotsList = spotsList.reduce((acc, s) => s.properties?.isSample ? acc : [...acc, s], []);
-    if (isEmpty(spotsList)) {
-      const activeSpotsObj = getActiveSpotsObj();
-      const activeSpots = Object.values(activeSpotsObj);
-      spotsList = sortSpotsByDateCreated(activeSpots);
-      spotsList = spotsList.reduce((acc, s) => s.properties?.isSample ? acc : [...acc, s], []);
-    }
-
+  const renderSpotsList = () => {
     return (
       <View style={notebookStyles.centerContainer}>
         {currentImageBasemap && renderParentSpot()}
-        <SectionDivider dividerText={'Recent Spots'}/>
-        <FlatList
-          ItemSeparatorComponent={FlatListItemSeparator}
-          ListEmptyComponent={<ListEmptyText text={'No Spots in Active Datasets'}/>}
-          data={spotsList}
-          keyExtractor={item => item.properties.id.toString()}
-          renderItem={({item}) => (
-            <SpotsListItem
-              doShowTags={true}
-              onPress={() => handleSpotSelected(item)}
-              spot={item}
-            />
-          )}
-        />
+        <View style={mainMenuPanelStyles.mainMenuHeaderContainer}>
+          <View style={{flex: 1, justifyContent: 'center'}}>
+            <Text style={mainMenuPanelStyles.headerText}>{MAIN_MENU_ITEMS.PROJECT_DATA.SPOTS}</Text>
+            <Text style={mainMenuPanelStyles.subheaderText}>
+              Project: {truncateText(projectName, 22) || 'No Project Selected'}
+            </Text>
+          </View>
+        </View>
+        <SpotsList onPress={handleSpotSelected} openDatasetsPage={openDatasetsPage}/>
         {!SMALL_SCREEN && (
           <ClearButton
             onPress={closeNotebookPanel}

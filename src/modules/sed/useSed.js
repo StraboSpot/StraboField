@@ -7,17 +7,17 @@ import {
   INTERVAL_FIELDS,
   LITHOLOGIES_FIELDS,
   LITHOLOGY_SUBPAGES,
-  ROCK_SECOND_ORDER_TYPE_FIELDS,
   STRUCTURE_SUBPAGES,
   Y_MULTIPLIER,
 } from './sed.constants';
 import {isLithologyRequiredForInterval, setSedFieldValue} from './sed.helpers';
 import useSedValidation from './useSedValidation';
-import {getNewId, getNewUUID, isEmpty, roundToDecimalPlaces, toTitleCase} from '../../shared/helpers';
+import {getNewUUID, isEmpty, roundToDecimalPlaces} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import useForm from '../form/useForm';
 import {clearedStratSection, setStratSection} from '../maps/maps.slice';
 import useStratSectionCalculations from '../maps/strat-section/useStratSectionCalculations';
+import {getDefaultLabel, resolveLabelOnSave} from '../page/featureLabels.helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
@@ -220,33 +220,11 @@ const useSed = () => {
     return true;
   };
 
-  const getBeddingTitle = (bedding) => {
-    const formName = ['sed', 'bedding'];
-    const fieldName = 'package_geometry';
-    const choiceLabels = getLabels(bedding[fieldName], formName);
-    if (isEmpty(choiceLabels)) return 'Unknown Bed';
-    else return choiceLabels;
-  };
-
   const getIntervalTitle = (character, interval) => {
     const formName = ['sed', 'interval'];
     return (interval.interval_thickness ? getLabel(interval.interval_thickness, formName) : 'Unknown Thickness')
       + (interval.thickness_units ? getLabel(interval.thickness_units, formName) : ' Unknown Units')
       + (character ? ' ' + getLabel(character, formName) : ' Unknown Character');
-  };
-
-  const getSedRockTitle = (rock) => {
-    const formName = ['sed', 'lithologies'];
-    const mainLabel = getLabel(rock.primary_lithology, formName);
-    const labelsArr = ROCK_SECOND_ORDER_TYPE_FIELDS.reduce((acc, fieldName) => {
-      if (rock[fieldName]) {
-        const choiceLabel = getLabels(rock[fieldName], formName);
-        return [...acc, choiceLabel.toUpperCase()];
-      }
-      else return acc;
-    }, []);
-    if (isEmpty(labelsArr)) return toTitleCase(mainLabel);
-    else return toTitleCase(mainLabel) + ' - ' + labelsArr.join(', ');
   };
 
   const getStratSectionTitle = (inStratSection) => {
@@ -259,18 +237,22 @@ const useSed = () => {
       + ' (' + columnYUnits + ')';
   };
 
-  const saveSedBedFeature = async (key, spot, formCurrent, isLeavingPage) => {
-    return saveSedFeature(key, spot, formCurrent, isLeavingPage, 'beds');
+  const saveSedBedFeature = async (key, spot, formCurrent, isLeavingPage, previousFeature) => {
+    return saveSedFeature(key, spot, formCurrent, isLeavingPage, 'beds', previousFeature);
   };
 
-  const saveSedFeature = async (key, spot, formCurrent, isLeavingPage, subKey) => {
+  const saveSedFeature = async (key, spot, formCurrent, isLeavingPage, subKey, previousFeature) => {
     let pageKey = key;
     if (Object.values(LITHOLOGY_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.LITHOLOGIES;
     else if (Object.values(STRUCTURE_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.STRUCTURES;
     else if (Object.values(INTERPRETATIONS_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.INTERPRETATIONS;
 
     try {
-      let {errors, values: editedFeatureData} = await submitAndShowErrors(formCurrent, isLeavingPage);
+      const {errors, values} = await submitAndShowErrors(formCurrent, isLeavingPage);
+      // The shared bedding record is not a row in any list - the beds within it are - so it is not labeled
+      const editedFeatureData = pageKey === PAGE_KEYS.BEDDING && !subKey ? values
+        : await resolveLabelOnSave({pageKey: pageKey, previousFeature: previousFeature, values: values,
+          getLabel: getLabel, getLabels: getLabels});
       let editedSpot = JSON.parse(JSON.stringify(spot));
       let editedSedData = editedSpot.properties.sed ? JSON.parse(JSON.stringify(editedSpot.properties.sed)) : {};
       if (subKey) {
@@ -336,7 +318,11 @@ const useSed = () => {
   const saveSedFeatureValuesFromTemplates = (key, spot, activeTemplates) => {
     let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
     if (!editedSedData[key] || !Array.isArray(editedSedData[key])) editedSedData[key] = [];
-    activeTemplates.forEach(t => editedSedData[key].push({...t.values, id: getNewId()}));
+    activeTemplates.forEach((t) => {
+      const feature = {...t.values, id: getNewUUID()};
+      feature.label = getDefaultLabel(key, feature, getLabel, getLabels);
+      editedSedData[key].push(feature);
+    });
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
   };
@@ -370,9 +356,7 @@ const useSed = () => {
 
   return {
     deleteSedFeature,
-    getBeddingTitle,
     getIntervalTitle,
-    getSedRockTitle,
     getStratSectionTitle,
     saveSedBedFeature,
     saveSedFeature,

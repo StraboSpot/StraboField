@@ -3,13 +3,14 @@ import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getReportsToList} from './reports.helpers';
 import ReportsListItem from './ReportsListItem';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setModalValues, setModalVisible} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
-const ReportsList = ({isCheckedList, reportsSubset}) => {
+const ReportsList = ({checkedItems, isCheckedList, isPreSorted, onChecked, reportsSubset}) => {
   console.log('Rendering ReportsList...');
 
   /* Data Hooks */
@@ -21,13 +22,10 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
 
   /* Derived Variables */
 
-  // A memo marked only_me is its author's alone. One saved before authorship was recorded names no author,
-  // so it falls to whoever owns the project
-  const reportsToList = (reportsSubset ?? reports).filter(
-    r => r.report_privacy !== 'only_me'
-      || (r.straboUserId ? r.straboUserId === straboUserId : straboUserId === owner_straboUserId));
-  const reportsToListSorted = [...reportsToList].sort(
-    (a, b) => new Date(b.updated_timestamp) - new Date(a.updated_timestamp));
+  // A caller that put its own order on the memos keeps it - sorting by edit time would reshuffle a list being
+  // checked through, since checking a memo edits it
+  const reportsToListSorted = isPreSorted ? reportsSubset
+    : getReportsToList(reportsSubset ?? reports, straboUserId, owner_straboUserId);
 
   /* Event Handlers */
 
@@ -49,6 +47,8 @@ const ReportsList = ({isCheckedList, reportsSubset}) => {
           <ReportsListItem
             doShowTags={true}
             isCheckedList={isCheckedList}
+            isItemChecked={checkedItems?.some(id => id.toString() === item.id.toString())}
+            onChecked={onChecked}
             onPress={() => onShowReport(item)}
             report={item}
           />

@@ -27,6 +27,7 @@ const ReportModal = ({openSpotInNotebook}) => {
     confirmCloseModal,
     deleteReport,
     formRef,
+    handleSampleChecked,
     handleSaveComment,
     handleSavePressed,
     handleSpotChecked,
@@ -96,7 +97,7 @@ const ReportModal = ({openSpotInNotebook}) => {
                 <ReportMetadata
                   createdBy={initialValues.created_by}
                   createdTimestamp={initialValues.created_timestamp}
-                  updatedTimestamp={initialValues.updated_timestamp}
+                  modifiedTimestamp={initialValues.modified_timestamp}
                 />
               )}
               <ReportImages
@@ -107,9 +108,17 @@ const ReportModal = ({openSpotInNotebook}) => {
               <View style={{paddingTop: 10}}/>
               <ReportSpots
                 checkedSpotsIds={checkedSpotsIds}
-                handleSpotChecked={handleSpotChecked}
+                handleChecked={handleSpotChecked}
                 handleSpotPressed={handleSpotPressed}
                 isReadOnly={isReadOnly}
+              />
+              <View style={{paddingTop: 10}}/>
+              <ReportSpots
+                checkedSpotsIds={checkedSpotsIds}
+                handleChecked={handleSampleChecked}
+                handleSpotPressed={handleSpotPressed}
+                isReadOnly={isReadOnly}
+                isSamples
               />
               <View style={{paddingTop: 10}}/>
               <ReportTags

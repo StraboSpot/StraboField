@@ -13,7 +13,7 @@ import TagsList from './TagsList';
 import TagsOverflowMenuModal from './TagsOverflowMenuModal';
 import {isEmpty} from '../../shared/helpers';
 import AddButton from '../../shared/ui/buttons/AddButton';
-import {setListFilters} from '../main-menu-panel/mainMenuPanel.slice';
+import {setListFilters, setListSort} from '../main-menu-panel/mainMenuPanel.slice';
 import {setIsMapExtentFilterActive} from '../maps/maps.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
@@ -31,6 +31,7 @@ const Tags = ({
 
   const dispatch = useDispatch();
   const listFilters = useSelector(state => state.mainMenu.listFilters);
+  const listSorts = useSelector(state => state.mainMenu.listSorts);
   const tags = useSelector(state => state.project.project?.tags) || [];
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
 
@@ -48,9 +49,10 @@ const Tags = ({
   const label = page.label;
   const addButtonTitle = isGeologicUnits ? 'Create New Geologic Unit' : 'Create New Tag';
 
-  // Each page (Tags/Geologic Units) keeps its own filters in Redux so selecting one doesn't affect the other.
+  // Each page (Tags/Geologic Units) keeps its own filters and sort in Redux so selecting one doesn't affect the other.
   const pageFilter = listFilters?.[pageKey];
   const activeFilters = Array.isArray(pageFilter) ? pageFilter : [];
+  const pageSort = listSorts?.[pageKey];
 
   /* Derived State */
 
@@ -85,6 +87,8 @@ const Tags = ({
 
   const setActiveFilters = filters => dispatch(setListFilters({page: pageKey, value: filters}));
 
+  const setSort = sort => dispatch(setListSort({page: pageKey, value: sort}));
+
   /* View */
 
   return (
@@ -95,8 +99,11 @@ const Tags = ({
           <TagQuery
             activeFilters={activeFilters}
             isGeologicUnits={isGeologicUnits}
+            isReverseSort={!!pageSort?.isReverse}
             setActiveFilters={setActiveFilters}
+            setSort={setSort}
             setTagsSorted={setTagsSorted}
+            sortOrder={pageSort?.order}
             tags={baseTags}
           />
         </>

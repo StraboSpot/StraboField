@@ -7,26 +7,25 @@ import {useDispatch, useSelector} from 'react-redux';
 import NoteForm from './NoteForm';
 import {isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import ActionButton from '../../shared/ui/buttons/ActionButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import uiStyles from '../../shared/ui/ui.styles';
-import {setLoadingStatus} from '../home/home.slice';
+import {setLoadingStatus, setModalVisible} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
-import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
+import {getActiveTemplateList, getIsTemplateInUse} from '../templates/templates.helpers';
 import TemplatesNotebook from '../templates/TemplatesNotebook';
 
-const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
+const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocation}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const initialNote = useSelector(state => state.spot.selectedSpot?.properties?.notes) || undefined;
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
 
@@ -47,24 +46,30 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
   /* Derived Variables */
 
   const page = PRIMARY_PAGES.find(p => p.key === PAGE_KEYS.NOTES);
-  // When a parent supplies a save ref (the Shortcut Notes modal), it renders the sticky Save button
-  // in its footer and expects the note field to fill the body, so we hide the inline Save button here.
-  const isFillLayout = !!registerSave;
+  // The Shortcut Notes modal is the only caller that supplies a save ref: it renders the sticky Save button in
+  // its footer and expects the note field to fill the body. It is also the only Notes that makes a new Spot, so
+  // this - not modalVisible - is what tells the two apart. The Notebook's own Notes page can be open at the same
+  // time as the shortcut modal, and keying off modalVisible had it creating Spots and skipping its own prompt.
+  const isShortcutNote = !!registerSave;
 
   /* Side Effects */
 
+  // The note is watched alongside the Spot's id because a shortcut note lands on the Spot after it is selected:
+  // the Spot is created and selected first, then the note written into it, so the id alone never sees the note
+  // arrive and the page would hold the blank values it initialized with.
   useLayoutEffect(() => {
-    console.log('ULE Notes [templates, selectedSpot]', templates);
-    if (!isReadOnly && isEmpty(initialNote) && templates.notes && templates.notes.isInUse
-      && !isEmpty(templates.notes.active)) {
-      const templatesNotes = templates.notes.active.map(t => t.values.note).join('\n');
+    console.log('ULE Notes [templates, selectedSpot id, initialNote]', templates);
+    const activeNoteTemplates = getActiveTemplateList(templates, PAGE_KEYS.NOTES);
+    if (!isReadOnly && isEmpty(initialNote) && getIsTemplateInUse(templates, PAGE_KEYS.NOTES)
+      && !isEmpty(activeNoteTemplates)) {
+      const templatesNotes = activeNoteTemplates.map(t => t.values.note).join('\n');
       setInitialNotesValues({note: templatesNotes});
     }
     else {
       setInitialNotesValues({note: initialNote});
     }
     return () => confirmLeavePage();
-  }, [templates, spot?.properties?.id]);
+  }, [templates, spot?.properties?.id, initialNote]);
 
   /* Logic Helpers */
 
@@ -73,7 +78,7 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
   };
 
   const confirmLeavePage = () => {
-    if (formRef.current?.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.NOTE
+    if (formRef.current?.dirty && !isShortcutNote
       && !isEqual(formRef.current.values, savedValuesRef.current)) {
       const formCurrent = formRef.current;
       alert('Unsaved Changes',
@@ -90,10 +95,12 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
     }
   };
 
+  // Returns the Spot a shortcut note created, for the caller to show; editing an existing Spot returns undefined.
   const saveForm = async (currentForm) => {
+    let createdSpot;
     try {
       dispatch(setLoadingStatus({view: 'home', bool: true}));
-      if (modalVisible === MODAL_KEYS.SHORTCUTS.NOTE) {
+      if (isShortcutNote) {
         let pointSetAtCurrentLocation = await setPointAtCurrentLocation();
         pointSetAtCurrentLocation = {
           ...pointSetAtCurrentLocation,
@@ -105,6 +112,7 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
         console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
         dispatch(updatedModifiedTimestampsBySpotsIds([pointSetAtCurrentLocation.properties.id]));
         dispatch(editedOrCreatedSpot(pointSetAtCurrentLocation));
+        createdSpot = pointSetAtCurrentLocation;
       }
       else {
         await currentForm.submitForm();
@@ -115,18 +123,29 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
       }
       savedValuesRef.current = {...currentForm.values};
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      if (Platform.OS !== 'web') toast.show('Notes Saved', {type: 'success'});
+      // A shortcut note toasts from saveFormAndGo instead, once the modal is gone and the zoom has finished -
+      // both of which would otherwise cover it
+      if (Platform.OS !== 'web' && !isShortcutNote) toast.show('Notes Saved', {type: 'success'});
     }
     catch (err) {
       console.error('Error submitting form', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
     }
+    return createdSpot;
   };
 
   const saveFormAndGo = async (currentForm) => {
     try {
-      await saveForm(currentForm);
-      if (zoomToCurrentLocation) await zoomToCurrentLocation();
+      // A Spot coming back means the shortcut save worked. Show it and let the shortcut go - nothing else closes
+      // it, as Notes' unmount cleanup skips the shortcut - then zoom, and only then say so: the modal and the
+      // zoom's full-screen spinner would each paint over the toast.
+      const createdSpot = await saveForm(currentForm);
+      if (createdSpot) {
+        openSpotInNotebook(createdSpot, PAGE_KEYS.NOTES);
+        dispatch(setModalVisible({modal: null}));
+        await zoomToCurrentLocation();
+        if (Platform.OS !== 'web') toast.show('Notes Saved', {type: 'success'});
+      }
       else dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
     catch (err) {
@@ -152,7 +171,7 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
 
   return (
     <View style={{flex: 1}}>
-      {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE ? (
+      {isShortcutNote ? (
         <>
           {!isShowTemplates && (
             <View style={uiStyles.alignItemsToCenter}>
@@ -184,11 +203,9 @@ const Notes = ({isReadOnly, registerSave, zoomToCurrentLocation}) => {
           <NoteForm
             formRef={formRef}
             initialNotesValues={initialNotesValues}
-            isFillHeight={isFillLayout}
+            isFillHeight={isShortcutNote}
             isReadOnly={isReadOnly}
           />
-          {modalVisible === MODAL_KEYS.SHORTCUTS.NOTE && !isFillLayout
-            && <ActionButton onPress={() => saveFormAndGo(formRef.current)}/>}
         </>
       )}
     </View>

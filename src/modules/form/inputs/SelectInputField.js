@@ -49,6 +49,10 @@ const SelectInputField = ({
   const isChoiceListInRows = appearance === 'horizontal' || isChoiceLabelStacked;
   // A horizontal appearance lays the choices out too, so the dropdown is what is left when neither asks for them
   const isChoiceListShown = shouldShowChoiceList || isChoiceListInRows;
+  // Read off the choices rather than isReadOnly, since Form disables one field by marking every choice it
+  // passes, and so a field can be disabled while the form around it is not. A caller building its own choices
+  // says so with isReadOnly instead.
+  const isFieldDisabled = choices[0]?.disabled ?? isReadOnly;
   const placeholderText = name === 'spot_id_for_pet_copy' ? '-- None --' : `-- Select ${label} --`;
   const selectedValues = isEmpty(value) ? [] : Array.isArray(value) ? value : [value];
   // A saved value these choices don't contain still counts toward the field but renders no row to untick and no
@@ -56,7 +60,7 @@ const SelectInputField = ({
   // that have drifted apart, and to anything written against an older version of a list. Give it a row of its
   // own, labeled the way useForm labels an unknown key; deselecting it takes the row away with it
   const unlistedChoices = selectedValues.filter(v => !choices.some(choice => choice.value === v)).map(v => ({
-    disabled: choices[0]?.disabled ?? isReadOnly,
+    disabled: isFieldDisabled,
     label: String(v).replace(/_/g, ' '),
     value: v,
   }));
@@ -74,6 +78,9 @@ const SelectInputField = ({
 
   // Choosing the value a single-select field already holds deselects it
   const fieldValueChanged = (itemValue) => {
+    // Every control writes through here, which is where a disabled field is held rather than at each of them:
+    // the remove icon on a tag is the library's own and takes no disabled state
+    if (isFieldDisabled) return;
     const newValue = isSingleSelect ? itemValue[0] === value ? undefined : itemValue[0]
       : isEmpty(itemValue) ? undefined : itemValue;
     setValue(name, newValue);
@@ -265,7 +272,7 @@ const SelectInputField = ({
             styleItemsContainer={formStyles.dropdownItemsContainer}
             tagBorderColor={PRIMARY_TEXT_COLOR}
             tagContainerStyle={formStyles.dropdownTagContainer}
-            tagRemoveIconColor={isReadOnly ? SECONDARY_BACKGROUND_COLOR : WARNING_COLOR}
+            tagRemoveIconColor={isFieldDisabled ? SECONDARY_BACKGROUND_COLOR : WARNING_COLOR}
             tagTextColor={PRIMARY_TEXT_COLOR}
             textColor={PRIMARY_TEXT_COLOR}
             textInputProps={{editable: false}}

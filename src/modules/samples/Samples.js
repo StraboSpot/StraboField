@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 
 import SamplesSectionList from './SamplesSectionList';
-import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
+import ActiveDatasetsSummary from '../project/datasets/ActiveDatasetsSummary';
 import SpotQuery from '../spots/SpotQuery';
 import useSpots from '../spots/useSpots';
 
-const Samples = ({checkedItems, isCheckedList, openSpotInNotebook}) => {
+const Samples = ({canPickReadOnly, checkedItems, isCheckedList, onChecked, openDatasetsPage, openSpotInNotebook}) => {
   /* Data Hooks */
 
   const {getActiveSpotsObj} = useSpots();
@@ -46,17 +46,24 @@ const Samples = ({checkedItems, isCheckedList, openSpotInNotebook}) => {
         setScopeText={setScopeText}
         setSpotsSorted={setSpotsWithSamplesSorted}
       />
-      {isEmpty(spotsWithSamplesSorted) ? <ListEmptyText text={`No Samples${scopeSuffix}`}/> : (
+      {isEmpty(spotsWithSamplesSorted) ? (
+        <>
+          <ActiveDatasetsSummary openDatasetsPage={openDatasetsPage}/>
+          <ListEmptyText text={`No Samples${scopeSuffix}`}/>
+        </>
+      ) : (
         <View style={{flex: 1}}>
-          <Text
-            style={[commonStyles.standardDescriptionText, {alignSelf: 'center', padding: 10, textAlign: 'center'}]}>
-            {filterPrefix}{samplesCount + (samplesCount === 1 ? ' Sample' : ' Samples')}{scopeSuffix}
-          </Text>
+          <ActiveDatasetsSummary
+            countText={`${filterPrefix}${samplesCount + (samplesCount === 1 ? ' Sample' : ' Samples')}${scopeSuffix}`}
+            openDatasetsPage={openDatasetsPage}
+          />
           <SamplesSectionList
+            canPickReadOnly={canPickReadOnly}
             checkedItems={checkedItems}
             dataSectioned={dataSectioned}
             isCheckedList={isCheckedList}
             listEmptyText={`No Samples${scopeSuffix}`}
+            onChecked={onChecked}
             openSpotInNotebook={openSpotInNotebook}
           />
         </View>

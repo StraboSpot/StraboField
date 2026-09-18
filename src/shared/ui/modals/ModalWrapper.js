@@ -4,10 +4,11 @@ import {Keyboard, Modal, Platform, Pressable, StyleSheet, useWindowDimensions, V
 import {ListItem} from '@rn-vui/base';
 import {FlatList, GestureHandlerRootView} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import ModalWrapperHeader from './ModalWrapperHeader';
 import overlayStyles from './overlay.styles';
+import {applyPendingModal} from '../../../modules/home/home.slice';
 import {SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
 import {isEmpty} from '../../helpers';
@@ -58,6 +59,8 @@ const ModalWrapper = ({
                       }) => {
   /* Data Hooks */
 
+  const dispatch = useDispatch();
+
   const footerShortcutModal = useSelector((state) => {
     if (isEmpty(state.spot.selectedSpot) || !isEmpty(state.spot.selectedAttributes)) return null;
     return SHORTCUT_MODALS.find(m => m.key === state.home.modalVisible && m.notebook_modal_key) ?? null;
@@ -106,6 +109,14 @@ const ModalWrapper = ({
   // must clear `isLoading` on every path (a `finally`), or the modal has no exit at all while it is set.
   const handleRequestClose = () => {
     if (canDismiss) (onBackdropPress || closeModal || onCancelPress)?.();
+  };
+
+  // Fast path for the iOS two-phase modal switch (see setModalVisible): when this modal finishes dismissing, show any
+  // modal queued behind it. Fires on iOS only, and no-ops when nothing is queued; the OverlaysContainer timer is the
+  // guaranteed fallback for modals that unmount without delivering onDismiss.
+  const handleDismiss = () => {
+    dispatch(applyPendingModal());
+    onDismiss?.();
   };
 
   /* Logic Helpers */
@@ -243,7 +254,7 @@ const ModalWrapper = ({
     return (
       <Modal
         animationType={'fade'}
-        onDismiss={onDismiss}
+        onDismiss={handleDismiss}
         onRequestClose={handleRequestClose}
         statusBarTranslucent
         supportedOrientations={['portrait', 'landscape']}
@@ -278,7 +289,7 @@ const ModalWrapper = ({
   return (
     <Modal
       animationType={'fade'}
-      onDismiss={onDismiss}
+      onDismiss={handleDismiss}
       onRequestClose={handleRequestClose}
       supportedOrientations={['portrait', 'landscape']}
       transparent

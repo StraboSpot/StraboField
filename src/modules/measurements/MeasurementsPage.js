@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import MeasurementDetail from './MeasurementDetail';
 import MeasurementItem from './MeasurementItem';
+import {getMeasurementsBySection} from './measurements.helpers';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import {isEmpty} from '../../shared/helpers';
@@ -31,7 +32,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {createNewMeasurement, deleteMeasurements} = useMeasurements();
+  const {createNewMeasurement, deleteMeasurements, toggleMeasurementHiddenOnMap} = useMeasurements();
 
   /* Local State */
 
@@ -44,17 +45,14 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   const SECTIONS = {
     PLANAR: {
       title: isReadOnly ? 'Planar Measurements' : 'Planar \nMeasurements',
-      keys: ['planar_orientation', 'tabular_orientation'],
       compass_toggles: [COMPASS_TOGGLE_BUTTONS.PLANAR],
     },
     LINEAR: {
       title: isReadOnly ? 'Linear Measurements' : 'Linear \nMeasurements',
-      keys: ['linear_orientation'],
       compass_toggles: [COMPASS_TOGGLE_BUTTONS.LINEAR],
     },
     PLANARLINEAR: {
       title: isReadOnly ? 'Planar + Linear Measurements' : 'Planar + Linear \nMeasurements',
-      keys: ['linear_orientation', 'planar_orientation', 'tabular_orientation'],
       compass_toggles: [COMPASS_TOGGLE_BUTTONS.PLANAR, COMPASS_TOGGLE_BUTTONS.LINEAR],
     },
   };
@@ -257,13 +255,9 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   };
 
   const renderSections = () => {
-    const sections = Object.values(SECTIONS).reduce((acc, {title, keys}) => {
-      const data = spot?.properties?.orientation_data?.filter((meas) => {
-        return ((keys.length !== 3 && !meas?.associated_orientation)
-          || (keys.length === 3 && meas?.associated_orientation)) && keys.includes(meas?.type);
-      }) || [];
-      return [...acc, {title: title, data: data.reverse()}];
-    }, []);
+    const measurementsBySection = getMeasurementsBySection(spot?.properties?.orientation_data);
+    const sections = Object.entries(SECTIONS).map(
+      ([sectionName, {title}]) => ({title: title, data: measurementsBySection[sectionName]}));
 
     return (
       <SectionList
@@ -276,6 +270,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
               isSelectMode={multiSelectMode === sectionType}
               item={item}
               onPress={() => onMeasurementPressed(item, section.title)}
+              onToggleHiddenOnMap={!isReadOnly && toggleMeasurementHiddenOnMap}
               selectedIds={getIdsOfSelected()}
             />
           );

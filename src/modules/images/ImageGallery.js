@@ -1,25 +1,24 @@
 import React, {useCallback, useMemo, useState} from 'react';
-import {SectionList, Text, View} from 'react-native';
+import {SectionList, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch} from 'react-redux';
 
 import imageStyles from './image.styles';
 import ImagesList from './ImagesList';
-import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import LittleSpacer from '../../shared/ui/LittleSpacer';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import {setLoadingStatus} from '../home/home.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
+import ActiveDatasetsSummary from '../project/datasets/ActiveDatasetsSummary';
 import SpotQuery from '../spots/SpotQuery';
 import useSpots from '../spots/useSpots';
 
 const SECTIONS_PER_PAGE = 30;
 let sortedSpotsWithImages = [];
 
-const ImageGallery = ({openSpotInNotebook}) => {
+const ImageGallery = ({openDatasetsPage, openSpotInNotebook}) => {
   console.log('Rendering ImageGallery...');
 
   /* Data Hooks */
@@ -78,7 +77,12 @@ const ImageGallery = ({openSpotInNotebook}) => {
   };
 
   const renderNoImagesText = () => {
-    return <ListEmptyText text={'No Images in Visible Datasets'}/>;
+    return (
+      <>
+        <ActiveDatasetsSummary openDatasetsPage={openDatasetsPage}/>
+        <ListEmptyText text={'No Images in Active Datasets'}/>
+      </>
+    );
   };
 
   const renderSectionHeader = ({spot}) => {
@@ -115,13 +119,17 @@ const ImageGallery = ({openSpotInNotebook}) => {
           setScopeText={setScopeText}
           setSpotsSorted={resetAndSetSpotsSorted}
         />
-        {isEmpty(spotsAsSections) ? <ListEmptyText text={`No Images${scopeSuffix}`}/> : (
+        {isEmpty(spotsAsSections) ? (
+          <>
+            <ActiveDatasetsSummary openDatasetsPage={openDatasetsPage}/>
+            <ListEmptyText text={`No Images${scopeSuffix}`}/>
+          </>
+        ) : (
           <View style={imageStyles.galleryImageContainer}>
-            <LittleSpacer/>
-            <Text style={[commonStyles.standardDescriptionText, {alignSelf: 'center'}]}>
-              {filterPrefix}{count + (count === 1 ? ' Image' : ' Images')}{scopeSuffix}
-            </Text>
-            <LittleSpacer/>
+            <ActiveDatasetsSummary
+              countText={`${filterPrefix}${count + (count === 1 ? ' Image' : ' Images')}${scopeSuffix}`}
+              openDatasetsPage={openDatasetsPage}
+            />
             <SectionList
               keyExtractor={(item, index) => item + index}
               onEndReached={loadMoreSections}

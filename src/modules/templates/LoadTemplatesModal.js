@@ -6,6 +6,7 @@ import RNFS from 'react-native-fs';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TEMPLATE_BACKUP_MESSAGES, TEMPLATE_BACKUP_STATUS} from './templates.constants';
+import {mergeTemplates} from './templates.helpers';
 import useSafeDocumentPicker from '../../services/device/useSafeDocumentPicker';
 import {
   DARKGREY,
@@ -152,54 +153,6 @@ const LoadTemplatesModal = ({closeModal}) => {
     setValidationMessage(`${reason} ${chooseFileText}`);
     setLoadingStatus_('');
     dispatch(setHomeLoadingStatus({view: 'home', bool: false}));
-  };
-
-  const mergeTemplateArray = (existing, imported) => {
-    const merged = [...existing];
-    let newCount = 0;
-    let mergedCount = 0;
-    for (const importedTemplate of imported) {
-      const existingIndex = merged.findIndex(t => t.id === importedTemplate.id);
-      if (existingIndex >= 0) {
-        const matchedTemplate = merged[existingIndex];
-        const mergedValues = {...importedTemplate.values};
-        for (const [k, v] of Object.entries(matchedTemplate.values || {})) {
-          if (v !== undefined && v !== null) mergedValues[k] = v;
-        }
-        merged[existingIndex] = {...importedTemplate, ...matchedTemplate, values: mergedValues};
-        mergedCount++;
-      }
-      else {
-        merged.push(importedTemplate);
-        newCount++;
-      }
-    }
-    return {merged, newCount, mergedCount};
-  };
-
-  const mergeTemplates = (existing, imported) => {
-    const mergedTemplates = {...existing};
-    let totalNew = 0;
-    let totalMerged = 0;
-
-    for (const key of Object.keys(imported)) {
-      if (key === 'measurementTemplates' && Array.isArray(imported[key])) {
-        const existingArr = existing.measurementTemplates || [];
-        const {merged, newCount, mergedCount} = mergeTemplateArray(existingArr, imported[key]);
-        mergedTemplates.measurementTemplates = merged;
-        totalNew += newCount;
-        totalMerged += mergedCount;
-      }
-      else if (imported[key] && typeof imported[key] === 'object' && Array.isArray(imported[key].templates)) {
-        const existingArr = existing[key]?.templates || [];
-        const {merged, newCount, mergedCount} = mergeTemplateArray(existingArr, imported[key].templates);
-        mergedTemplates[key] = {...(existing[key] || {}), templates: merged};
-        totalNew += newCount;
-        totalMerged += mergedCount;
-      }
-    }
-
-    return {mergedTemplates, newCount: totalNew, mergedCount: totalMerged};
   };
 
   /* Render Functions */

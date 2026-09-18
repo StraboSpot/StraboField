@@ -13,10 +13,19 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import imageStyles from '../images/image.styles';
+import Samples from '../samples/Samples';
 import SpotsList from '../spots/SpotsList';
 import SpotsListItem from '../spots/SpotsListItem';
 
-const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isReadOnly}) => {
+// The Spots a memo references, or with isSamples the samples among them. A sample is a Spot carrying isSample, so
+// the memo keeps one list of ids and the two sections divide it, each showing only its own kind.
+const ReportSpots = ({
+                       checkedSpotsIds,
+                       handleChecked,
+                       handleSpotPressed,
+                       isReadOnly,
+                       isSamples,
+                     }) => {
   /* Data Hooks */
 
   const spots = useSelector(state => state.spot.spots);
@@ -29,8 +38,11 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isR
 
   /* Derived Variables */
 
+  const itemsLabel = isSamples ? 'Samples' : 'Spots';
   const checkedSpots = Object.entries(spots).reduce((acc, [spotId, spotObj]) => {
-    return checkedSpotsIds.find(id => id.toString() === spotId) ? [...acc, spotObj] : acc;
+    const isSampleSpot = !!spotObj.properties?.isSample;
+    return isSampleSpot === !!isSamples && checkedSpotsIds.some(id => id.toString() === spotId)
+      ? [...acc, spotObj] : acc;
   }, []);
   const listWidth = SMALL_SCREEN ? width - 30 : width * 0.80 - 30;
 
@@ -38,12 +50,28 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isR
 
   const addAssociatedSpots = () => setIsSpotsListModalVisible(true);
 
+  /* Render Functions */
+
+  // Samples come from the Samples list, which groups them under the Spot each was taken at and includes the ones
+  // still held inside it. Those cannot go on a memo, so handleChecked answers for them rather than the list
+  // leaving them out and looking like the sample is gone
+  const renderPicker = () => {
+    const pickerProps = {
+      // Picking writes the id to the memo and never to the record, so a locked dataset has no say in it
+      canPickReadOnly: true,
+      checkedItems: checkedSpotsIds,
+      isCheckedList: true,
+      onChecked: handleChecked,
+    };
+    return isSamples ? <Samples {...pickerProps}/> : <SpotsList {...pickerProps}/>;
+  };
+
   /* View */
 
   return (
     <>
       <View>
-        <SectionDivider dividerText={'Associated Spots'}/>
+        <SectionDivider dividerText={'Associated ' + itemsLabel}/>
         {!isReadOnly && (
           <View style={{flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-start'}}>
             <OutlineButton
@@ -54,19 +82,19 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isR
                 type: 'material-community',
               }}
               onPress={addAssociatedSpots}
-              title={'Add/Remove Spots'}
+              title={'Add/Remove ' + itemsLabel}
             />
           </View>
         )}
 
         <View style={{flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 5}}>
-          {isEmpty(checkedSpots) && <ListEmptyText text={'No Associated Spots'}/>}
+          {isEmpty(checkedSpots) && <ListEmptyText text={'No Associated ' + itemsLabel}/>}
           {checkedSpots.map(d => (
             <TouchableOpacity
               key={d.properties.id.toString()}
               style={{borderWidth: 0.75, padding: 2, margin: 2, width: listWidth < 600 ? listWidth : REPORT_ITEM_WIDTH}}
             >
-              <SpotsListItem onPress={handleSpotPressed} spot={d}/>
+              <SpotsListItem isSample={isSamples} onPress={handleSpotPressed} spot={d}/>
             </TouchableOpacity>
           ))}
         </View>
@@ -77,33 +105,14 @@ const ReportSpots = ({checkedSpotsIds, handleSpotChecked, handleSpotPressed, isR
       {isSpotsListModalVisible && (
         <ModalWrapper
           closeModal={() => setIsSpotsListModalVisible(false)}
-          headerTitle={'Add/Remove Spots'}
+          headerTitle={'Add/Remove ' + itemsLabel}
           overlayStyleOverride={{maxHeight: '60%', flex: 1}}
           showActionButton={false}
           showCancelButton={false}
           showCloseButton
         >
-          {Platform.OS === 'web' ? (
-            <ScrollView>
-              <SpotsList
-                checkedItems={checkedSpotsIds}
-                ignoreReadOnly={true}
-                isCheckedList={true}
-                onChecked={handleSpotChecked}
-              />
-            </ScrollView>
-          ) : (
-            <FlatList
-              ListHeaderComponent={
-                <SpotsList
-                  checkedItems={checkedSpotsIds}
-                  ignoreReadOnly={true}
-                  isCheckedList={true}
-                  onChecked={handleSpotChecked}
-                />
-              }
-            />
-          )}
+          {Platform.OS === 'web' ? <ScrollView>{renderPicker()}</ScrollView>
+            : <FlatList ListHeaderComponent={renderPicker()}/>}
         </ModalWrapper>
       )}
     </>
