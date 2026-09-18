@@ -156,10 +156,23 @@ const useMeasurements = () => {
     return getLabel(key, ['measurement']);
   };
 
+  // Associated orientations are drawn from inside their parent, so hiding a parent takes them off the map
+  // with it and they need no flag of their own
+  const toggleMeasurementHiddenOnMap = (measurementToToggle) => {
+    const updatedOrientationData = JSON.parse(JSON.stringify(spot.properties.orientation_data));
+    const measurement = updatedOrientationData.find(meas => meas.id === measurementToToggle.id);
+    // Absent rather than false, so a measurement never hidden adds nothing to what is synced
+    if (measurement.isHiddenOnMap) delete measurement.isHiddenOnMap;
+    else measurement.isHiddenOnMap = true;
+    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+    dispatch(editedSpotProperties({field: 'orientation_data', value: updatedOrientationData}));
+  };
+
   return {
     createNewMeasurement,
     deleteMeasurements,
     getMeasurementLabel,
+    toggleMeasurementHiddenOnMap,
   };
 };
 

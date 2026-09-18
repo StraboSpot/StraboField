@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
 import MeasurementLabel from './MeasurementLabel';
@@ -16,6 +16,7 @@ const MeasurementItem = ({
                            isSelectMode,
                            item,
                            onPress,
+                           onToggleHiddenOnMap,
                            selectedIds,
                          }) => {
 
@@ -32,6 +33,19 @@ const MeasurementItem = ({
   const onMeasurementPress = () => {
     if (isMultipleFeaturesTaggingEnabled) setFeaturesSelectedForMultiTagging(item);
     else onPress();
+  };
+
+  // A measurement kept off the map says so wherever it is listed, but only a page that can edit changes it
+  const renderMapVisibilityIcon = () => {
+    if (!onToggleHiddenOnMap && !item.isHiddenOnMap) return null;
+    return (
+      <Icon
+        color={item.isHiddenOnMap ? themes.PRIMARY_ACCENT_COLOR : themes.MEDIUMGREY}
+        name={item.isHiddenOnMap ? 'eye-off-outline' : 'eye-outline'}
+        onPress={onToggleHiddenOnMap ? () => onToggleHiddenOnMap(item) : undefined}
+        type={'ionicon'}
+      />
+    );
   };
 
   if (!isEmpty(item)) {
@@ -61,7 +75,12 @@ const MeasurementItem = ({
           </ListItem.Title>
           <FeatureTagsList featureId={item.id} spotId={spot.properties.id}/>
         </ListItem.Content>
-        {!isMultipleFeaturesTaggingEnabled && !isSelectMode && <ListItem.Chevron/>}
+        {!isMultipleFeaturesTaggingEnabled && !isSelectMode && (
+          <>
+            {renderMapVisibilityIcon()}
+            <ListItem.Chevron/>
+          </>
+        )}
       </ListItem>
     );
   }

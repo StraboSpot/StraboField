@@ -14,6 +14,36 @@ import notebookReducer from '../notebook-panel/notebook.slice';
 import projectReducer from '../project/projects.slice';
 import spotReducer from '../spots/spots.slice';
 
+// Mounts useMeasurements against a store so a test can call it and read back what it wrote to the Spot
+const renderUseMeasurements = (preloadedState) => {
+  const store = configureStore({
+    preloadedState: preloadedState,
+    reducer: {
+      compass: compassReducer,
+      connections: connectionsReducer,
+      home: homeReducer,
+      notebook: notebookReducer,
+      project: projectReducer,
+      spot: spotReducer,
+    },
+  });
+  let measurementsApi;
+  const Probe = () => {
+    measurementsApi = useMeasurements();
+    return null;
+  };
+  ReactTestRenderer.act(() => {
+    ReactTestRenderer.create(
+      <Provider store={store}>
+        <ToastProvider>
+          <Probe/>
+        </ToastProvider>
+      </Provider>,
+    );
+  });
+  return {measurementsApi: measurementsApi, store: store};
+};
+
 // A template prefills a new measurement, but the template form is the whole measurement form, so a template
 // can hold a strike or dip of its own. Those must never overrule what the compass actually read.
 describe('createNewMeasurement', () => {
@@ -37,31 +67,7 @@ describe('createNewMeasurement', () => {
 
   const createMeasurement = (activeMeasurementTemplates,
     measurementTypes = [COMPASS_TOGGLE_BUTTONS.PLANAR]) => {
-    const store = configureStore({
-      preloadedState: getState(activeMeasurementTemplates, measurementTypes),
-      reducer: {
-        compass: compassReducer,
-        connections: connectionsReducer,
-        home: homeReducer,
-        notebook: notebookReducer,
-        project: projectReducer,
-        spot: spotReducer,
-      },
-    });
-    let measurementsApi;
-    const Probe = () => {
-      measurementsApi = useMeasurements();
-      return null;
-    };
-    ReactTestRenderer.act(() => {
-      ReactTestRenderer.create(
-        <Provider store={store}>
-          <ToastProvider>
-            <Probe/>
-          </ToastProvider>
-        </Provider>,
-      );
-    });
+    const {measurementsApi, store} = renderUseMeasurements(getState(activeMeasurementTemplates, measurementTypes));
     ReactTestRenderer.act(() => measurementsApi.createNewMeasurement());
     return store.getState().spot.selectedSpot.properties.orientation_data[0];
   };
@@ -120,5 +126,50 @@ describe('createNewMeasurement', () => {
 
   it('gives the new measurement an id', () => {
     expect(typeof createMeasurement([]).id).toBe('string');
+  });
+});
+
+// Which measurements a Spot puts on the map is recorded on the measurements themselves, so the choice travels
+// with the Spot rather than sitting in a map setting on one device
+describe('toggleMeasurementHiddenOnMap', () => {
+  const spotId = 1756000000002;
+
+  const toggle = (orientationData, measurementToToggle) => {
+    const spot = {
+      properties: {id: spotId, name: 'Spot 09', orientation_data: orientationData},
+      type: 'Feature',
+    };
+    const {measurementsApi, store} = renderUseMeasurements({
+      compass: {measurements: {}, measurementTypes: []},
+      project: {
+        datasets: {12: {id: 12, modified_timestamp: 1, name: 'Dataset 1', spotIds: [spotId]}},
+        project: {modified_timestamp: 1},
+      },
+      spot: {selectedSpot: spot, selectedAttributes: [], spots: {[spotId]: spot}},
+    });
+    ReactTestRenderer.act(() => measurementsApi.toggleMeasurementHiddenOnMap(measurementToToggle));
+    return store.getState().spot.selectedSpot.properties.orientation_data;
+  };
+
+  const planar = {dip: 40, id: 'm1', strike: 350, type: 'planar_orientation'};
+  const linear = {id: 'm2', plunge: 20, trend: 10, type: 'linear_orientation'};
+
+  it('marks the measurement it is given as hidden', () => {
+    expect(toggle([planar, linear], planar)[0].isHiddenOnMap).toBe(true);
+  });
+
+  // Absent rather than false, so a measurement that was never hidden adds nothing to what is synced
+  it('drops the flag entirely when a hidden measurement is shown again', () => {
+    const shownAgain = toggle([{...planar, isHiddenOnMap: true}, linear], planar)[0];
+    expect('isHiddenOnMap' in shownAgain).toBe(false);
+  });
+
+  it('leaves the other measurements alone', () => {
+    expect(toggle([planar, linear], planar)[1]).toEqual(linear);
+  });
+
+  // Order is what Only 1st Measurements reads, so hiding must not double as a reorder
+  it('keeps the measurement where it sits in the list', () => {
+    expect(toggle([planar, linear], planar).map(meas => meas.id)).toEqual(['m1', 'm2']);
   });
 });
