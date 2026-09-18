@@ -1,3 +1,7 @@
+STABILITY
+• Crash fix: loading or switching projects no longer crashes the app on iOS
+• Fewer crashes: fixed iOS crashes that could occur when switching between modal screens
+
 FORMS & VALIDATION
 • Live form validation: errors show as you type and Save stays disabled until they're fixed
 • Find the problem field: the tab holding an unanswered field is marked so you know where to look
@@ -59,8 +63,5 @@ SMALL TOUCHES
 • Copied Spots: a copied Spot gets its own feature ids
 • Mineral lookup: mineral data you already entered is kept when a mineral is looked up
 • Project visibility: an owner's project is listed again once its collaboration is halted
-
-STABILITY
-• Fewer crashes: fixed iOS crashes that could occur when switching between modal screens
 
 Thanks for using StraboSpot!

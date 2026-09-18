@@ -18,8 +18,14 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 
 const RELEASE_NOTES = [
   {
-    version: '2.32.0',
+    version: '2.32.1',
     groups: [
+      {
+        title: 'Stability',
+        items: [
+          {text: 'Crash fix: loading or switching projects no longer crashes the app on iOS', commit: '554e1c22d'},
+        ],
+      },
       {
         title: 'Forms & validation',
         items: [
