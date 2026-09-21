@@ -22,7 +22,7 @@
       "hint": "Azimuth in degrees. Bulk convert strikes to dip directions, or the reverse, from Home Menu -> User Conventions.",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -31,7 +31,7 @@
       "hint": "Bulk convert strikes to dip directions, or the reverse, from Home Menu -> User Conventions.",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -39,7 +39,7 @@
       "label": "Dip",
       "required": "false",
       "constraint": ". >= 0 and . <= 90",
-      "constraint_message": "Value must be a whole number between 0-90."
+      "constraint_message": "Value must be a whole number between 0 and 90."
     },
     {
       "type": "select_one xn9nf56",

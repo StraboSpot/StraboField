@@ -37,19 +37,25 @@
       "type": "decimal",
       "name": "thickness_typical",
       "label": "Typical Thickness",
-      "required": "${thickness_minimum} = '' and ${thickness_maximum} = ''"
+      "required": "${thickness_minimum} = '' and ${thickness_maximum} = ''",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "thickness_minimum",
       "label": "Minimum Thickness",
-      "required": "${thickness_typical} = '' and ${thickness_maximum} = ''"
+      "required": "${thickness_typical} = '' and ${thickness_maximum} = ''",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "thickness_maximum",
       "label": "Maximum Thickness",
-      "required": "${thickness_typical} = '' and ${thickness_minimum} = ''"
+      "required": "${thickness_typical} = '' and ${thickness_minimum} = ''",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "select_one lv1et65",

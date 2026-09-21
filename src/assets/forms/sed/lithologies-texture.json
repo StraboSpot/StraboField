@@ -68,7 +68,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'clay')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -78,7 +80,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'silt')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -88,7 +92,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'sand_very_fin')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -98,7 +104,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'sand_fine_low')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -108,7 +116,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'sand_fine_upp')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -118,7 +128,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'sand_medium_l')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -128,7 +140,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'sand_medium_u')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -138,7 +152,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'sand_coarse_l')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -148,7 +164,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'sand_coarse_u')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -158,7 +176,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'sand_very_coa')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -168,7 +188,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'granule')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -178,7 +200,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'pebble')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -188,7 +212,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'cobble')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -198,7 +224,9 @@
       "read_only": false,
       "relevant": "selected(${grain_size_range}, 'boulder')",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -208,7 +236,9 @@
       "read_only": false,
       "relevant": "",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -218,7 +248,9 @@
       "read_only": false,
       "relevant": "",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -228,7 +260,9 @@
       "read_only": false,
       "relevant": "",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "select_multiple fz52a24",
