@@ -43,7 +43,7 @@
       "hint": "Azimuth in degrees",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -51,7 +51,7 @@
       "label": "Azimuth Dip Direction",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -59,7 +59,7 @@
       "label": "Dip",
       "required": "false",
       "constraint": ". >= 0 and . <= 90",
-      "constraint_message": "Value must be a whole number between 0-90."
+      "constraint_message": "Value must be a whole number between 0 and 90."
     },
     {
       "type": "select_one qt5nd15",
@@ -127,7 +127,9 @@
       "type": "decimal",
       "name": "amplitude_m",
       "label": "Planar Feature Thickness (m)",
-      "required": "false"
+      "required": "false",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",

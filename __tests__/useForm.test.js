@@ -54,7 +54,7 @@ describe('validateForm', () => {
 
   it('reports the constraint message for a value outside its range', () => {
     const {errors} = validateForm({formName: PLANAR_FORM_NAME, values: {strike: '400'}});
-    expect(errors.strike).toBe('Value must be a whole number between 0-360.');
+    expect(errors.strike).toBe('Value must be a whole number between 0 and 360.');
   });
 
   it('finds no errors for a value within its range', () => {

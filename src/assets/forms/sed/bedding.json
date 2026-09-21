@@ -85,21 +85,24 @@
       "name": "avg_thickness",
       "label": "Average Thickness",
       "required": "false",
-      "constraint": ". > 0"
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "max_thickness",
       "label": "Maximum Thickness",
       "required": "false",
-      "constraint": ". > 0"
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "min_thickness",
       "label": "Minimum Thickness",
       "required": "false",
-      "constraint": ". > 0"
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "select_one zc89y27",

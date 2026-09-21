@@ -20,6 +20,7 @@
       "label": "Interval Thickness",
       "required": false,
       "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0.",
       "calculation": ""
     },
     {

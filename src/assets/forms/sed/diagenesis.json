@@ -75,7 +75,9 @@
       "relevant": "",
       "appearance": "",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -85,7 +87,9 @@
       "relevant": "",
       "appearance": "",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "text",
@@ -155,7 +159,9 @@
       "relevant": "",
       "appearance": "",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -165,7 +171,9 @@
       "relevant": "",
       "appearance": "",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "text",
@@ -235,7 +243,9 @@
       "relevant": "",
       "appearance": "",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -245,7 +255,9 @@
       "relevant": "",
       "appearance": "",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -255,7 +267,9 @@
       "relevant": "",
       "appearance": "",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "select_multiple zb73n93",
@@ -285,7 +299,9 @@
       "relevant": "",
       "appearance": "",
       "calculation": "",
-      "$given_name": ""
+      "$given_name": "",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "select_one gx9jq81",

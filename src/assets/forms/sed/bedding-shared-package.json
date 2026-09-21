@@ -6,6 +6,7 @@
       "label": "Thickness of Individual Beds",
       "required": false,
       "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0.",
       "relevant": "",
       "read_only": "",
       "calculation": "",

@@ -22,7 +22,7 @@
       "hint": "Azimuth in degrees. Bulk convert strikes to dip directions, or the reverse, from Home Menu -> User Conventions.",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -31,7 +31,7 @@
       "hint": "Bulk convert strikes to dip directions, or the reverse, from Home Menu -> User Conventions.",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -39,7 +39,7 @@
       "label": "Dip",
       "required": "false",
       "constraint": ". >= 0 and . <= 90",
-      "constraint_message": "Value must be a whole number between 0-90."
+      "constraint_message": "Value must be a whole number between 0 and 90."
     },
     {
       "type": "select_one qt5nd15",
@@ -310,7 +310,7 @@
       "label": "Minimum Age of Structure (Ma)",
       "required": "false",
       "constraint": ". >= 0",
-      "constraint_message": "Value must be greater than or equal to 0 (active).",
+      "constraint_message": "Value must be 0 or greater (0 is active).",
       "relevant": "${feature_type} = 'foliation' or ${feature_type} = 'fault'"
     },
     {

@@ -68,91 +68,117 @@
       "name": "skeletal_general_percent",
       "label": "Skeletal (General) Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'skeletal_gener')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'skeletal_gener')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "mollusc_percent",
       "label": "Mollusc Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'mollusc')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'mollusc')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "brachiopod_percent",
       "label": "Brachiopod Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'brachiopod')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'brachiopod')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "coral_percent",
       "label": "Coral Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'coral')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'coral')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "echinoderm_percent",
       "label": "Echinoderm Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'echinoderm')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'echinoderm')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "bryozoan_percent",
       "label": "Bryozoan Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'bryozoan')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'bryozoan')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "calcareous_algae_percent",
       "label": "Calcareous Algae Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'calcareous_alg')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'calcareous_alg')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "foraminifera_percent",
       "label": "Foraminifera Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'foraminifera')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'foraminifera')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "stromatolite_percent",
       "label": "Stromatolite Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'stromatolite')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'stromatolite')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "thrombolite_percent",
       "label": "Thrombolite Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'thrombolite')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'thrombolite')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "dendrolite_percent",
       "label": "Dendrolite Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'dendrolite')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'dendrolite')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "leiolite_percent",
       "label": "Leiolite Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'leiolite')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'leiolite')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "other_skeletal_carbonate_component_percent",
       "label": "Other Skeletal Carbonate Component Percent",
       "required": "false",
-      "relevant": "selected(${skeletal_carbonate_components}, 'other')"
+      "relevant": "selected(${skeletal_carbonate_components}, 'other')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_multiple gi8hz21",
@@ -172,91 +198,117 @@
       "name": "mud_percent",
       "label": "Mud Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'mud')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'mud')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "cement_percent",
       "label": "Cement Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'cement')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'cement')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "intraclast_percent",
       "label": "Intraclast Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'intraclast')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'intraclast')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "peloid_percent",
       "label": "Peloid Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'peloid')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'peloid')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "ooid_percent",
       "label": "Ooid Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'ooid')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'ooid')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "oncoid_percent",
       "label": "Oncoid Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'oncoid')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'oncoid')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "pisoid_percent",
       "label": "Pisoid Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'pisoid')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'pisoid')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "coated_grian_percent",
       "label": "Coated Grian Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'coated_grain')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'coated_grain')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "grapestone_percent",
       "label": "Grapestone Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'grapestone')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'grapestone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "giant_ooid_percent",
       "label": "Giant Ooid Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'giant_ooid')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'giant_ooid')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "seafloor_precipitate_percent",
       "label": "Seafloor Precipitate Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'seafloor_preci')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'seafloor_preci')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "molar_tooth_percent",
       "label": "Molar Tooth Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'molar_tooth')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'molar_tooth')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
       "name": "other_non_skeletal_component_percent",
       "label": "Other Non-Skeletal Component Percent",
       "required": "false",
-      "relevant": "selected(${non_skeletal_carbonate_compone}, 'other')"
+      "relevant": "selected(${non_skeletal_carbonate_compone}, 'other')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_multiple kg6zo76",
@@ -279,7 +331,9 @@
       "label": "Siliceous Mudstone Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_muds')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_muds')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -287,7 +341,9 @@
       "label": "Siliceous Calcareous Mudstone Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_calc')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_calc')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -295,7 +351,9 @@
       "label": "Siliceous Volcaniclastic Mudstone Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_volc')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'siliceous_volc')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -303,7 +361,9 @@
       "label": "Calcareous Mudstone Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'calcareous_mud')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'calcareous_mud')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -311,7 +371,9 @@
       "label": "Black Shale Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'black_shale')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'black_shale')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -319,7 +381,9 @@
       "label": "Red Clay Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'red_clay')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'red_clay')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -327,7 +391,9 @@
       "label": "Red Mudstone Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'red_mudstone')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'red_mudstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -335,7 +401,9 @@
       "label": "Green Mudstone Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'green_mudstone')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'green_mudstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -343,7 +411,9 @@
       "label": "Variegated Mudstone Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'variegated_mud')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'variegated_mud')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -351,7 +421,9 @@
       "label": "Marl Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'marl')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'marl')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -359,7 +431,9 @@
       "label": "Sarl Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'sarl')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'sarl')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -367,7 +441,9 @@
       "label": "Argillaceous Mudstone Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clay_or_mudstone_type}, 'argillaceous_m')"
+      "relevant": "selected(${clay_or_mudstone_type}, 'argillaceous_m')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_multiple ih44p58",
@@ -397,7 +473,9 @@
       "label": "Intrusive Igneous Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'intrusive_igne')"
+      "relevant": "selected(${clast_composition}, 'intrusive_igne')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -405,7 +483,9 @@
       "label": "Volcanic Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'extrusive_igne')"
+      "relevant": "selected(${clast_composition}, 'extrusive_igne')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -413,7 +493,9 @@
       "label": "Metamorphic Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'met_clast')"
+      "relevant": "selected(${clast_composition}, 'met_clast')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -421,7 +503,9 @@
       "label": "Mudstone Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'mudstone')"
+      "relevant": "selected(${clast_composition}, 'mudstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -429,7 +513,9 @@
       "label": "Siltstone Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'siltstone')"
+      "relevant": "selected(${clast_composition}, 'siltstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -437,7 +523,9 @@
       "label": "Sandstone Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'sandstone')"
+      "relevant": "selected(${clast_composition}, 'sandstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -445,7 +533,9 @@
       "label": "Conglomerate Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'conglomerate')"
+      "relevant": "selected(${clast_composition}, 'conglomerate')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -453,7 +543,9 @@
       "label": "Limestone Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'limestone')"
+      "relevant": "selected(${clast_composition}, 'limestone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -461,7 +553,9 @@
       "label": "Dolostone Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'dolostone')"
+      "relevant": "selected(${clast_composition}, 'dolostone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -469,7 +563,9 @@
       "label": "Wackestone Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'wackestone')"
+      "relevant": "selected(${clast_composition}, 'wackestone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -477,7 +573,9 @@
       "label": "Packstone Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'packstone')"
+      "relevant": "selected(${clast_composition}, 'packstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -485,7 +583,9 @@
       "label": "Grainstone Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'grainstone')"
+      "relevant": "selected(${clast_composition}, 'grainstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -493,7 +593,9 @@
       "label": "Boundstone Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'boundstone')"
+      "relevant": "selected(${clast_composition}, 'boundstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -501,7 +603,9 @@
       "label": "Other Clast Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${clast_composition}, 'other')"
+      "relevant": "selected(${clast_composition}, 'other')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_multiple co1jf03",
@@ -524,7 +628,9 @@
       "label": "Intrusive igneous Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${matrix_composition}, 'intrusive_igneous')"
+      "relevant": "selected(${matrix_composition}, 'intrusive_igneous')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -532,7 +638,9 @@
       "label": "Extrusive igneous Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${matrix_composition}, 'extrusive_igneous')"
+      "relevant": "selected(${matrix_composition}, 'extrusive_igneous')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -540,7 +648,9 @@
       "label": "Metamorphic igneous Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${matrix_composition}, 'metamorphic')"
+      "relevant": "selected(${matrix_composition}, 'metamorphic')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -548,7 +658,9 @@
       "label": "Mudstone Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${matrix_composition}, 'mudstone')"
+      "relevant": "selected(${matrix_composition}, 'mudstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -556,7 +668,9 @@
       "label": "Siltstone Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${matrix_composition}, 'siltstone')"
+      "relevant": "selected(${matrix_composition}, 'siltstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -564,7 +678,9 @@
       "label": "Sandstone Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${matrix_composition}, 'sandstone')"
+      "relevant": "selected(${matrix_composition}, 'sandstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -572,7 +688,9 @@
       "label": "Conglomerate Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${matrix_composition}, 'conglomerate')"
+      "relevant": "selected(${matrix_composition}, 'conglomerate')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_multiple ng3et79",
@@ -588,7 +706,9 @@
       "label": "Limestone Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${carbonate_matrix_type}, 'limestone')"
+      "relevant": "selected(${carbonate_matrix_type}, 'limestone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -596,7 +716,9 @@
       "label": "Dolostone Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${carbonate_matrix_type}, 'dolostone')"
+      "relevant": "selected(${carbonate_matrix_type}, 'dolostone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -604,7 +726,9 @@
       "label": "Skeletal Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${carbonate_matrix_type}, 'skeletal')"
+      "relevant": "selected(${carbonate_matrix_type}, 'skeletal')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -612,7 +736,9 @@
       "label": "Wackestone Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${carbonate_matrix_type}, 'wackestone')"
+      "relevant": "selected(${carbonate_matrix_type}, 'wackestone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -620,7 +746,9 @@
       "label": "Packstone Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${carbonate_matrix_type}, 'packstone')"
+      "relevant": "selected(${carbonate_matrix_type}, 'packstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -628,7 +756,9 @@
       "label": "Grainstone Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${carbonate_matrix_type}, 'grainstone')"
+      "relevant": "selected(${carbonate_matrix_type}, 'grainstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -636,7 +766,9 @@
       "label": "Boundstone Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${carbonate_matrix_type}, 'boundstone')"
+      "relevant": "selected(${carbonate_matrix_type}, 'boundstone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -644,7 +776,9 @@
       "label": "Other Carbonate Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${carbonate_matrix_type}, 'other')"
+      "relevant": "selected(${carbonate_matrix_type}, 'other')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -652,7 +786,9 @@
       "label": "Other Matrix Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${matrix_composition}, 'other')"
+      "relevant": "selected(${matrix_composition}, 'other')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_multiple so29n97",
@@ -675,7 +811,9 @@
       "label": "Glass Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'glass')"
+      "relevant": "selected(${volcaniclastic_type}, 'glass')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -683,7 +821,9 @@
       "label": "Crystals Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'crystals')"
+      "relevant": "selected(${volcaniclastic_type}, 'crystals')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -691,7 +831,9 @@
       "label": "Lithic Fragments Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'lithic_fragmen')"
+      "relevant": "selected(${volcaniclastic_type}, 'lithic_fragmen')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -699,7 +841,9 @@
       "label": "Volcanic Mudstone Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'volcanic_mudst')"
+      "relevant": "selected(${volcaniclastic_type}, 'volcanic_mudst')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -707,7 +851,9 @@
       "label": "Volcanic Sandstone Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'volcanic_sands')"
+      "relevant": "selected(${volcaniclastic_type}, 'volcanic_sands')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -715,7 +861,9 @@
       "label": "Lapillistone Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'lapillistone')"
+      "relevant": "selected(${volcaniclastic_type}, 'lapillistone')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -723,7 +871,9 @@
       "label": "Agglomerate Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'agglomerate')"
+      "relevant": "selected(${volcaniclastic_type}, 'agglomerate')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -731,7 +881,9 @@
       "label": "Volcanic Breccia Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'volcanic_brecc')"
+      "relevant": "selected(${volcaniclastic_type}, 'volcanic_brecc')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -739,7 +891,9 @@
       "label": "Bentonite Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'bentonite')"
+      "relevant": "selected(${volcaniclastic_type}, 'bentonite')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -747,7 +901,9 @@
       "label": "Tuff Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'tuff')"
+      "relevant": "selected(${volcaniclastic_type}, 'tuff')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -755,7 +911,9 @@
       "label": "Welded Tuff Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'welded_tuff')"
+      "relevant": "selected(${volcaniclastic_type}, 'welded_tuff')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -763,7 +921,9 @@
       "label": "Ignimbrite Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'ignimbrite')"
+      "relevant": "selected(${volcaniclastic_type}, 'ignimbrite')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -771,7 +931,9 @@
       "label": "Other Volcaniclastic Type Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${volcaniclastic_type}, 'other')"
+      "relevant": "selected(${volcaniclastic_type}, 'other')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_multiple gg6bk97",
@@ -786,7 +948,9 @@
       "label": "Gypsum - Anhydrite Primary Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_prim')"
+      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_prim')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_multiple el5ss78",
@@ -802,7 +966,9 @@
       "label": "Gypsum - Anhydrite Diagenetic Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_dia')"
+      "relevant": "selected(${evaporite_type}, 'gyp_anhyd_dia')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_multiple wy2is73",
@@ -818,7 +984,9 @@
       "label": "Halite - Primary Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${evaporite_type}, 'halite_primary')"
+      "relevant": "selected(${evaporite_type}, 'halite_primary')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_multiple la9sa83",
@@ -834,7 +1002,9 @@
       "label": "Halite - Diagenetic Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${evaporite_type}, 'halite_diagene')"
+      "relevant": "selected(${evaporite_type}, 'halite_diagene')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_multiple dv3xg82",
@@ -864,7 +1034,9 @@
       "label": "Amber Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${organic_coal_lithologies}, 'amber')"
+      "relevant": "selected(${organic_coal_lithologies}, 'amber')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -872,7 +1044,9 @@
       "label": "Peat Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${organic_coal_lithologies}, 'peat')"
+      "relevant": "selected(${organic_coal_lithologies}, 'peat')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -880,7 +1054,9 @@
       "label": "Lignite Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${organic_coal_lithologies}, 'lignite')"
+      "relevant": "selected(${organic_coal_lithologies}, 'lignite')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -888,7 +1064,9 @@
       "label": "Subbituminous Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${organic_coal_lithologies}, 'subbituminous')"
+      "relevant": "selected(${organic_coal_lithologies}, 'subbituminous')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -896,7 +1074,9 @@
       "label": "Bituminous Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${organic_coal_lithologies}, 'bituminous')"
+      "relevant": "selected(${organic_coal_lithologies}, 'bituminous')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -904,7 +1084,9 @@
       "label": "Coal Ball Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${organic_coal_lithologies}, 'coal_ball')"
+      "relevant": "selected(${organic_coal_lithologies}, 'coal_ball')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "decimal",
@@ -912,7 +1094,9 @@
       "label": "Tar Percent",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${organic_coal_lithologies}, 'tar')"
+      "relevant": "selected(${organic_coal_lithologies}, 'tar')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "text",

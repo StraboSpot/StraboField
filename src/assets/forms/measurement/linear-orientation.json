@@ -22,7 +22,7 @@
       "hint": "Azimuth in degrees",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -30,7 +30,7 @@
       "label": "Plunge",
       "required": "false",
       "constraint": ". >= 0 and . <= 90",
-      "constraint_message": "Value must be a whole number between 0-90."
+      "constraint_message": "Value must be a whole number between 0 and 90."
     },
     {
       "type": "integer",
@@ -39,7 +39,7 @@
       "hint": "down dip angle from strike on plane (0-180)?",
       "required": "false",
       "constraint": ". >= 0 and . <= 180",
-      "constraint_message": "Value must be a whole number between 0-180."
+      "constraint_message": "Value must be a whole number between 0 and 180."
     },
     {
       "type": "select_one hq7tk98",

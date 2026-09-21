@@ -40,7 +40,9 @@
       "label": "Slip Azimuth",
       "hint": "0-360 degrees",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture'"
+      "relevant": "${earthquake_feature} = 'fault_rupture'",
+      "constraint": ". >= 0 and . <= 360",
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "select_multiple rz2qw00",
@@ -70,21 +72,27 @@
       "label": "Strike",
       "hint": "Azimuth in degrees",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture'"
+      "relevant": "${earthquake_feature} = 'fault_rupture'",
+      "constraint": ". >= 0 and . <= 360",
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
       "name": "azimuth_dip_dir",
       "label": "Azimuth Dip Direction",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture'"
+      "relevant": "${earthquake_feature} = 'fault_rupture'",
+      "constraint": ". >= 0 and . <= 360",
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
       "name": "dip",
       "label": "Dip",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture'"
+      "relevant": "${earthquake_feature} = 'fault_rupture'",
+      "constraint": ". >= 0 and . <= 90",
+      "constraint_message": "Value must be a whole number between 0 and 90."
     },
     {
       "type": "select_one uf5yp07",
@@ -117,7 +125,9 @@
       "label": "Trend",
       "hint": "0-360 Degrees",
       "required": "false",
-      "relevant": "selected(${fault_slip_meas}, 'vector_measurement')"
+      "relevant": "selected(${fault_slip_meas}, 'vector_measurement')",
+      "constraint": ". >= 0 and . <= 360",
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -125,7 +135,9 @@
       "label": "Plunge",
       "hint": "0-90 Degrees",
       "required": "false",
-      "relevant": "selected(${fault_slip_meas}, 'vector_measurement')"
+      "relevant": "selected(${fault_slip_meas}, 'vector_measurement')",
+      "constraint": ". >= 0 and . <= 90",
+      "constraint_message": "Value must be a whole number between 0 and 90."
     },
     {
       "type": "select_one hm18t55",
@@ -142,63 +154,81 @@
       "name": "slip_preferred",
       "label": "Slip Preferred (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'vector_measurement')"
+      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'vector_measurement')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "slip_min",
       "label": "Slip Minimum (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'vector_measurement')"
+      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'vector_measurement')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "slip_max",
       "label": "Slip Maximum  (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'vector_measurement')"
+      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'vector_measurement')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "horiz_sep_pref",
       "label": "Horizontal Separation Preferred (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')"
+      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "horiz_sep_min",
       "label": "Horizontal Separation Minimum (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')"
+      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "horiz_sep_max",
       "label": "Horizontal Separation Maximum (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')"
+      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "vert_sep_pref",
       "label": "Vertical Separation Preferred (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')"
+      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "vert_sep_min",
       "label": "Vertical Separation Minimum (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')"
+      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "vertical_sep_max",
       "label": "Vertical Separation Maximum (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')"
+      "relevant": "${earthquake_feature} = 'fault_rupture' and selected(${fault_slip_meas}, 'slip_components')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "select_one rb7mn64",
@@ -212,21 +242,27 @@
       "name": "heave_pref",
       "label": "Heave Preferred (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture'"
+      "relevant": "${earthquake_feature} = 'fault_rupture'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "heave_min",
       "label": "Heave Min (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture'"
+      "relevant": "${earthquake_feature} = 'fault_rupture'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "heave_max",
       "label": "Heave Max (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture' and ${fault_slip_meas} != ''"
+      "relevant": "${earthquake_feature} = 'fault_rupture' and ${fault_slip_meas} != ''",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "text",
@@ -234,29 +270,34 @@
       "label": "Rupture Expression",
       "hint": "What does the rupture look like at this location? (e.g. mole track, crack, en echelon fractures, etc.)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture'",
-      "constraint": ". = ''"
+      "relevant": "${earthquake_feature} = 'fault_rupture'"
     },
     {
       "type": "decimal",
       "name": "rupture_width_pref",
       "label": "Rupture Width Preferred (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture'"
+      "relevant": "${earthquake_feature} = 'fault_rupture'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "rupture_width_min",
       "label": "Rupture Width Min (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture'"
+      "relevant": "${earthquake_feature} = 'fault_rupture'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "rupture_width_max",
       "label": "Rupture Width Max (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'fault_rupture'"
+      "relevant": "${earthquake_feature} = 'fault_rupture'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "select_one mv2vk38",
@@ -270,21 +311,27 @@
       "name": "diameter",
       "label": "Diameter (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'liquefaction'"
+      "relevant": "${earthquake_feature} = 'liquefaction'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "height_of_material",
       "label": "Height of Material (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'liquefaction'"
+      "relevant": "${earthquake_feature} = 'liquefaction'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "max_vert_movement",
       "label": "Maximum Vertical Movement (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'liquefaction'"
+      "relevant": "${earthquake_feature} = 'liquefaction'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "select_one ub5fh32",
@@ -334,35 +381,45 @@
       "label": "Direction of Slope Movement",
       "hint": "0-360 degrees",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'slope_movement'"
+      "relevant": "${earthquake_feature} = 'slope_movement'",
+      "constraint": ". >= 0 and . <= 360",
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
       "name": "displacement_amt",
       "label": "Displacement Amount (m) ",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'slope_movement'"
+      "relevant": "${earthquake_feature} = 'slope_movement'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be a whole number greater than 0."
     },
     {
       "type": "integer",
       "name": "depth",
       "label": "Depth (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'slope_movement'"
+      "relevant": "${earthquake_feature} = 'slope_movement'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be a whole number greater than 0."
     },
     {
       "type": "integer",
       "name": "max_drop_in_elevation",
       "label": "Max Drop in Elevation (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'slope_movement'"
+      "relevant": "${earthquake_feature} = 'slope_movement'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be a whole number greater than 0."
     },
     {
       "type": "integer",
       "name": "length_exposed_downslope",
       "label": "Length Exposed Downslope (m)",
       "required": "false",
-      "relevant": "${earthquake_feature} = 'slope_movement'"
+      "relevant": "${earthquake_feature} = 'slope_movement'",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be a whole number greater than 0."
     },
     {
       "type": "date",

@@ -28,7 +28,7 @@
       "hint": "Number to append to the end of every spot name. Increments automatically.",
       "required": "false",
       "constraint": ". >= 0",
-      "constraint_message": "Must start with 0 or greater"
+      "constraint_message": "Value must be a whole number 0 or greater."
     },
     {
       "type": "acknowledge",
@@ -88,7 +88,8 @@
       "label": "Starting Number",
       "hint": "Number to append to the end of every sample name. Use exactly 6 numbers if creating an IGSN code. Increments automatically.",
       "required": "false",
-      "constraint_message": "Must start with 0 or greater"
+      "constraint": ". >= 0",
+      "constraint_message": "Value must be a whole number 0 or greater."
     },
     {
       "type": "acknowledge",

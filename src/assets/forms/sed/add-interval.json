@@ -32,6 +32,7 @@
       "required": true,
       "relevant": "",
       "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0.",
       "appearance": "",
       "calculation": "",
       "$given_name": ""
@@ -452,6 +453,7 @@
       "required": true,
       "relevant": "${interbed_proportion_change} = 'no_change'",
       "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0.",
       "appearance": "",
       "calculation": "",
       "$given_name": ""
@@ -464,6 +466,7 @@
       "required": true,
       "relevant": "${interbed_proportion_change} = 'increase' or ${interbed_proportion_change} = 'decrease'",
       "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0.",
       "appearance": "",
       "calculation": "",
       "$given_name": ""
@@ -476,6 +479,7 @@
       "required": true,
       "relevant": "${interbed_proportion_change} = 'increase' or ${interbed_proportion_change} = 'decrease'",
       "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0.",
       "appearance": "",
       "calculation": "",
       "$given_name": ""
@@ -488,6 +492,7 @@
       "required": true,
       "relevant": "${interbed_proportion_change} = 'no_change' or ${interbed_proportion_change} = 'increase' or ${interbed_proportion_change} = 'decrease'",
       "constraint": ". > 0 and . <= 50",
+      "constraint_message": "Value must be greater than 0 and no more than 50.",
       "appearance": "",
       "calculation": "",
       "$given_name": ""
@@ -500,6 +505,7 @@
       "required": true,
       "relevant": "${interbed_proportion_change} = 'no_change'",
       "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0.",
       "appearance": "",
       "calculation": "",
       "$given_name": ""
@@ -512,6 +518,7 @@
       "required": true,
       "relevant": "${interbed_proportion_change} = 'increase' or ${interbed_proportion_change} = 'decrease'",
       "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0.",
       "appearance": "",
       "calculation": "",
       "$given_name": ""
@@ -524,6 +531,7 @@
       "required": true,
       "relevant": "${interbed_proportion_change} = 'increase' or ${interbed_proportion_change} = 'decrease'",
       "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0.",
       "appearance": "",
       "calculation": "",
       "$given_name": ""
@@ -572,6 +580,7 @@
       "required": true,
       "relevant": "${interval_type} = 'package_succe'",
       "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0.",
       "appearance": "",
       "calculation": "",
       "$given_name": ""

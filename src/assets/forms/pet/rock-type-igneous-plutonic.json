@@ -75,7 +75,9 @@
       "type": "decimal",
       "name": "color_index_pluton",
       "label": "Color Index",
-      "required": "false"
+      "required": "false",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_one nx1fj58",
@@ -88,7 +90,9 @@
       "type": "integer",
       "name": "pluton_characteristic_size_of",
       "label": "Characteristic Size of Crystals (mm)",
-      "required": "false"
+      "required": "false",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be a whole number greater than 0."
     },
     {
       "type": "select_multiple pt2tr54",

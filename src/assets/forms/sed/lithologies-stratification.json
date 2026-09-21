@@ -123,7 +123,9 @@
       "type": "decimal",
       "name": "interbed_proportion",
       "label": "Interbed Relative Proportion (%)",
-      "required": "false"
+      "required": "false",
+      "constraint": ". > 0 and . <= 50",
+      "constraint_message": "Value must be greater than 0 and no more than 50."
     },
     {
       "type": "select_one jf3we63",

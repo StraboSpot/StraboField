@@ -40,7 +40,7 @@
       "hint": "Azimuth in degrees",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -48,7 +48,7 @@
       "label": "Plunge",
       "required": "false",
       "constraint": ". >= 0 and . <= 90",
-      "constraint_message": "Value must be a whole number between 0-90."
+      "constraint_message": "Value must be a whole number between 0 and 90."
     },
     {
       "type": "select_one rg23y65",
@@ -77,7 +77,7 @@
       "hint": "Azimuth in degrees",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -85,7 +85,7 @@
       "label": "Azimuthal Dip Direction",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -93,7 +93,7 @@
       "label": "Dip",
       "required": "false",
       "constraint": ". >= 0 and . <= 90",
-      "constraint_message": "Value must be a whole number between 0-90."
+      "constraint_message": "Value must be a whole number between 0 and 90."
     },
     {
       "type": "select_one ne4bk50",
@@ -153,7 +153,9 @@
       "type": "decimal",
       "name": "amplitude_m",
       "label": "Amplitude (m)",
-      "required": "false"
+      "required": "false",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "text",
@@ -187,7 +189,7 @@
       "hint": "Azimuth in degrees",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -195,7 +197,7 @@
       "label": "Dip Direction",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -203,7 +205,7 @@
       "label": "Dip",
       "required": "false",
       "constraint": ". >= 0 and . <= 90",
-      "constraint_message": "Value must be a whole number between 0-90."
+      "constraint_message": "Value must be a whole number between 0 and 90."
     },
     {
       "type": "select_one fold_fol_quality_5Cye72eaqyA_",

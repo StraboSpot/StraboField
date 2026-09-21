@@ -73,7 +73,7 @@
       "required": "false",
       "relevant": "${feature_type} = 'ellipsoidal_data'",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be between 0-360."
+      "constraint_message": "Value must be between 0 and 360."
     },
     {
       "type": "decimal",
@@ -137,7 +137,7 @@
       "required": "false",
       "relevant": "${feature_type} = 'ellipsoidal_data'",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be between 0-360."
+      "constraint_message": "Value must be between 0 and 360."
     },
     {
       "type": "decimal",
@@ -201,7 +201,7 @@
       "required": "false",
       "relevant": "${feature_type} = 'ellipsoidal_data'",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be between 0-360."
+      "constraint_message": "Value must be between 0 and 360."
     },
     {
       "type": "decimal",
@@ -303,7 +303,7 @@
       "required": "false",
       "relevant": "${feature_type} = 'non_ellipsoidal_data'",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be between 0-360."
+      "constraint_message": "Value must be between 0 and 360."
     },
     {
       "type": "decimal",
@@ -367,7 +367,7 @@
       "required": "false",
       "relevant": "${feature_type} = 'non_ellipsoidal_data'",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be between 0-360."
+      "constraint_message": "Value must be between 0 and 360."
     },
     {
       "type": "decimal",
@@ -431,7 +431,7 @@
       "required": "false",
       "relevant": "${feature_type} = 'non_ellipsoidal_data'",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be between 0-360."
+      "constraint_message": "Value must be between 0 and 360."
     },
     {
       "type": "decimal",
@@ -509,7 +509,7 @@
       "required": "false",
       "relevant": "${feature_type} = 'elliptical_data'",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -518,7 +518,7 @@
       "required": "false",
       "relevant": "${feature_type} = 'elliptical_data'",
       "constraint": ". >= 0 and . <= 90",
-      "constraint_message": "Value must be a whole number between 0-90."
+      "constraint_message": "Value must be a whole number between 0 and 90."
     },
     {
       "type": "integer",
@@ -527,7 +527,7 @@
       "required": "false",
       "relevant": "${feature_type} = 'elliptical_data'",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Value must be a whole number between 0-360."
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "integer",
@@ -536,7 +536,7 @@
       "required": "false",
       "relevant": "${feature_type} = 'elliptical_data'",
       "constraint": ". >= 0 and . <= 180",
-      "constraint_message": "Value must be a whole number between 0-180."
+      "constraint_message": "Value must be a whole number between 0 and 180."
     },
     {
       "type": "select_one elliptical_quality_T4gjnTMk9Fg_",
