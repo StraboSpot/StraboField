@@ -1,4 +1,70 @@
 STABILITY
 • Fewer crashes: fixed iOS crashes that could occur when switching between modal screens
 
+COMPASS
+• Works without GPS: uses magnetic declination on devices with no GPS fix
+• Hold-aware readings: trend/plunge adjust for landscape and tablet orientation
+• Clearer calibration: improved calibration alerts and more consistent behavior across platforms
+• Smoother, more accurate compass: faster needle updates and improved declination handling
+
+SAMPLES & IGSN
+• Steadier SESAR: better session handling, offline warnings, and clearer error feedback when registering IGSNs
+• IGSN required fields: registration now warns inline about missing required fields, and falls back to the Spot's date when no collection date is set
+• Sample dates: converting a legacy sample keeps the parent Spot's created date
+• Richer Samples: Samples can now hold images, measurements, and more — just like Spots — with a gold border and banner, visible in nesting, and taggable
+• Add Sample screen: attach images and assign geologic units right when you create a sample
+• IGSN registration: updated registration UI, with a Get IGSN button and an upload progress bar
+• Keep IGSNs in sync: prompts to update SESAR when relevant fields change, with a View IGSN Data link and offline warnings
+
+SMALL TOUCHES
+• Custom map details scroll properly on smaller screens
+• Battery status: battery icons now show charging vs. discharging
+• Conventions remembered: unsaved convention changes are kept and toggles stay in sync
+• Checkbox selection: multi-select now uses checkboxes instead of a full-row highlight
+
+MAPS
+• Import progress: see progress while importing, and large tile imports no longer stall
+
+BACKUP & UPLOADS
+• Simpler uploads: a unified upload screen with more consistent behavior
+• Accurate backup times: backup lists now show the correct timestamps
+
+DRAWING & EDITING
+• Freehand vertex spacing: control how closely points are placed when you draw freehand lines and polygons
+• Extend a line: drag out a new endpoint to make an existing line longer
+• Overlapping Spot picker: when several Spots sit under your tap, choose exactly which one to select
+• Undo Spot delete: deleted a Spot by mistake? Tap the undo toast to bring it back (not on web)
+
+MAP DISPLAY & SYMBOLS
+• Dike symbol: a new map symbol for the dike planar feature type
+• Symbol labels: label map symbols with Dip/Plunge/Name
+• UTM coordinates: toggle a UTM coordinate display on the map
+• Colored strat intervals: strat section intervals take on their tag or geologic-unit colors
+
+NOTEBOOK & FORMS
+• Outcrop Summaries: a new notebook page with 1 summary per Spot
+• More Pages menu: reorganized into five clearer sections
+• Surface-feature detail: added quality and notes fields
+
+PHOTOS & SKETCHING
+• Save sketches your way: save a sketch over an image as a copy or an update, with a heads-up before you overwrite
+• Zoom & pan while sketching: pinch to zoom and drag to pan when drawing on an image
+
+LISTS & SEARCH
+• Powerful search & filters: a shared search bar with grouped multi-select filters for Spots and Tags
+• Live map extent lists: your lists update automatically as you move the map — no button to press
+• Inspect Raw Data: expanded by default, and now available on web
+
+MEASUREMENTS
+• Measurement mode that sticks: your manual vs. compass preference now syncs and is remembered
+
+BACKUP, SYNC & OFFLINE
+• Auto-save: saves your work automatically alongside manual backup, with adjustable frequencies and countdown timers
+• Backup status: a status screen and status-bar icons show what's pending, with Save Now button
+• Offline profile sync: your profile syncs even after you've been offline
+
+ACCOUNTS & SIGN-IN
+• Forgot Password: reset your password right from the sign-in screen
+• Session handling: prompts you to sign back in when your session expires instead of failing silently
+
 Thanks for using StraboSpot!
