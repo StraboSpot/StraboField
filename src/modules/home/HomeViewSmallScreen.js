@@ -17,7 +17,7 @@ import {useWindowSize} from '../../shared/ui/useWindowSize';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import MapContainer from '../maps/MapContainer';
 import {canceledIntervalDrag} from '../maps/maps.slice';
-import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
+import OfflineMapPreviewBanner from '../maps/offline-maps/OfflineMapPreviewBanner';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import BackupStatusIcons from '../project/backup/BackupStatusIcons';
@@ -196,7 +196,7 @@ const HomeViewSmallScreen = forwardRef(({
                   />
                 </View>
 
-                <OfflineMapLabel/>
+                <OfflineMapPreviewBanner/>
                 <VersionCheckLabel/>
               </>
             }

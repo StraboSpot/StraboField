@@ -12,7 +12,7 @@ import {
 } from '../../modules/home/home.slice';
 import {stripMapboxTokenFromCustomMaps} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
-import {addedMapsFromDevice} from '../../modules/maps/offline-maps/offlineMaps.slice';
+import {setOfflineMapsFromImport} from '../../modules/maps/offline-maps/offlineMaps.slice';
 import {addedDatasets, addedProject, setActiveDatasets} from '../../modules/project/projects.slice';
 import {addedSpotsFromDevice} from '../../modules/spots/spots.slice';
 import {isEmpty} from '../../shared/helpers';
@@ -78,7 +78,7 @@ const useImport = () => {
       dispatch(addedStatusMessage('Moving Maps...'));
       progress = await moveFiles(dataFile);
       console.log('fileCount', progress);
-      dispatch(addedMapsFromDevice({mapType: 'offlineMaps', maps: mapNamesDb}));
+      dispatch(setOfflineMapsFromImport(mapNamesDb));
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('---------------------'));
       dispatch(addedStatusMessage(`Map tiles imported: ${progress?.fileCount || 0}`));

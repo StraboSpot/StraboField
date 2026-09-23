@@ -10,6 +10,7 @@ import {Provider} from 'react-redux';
 import {PersistGate} from 'redux-persist/integration/react';
 
 import installGlyphs from './src/modules/maps/glyphs/installGlyphs';
+import {clearedOfflineMapPreview} from './src/modules/maps/offline-maps/offlineMaps.slice';
 import ConnectionStatus from './src/modules/status-bar/ConnectionStatus';
 import ProfileSyncListener from './src/modules/user/ProfileSyncListener';
 import Routes from './src/routes/Routes';
@@ -82,6 +83,13 @@ const linking = Platform.OS !== 'web' && {
 // persistor.purge(); // Use this to clear persistStore completely
 
 
+// Runs after rehydration, before anything renders. An offline map preview is persisted while the basemap behind
+// it is rebuilt live at launch, so one left open at quit would come back labelling a map that is not previewed.
+const onBeforeLift = async () => {
+  store.dispatch(clearedOfflineMapPreview());
+  await installGlyphs();
+};
+
 const App = () => {
 
   if (Platform.OS === 'web' && !didInit) {
@@ -96,7 +104,7 @@ const App = () => {
       <SafeAreaView style={uiStyles.container}>
         <Provider store={store}>
           <ToastWrapper>
-            <PersistGate loading={null} onBeforeLift={installGlyphs} persistor={persistor}>
+            <PersistGate loading={null} onBeforeLift={onBeforeLift} persistor={persistor}>
               {/*<Sentry.TouchEventBoundary>*/}
               {!SMALL_SCREEN && <StatusBar hidden/>}
               <ConnectionStatus/>
