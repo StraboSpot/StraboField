@@ -92,7 +92,6 @@ const useDevice = () => {
   const deleteOfflineMap = async (map) => {
     let mapID = map.id;
     console.log(`Deleting Map, ${map.name}, with ID of ${map.id} Here`);
-    mapID === 'mapwarper' ? map.name : map.id;
     // Mapbox Styles map ids are 'username/styleId', but tiles are cached under the styleId only
     // (see getTileFolderName). Offline maps carry source 'direct from filesystem', not 'mapbox_styles',
     // so key off the '/' in the id to strip the account prefix and avoid orphaning the cached tiles.
