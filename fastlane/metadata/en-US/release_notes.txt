@@ -13,7 +13,6 @@ COMPASS
 • Compass over template: a fresh compass reading now takes priority over an active template
 
 MEASUREMENTS
-• Hide from map: hide individual measurements from the map
 • Bulk strike/dip: calculate missing strikes and dip directions for every record that holds a plane
 • Steadier validation: planar+linear and 3D-structure measurements are checked and hinted more reliably
 

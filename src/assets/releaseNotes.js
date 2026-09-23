@@ -10,6 +10,13 @@
 // bolded in the modal), and `commit` is the short hash of the representative commit so users can open
 // it on GitHub. A feature that spans several commits just points at its main one.
 //
+// Two optional item fields steer the store notes built by scripts/release-notes.js (the modal ignores them):
+//   - `play`: a short blurb that marks the item as a Google Play highlight. Play's 500-char cap only
+//     fits a handful, so when any release in range has `play` items, only those are listed there
+//     (feature releases first) and the rest fold into a "Plus more fixes" line.
+//   - `platforms`: e.g. ['ios'] or ['web'] for platform-specific items; they are left out of the other
+//     platform's store notes.
+//
 // Add a new entry to the TOP for each public release. `version` must match the string in package.json
 // once that release ships. An empty `groups` array renders "No user-facing highlights".
 
@@ -33,9 +40,18 @@ const RELEASE_NOTES = [
             text: 'Live form validation: errors show as you type and Save stays disabled until they\'re fixed',
             commit: '4c79a313f',
           },
-          {text: 'Find the problem field: the tab holding an unanswered field is marked so you know where to look', commit: 'cdcf10eb1'},
-          {text: 'Auto dip direction: entering a strike fills in the matching dip direction wherever you type one', commit: '3daf75261'},
-          {text: 'Negative numbers on iOS: type negative values, with a keyboard matched to the field', commit: '37f4bd19b'},
+          {
+            text: 'Find the problem field: the tab holding an unanswered field is marked so you know where to look',
+            commit: 'cdcf10eb1',
+          },
+          {
+            text: 'Auto dip direction: entering a strike fills in the matching dip direction wherever you type one',
+            commit: '3daf75261',
+          },
+          {
+            text: 'Negative numbers on iOS: type negative values, with a keyboard matched to the field',
+            commit: '37f4bd19b',
+          },
         ],
       },
       {
@@ -49,24 +65,32 @@ const RELEASE_NOTES = [
             text: 'Declination without GPS: falls back through your project location and nearby Spots to stay corrected, with clearer warnings when it can\'t',
             commit: 'cbf505d88',
           },
-          {text: 'Compass over template: a fresh compass reading now takes priority over an active template', commit: 'e8935e8ae'},
+          {
+            text: 'Compass over template: a fresh compass reading now takes priority over an active template',
+            commit: 'e8935e8ae',
+          },
         ],
       },
       {
         title: 'Measurements',
         items: [
-          {text: 'Hide from map: hide individual measurements from the map', commit: '52da123ae'},
           {
             text: 'Bulk strike/dip: calculate missing strikes and dip directions for every record that holds a plane',
             commit: 'f851e2dbd',
           },
-          {text: 'Steadier validation: planar+linear and 3D-structure measurements are checked and hinted more reliably', commit: '52a0b2c2d'},
+          {
+            text: 'Steadier validation: planar+linear and 3D-structure measurements are checked and hinted more reliably',
+            commit: '52a0b2c2d',
+          },
         ],
       },
       {
         title: 'Tags',
         items: [
-          {text: 'Memos on tags: add, remove, count, and list a tag\'s memos from its detail page', commit: '0075f7468'},
+          {
+            text: 'Memos on tags: add, remove, count, and list a tag\'s memos from its detail page',
+            commit: '0075f7468',
+          },
           {text: 'Cleaner tag counts: a tag\'s counts show as icon chips instead of a legend', commit: '336086e36'},
           {text: 'Sample tagging: only samples that have their own Spot can be tagged', commit: '74bd5d3af'},
         ],
@@ -75,7 +99,10 @@ const RELEASE_NOTES = [
         title: 'Memos',
         items: [
           {text: 'Memo authorship: memos record who wrote them and when', commit: '7c50d6792'},
-          {text: 'Associated samples: link samples to a memo, including legacy samples, from the Memo modal', commit: '621c63738'},
+          {
+            text: 'Associated samples: link samples to a memo, including legacy samples, from the Memo modal',
+            commit: '621c63738',
+          },
           {text: 'Memos in Overview: a Spot\'s memos now show in its notebook Overview', commit: 'f2c4ec72b'},
         ],
       },
@@ -94,8 +121,14 @@ const RELEASE_NOTES = [
             text: 'Remembered sort: each list keeps its sort order and reverse sort, applied before the first paint',
             commit: '43fe4b115',
           },
-          {text: 'Active dataset names: lists name the active datasets at the top, with a shortcut to open Datasets', commit: '4da0e2c21'},
-          {text: 'Map filter for Spots: filter Spots by whether they\'re on the geographic map or not mapped', commit: '7cddc4a4d'},
+          {
+            text: 'Active dataset names: lists name the active datasets at the top, with a shortcut to open Datasets',
+            commit: '4da0e2c21',
+          },
+          {
+            text: 'Map filter for Spots: filter Spots by whether they\'re on the geographic map or not mapped',
+            commit: '7cddc4a4d',
+          },
         ],
       },
       {
@@ -111,8 +144,14 @@ const RELEASE_NOTES = [
       {
         title: 'Strat sections',
         items: [
-          {text: 'Image overlays: set up, save, and draw image overlays under a strat section in the right order', commit: '521f1f1ec'},
-          {text: 'Open with intervals: opening a section activates the datasets holding its intervals', commit: '6252cf94b'},
+          {
+            text: 'Image overlays: set up, save, and draw image overlays under a strat section in the right order',
+            commit: '521f1f1ec',
+          },
+          {
+            text: 'Open with intervals: opening a section activates the datasets holding its intervals',
+            commit: '6252cf94b',
+          },
         ],
       },
       {
@@ -120,20 +159,29 @@ const RELEASE_NOTES = [
         items: [
           {text: 'Steadier SESAR: improved login and token handling for IGSN registration', commit: '340bbda00'},
           {text: 'Safer saves: Save is disabled when SESAR registration can\'t go through', commit: 'eed4069c7'},
-          {text: 'Correct sample location: a sample from an image-basemap Spot gets a real-world location', commit: 'c8bf57cce'},
+          {
+            text: 'Correct sample location: a sample from an image-basemap Spot gets a real-world location',
+            commit: 'c8bf57cce',
+          },
         ],
       },
       {
         title: 'Shortcuts',
         items: [
           {text: 'Straight to the Notebook: each shortcut opens its new Spot in the Notebook', commit: 'f23e9d0b8'},
-          {text: 'No empty Spots: canceling a photo or sketch no longer leaves an empty Spot behind', commit: 'c260154ca'},
+          {
+            text: 'No empty Spots: canceling a photo or sketch no longer leaves an empty Spot behind',
+            commit: 'c260154ca',
+          },
         ],
       },
       {
         title: 'Maps',
         items: [
-          {text: 'Accurate Spot placement: a Spot lands on the map it was set in, sized to the view', commit: 'a3956a1b2'},
+          {
+            text: 'Accurate Spot placement: a Spot lands on the map it was set in, sized to the view',
+            commit: 'a3956a1b2',
+          },
           {text: 'Remembered map view: the map view is saved once the camera settles', commit: 'ae29924cc'},
           {text: 'Single name label: a Spot with multiple measurements draws its name label once', commit: '28772ecd6'},
         ],
@@ -142,8 +190,14 @@ const RELEASE_NOTES = [
         title: 'Small touches',
         items: [
           {text: 'Copied Spots: a copied Spot gets its own feature ids', commit: '4bc897794'},
-          {text: 'Mineral lookup: mineral data you already entered is kept when a mineral is looked up', commit: '25b763f5c'},
-          {text: 'Project visibility: an owner\'s project is listed again once its collaboration is halted', commit: '3cde7a4b4'},
+          {
+            text: 'Mineral lookup: mineral data you already entered is kept when a mineral is looked up',
+            commit: '25b763f5c',
+          },
+          {
+            text: 'Project visibility: an owner\'s project is listed again once its collaboration is halted',
+            commit: '3cde7a4b4',
+          },
         ],
       },
     ],
@@ -154,7 +208,11 @@ const RELEASE_NOTES = [
       {
         title: 'Stability',
         items: [
-          {text: 'Fewer crashes: fixed iOS crashes that could occur when switching between modal screens', commit: '94e61003c'},
+          {
+            text: 'Fewer crashes: fixed iOS crashes that could occur when switching between modal screens',
+            commit: '94e61003c',
+            platforms: ['ios'],
+          },
         ],
       },
     ],
@@ -165,7 +223,11 @@ const RELEASE_NOTES = [
       {
         title: 'Compass',
         items: [
-          {text: 'Works without GPS: uses magnetic declination on devices with no GPS fix', commit: 'd645effd7'},
+          {
+            text: 'Works without GPS: uses magnetic declination on devices with no GPS fix',
+            commit: 'd645effd7',
+            play: 'Compass works without GPS',
+          },
           {text: 'Hold-aware readings: trend/plunge adjust for landscape and tablet orientation', commit: 'bf0a6c903'},
           {
             text: 'Clearer calibration: improved calibration alerts and more consistent behavior across platforms',
@@ -242,6 +304,7 @@ const RELEASE_NOTES = [
           {
             text: 'Richer Samples: Samples can now hold images, measurements, and more — just like Spots — with a gold border and banner, visible in nesting, and taggable',
             commit: 'e1816cd9a',
+            play: 'Richer Samples: add photos, measurements, tags & geologic units',
           },
           {
             text: 'Add Sample screen: attach images and assign geologic units right when you create a sample',
@@ -250,6 +313,7 @@ const RELEASE_NOTES = [
           {
             text: 'IGSN registration: updated registration UI, with a Get IGSN button and an upload progress bar',
             commit: '25dadd71b',
+            play: 'IGSN: register in-app with progress & SESAR update prompts',
           },
           {
             text: 'Keep IGSNs in sync: prompts to update SESAR when relevant fields change, with a View IGSN Data link and offline warnings',
@@ -260,9 +324,13 @@ const RELEASE_NOTES = [
       {
         title: 'Now on the web',
         items: [
-          {text: 'Freehand drawing: draw freehand lines and polygons in the web app', commit: 'd07c52a44'},
-          {text: 'Stereonet lasso: lasso-select measurements for Stereonet', commit: '55104cf1c'},
-          {text: 'Export & import: tags, geologic units, and templates', commit: '508f52e77'},
+          {
+            text: 'Freehand drawing: draw freehand lines and polygons in the web app',
+            commit: 'd07c52a44',
+            platforms: ['web'],
+          },
+          {text: 'Stereonet lasso: lasso-select measurements for Stereonet', commit: '55104cf1c', platforms: ['web']},
+          {text: 'Export & import: tags, geologic units, and templates', commit: '508f52e77', platforms: ['web']},
         ],
       },
       {
@@ -272,7 +340,11 @@ const RELEASE_NOTES = [
             text: 'Freehand vertex spacing: control how closely points are placed when you draw freehand lines and polygons',
             commit: '243d8d7b1',
           },
-          {text: 'Extend a line: drag out a new endpoint to make an existing line longer', commit: '1614fecb8'},
+          {
+            text: 'Extend a line: drag out a new endpoint to make an existing line longer',
+            commit: '1614fecb8',
+            play: 'Maps: extend lines & pick overlapping Spots',
+          },
           {
             text: 'Overlapping Spot picker: when several Spots sit under your tap, choose exactly which one to select',
             commit: '35378aa7e',
@@ -288,7 +360,11 @@ const RELEASE_NOTES = [
         items: [
           {text: 'Dike symbol: a new map symbol for the dike planar feature type', commit: '24feb05e5'},
           {text: 'Symbol labels: label map symbols with Dip/Plunge/Name', commit: 'd0e63d42e'},
-          {text: 'UTM coordinates: toggle a UTM coordinate display on the map', commit: 'f402b9b95'},
+          {
+            text: 'UTM coordinates: toggle a UTM coordinate display on the map',
+            commit: 'f402b9b95',
+            play: 'UTM display, dike symbol & Dip/Plunge/Name labels',
+          },
           {
             text: 'Colored strat intervals: strat section intervals take on their tag or geologic-unit colors',
             commit: '819850e22',
@@ -301,6 +377,7 @@ const RELEASE_NOTES = [
           {
             text: 'Outcrop Summaries: a new notebook page with 1 summary per Spot',
             commit: 'bc1109ffc',
+            play: 'Outcrop Summaries page, undo Spot delete, better search & filters',
           },
           {text: 'More Pages menu: reorganized into five clearer sections', commit: 'df87b5b69'},
           {
@@ -315,6 +392,7 @@ const RELEASE_NOTES = [
           {
             text: 'Save sketches your way: save a sketch over an image as a copy or an update, with a heads-up before you overwrite',
             commit: '7832c1b9f',
+            play: 'Sketch: zoom/pan and save as a copy',
           },
           {
             text: 'Zoom & pan while sketching: pinch to zoom and drag to pan when drawing on an image',
@@ -351,6 +429,7 @@ const RELEASE_NOTES = [
           {
             text: 'Auto-save: saves your work automatically alongside manual backup, with adjustable frequencies and countdown timers',
             commit: '613d9220f',
+            play: 'Auto-save with a backup status screen',
           },
           {
             text: 'Backup status: a status screen and status-bar icons show what\'s pending, with Save Now button',
