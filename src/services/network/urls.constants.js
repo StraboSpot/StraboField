@@ -53,6 +53,14 @@ export const MICRO_PATHS = {
   WEB_PROJECT: microDB + '/webProject',
 };
 
+// StraboSamples
+const samplesDB = '/samplesdb';
+
+export const SAMPLES_PATHS = {
+  MY_SAMPLES: samplesDB + '/mysamples/',
+  SAMPLE: samplesDB + '/sample/',
+};
+
 export const SESAR_PATHS = {
   GET_TOKEN: '/get_token.php',
   REFRESH_TOKEN: '/refresh_token.php',

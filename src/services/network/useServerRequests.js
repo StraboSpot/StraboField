@@ -10,7 +10,7 @@ import {
   postRequest,
   timeoutPromise,
 } from './serverRequests.helpers';
-import {MACROSTRAT_PATHS, MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
+import {MACROSTRAT_PATHS, MICRO_PATHS, ORCID_PATHS, SAMPLES_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
 import {userAgent} from './userAgent.constants';
 import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
 import alert from '../../shared/ui/alert';
@@ -126,6 +126,13 @@ const useServerRequests = () => {
 
   const getMyMicroProjects = () => getRequest(`${domain}${MICRO_PATHS.MY_PROJECTS}`, basicAuth());
 
+  // The samples API sits beside /db on the same server, so a custom endpoint gets it too
+  const getSamplesBaseUrl = () => baseUrl.replace(/\/db\/?$/, '');
+
+  // Leave out the samples already in Field, so only the Micro and Experimental samples are offered to link
+  const getMySamples = () => getRequest(
+    `${getSamplesBaseUrl()}${SAMPLES_PATHS.MY_SAMPLES}?omit=field&include_subsystem_flags=1`, basicAuth());
+
   const getMyProjects = () => getRequest(`${baseUrl}/myProjects`, basicAuth());
 
   const getOrcidToken = async () => {
@@ -156,6 +163,9 @@ const useServerRequests = () => {
 
   const getProject = (projectId, encodedLogin) =>
     getRequest(`${baseUrl}/project/${projectId}`, basicAuth(encodedLogin));
+
+  const getStraboSample = id =>
+    getRequest(`${getSamplesBaseUrl()}${SAMPLES_PATHS.SAMPLE}${encodeURIComponent(id)}`, basicAuth());
 
   const getSesarToken = async (orcidToken) => {
     const formData = new FormData();
@@ -287,12 +297,14 @@ const useServerRequests = () => {
     getMyMapsBbox,
     getMyMicroProjects,
     getMyProjects,
+    getMySamples,
     getOrcidToken,
     getProfile,
     getProfileImage,
     getProfileImageURL,
     getProject,
     getSesarToken,
+    getStraboSample,
     getSesarUserCode,
     getTileBaseUrl,
     getTilesFromHost,

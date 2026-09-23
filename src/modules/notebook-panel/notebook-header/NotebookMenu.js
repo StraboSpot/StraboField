@@ -16,6 +16,7 @@ import WarningModal from '../../../shared/ui/modals/WarningModal';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import LinkSampleModal from '../../samples/LinkSampleModal';
 import useSamples from '../../samples/useSamples';
 import useSpots from '../../spots/useSpots';
 import {setInitialSesarState} from '../../user/userProfile.slice';
@@ -50,6 +51,7 @@ const NotebookMenu = ({
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
+  const [isLinkSampleModalVisible, setIsLinkSampleModalVisible] = useState(false);
   const [isRockdModalVisible, setIsRockdModalVisible] = useState(false);
 
   /* Derived Variables */
@@ -59,6 +61,7 @@ const NotebookMenu = ({
     ...(!isSample && !isEmpty(targetDatasetId) ? [{key: 'copy', title: `Copy this ${type}`}] : []),
     {key: 'zoom', title: `Zoom to this ${type}`},
     {key: 'delete', title: `Delete this ${type}`},
+    ...(isSample ? [{key: 'linkSample', title: 'Link Sample'}] : []),
     {key: 'geography', title: 'Show Geography'},
     {key: 'metadata', title: 'Show Metadata'},
     {key: 'nesting', title: 'Show Nesting'},
@@ -86,6 +89,11 @@ const NotebookMenu = ({
     else if (key === 'nesting') dispatch(setNotebookPageVisible(PAGE_KEYS.NESTING));
     else if (key === 'geography') dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY));
     else if (key === 'metadata') dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA));
+    else if (key === 'linkSample') {
+      closeNotebookMenu();
+      // iOS drops a modal presented while another is still dismissing
+      setTimeout(() => setIsLinkSampleModalVisible(true), 400);
+    }
     else if (key === 'rockd') {
       closeNotebookMenu();
       setIsRockdModalVisible(true);
@@ -119,7 +127,7 @@ const NotebookMenu = ({
   /* Render Functions */
 
   const renderActionItem = ({item}) => {
-    if (isReadOnly && ['delete', 'copy'].includes(item.key)) return;
+    if (isReadOnly && ['delete', 'copy', 'linkSample'].includes(item.key)) return;
     // A copy keeps image_basemap/strat_section_id, so it would be a new Spot on a read only map
     else if (item.key === 'copy' && isSpotOnReadOnlyMap(spot)) return;
     else if (item.key === 'rockd' && !isTestingMode
@@ -182,6 +190,10 @@ const NotebookMenu = ({
       >
         {renderDeleteMessage()}
       </WarningModal>
+      <LinkSampleModal
+        closeModal={() => setIsLinkSampleModalVisible(false)}
+        isVisible={isLinkSampleModalVisible}
+      />
       <RockdModal
         closeModal={() => setIsRockdModalVisible(false)}
         isVisible={isRockdModalVisible}

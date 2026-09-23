@@ -1,20 +1,29 @@
 import * as turf from '@turf/turf';
 import {useToast} from 'react-native-toast-notifications';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
+import {getLinkedSample, getSampleMetadata, getUnlinkedSample} from './samples.helpers';
 import {isEmpty} from '../../shared/helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {addedNewSpotIdToDataset, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {isOnGeoMap} from '../spots/spots.helpers';
-import {clearedSelectedSpots, editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
+import {
+  clearedSelectedSpots,
+  editedOrCreatedSpot,
+  editedSpotProperties,
+  setSelectedAttributes,
+  setSelectedSpot,
+} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
 const useSamples = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
+  const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const {getTargetDatasetFromId} = useProject();
   const {deleteSpot, getRootSpotGeoCoords} = useSpots();
@@ -36,6 +45,24 @@ const useSamples = () => {
     if (isEmpty(parentSpot.geometry)) return undefined;
     return parentSpot.geometry.type === 'Point' || parentSpot.geometry.type === 'LineString' ? parentSpot.geometry
       : turf.centroid(parentSpot).geometry;
+  };
+
+  // Replace the selected sample's record: the one a rich sample holds, or the one open on its parent Spot
+  const saveSelectedSample = (editedSample) => {
+    if (selectedSpot.properties.isSample) {
+      dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: [editedSample]}));
+      // A Sample Spot is named after its sample, as when the sample form is saved
+      if (editedSample.sample_id_name && selectedSpot.properties.name !== editedSample.sample_id_name) {
+        dispatch(editedSpotProperties({field: 'name', value: editedSample.sample_id_name}));
+      }
+    }
+    else {
+      const samples = (selectedSpot.properties[PAGE_KEYS.SAMPLES] || [])
+        .map(s => s.id === editedSample.id ? editedSample : s);
+      dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: samples}));
+      dispatch(setSelectedAttributes([editedSample]));
+    }
+    dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot.properties.id]));
   };
 
   /* Exported Functions */
@@ -91,6 +118,14 @@ const useSamples = () => {
     return newEnrichedSample;
   };
 
+  // The selected sample's record, whether it is a rich sample or a sample kept on its parent Spot
+  const getSelectedSample = () => selectedSpot.properties?.isSample ? getSampleMetadata(selectedSpot)
+    : selectedAttributes?.[0];
+
+  const linkSample = strabosample => saveSelectedSample(getLinkedSample(getSelectedSample(), strabosample));
+
+  const unlinkSample = () => saveSelectedSample(getUnlinkedSample(getSelectedSample()));
+
   const deleteRichSample = (sampleToDelete, parentSpot) => {
     console.log('Deleting Sample', sampleToDelete, 'from Spot', parentSpot);
     if (parentSpot) {
@@ -114,6 +149,9 @@ const useSamples = () => {
   return {
     createRichSample,
     deleteRichSample,
+    getSelectedSample,
+    linkSample,
+    unlinkSample,
   };
 };
 
