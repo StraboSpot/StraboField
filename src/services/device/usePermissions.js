@@ -34,8 +34,10 @@ const PERMISSION_CONFIG = {
 const usePermissions = () => {
   /* Internal Functions */
 
-  // Runs the check -> request -> alert flow for a semantic feature. Returns true if usable.
-  const requestPermissionForFeature = async (feature) => {
+  // Runs the check -> request -> alert flow for a semantic feature. Returns true if usable. Pass
+  // {showBlockedAlert: false} for a background check that should stay silent when the permission is blocked
+  // or unavailable and the caller has its own fallback (e.g. resolving declination without live GPS).
+  const requestPermissionForFeature = async (feature, {showBlockedAlert = true} = {}) => {
     const config = PERMISSION_CONFIG[feature];
     if (!config) throw Error(`Unknown permission feature: ${feature}`);
 
@@ -48,8 +50,8 @@ const usePermissions = () => {
     let status = await check(permission);
     if (status === RESULTS.DENIED) status = await request(permission);
     if (status === RESULTS.GRANTED || status === RESULTS.LIMITED) return true;
-    if (status === RESULTS.BLOCKED) alert(...config.blocked);
-    else if (status === RESULTS.UNAVAILABLE) alert(...config.unavailable);
+    if (showBlockedAlert && status === RESULTS.BLOCKED) alert(...config.blocked);
+    else if (showBlockedAlert && status === RESULTS.UNAVAILABLE) alert(...config.unavailable);
     return false;
   };
 
@@ -57,7 +59,7 @@ const usePermissions = () => {
 
   const hasCameraPermission = () => requestPermissionForFeature('camera');
 
-  const hasLocationPermission = () => requestPermissionForFeature('location');
+  const hasLocationPermission = options => requestPermissionForFeature('location', options);
 
   const hasStoragePermission = () => requestPermissionForFeature('storage');
 

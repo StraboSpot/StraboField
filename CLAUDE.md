@@ -24,7 +24,8 @@ Guidance for Claude Code when working in this repository.
   hand-write the changelog. See [Release Process](#release-process-rc--master).
 - **Package manager is Yarn 4.13.0** (install with `yarn`); npm-script names below run fine via `npm run` or `yarn`.
 - **Ids: UUIDs inside `spot.properties`, numbers only for the server's keys** — never lengthen `getNewId`'s output
-  and never do arithmetic on an id. See the Ids paragraph under [Architecture](#architecture).
+  and never do arithmetic on an id. Samples are the one exception: a sample id is also a Spot id, so it stays
+  numeric. See the Ids paragraph under [Architecture](#architecture).
 - **CLAUDE.md is auto-edited on commit** by `scripts/update-claude-md.js` (module count + dep versions). Keep the anchor
   lines it matches intact — see the Architecture/Dependencies sections.
 
@@ -182,6 +183,13 @@ server treats those as an opaque blob. `getNewId()` (a number) **only** for what
 project and image ids, which cannot change without a coordinated backend migration. `getNewId` must never get longer
 either: past `Number.MAX_SAFE_INTEGER` JavaScript drops an integer's low digits and two different ids compare equal.
 It is a millisecond timestamp × 10 that steps past the last id issued, so a burst of mints cannot collide.
+
+**Samples are the exception inside `spot.properties`, and their numeric id is correct — don't "fix" it.** A sample id
+*is* a Spot id: `createRichSample` in `samples/useSamples.js` promotes every sample into its own Spot reusing the
+sample's id as `properties.id`, then registers it with `addedNewSpotIdToDataset`. Both save paths in
+`useSampleModal.js` and the legacy conversion in `NotebookFooter.js` go through it, so the id is always one of the
+server's keys. The parent Spot keeps only a `{id}` stub in `properties.samples`, and that id is the entire parent/child
+linkage — `useNesting.js` resolves the child as `spots[sampleId]` and `getSpotWithThisSample` walks back the other way.
 
 Records already in the field keep their old numeric ids, so ids are permanently mixed. That needs no coercion by itself
 — an id's type is stable per record — but **never do arithmetic on an id**: sorting tags by `b.id - a.id` silently

@@ -24,8 +24,9 @@ const useMapLocation = () => {
     createRandomSpots(feature, numRandomSpots);
   };
 
-  // Get the current location from the device and set it in the state
-  const getCurrentLocation = async () => {
+  // Get the current location from the device and set it in the state. Pass {showBlockedAlert: false} when the
+  // caller has its own fallback for a missing fix and shouldn't surface the Settings alert (declination resolution).
+  const getCurrentLocation = async ({showBlockedAlert = true} = {}) => {
     if (Platform.OS === 'web') {
       return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
@@ -44,7 +45,7 @@ const useMapLocation = () => {
 
     // Native (iOS + Android): verify permission up front so a denial shows the
     // Settings alert from usePermissions rather than failing silently in the geolocation call.
-    const permissionGranted = await hasLocationPermission();
+    const permissionGranted = await hasLocationPermission({showBlockedAlert});
     if (!permissionGranted) throw new Error('Location permission not granted');
 
     const geolocationOptions = {

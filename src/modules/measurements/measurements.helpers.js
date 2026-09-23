@@ -28,11 +28,6 @@ export const getMeasurementsBySection = (orientationData) => {
 export const getMeasurementsInSectionOrder = orientationData => Object.values(
   getMeasurementsBySection(orientationData)).flat();
 
-// The measurements a Spot draws on the map. What the map draws and what the map symbols menu offers a toggle
-// for have to agree, so both ask here rather than each testing the flag.
-export const getVisibleMeasurements = orientationData => (orientationData || []).filter(
-  meas => !meas?.isHiddenOnMap);
-
 // The descriptive half of a measurement's title - what kind of feature it is, without the orientation numbers,
 // which are read off the measurement at render time so they follow the user's measurement convention.
 // getLabel is passed in because a plain helper cannot call useForm.
