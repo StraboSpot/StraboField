@@ -4,7 +4,7 @@ import {ActivityIndicator, Linking, ScrollView, Text, View} from 'react-native';
 import {Icon, Image} from '@rn-vui/base';
 import Animated, {useAnimatedStyle, useSharedValue, withSpring} from 'react-native-reanimated';
 import {useToast} from 'react-native-toast-notifications';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {formatContentItems} from './igsn.helpers';
 import IGSNModalStyles from './IGSNModal.styles';
@@ -32,6 +32,7 @@ import {
 const StepRow = ({label, status}) => {
   const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
+
 
   useEffect(() => {
     if (status === 'done' || status === 'error') {
@@ -89,6 +90,7 @@ const IGSNModal = forwardRef(({
   const {initializeUpload} = useUpload();
   const {getSesarToken} = useServerRequests();
   const toast = useToast();
+  const store = useStore();
 
   const {sesar} = useSelector(state => state.user);
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
@@ -212,6 +214,7 @@ const IGSNModal = forwardRef(({
         console.log('SESAR TOKEN', tokens);
         dispatch(setSesarToken(tokens));
       }
+      tokens = store.getState().user.sesar.sesarToken;
       if (tokens.access) {
         tokens = await authenticateWithSesar(tokens);
         if (!tokens?.access) {

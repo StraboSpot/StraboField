@@ -65,12 +65,12 @@ const userProfileSlice = createSlice({
       state.sesar.selectedUserCode = action.payload;
     },
     setSesarToken(state, action) {
-      const {access, refresh} = action.payload;
+      const {access, refresh} = action.payload.data;
       state.sesar.sesarToken.access = access;
       state.sesar.sesarToken.refresh = refresh;
     },
     setSesarUserCodes(state, action) {
-      state.sesar.userCodes = action.payload;
+      state.sesar.userCodes = action.payload.data;
     },
     setUserData(state, action) {
       Object.assign(state, {...state, ...action.payload});
