@@ -2,12 +2,13 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {BASEMAPS} from './maps.constants';
 import {isDrawMode} from './maps.helpers';
-import {setCurrentBasemap} from './maps.slice';
+import {setCurrentBasemap, updateCustomMap} from './maps.slice';
 import useMapURL from './useMapURL';
 import useMapCoords from './view/useMapCoords';
 import {STRABO_APIS} from '../../services/network/urls.constants';
 import useServerRequests from '../../services/network/useServerRequests';
 import {openedMessageModal} from '../home/home.slice';
+import {updatedProject} from '../project/projects.slice';
 
 const useMap = () => {
   /* Data Hooks */
@@ -19,6 +20,22 @@ const useMap = () => {
   const {getMyMapsBboxCoords} = useMapCoords();
   const {buildStyleURL} = useMapURL();
   const {getTileBaseUrl} = useServerRequests();
+
+  /* Internal Functions */
+
+  // An extent is fetched once and then kept with the map rather than only with this view of it. It is what zooming
+  // to the map reads, and what its thumbnail is taken from, and the server need not be asked again on every use.
+  // Written here rather than through useCustomMap's updateMap, which cannot be reached from this hook - useCustomMap
+  // is the one that depends on this one.
+  const storeCustomMapBbox = (mapId, bbox) => {
+    const customMap = customMaps[mapId];
+    if (!customMap || customMap.bbox === bbox) return;
+    console.log('Storing bbox for custom map', mapId, bbox);
+    const updatedCustomMap = {...customMap, bbox: bbox};
+    dispatch(updateCustomMap(updatedCustomMap));
+    dispatch(updatedProject(
+      {field: 'other_maps', value: Object.values({...customMaps, [mapId]: updatedCustomMap})}));
+  };
 
   /* Exported Functions */
 
@@ -46,7 +63,10 @@ const useMap = () => {
           newBasemap = {...newBasemap, ...styleURLObj};
           if (!customDatabaseEndpoint.isSelected) {
             bbox = await getMyMapsBboxCoords(newBasemap);
-            if (bbox) newBasemap = {...newBasemap, bbox: bbox};
+            if (bbox) {
+              newBasemap = {...newBasemap, bbox: bbox};
+              storeCustomMapBbox(mapId, bbox);
+            }
           }
         }
         else {

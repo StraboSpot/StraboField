@@ -20,6 +20,7 @@ const ActionButtonsSmallScreen = ({
                                     onEndDrawPressed,
                                     selectingMode,
                                     toggleDialog,
+                                    zoomToCustomMap,
                                   }) => {
   /* View */
 
@@ -54,6 +55,7 @@ const ActionButtonsSmallScreen = ({
               dialogClickHandler={dialogClickHandler}
               dialogs={dialogs}
               toggleDialog={toggleDialog}
+              zoomToCustomMap={zoomToCustomMap}
             />
           </View>
           {hasDrawTools && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}

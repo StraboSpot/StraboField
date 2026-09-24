@@ -193,6 +193,7 @@ const HomeViewSmallScreen = forwardRef(({
                     onEndDrawPressed={onEndDrawPressed}
                     selectingMode={selectingMode}
                     toggleDialog={toggleDialog}
+                    zoomToCustomMap={bbox => mapComponentRef?.current?.zoomToCustomMap(bbox)}
                   />
                 </View>
 

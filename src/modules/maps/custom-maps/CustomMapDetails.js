@@ -5,7 +5,7 @@ import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {CUSTOM_MAP_SOURCES, CUSTOM_MAP_TYPES} from './customMaps.constants';
-import {getMapTypeName, normalizeCustomMapId} from './customMaps.helpers';
+import {getMapTypeName, normalizeCustomMapId, stripOverlayDisplaySettings} from './customMaps.helpers';
 import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
@@ -19,8 +19,6 @@ import Loading from '../../../shared/ui/Loading';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
-import SliderBar from '../../../shared/ui/SliderBar';
-import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
 import formStyles from '../../form/form.styles';
 import FormikWrapper from '../../form/FormikWrapper';
 import TextInputField from '../../form/inputs/TextInputField';
@@ -49,10 +47,11 @@ const CustomMapDetails = () => {
 
   /* Derived Variables */
 
-  // Seeded with the whole map, so the keys the form never shows - its url, its stored extent - survive the save
-  const initialCustomMapValues = isEmpty(customMapToEdit)
-    ? {title: '', opacity: 1, overlay: false, id: '', source: ''}
-    : customMapToEdit;
+  // Seeded with the whole map, so the keys the form never shows - its url, its stored extent - survive the save.
+  // Overlay display is the exception: it is switched from the map layers menu while the map is on screen, so a
+  // form opened before that change must not write the settings it was opened with back over it.
+  const initialCustomMapValues = isEmpty(customMapToEdit) ? {title: '', id: '', source: ''}
+    : stripOverlayDisplaySettings(customMapToEdit);
 
   /* Event Handlers */
 
@@ -252,51 +251,6 @@ const CustomMapDetails = () => {
     </View>
   );
 
-  const renderOverlaySection = (formProps) => {
-    // An opacity never set, or saved outside the slider's range, shows as fully opaque
-    const savedOpacity = formProps.values.opacity;
-    const opacity = savedOpacity && typeof savedOpacity === 'number' && savedOpacity >= 0 && savedOpacity <= 1
-      ? savedOpacity : 1;
-    const sliderValuePercent = Math.round(opacity * 100).toFixed(0);
-    return (
-      <>
-        <SectionDivider
-          dividerText={'Overlay Settings'}
-          subtitle={'To save this map as an overlay for offline use first save as a basemap then switch it to an'
-            + ' overlay.'}
-        />
-        <ListItem containerStyle={commonStyles.listItem}>
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>Display as overlay</ListItem.Title>
-          </ListItem.Content>
-          <SwitchWrapper
-            onValueChange={val => formProps.setFieldValue('overlay', val)}
-            value={formProps.values.overlay}
-          />
-        </ListItem>
-        {formProps.values.overlay && (
-          <ListItem containerStyle={commonStyles.listItem}>
-            <ListItem.Content>
-              <ListItem.Title style={commonStyles.listItemTitle}>Opacity</ListItem.Title>
-              <ListItem.Subtitle style={{paddingLeft: 10}}>{sliderValuePercent}%</ListItem.Subtitle>
-            </ListItem.Content>
-            <View style={{flex: 2}}>
-              <SliderBar
-                labels={['5%', '50%', '100%']}
-                maximumValue={1}
-                minimumValue={0.05}
-                onValueChange={val => formProps.setFieldValue('opacity', val)}
-                rotateLabels
-                step={0.05}
-                value={opacity}
-              />
-            </View>
-          </ListItem>
-        )}
-      </>
-    );
-  };
-
   const renderSidePanelHeader = formProps => (
     <SidePanelHeader
       backButton={() => handleBackPress(formProps)}
@@ -336,7 +290,6 @@ const CustomMapDetails = () => {
               style={{flex: 1}}
             >
               {renderTitle()}
-              {renderOverlaySection(formProps)}
               {isEmpty(customMapToEdit) && renderMapTypeList(formProps)}
               {!isEmpty(formProps.values.source) && renderMapDetails(formProps)}
             </ScrollView>

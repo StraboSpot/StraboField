@@ -190,13 +190,13 @@ const useMapsOffline = () => {
     }
   };
 
-  // Start getting the tiles to download by creating a zip url
-  const getMapTiles = async (extentString, downloadZoom) => {
+  // Start getting the tiles to download by creating a zip url. `map` is whichever map is being saved - the
+  // basemap, or an overlay the user picked out of the ones currently drawn over it.
+  const getMapTiles = async (extentString, downloadZoom, map = currentBasemap) => {
     try {
       let layer, id, username;
       let startZipURL = 'unset';
-      let mapKey = currentBasemap.id;
-      const layerSource = currentBasemap.source;
+      const layerSource = map.source;
       const tilehost = STRABO_APIS.TILE_HOST;
       const endpointTilehost = customDatabaseEndpoint.isSelected ? getTileBaseUrl() : tilehost;
 
@@ -205,8 +205,9 @@ const useMapsOffline = () => {
         //configure advanced URL for custom map types here.
         //first, figure out what kind of map we are downloading...
 
-        let downloadMap = {};
-        if (customMaps[mapKey].id === currentBasemap.id) downloadMap = customMaps[mapKey];
+        // The project's copy carries the provider fields, but a map being saved is not always one the project
+        // holds, so fall back to the map itself rather than indexing customMaps and trusting the result.
+        const downloadMap = customMaps[map.id] || map;
 
         console.log('DownloadMap: ', downloadMap);
 
@@ -229,7 +230,7 @@ const useMapsOffline = () => {
         }
       }
       else {
-        layer = currentBasemap.id;
+        layer = map.id;
         startZipURL = endpointTilehost + '/asynczip?layer=' + layer + '&extent=' + extentString + '&zoom=' + downloadZoom;
       }
 
@@ -267,6 +268,24 @@ const useMapsOffline = () => {
     ];
   };
 
+  // A downloaded tile standing in for the map in a list. Which tiles were downloaded is only known from the
+  // directory, so one is picked from it rather than computed from the map's extent: the middle tile of the
+  // deepest zoom, which sits nearest the center of whatever area was downloaded.
+  const getThumbnailTilePath = async (map) => {
+    const tileTemplate = map.sources?.['raster-tiles']?.tiles?.[0];
+    if (!tileTemplate || !APP_DIRECTORIES.ROOT_PATH) return;
+    const entries = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, map.id);
+    if (isEmpty(entries)) return;   // the read reports its own failure and hands back nothing
+    // Anything else sitting in the directory would make every number NaN and name a tile that does not exist
+    const tiles = entries.map(entry => entry.replace('.png', '').split('_').map(Number))
+      .filter(tile => tile.length === 3 && tile.every(Number.isFinite));
+    if (isEmpty(tiles)) return;
+    const zoom = Math.max(...tiles.map(([z]) => z));
+    const tilesAtZoom = tiles.filter(([z]) => z === zoom).sort(([, aX, aY], [, bX, bY]) => aX - bX || aY - bY);
+    const [z, x, y] = tilesAtZoom[Math.floor(tilesAtZoom.length / 2)];
+    return tileTemplate.replace('{z}', z).replace('{x}', x).replace('{y}', y);
+  };
+
   const getSavedMapsFromDevice = async () => {
     try {
       console.count('getSavedMapsFromDevice');
@@ -283,9 +302,9 @@ const useMapsOffline = () => {
     }
   };
 
-  const initializeSaveMap = async (extentString, downloadZoom) => {
+  const initializeSaveMap = async (extentString, downloadZoom, map = currentBasemap) => {
     try {
-      const startZipUrl = await getMapTiles(extentString, downloadZoom);
+      const startZipUrl = await getMapTiles(extentString, downloadZoom, map);
       await saveZipMap(startZipUrl);
       return zipUID;
     }
@@ -295,13 +314,13 @@ const useMapsOffline = () => {
     }
   };
 
-  const moveFiles = async (zipUId) => {
+  const moveFiles = async (zipUId, map = currentBasemap) => {
     fileCount = 0;
     neededTiles = 0;
     notNeededTiles = 0;
     try {
       let result;
-      const mapID = getTileFolderName(currentBasemap.id, currentBasemap.source);
+      const mapID = getTileFolderName(map.id, map.source);
       let folderExists = await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + mapID);
       if (!folderExists) {
         console.log('FOLDER DOESN\'T EXIST! ', APP_DIRECTORIES.TILE_CACHE + mapID);
@@ -317,8 +336,8 @@ const useMapsOffline = () => {
     }
   };
 
-  const moveTile = async (tile, zipID) => {
-    const mapID = getTileFolderName(currentBasemap.id, currentBasemap.source);
+  const moveTile = async (tile, zipID, map = currentBasemap) => {
+    const mapID = getTileFolderName(map.id, map.source);
     let zipId = zipUID ?? zipID;
     fileCount++;
     let fileExists = await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + mapID + '/tiles/' + tile);
@@ -446,6 +465,7 @@ const useMapsOffline = () => {
     getMapTiles,
     getMapTilesBbox,
     getSavedMapsFromDevice,
+    getThumbnailTilePath,
     initializeSaveMap,
     moveFiles,
     moveTile,

@@ -5,7 +5,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
   deleteRequest,
   getRequest,
-  handleResponse,
   postFormDataRequest,
   postRequest,
   timeoutPromise,
@@ -119,10 +118,9 @@ const useServerRequests = () => {
   //
   // };
 
-  const getMyMapsBbox = async (mapUrl) => {
-    const response = await fetch(mapUrl);
-    return handleResponse(response);
-  };
+  // A public endpoint, so no auth - but through getRequest like everything else, for its timeout and the
+  // User-Agent identifying the app.
+  const getMyMapsBbox = mapUrl => getRequest(mapUrl);
 
   const getMyMicroProjects = () => getRequest(`${domain}${MICRO_PATHS.MY_PROJECTS}`, basicAuth());
 

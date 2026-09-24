@@ -1,23 +1,10 @@
-import React, {useEffect, memo} from 'react';
+import React, {memo} from 'react';
 
 import {Layer, Source} from 'react-map-gl/mapbox';
 
-import useMapURL from '../useMapURL';
+import {getOverlayOpacity} from '../custom-maps/customMaps.helpers';
 
-const CustomOverlayLayer = ({customMap}) => {
-  /* Data Hooks */
-
-  const {buildTileURL} = useMapURL();
-
-  /* Side Effects */
-
-  useEffect(() => {
-    return () => {
-      // Cleanup: Log when component unmounts for debugging
-      console.log('CustomMapLayer (web) unmounting for map:', customMap.id);
-    };
-  }, [customMap.id]);
-
+const CustomOverlayLayer = ({customMap, tileUrlTemplate}) => {
   /* View */
 
   // Defensive check to ensure customMap is valid
@@ -30,17 +17,12 @@ const CustomOverlayLayer = ({customMap}) => {
     <Source
       id={customMap.id}
       key={customMap.id}
-      tiles={[buildTileURL(customMap)]}
+      tiles={[tileUrlTemplate]}
       type={'raster'}
     >
       <Layer
-        // beforeId={'pointLayerSelectedHalo'}
         id={customMap.id + 'Layer'}
-        paint={{
-          'raster-opacity': customMap.opacity && parseFloat(customMap.opacity.toString())
-          && parseFloat(customMap.opacity.toString()) >= 0 && parseFloat(customMap.opacity.toString()) <= 1
-            ? parseFloat(customMap.opacity.toString()) : 1,
-        }}
+        paint={{'raster-opacity': getOverlayOpacity(customMap)}}
         type={'raster'}
       />
     </Source>

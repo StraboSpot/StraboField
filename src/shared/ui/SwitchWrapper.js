@@ -10,7 +10,7 @@ import {
   PRIMARY_ACCENT_COLOR_FADED_60,
 } from '../styles.constants';
 
-const SwitchWrapper = ({disabled, onValueChange, value}) => {
+const SwitchWrapper = ({accessibilityLabel, disabled, onValueChange, value}) => {
 
   const systemScheme = useColorScheme();
   const isDarkMode = systemScheme === 'dark';
@@ -25,6 +25,7 @@ const SwitchWrapper = ({disabled, onValueChange, value}) => {
       // and fires that too, opening a detail page from a row the switch is only a part of. Every other
       // pressable stops its own click, so stop this one to keep the press to the switch.
       <Switch
+        accessibilityLabel={accessibilityLabel}
         activeThumbColor={disabled ? PRIMARY_ACCENT_COLOR_FADED_60 : PRIMARY_ACCENT_COLOR}
         activeTrackColor={disabled ? PRIMARY_ACCENT_COLOR_FADED_20 : PRIMARY_ACCENT_COLOR_FADED_40}
         disabled={disabled}
@@ -41,6 +42,7 @@ const SwitchWrapper = ({disabled, onValueChange, value}) => {
     return (
       <View style={{transform: [{scaleX: 0.7}, {scaleY: 0.8}], marginRight: 5}}>
         <Switch
+          accessibilityLabel={accessibilityLabel}
           disabled={disabled}
           ios_backgroundColor={isDarkMode ? MEDIUMGREY : LIGHTGREY}
           onValueChange={onValueChange}
@@ -54,6 +56,7 @@ const SwitchWrapper = ({disabled, onValueChange, value}) => {
   else {
     return (
       <Switch
+        accessibilityLabel={accessibilityLabel}
         disabled={disabled}
         onValueChange={onValueChange}
         style={switchStyle}

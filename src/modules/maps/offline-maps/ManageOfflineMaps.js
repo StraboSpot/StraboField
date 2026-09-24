@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {FlatList, TouchableOpacity} from 'react-native';
 
-import {ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getOfflineMapTitle} from './offlineMaps.helpers';
@@ -11,6 +11,7 @@ import useMapsOffline from './useMapsOffline';
 import useDevice from '../../../services/device/useDevice';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, truncateText} from '../../../shared/helpers';
+import {MEDIUMGREY, PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
@@ -33,7 +34,7 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
   const previewedOfflineMapId = useSelector(state => state.offlineMap.previewedOfflineMapId);
 
   const {deleteOfflineMap} = useDevice();
-  const {getSavedMapsFromDevice, stopOfflineMapPreview, switchToOfflineMap} = useMapsOffline();
+  const {getSavedMapsFromDevice, setOfflineMapTiles, stopOfflineMapPreview, switchToOfflineMap} = useMapsOffline();
 
   /* Local State */
 
@@ -104,6 +105,19 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
     }
     catch (err) {
       console.error('Error previewing offline map', err);
+    }
+  };
+
+  // Offline, the downloaded tiles are the map, so this is the custom maps' view button rather than a preview:
+  // show the map and frame what was downloaded of it. An overlay is only framed, since whether it is drawn is
+  // set in Map Layers, over whichever basemap is showing.
+  const viewOfflineMap = async (item) => {
+    try {
+      if (!item.overlay) await setOfflineMapTiles(item);
+      await zoomToOfflineMapTiles(item.id);
+    }
+    catch (err) {
+      console.error('Error viewing offline map', err);
     }
   };
 
@@ -187,6 +201,17 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
               disabled={item.count === 0}
               onPress={() => toggleOfflineMapPreview(item)}
               title={isPreviewed ? 'Stop' : 'Preview'}
+            />
+          )}
+          {!isOnline.isInternetReachable && (
+            <Icon
+              accessibilityLabel={'View on map'}
+              color={item.count === 0 ? MEDIUMGREY : PRIMARY_ACCENT_COLOR}
+              disabled={item.count === 0}
+              disabledStyle={{backgroundColor: 'transparent'}}
+              name={'map-search-outline'}
+              onPress={() => viewOfflineMap(item)}
+              type={'material-community'}
             />
           )}
         </ListItem.Content>

@@ -1,6 +1,6 @@
 import proj4 from 'proj4';
 
-import {DEFAULT_MAPS, GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
+import {DEFAULT_MAPS, GEO_LAT_LNG_PROJECTION, MAP_MODES, MAP_PROVIDERS, PIXEL_PROJECTION} from './maps.constants';
 import {isEmpty} from '../../shared/helpers';
 
 // proj4 definition for a UTM zone on the WGS84 datum
@@ -93,6 +93,22 @@ export const getUtmDisplayString = ([lng, lat]) => {
 };
 
 // A basemap the app ships. Read the list rather than restating its ids, which drifts as maps are added.
+// A map downloaded to the device is stored under a source of its own, so the provider it actually came from is
+// recovered from the custom map source kept beside it, or from the default map it is a copy of.
+export const getMapProviderSource = map => MAP_PROVIDERS[map?.source] ? map.source
+  : map?.customMapSource || DEFAULT_MAPS.find(defaultMap => defaultMap.id === map?.id)?.source;
+
+// The credit a list of maps owes, as one line naming each party once. Built from the parties a provider credits
+// rather than from its `attributions` sentence, which is written for the map's own attribution control: several
+// providers say the same sentence, one provider credits two parties within a sentence, and one states its whole
+// service name, so joining those sentences repeats a name and runs long. A list needs a credit of its own at all
+// because that control only speaks for the map being rendered, and says nothing about the tiles drawn beside the
+// names here - which include tiles bundled with the app.
+export const getAttributionText = (maps) => {
+  const credits = [...new Set(maps.flatMap(map => MAP_PROVIDERS[getMapProviderSource(map)]?.credits || []))];
+  return isEmpty(credits) ? '' : `Map data © ${credits.join(', ')}`;
+};
+
 export const isDefaultMap = map => DEFAULT_MAPS.some(defaultMap => defaultMap.id === map.id);
 
 export const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);

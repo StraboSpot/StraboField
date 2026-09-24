@@ -57,7 +57,7 @@ const MapContainer = forwardRef(({
   const stratSection = useSelector(state => state.map.stratSection);
   const userEmail = useSelector(state => state.user.email);
 
-  const {setCustomMapSwitchValue} = useCustomMap();
+  const {hideCustomMapOverlay} = useCustomMap();
   const {setImageHeightAndWidth} = useImageSize();
   const {getExtentAndZoomCall, setBasemap} = useMap();
   const {convertFeatureGeometryToImagePixels} = useMapCoords();
@@ -254,7 +254,7 @@ const MapContainer = forwardRef(({
     }
     else if (isOnline === false && currentBasemap && Platform.OS !== 'web') {
       Object.values(customBasemap).forEach((map) => {
-        if (offlineMaps[map.id]?.id !== map.id) setCustomMapSwitchValue(false, map);
+        if (offlineMaps[map.id]?.id !== map.id) hideCustomMapOverlay(map);
       });
       switchToOfflineMap().catch(err => console.error('Error Setting Offline Basemap', err));
     }

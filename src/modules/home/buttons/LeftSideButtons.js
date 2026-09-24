@@ -17,6 +17,7 @@ const LeftSideButtons = ({
                            dialogs,
                            openMainMenuPanel,
                            toggleDialog,
+                           zoomToCustomMap,
                          }) => {
   console.log('Rendering LeftSideButtons...');
 
@@ -38,6 +39,7 @@ const LeftSideButtons = ({
           dialogClickHandler={dialogClickHandler}
           dialogs={dialogs}
           toggleDialog={toggleDialog}
+          zoomToCustomMap={zoomToCustomMap}
         />
       </Animated.View>
 

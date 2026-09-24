@@ -3,24 +3,20 @@ import React, {useMemo} from 'react';
 import {useSelector} from 'react-redux';
 
 import CustomOverlayLayer from './CustomOverlayLayer';
+import {getVisibleCustomOverlays} from '../custom-maps/customMaps.helpers';
+import useMapURL from '../useMapURL';
 
 const CustomOverlayLayers = ({basemap}) => {
   /* Data Hooks */
 
   const customMaps = useSelector(state => state.map.customMaps);
+  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
+
+  const {buildOverlayTileURL} = useMapURL();
 
   /* Derived State */
 
-  // Use useMemo to ensure we get a new array reference when isViewable changes
-  const visibleOverlays = useMemo(() => {
-    const overlays = Object.values(customMaps)
-      .filter(customMap => customMap && customMap.id && customMap.overlay && customMap.isViewable);
-
-    console.log('CustomOverlayLayers filtering overlays. Total maps:', Object.keys(customMaps).length);
-    console.log('Visible overlays:', overlays.map(m => `${m.id} (isViewable: ${m.isViewable})`));
-
-    return overlays;
-  }, [customMaps]);
+  const visibleOverlays = useMemo(() => getVisibleCustomOverlays(customMaps, offlineMaps), [customMaps, offlineMaps]);
 
   /* View */
 
@@ -30,7 +26,8 @@ const CustomOverlayLayers = ({basemap}) => {
         <CustomOverlayLayer
           basemap={basemap}
           customMap={customMap}
-          key={`overlay-${customMap.id}-${customMap.isViewable}`}
+          key={`overlay-${customMap.id}`}
+          tileUrlTemplate={buildOverlayTileURL(customMap)}
         />
       ))}
     </>
