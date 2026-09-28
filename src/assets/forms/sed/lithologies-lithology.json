@@ -357,22 +357,22 @@
     {
       "list_name": "gg6bk97",
       "name": "gyp_anhyd_prim",
-      "label": "gypsum - anhydrite primary"
+      "label": "primary gypsum/anhydrite"
     },
     {
       "list_name": "gg6bk97",
       "name": "gyp_anhyd_dia",
-      "label": "gypsum - anhydrite diagenetic"
+      "label": "diagenetic gypsum/anhydrite"
     },
     {
       "list_name": "gg6bk97",
       "name": "halite_primary",
-      "label": "halite - primary"
+      "label": "primary halite"
     },
     {
       "list_name": "gg6bk97",
       "name": "halite_diagene",
-      "label": "halite - diagenetic"
+      "label": "diagenetic halite"
     },
     {
       "list_name": "gg6bk97",
