@@ -4,6 +4,7 @@ import {
   getSedRockTitle,
   getSiliciclasticGrainSize,
   getSiliciclasticGrainSizeKey,
+  hasSedRockData,
   validateImageOverlay,
 } from '../src/modules/sed/sed.helpers';
 
@@ -103,6 +104,18 @@ describe('getSedRockTitle', () => {
   it('leaves the Composition notes out', () => {
     expect(getSedRockTitle({primary_lithology: 'chert', notes: 'looks odd'}, getLabel, getLabels))
       .toBe('L(chert)');
+  });
+});
+
+describe('hasSedRockData', () => {
+  it('counts a field of the Sedimentary Rocks form', () => {
+    expect(hasSedRockData({id: 1, primary_lithology: 'chert'})).toBe(true);
+    expect(hasSedRockData({id: 1, fresh_color: 'gray'})).toBe(true);
+  });
+
+  it('does not count data from the other lithology tabs, or the label', () => {
+    expect(hasSedRockData({id: 1, label: 'Unknown Rock Type', minerals_present: ['quartz'], sorting: 'well'}))
+      .toBe(false);
   });
 });
 

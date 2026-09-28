@@ -10,6 +10,11 @@ export const ROCK_SECOND_ORDER_TYPE_FIELDS = [
   'phosphorite_type',
 ];
 
+// The Sedimentary Rocks form's fields (the Lithology tab's), without the label every save fills in
+export const SED_ROCK_FIELDS = sedLithologiesLithology.survey
+  .filter(field => field.name && field.name !== 'label' && !field.type.includes('group'))
+  .map(field => field.name);
+
 // The Composition fields a sed rock's title can use, in tab order, stopping before Notes
 const compositionSurvey = sedLithologiesComposition.survey;
 export const ROCK_COMPOSITION_TITLE_FIELDS = compositionSurvey

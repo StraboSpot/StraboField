@@ -4,6 +4,7 @@ import {
   ROCK_COMPOSITION_TITLE_FIELDS,
   ROCK_OTHER_TEXT_FIELDS,
   ROCK_SECOND_ORDER_TYPE_FIELDS,
+  SED_ROCK_FIELDS,
 } from './sed.constants';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {isStratInterval} from '../spots/spots.helpers';
@@ -95,6 +96,10 @@ export const getSiliciclasticGrainSizeKey = (siliciclasticType) => {
       return undefined;
   }
 };
+
+// Whether a lithology is also a sed rock. One filled in only on the Composition, Texture or Stratification tab has
+// nothing to show in the Sedimentary Rocks form, so it is listed under Lithologies alone.
+export const hasSedRockData = lithology => SED_ROCK_FIELDS.some(fieldName => !isEmpty(lithology[fieldName]));
 
 // A bed, interbedded, mixed or package interval is described by its lithologies, so it takes at least one. The
 // Lithologies list says so while it is empty, and deleting the last one is refused.
