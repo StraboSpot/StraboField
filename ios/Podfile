@@ -78,6 +78,13 @@ target 'StraboSpot2' do
 #             end
 #         end
    installer.pods_project.targets.each do |target|
+    # Some pods (lottie-ios, AsyncStorage, ...) declare targets below Xcode's supported minimum
+    target.build_configurations.each do |config|
+      deployment_target = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+      if deployment_target && Gem::Version.new(deployment_target) < Gem::Version.new(min_ios_version_supported)
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = min_ios_version_supported
+      end
+    end
     if target.respond_to?(:product_type) and target.product_type == "com.apple.product-type.bundle"
       target.build_configurations.each do |config|
           config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
