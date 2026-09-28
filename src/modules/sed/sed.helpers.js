@@ -1,6 +1,8 @@
 import {
   IMAGE_OVERLAY_SIZE_KEYS,
   LITHOLOGY_INTERVAL_CHARACTERS,
+  ROCK_COMPOSITION_TITLE_FIELDS,
+  ROCK_OTHER_TEXT_FIELDS,
   ROCK_SECOND_ORDER_TYPE_FIELDS,
 } from './sed.constants';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
@@ -53,16 +55,23 @@ export const getRequiredLithologyKeys = (lithology, spot) => {
 // getLabel and getLabels are passed in because a plain helper cannot call useForm
 export const getSedRockTitle = (rock, getLabel, getLabels) => {
   const formName = ['sed', 'lithologies'];
-  const mainLabel = getLabel(rock.primary_lithology, formName);
-  const labelsArr = ROCK_SECOND_ORDER_TYPE_FIELDS.reduce((acc, fieldName) => {
-    if (rock[fieldName]) {
-      const choiceLabel = getLabels(rock[fieldName], formName);
-      return [...acc, choiceLabel.toUpperCase()];
-    }
-    else return acc;
-  }, []);
-  if (isEmpty(labelsArr)) return toTitleCase(mainLabel);
-  else return toTitleCase(mainLabel) + ' - ' + labelsArr.join(', ');
+  // A choice of 'other' reads as whatever was typed for it, if anything was
+  const getChoicesText = (fieldName, choicesFormName) => [rock[fieldName]].flat()
+    .map(value => (value === 'other' && rock[ROCK_OTHER_TEXT_FIELDS[fieldName]]) || getLabels(value, choicesFormName))
+    .join(', ');
+
+  // Primary Lithology is optional outside a strat interval
+  const mainLabel = rock.primary_lithology ? toTitleCase(getLabel(rock.primary_lithology, formName))
+    : 'Unknown Rock Type';
+  const typeLabels = ROCK_SECOND_ORDER_TYPE_FIELDS.filter(fieldName => rock[fieldName])
+    .map(fieldName => getChoicesText(fieldName, formName).toUpperCase());
+  const typeTitle = isEmpty(typeLabels) ? mainLabel : mainLabel + ' - ' + typeLabels.join(', ');
+
+  // Only the first Composition field filled in, set apart as the finer detail. The second order types are on the
+  // Composition tab too, so when the first is one of those the title already shows it.
+  const compositionField = ROCK_COMPOSITION_TITLE_FIELDS.find(fieldName => !isEmpty(rock[fieldName]));
+  if (!compositionField || ROCK_SECOND_ORDER_TYPE_FIELDS.includes(compositionField)) return typeTitle;
+  return typeTitle + ' (' + toTitleCase(getChoicesText(compositionField, ['sed', 'composition'])) + ')';
 };
 
 export const getSiliciclasticGrainSize = lithology => lithology[getSiliciclasticGrainSizeKey(
