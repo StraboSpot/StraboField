@@ -134,11 +134,15 @@ const RockPage = ({isReadOnly, page}) => {
     else console.log('Spot to copy is empty. Aborting copying.');
   };
 
-  const editRock = (rock, i) => {
-    if (!rock.id) {
+  const editRock = (rock) => {
+    // A sed rock imported from StraboSpot 1 is given the id it arrived without. A deprecated pet rock is left alone:
+    // it is the Spot's pet data itself rather than an entry in the sed data.
+    if (groupKey === 'sed' && !rock.id) {
       let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
+      // The list is filtered and newest first, so a row's place in it is not its place in the Spot
+      const rockIndex = spot.properties.sed[pageKey].indexOf(rock);
       rock = {...rock, id: getNewUUID()};
-      editedSedData[pageKey].splice(i, 1, rock);
+      editedSedData[pageKey].splice(rockIndex, 1, rock);
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     }
@@ -229,9 +233,9 @@ const RockPage = ({isReadOnly, page}) => {
       <SectionList
         ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        renderItem={({item, index}) => (
+        renderItem={({item}) => (
           <BasicListItem
-            editItem={itemToEdit => editRock(itemToEdit, index)}
+            editItem={editRock}
             item={item}
             page={page}
           />
