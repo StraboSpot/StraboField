@@ -297,9 +297,11 @@ export const toRadians = (deg) => {
   return deg * (Math.PI / 180);
 };
 
-// Convert a string to title case and properly handles (s) in a word by keeping the s lowercase
+// Convert a string to title case, treating each side of a slash as its own word ('Organic/Coal') and keeping the s
+// in a (s) lowercase
 export function toTitleCase(str) {
-  return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  const capitalize = word => word.charAt(0).toUpperCase() + word.slice(1);
+  return str.toLowerCase().split(' ').map(word => word.split('/').map(capitalize).join('/')).join(' ');
 }
 
 export const truncateText = (str, maxLength) => {
