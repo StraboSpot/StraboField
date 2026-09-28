@@ -4,13 +4,13 @@ import {Button} from '@rn-vui/base';
 
 import buttonStyles from './buttons.styles';
 
-const OutlineButton = ({backgroundColor, disabled, icon, iconContainerStyle, loading, onPress, title}) => {
+const OutlineButton = ({backgroundColor, containerStyle, disabled, icon, iconContainerStyle, loading, onPress, title}) => {
   return (
     <Button
       buttonStyle={[buttonStyles.standardButton,
         backgroundColor && {backgroundColor: backgroundColor},
       ]}
-      containerStyle={buttonStyles.standardButtonContainer}
+      containerStyle={[buttonStyles.standardButtonContainer, containerStyle]}
       disabled={disabled}
       icon={icon}
       iconContainerStyle={[{paddingRight: 5}, iconContainerStyle]}

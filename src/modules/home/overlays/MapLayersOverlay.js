@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Dimensions, FlatList, Platform, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import commonStyles from '../../../shared/common.styles';
 import {truncateText} from '../../../shared/helpers';
@@ -16,7 +16,9 @@ import SectionDivider from '../../../shared/ui/SectionDivider';
 import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
 import {getLiveCustomMaps, getLiveCustomOverlays} from '../../maps/custom-maps/customMaps.helpers';
 import useCustomMap from '../../maps/custom-maps/useCustomMap';
-import {BASEMAPS, DEFAULT_MAPS} from '../../maps/maps.constants';
+import {BASEMAPS} from '../../maps/maps.constants';
+import {isDefaultMap} from '../../maps/maps.helpers';
+import {clearedOfflineMapPreview} from '../../maps/offline-maps/offlineMaps.slice';
 import useMapsOffline from '../../maps/offline-maps/useMapsOffline';
 import useMap from '../../maps/useMap';
 
@@ -27,6 +29,7 @@ const overlayStyle = {...overlayStyles.overlayMapMenuPosition, height: '80%'};
 const MapLayersOverlay = ({onTouchOutside, visible}) => {
   /* Data Hooks */
 
+  const dispatch = useDispatch();
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const customMaps = useSelector(state => state.map.customMaps);
@@ -55,22 +58,21 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
 
   /* Event Handlers */
 
+  // Picking a map here ends any offline map preview, since both of these set a basemap of their own
   const onSetBasemap = async (customMap) => {
+    dispatch(clearedOfflineMapPreview());
     if (isWeb || (isConnected && customMap.url)) await setBasemap(customMap.id);
     else await setOfflineMapTiles(customMap);
   };
 
   /* Logic Helpers */
 
-  const isDefaultMap = map => DEFAULT_MAPS.some(defaultMap => defaultMap.id === map.id);
-
   const determineWhatCustomMapListToRender = () => {
-    if (isWeb) return [renderCustomMapsList(), renderCustomOverlaysList()];
-
-    // Offline basemaps are listed even when online so downloaded maps stay selectable regardless of the project.
-    if (isInternetReachable && isConnected) {
-      return [renderCustomMapsList(), renderOfflineCustomMapsList(), renderCustomOverlaysList()];
-    }
+    // Offline basemaps are listed only when there is no connection to serve the live ones: web has no local
+    // tile store at all, and while online, picking one would show downloaded tiles with nothing saying so.
+    // Previewing from Manage Offline Maps is that, with a label, and it reads the same device-wide store,
+    // so a map downloaded under another project is still reachable.
+    if (isWeb || (isInternetReachable && isConnected)) return [renderCustomMapsList(), renderCustomOverlaysList()];
     else if (!isInternetReachable && isConnected) {
       return [
         renderCustomMapsList(),
@@ -83,6 +85,7 @@ const MapLayersOverlay = ({onTouchOutside, visible}) => {
   };
 
   const setMap = async (map) => {
+    dispatch(clearedOfflineMapPreview());
     await setBasemap(map.id);
     SMALL_SCREEN && onTouchOutside();
   };

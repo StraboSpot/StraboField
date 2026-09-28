@@ -66,7 +66,7 @@
     {
       "type": "decimal",
       "name": "skeletal_general_percent",
-      "label": "Skeletal (General) Percent",
+      "label": "General Skeletal Percent",
       "required": "false",
       "relevant": "selected(${skeletal_carbonate_components}, 'skeletal_gener')",
       "constraint": ". >= 0 and . <= 100",
@@ -945,7 +945,7 @@
     {
       "type": "decimal",
       "name": "gypsum_anhydrite_primary_percent",
-      "label": "Gypsum - Anhydrite Primary Percent",
+      "label": "Primary Gypsum/Anhydrite Percent",
       "required": "false",
       "read_only": "false",
       "relevant": "selected(${evaporite_type}, 'gyp_anhyd_prim')",
@@ -955,7 +955,7 @@
     {
       "type": "select_multiple el5ss78",
       "name": "gypsum_anhydrite_primary_type",
-      "label": "Gypsum - Anhydrite Primary Type",
+      "label": "Primary Gypsum/Anhydrite Type",
       "required": "false",
       "read_only": "false",
       "relevant": "selected(${evaporite_type}, 'gyp_anhyd_prim')"
@@ -963,7 +963,7 @@
     {
       "type": "decimal",
       "name": "gypsum_anhydrite_diagenetic_percent",
-      "label": "Gypsum - Anhydrite Diagenetic Percent",
+      "label": "Diagenetic Gypsum/Anhydrite Percent",
       "required": "false",
       "read_only": "false",
       "relevant": "selected(${evaporite_type}, 'gyp_anhyd_dia')",
@@ -973,7 +973,7 @@
     {
       "type": "select_multiple wy2is73",
       "name": "gypsum_anhydrite_diagenetic_type",
-      "label": "Gypsum - Anhydrite Diagenetic Type",
+      "label": "Diagenetic Gypsum/Anhydrite Type",
       "required": "false",
       "read_only": "false",
       "relevant": "selected(${evaporite_type}, 'gyp_anhyd_dia')"
@@ -981,7 +981,7 @@
     {
       "type": "decimal",
       "name": "halite_primary_percent",
-      "label": "Halite - Primary Percent",
+      "label": "Primary Halite Percent",
       "required": "false",
       "read_only": "false",
       "relevant": "selected(${evaporite_type}, 'halite_primary')",
@@ -991,7 +991,7 @@
     {
       "type": "select_multiple la9sa83",
       "name": "halite_primary_type",
-      "label": "Halite - Primary Type",
+      "label": "Primary Halite Type",
       "required": "false",
       "read_only": "false",
       "relevant": "selected(${evaporite_type}, 'halite_primary')"
@@ -999,7 +999,7 @@
     {
       "type": "decimal",
       "name": "halite_diagenetic_percent",
-      "label": "Halite - Diagenetic Percent",
+      "label": "Diagenetic Halite Percent",
       "required": "false",
       "read_only": "false",
       "relevant": "selected(${evaporite_type}, 'halite_diagene')",
@@ -1009,7 +1009,7 @@
     {
       "type": "select_multiple dv3xg82",
       "name": "halite_diagenetic_type",
-      "label": "Halite - Diagenetic Type",
+      "label": "Diagenetic Halite Type",
       "required": "false",
       "read_only": "false",
       "relevant": "selected(${evaporite_type}, 'halite_diagene')"
@@ -1364,7 +1364,7 @@
     {
       "list_name": "hw9cd71",
       "name": "skeletal_gener",
-      "label": "skeletal (general)"
+      "label": "general skeletal"
     },
     {
       "list_name": "hw9cd71",
@@ -1595,18 +1595,18 @@
     {
       "list_name": "uz9ix58",
       "name": "sed_clast",
-      "label": "sedimentary (general)"
+      "label": "general sedimentary"
     },
     {
       "list_name": "uz9ix58",
       "name": "igneous_clast",
-      "label": "igneous (general)",
+      "label": "general igneous",
       "order": "1"
     },
     {
       "list_name": "uz9ix58",
       "name": "met_clast",
-      "label": "metamorphic (general)",
+      "label": "general metamorphic",
       "order": "2"
     },
     {
@@ -1920,22 +1920,22 @@
     {
       "list_name": "gg6bk97",
       "name": "gyp_anhyd_prim",
-      "label": "gypsum - anhydrite primary"
+      "label": "primary gypsum/anhydrite"
     },
     {
       "list_name": "gg6bk97",
       "name": "gyp_anhyd_dia",
-      "label": "gypsum - anhydrite diagenetic"
+      "label": "diagenetic gypsum/anhydrite"
     },
     {
       "list_name": "gg6bk97",
       "name": "halite_primary",
-      "label": "halite - primary"
+      "label": "primary halite"
     },
     {
       "list_name": "gg6bk97",
       "name": "halite_diagene",
-      "label": "halite - diagenetic"
+      "label": "diagenetic halite"
     },
     {
       "list_name": "gg6bk97",

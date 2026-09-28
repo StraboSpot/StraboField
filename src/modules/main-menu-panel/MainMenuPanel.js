@@ -174,7 +174,7 @@ const MainMenuPanel = forwardRef(({
         return (
           <ManageOfflineMapsMenu
             closeMainMenuPanel={closeMainMenuPanel}
-            zoomToCenterOfflineTile={mapComponentRef?.current?.zoomToCenterOfflineTile}
+            zoomToOfflineMapTiles={mapComponentRef?.current?.zoomToOfflineMapTiles}
           />
         );
 

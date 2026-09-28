@@ -1,29 +1,27 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {Animated, FlatList, Platform, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {FlatList, TouchableOpacity} from 'react-native';
 
-import {Icon, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getOfflineMapTitle} from './offlineMaps.helpers';
-import {editedOfflineMap, setOfflineMapVisible} from './offlineMaps.slice';
+import {editedOfflineMap, startedOfflineMapPreview} from './offlineMaps.slice';
 import styles from './offlineMaps.styles';
 import useMapsOffline from './useMapsOffline';
 import useDevice from '../../../services/device/useDevice';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, truncateText} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
-import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import Loading from '../../../shared/ui/Loading';
-import WarningModal from '../../../shared/ui/modals/WarningModal';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import TextInputModal from '../../../shared/ui/TextInputModal';
 import {setIsOfflineMapsModalVisible} from '../../home/home.slice';
-import useMap from '../useMap';
+import {isDefaultMap} from '../maps.helpers';
 
-const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
+const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
   console.log('Rendering ManageOfflineMaps...');
 
   /* Data Hooks */
@@ -32,50 +30,20 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   const isOnline = useSelector(state => state.connections.isOnline);
   const {isSelected} = useSelector(state => state.connections.databaseEndpoint);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
+  const previewedOfflineMapId = useSelector(state => state.offlineMap.previewedOfflineMapId);
 
   const {deleteOfflineMap} = useDevice();
-  const {setBasemap} = useMap();
-  const {getSavedMapsFromDevice, switchToOfflineMap} = useMapsOffline();
+  const {getSavedMapsFromDevice, stopOfflineMapPreview, switchToOfflineMap} = useMapsOffline();
 
   /* Local State */
 
-  const [availableMaps, setAvailableMaps] = useState({});
   const [isNameModalVisible, setIsNameModalVisible] = useState(false);
-  const [isWarningModalVisible, setIsWarningModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedMap, setSelectedMap] = useState({});
 
-  /* Derived State */
-
-  const animatedPulse = useMemo(() => new Animated.Value(1), []);
-
-  /* Side Effects */
-
-  useEffect(() => {
-    Animated.sequence([
-      // increase size
-      Animated.timing(animatedPulse, {
-        useNativeDriver: Platform.OS !== 'web',
-        toValue: 2,
-        duration: 750,
-      }),
-      // decrease size
-      Animated.timing(animatedPulse, {
-        useNativeDriver: Platform.OS !== 'web',
-        toValue: 1,
-        duration: 500,
-      }),
-    ]).start();
-  }, [animatedPulse]);
-
-  useEffect(() => {
-    console.log('UE ManageOfflineMaps [offlineMaps]', offlineMaps);
-    setAvailableMaps(offlineMaps);
-  }, [offlineMaps]);
-
   /* Logic Helpers */
 
-  const confirmDeleteMap = async () => {
+  const confirmDeleteMap = () => {
     alert(
       'Delete Offline Map',
       `Are you sure you want to delete ${selectedMap.count} tiles in ${selectedMap.name}?`,
@@ -87,15 +55,26 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
         },
         {
           text: 'OK',
-          onPress: () => {
-            Object.values(availableMaps).filter(mapId => mapId.id !== selectedMap.id);
-            deleteOfflineMap(selectedMap);
-            setIsNameModalVisible(false);
-          },
+          onPress: deleteMap,
         },
       ],
       {cancelable: false},
     );
+  };
+
+  const deleteMap = async () => {
+    // The confirmation has been answered, so the rename modal it came from has done its job. Closing it up
+    // front also keeps a failure alert from being raised while a modal is still on screen.
+    setIsNameModalVisible(false);
+    try {
+      // A preview shows this map's tiles as the basemap, so put a live one back before they go
+      if (selectedMap.id === previewedOfflineMapId) await stopOfflineMapPreview();
+      await deleteOfflineMap(selectedMap);
+    }
+    catch (err) {
+      console.error('Error deleting offline map', err);
+      alert('Error', `Unable to delete ${selectedMap.name}.`);
+    }
   };
 
   const editMap = (map) => {
@@ -114,19 +93,17 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
     setIsNameModalVisible(false);
   };
 
-  const toggleOfflineMap = async (item) => {
-    if (item.isOfflineMapVisible) {
-      dispatch(setOfflineMapVisible({mapId: item.id, viewable: false}));
-      await setBasemap(item.id);
+  // Shows the map with only its downloaded tiles, so its coverage can be checked without disconnecting.
+  // Genuinely offline behavior is a different thing: that runs the offline path in MapContainer.
+  const toggleOfflineMapPreview = async (item) => {
+    try {
+      if (item.id === previewedOfflineMapId) return await stopOfflineMapPreview();
+      dispatch(startedOfflineMapPreview(item.id));
+      await switchToOfflineMap(item.id);
+      await zoomToOfflineMapTiles(item.id);
     }
-    else {
-      dispatch(setOfflineMapVisible({mapId: item.id, viewable: true}));
-      const res = await switchToOfflineMap(item.id);
-      if (!isEmpty(res)) {
-        setSelectedMap(res);
-        setIsWarningModalVisible(true);
-      }
-      else zoomToCenterOfflineTile();
+    catch (err) {
+      console.error('Error previewing offline map', err);
     }
   };
 
@@ -183,64 +160,37 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   };
 
   const renderMapsListItem = (item) => {
+    const isPreviewed = item.id === previewedOfflineMapId;
+    // A default basemap is named by the app, so only a map the user added can be renamed
+    const isRenameable = !isDefaultMap(item);
     return (
       <ListItem
         containerStyle={commonStyles.listItemFormField}
         key={item.id}
       >
         <ListItem.Content style={styles.itemContainer}>
-          <View style={{marginLeft: 10}}>
-            <ListItem.Title style={commonStyles.listItemTitle}>
-              {`${!isEmpty(item) ? truncateText(getOfflineMapTitle(item), 20) : 'No Name'}`}
+          <TouchableOpacity
+            disabled={!isRenameable}
+            onPress={() => editMap(item)}
+            style={styles.nameContainer}
+          >
+            <ListItem.Title style={[commonStyles.listItemTitle, isRenameable && styles.renameableTitle]}>
+              {!isEmpty(item) ? truncateText(getOfflineMapTitle(item), 20) : 'No Name'}
             </ListItem.Title>
-            <ListItem.Subtitle style={styles.itemSubTextStyle}>{item.count} tiles</ListItem.Subtitle>
-          </View>
-          <View style={{flexDirection: 'row'}}>
-            {item.count === 0 && (
-              <Animated.View style={{transform: [{scale: animatedPulse}]}}>
-                <Icon
-                  color={'red'}
-                  containerStyle={{margin: 5}}
-                  name={'alert'}
-                  size={17}
-                  type={'material-community'}
-                />
-              </Animated.View>
-            )}
-            {isOnline.isInternetReachable && (
-              <ClearButton
-                disabled={item.count === 0}
-                icon={{
-                  name: item.isOfflineMapVisible ? 'eye-off-outline' : item.count === 0 ? 'No tiles to view' : 'eye-outline',
-                  size: 20,
-                  type: 'ionicon',
-                }}
-                onPress={() => toggleOfflineMap(item)}
-              />
-            )}
-            {item.id !== 'mapbox.outdoors' && item.id !== 'mapbox.satellite' && item.id !== 'osm'
-              && item.id !== 'macrostrat' && (
-                <ClearButton
-                  icon={{name: 'edit', size: 18, type: 'material'}}
-                  onPress={() => editMap(item)}
-                />
-              )}
-          </View>
+            <ListItem.Subtitle style={[commonStyles.listItemSubtitle, item.count === 0 && styles.noTilesText]}>
+              {item.count === 0 ? 'No tiles downloaded' : `${item.count} tiles`}
+            </ListItem.Subtitle>
+          </TouchableOpacity>
+          {isOnline.isInternetReachable && !item.overlay && (
+            <OutlineButton
+              containerStyle={styles.previewButtonContainer}
+              disabled={item.count === 0}
+              onPress={() => toggleOfflineMapPreview(item)}
+              title={isPreviewed ? 'Stop' : 'Preview'}
+            />
+          )}
         </ListItem.Content>
       </ListItem>
-    );
-  };
-
-  const renderWarningModal = () => {
-    return (
-      <WarningModal
-        isVisible={isWarningModalVisible}
-        onConfirmPress={() => setIsWarningModalVisible(false)}
-        showCancelButton={false}
-        title={'Map Not Available!'}
-      >
-        <Text>Selected map is not available for offline use. Switching to first available map: {selectedMap.name}</Text>
-      </WarningModal>
     );
   };
 
@@ -249,8 +199,7 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
   return (
     <>
       <OutlineButton
-        disabled={(!isOnline.isInternetReachable && !isOnline.isConnected) || isSelected
-          || Object.values(offlineMaps).some(map => map.isOfflineMapVisible === true)}
+        disabled={(!isOnline.isInternetReachable && !isOnline.isConnected) || isSelected || !!previewedOfflineMapId}
         onPress={handDownloadMapTilesPressed}
         title={'Download Tiles of Current Map'}
       />
@@ -263,7 +212,6 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToCenterOfflineTile}) => {
 
       {/* Modals */}
       {renderEditMapModal()}
-      {renderWarningModal()}
       <Loading
         isLoading={loading}
         text={'Checking and adjusting tile count'}

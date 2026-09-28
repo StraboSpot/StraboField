@@ -1,3 +1,6 @@
+import sedLithologiesComposition from '../../assets/forms/sed/lithologies-composition.json';
+import sedLithologiesLithology from '../../assets/forms/sed/lithologies-lithology.json';
+
 export const ROCK_SECOND_ORDER_TYPE_FIELDS = [
   'siliciclastic_type',
   'dunham_classification',
@@ -6,6 +9,25 @@ export const ROCK_SECOND_ORDER_TYPE_FIELDS = [
   'volcaniclastic_type',
   'phosphorite_type',
 ];
+
+// The Sedimentary Rocks form's fields (the Lithology tab's), without the label every save fills in
+export const SED_ROCK_FIELDS = sedLithologiesLithology.survey
+  .filter(field => field.name && field.name !== 'label' && !field.type.includes('group'))
+  .map(field => field.name);
+
+// The Composition fields a sed rock's title can use, in tab order, stopping before Notes
+const compositionSurvey = sedLithologiesComposition.survey;
+export const ROCK_COMPOSITION_TITLE_FIELDS = compositionSurvey
+  .slice(0, compositionSurvey.findIndex(field => field.name === 'notes'))
+  .filter(field => field.name && !field.type.includes('group'))
+  .map(field => field.name);
+
+// The text field shown once 'other' is selected, keyed by the field it is selected in, across both tabs a sed rock's
+// title reads from
+export const ROCK_OTHER_TEXT_FIELDS = [...sedLithologiesLithology.survey, ...compositionSurvey].reduce((acc, field) => {
+  const selectFieldName = field.type === 'text' && field.relevant?.match(/^selected\(\$\{(\w+)\}, 'other'\)$/)?.[1];
+  return selectFieldName ? {...acc, [selectFieldName]: field.name} : acc;
+}, {});
 
 // An image overlay's width and height are only ever saved together, and each is worked out from the other, so
 // they are kept as a pair - width first, so the two are always read the same way round

@@ -1,6 +1,6 @@
 import proj4 from 'proj4';
 
-import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
+import {DEFAULT_MAPS, GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
 import {isEmpty} from '../../shared/helpers';
 
 // proj4 definition for a UTM zone on the WGS84 datum
@@ -91,6 +91,9 @@ export const getUtmDisplayString = ([lng, lat]) => {
   const {easting, northing, zone} = convertLatLngToUtm([lng, lat]);
   return `UTM ${zone}  ${Math.round(easting)} mE  ${Math.round(northing)} mN`;
 };
+
+// A basemap the app ships. Read the list rather than restating its ids, which drifts as maps are added.
+export const isDefaultMap = map => DEFAULT_MAPS.some(defaultMap => defaultMap.id === map.id);
 
 export const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);
 

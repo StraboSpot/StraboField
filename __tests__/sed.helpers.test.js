@@ -1,8 +1,10 @@
 import {
   getCleanedImageOverlay,
   getRequiredLithologyKeys,
+  getSedRockTitle,
   getSiliciclasticGrainSize,
   getSiliciclasticGrainSizeKey,
+  hasSedRockData,
   validateImageOverlay,
 } from '../src/modules/sed/sed.helpers';
 
@@ -38,6 +40,82 @@ describe('getRequiredLithologyKeys', () => {
   it('requires nothing when the interval has no character to require it for', () => {
     const spot = {...INTERVAL_SPOT, properties: {...INTERVAL_SPOT.properties, sed: {}}};
     expect(getRequiredLithologyKeys({primary_lithology: 'siliciclastic'}, spot)).toEqual([]);
+  });
+});
+
+describe('getSedRockTitle', () => {
+  const getLabel = key => 'L(' + key + ')';
+  const getLabels = keys => (Array.isArray(keys) ? keys : [keys]).map(getLabel).join(', ');
+
+  it('names a lithology with no primary lithology as an unknown rock type', () => {
+    expect(getSedRockTitle({id: 1, grain_size: 'fine'}, getLabel, getLabels)).toBe('Unknown Rock Type');
+  });
+
+  it('names a lithology by its primary lithology and second order type', () => {
+    expect(getSedRockTitle({primary_lithology: 'siliciclastic', siliciclastic_type: 'sandstone'}, getLabel,
+      getLabels)).toBe('L(siliciclastic) - L(SANDSTONE)');
+  });
+
+  it('adds the first Composition field filled in, in parentheses after the type', () => {
+    expect(getSedRockTitle({primary_lithology: 'siliciclastic', siliciclastic_type: 'sandstone',
+      minerals_present: ['quartz', 'feldspar'], sandstone_modifier: ['arkosic']}, getLabel, getLabels))
+      .toBe('L(siliciclastic) - L(SANDSTONE) (L(quartz), L(feldspar))');
+  });
+
+  it('gives a lithology with no primary lithology its composition too', () => {
+    expect(getSedRockTitle({clast_composition: ['limestone']}, getLabel, getLabels))
+      .toBe('Unknown Rock Type (L(limestone))');
+  });
+
+  it('adds no composition when the first is a second order type the title already shows', () => {
+    expect(getSedRockTitle({primary_lithology: 'evaporite', evaporite_type: ['gypsum'], halite_primary_type: ['a']},
+      getLabel, getLabels)).toBe('L(evaporite) - L(GYPSUM)');
+  });
+
+  it('adds a Composition field that comes before a second order type', () => {
+    expect(getSedRockTitle({primary_lithology: 'evaporite', evaporite_type: ['gypsum'], minerals_present: ['halite']},
+      getLabel, getLabels)).toBe('L(evaporite) - L(GYPSUM) (L(halite))');
+  });
+
+  it('adds the composition after a Dunham classification too', () => {
+    expect(getSedRockTitle({primary_lithology: 'limestone', dunham_classification: 'packstone',
+      non_skeletal_carbonate_compone: ['ooid']}, getLabel, getLabels)).toBe('L(limestone) - L(PACKSTONE) (L(ooid))');
+  });
+
+  it('shows what was typed for an other composition in place of Other', () => {
+    expect(getSedRockTitle({primary_lithology: 'siliciclastic', minerals_present: ['quartz', 'other'],
+      other_minerals: 'zircon'}, getLabel, getLabels)).toBe('L(siliciclastic) (L(quartz), Zircon)');
+  });
+
+  it('shows what was typed for an other second order type in place of Other', () => {
+    expect(getSedRockTitle({primary_lithology: 'evaporite', evaporite_type: ['other'],
+      other_evaporite_type: 'trona'}, getLabel, getLabels)).toBe('L(evaporite) - TRONA');
+  });
+
+  it('keeps Other when nothing was typed for it', () => {
+    expect(getSedRockTitle({primary_lithology: 'siliciclastic', minerals_present: ['other']}, getLabel, getLabels))
+      .toBe('L(siliciclastic) (L(other))');
+  });
+
+  it('capitalizes both words of a rock type joined by a slash', () => {
+    expect(getSedRockTitle({primary_lithology: 'organic_coal'}, () => 'organic/coal', getLabels)).toBe('Organic/Coal');
+  });
+
+  it('leaves the Composition notes out', () => {
+    expect(getSedRockTitle({primary_lithology: 'chert', notes: 'looks odd'}, getLabel, getLabels))
+      .toBe('L(chert)');
+  });
+});
+
+describe('hasSedRockData', () => {
+  it('counts a field of the Sedimentary Rocks form', () => {
+    expect(hasSedRockData({id: 1, primary_lithology: 'chert'})).toBe(true);
+    expect(hasSedRockData({id: 1, fresh_color: 'gray'})).toBe(true);
+  });
+
+  it('does not count data from the other lithology tabs, or the label', () => {
+    expect(hasSedRockData({id: 1, label: 'Unknown Rock Type', minerals_present: ['quartz'], sorting: 'well'}))
+      .toBe(false);
   });
 });
 

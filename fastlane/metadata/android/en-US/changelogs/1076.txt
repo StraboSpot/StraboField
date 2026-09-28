@@ -1,5 +1,12 @@
-StraboField 2.31.3
-
-• Stability: Fewer crashes
+New since 2.29.15:
+• Richer Samples: add photos, measurements, tags & geologic units
+• IGSN: register in-app with progress & SESAR update prompts
+• Maps: extend lines & pick overlapping Spots
+• UTM display, dike symbol & Dip/Plunge/Name labels
+• Outcrop Summaries page, undo Spot delete, better search & filters
+• Sketch: zoom/pan and save as a copy
+• Auto-save with a backup status screen
+• Compass works without GPS
+• Plus more fixes and improvements
 
 Thanks for using StraboSpot!

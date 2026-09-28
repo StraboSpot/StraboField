@@ -9,6 +9,7 @@ import SelectSpotsAtPressModal from './editing/SelectSpotsAtPressModal';
 import SetInCurrentViewOverlay from './editing/SetInCurrentViewOverlay';
 import useMapEditor from './editing/useMapEditor';
 import VertexActionsOverlay from './editing/VertexActionsOverlay';
+import useMapFeatures from './features/useMapFeatures';
 import useMapFeaturesCalculated from './features/useMapFeaturesCalculated';
 import useMapPressEvents from './interactions/useMapPressEvents';
 import MacrostratOverlay from './macrostrat/MacrostratOverlay';
@@ -62,6 +63,7 @@ const MapContainer = forwardRef(({
   const {getExtentAndZoomCall, setBasemap} = useMap();
   const {convertFeatureGeometryToImagePixels} = useMapCoords();
   const mapRef = useRef(null);
+  const {getAllMappedSpots} = useMapFeatures();
   const {getSpotsInBoundingBox} = useMapFeaturesCalculated(mapRef);
   const [isShowVertexActionsModal, setIsShowVertexActionsModal] = useState(false);
   const [vertexActionValues, setVertexActionValues] = useState(null);
@@ -128,9 +130,9 @@ const MapContainer = forwardRef(({
     setSpotToEditFromPicker,
     switchToEditing,
   });
-  const {getMapCenterTile, switchToOfflineMap} = useMapsOffline();
+  const {getMapTilesBbox, switchToOfflineMap} = useMapsOffline();
   const {activateDatasetsWithIntervals} = useStratSection();
-  const {setMapView, zoomToSpotsNow} = useMapView();
+  const {zoomToSpotsNow} = useMapView();
   const {getRootSpotGeoCoords} = useSpots();
   const {getTilesFromHost} = useServerRequests();
 
@@ -144,7 +146,6 @@ const MapContainer = forwardRef(({
   const spotsRef = useRef(null);
 
   const [isCameraReady, setIsCameraReady] = useState(false);
-  const [isZoomToCenterOffline, setIsZoomToCenterOffline] = useState(false);
   const [showSetInCurrentViewModal, setShowSetInCurrentViewModal] = useState(false);
   const [showUserLocation, setShowUserLocation] = useState(false);
 
@@ -208,10 +209,10 @@ const MapContainer = forwardRef(({
   }, [isMapExtentFilterActive]);
 
   useEffect(() => {
-    // console.log('UE MapContainer [currentBasemap, isZoomToCenterOffline]');
-    updateMapView().catch(err => console.warn('Error getting center of custom map:', err));
+    // console.log('UE MapContainer [currentBasemap]');
+    if (isEmpty(currentBasemap)) setBasemap().catch(err => console.warn('Error setting a default basemap:', err));
     if (currentBasemap?.source !== 'macrostrat') setIsShowMacrostratOverlay(false);
-  }, [currentBasemap, isZoomToCenterOffline]);
+  }, [currentBasemap]);
 
   // Whenever a strat section becomes the current map, make sure every dataset holding one of its intervals
   // is active, otherwise the column draws with gaps. Keyed on the id so editing the section's settings,
@@ -277,7 +278,7 @@ const MapContainer = forwardRef(({
       saveEdits: saveEdits,
       startEditingMode: startEditingMode,
       toggleUserLocation: toggleUserLocation,
-      zoomToCenterOfflineTile: zoomToCenterOfflineTile,
+      zoomToOfflineMapTiles: zoomToOfflineMapTiles,
       zoomToCurrentLocation: zoomToCurrentLocation,
       zoomToCustomMap: zoomToCustomMap,
       zoomToSpots: zoomToSpots,
@@ -412,23 +413,16 @@ const MapContainer = forwardRef(({
     return [east - west, north - south];
   };
 
+  // #992, if the selected Spot is mapped on the current map, go straight to editing it instead of deselecting it
   const startEditingMode = () => {
-    startEditing(undefined, undefined, undefined, setMapModeToEdit);
+    const selectedMappedSpot = selectedSpot?.properties?.id
+      && getAllMappedSpots().find(spot => spot.properties.id === selectedSpot.properties.id);
+    const spotToEdit = selectedMappedSpot ? turf.cleanCoords(selectedMappedSpot) : undefined;
+    startEditing(spotToEdit, undefined, undefined, setMapModeToEdit);
   };
 
   const toggleUserLocation = (value) => {
     setShowUserLocation(value);
-  };
-
-  const updateMapView = async () => {
-    // console.log('Updating map view from Map.js');
-    if (isEmpty(currentBasemap)) await setBasemap();
-    else if (isZoomToCenterOffline) {
-      const newCenter = await getMapCenterTile(currentBasemap.id);
-      const newZoom = 12;
-      setMapView(newCenter, newZoom);
-      setIsZoomToCenterOffline(false);
-    }
   };
 
   // Calculate the Spots in the current map extent and send to redux. Skips the work unless a
@@ -462,8 +456,14 @@ const MapContainer = forwardRef(({
     }
   };
 
-  const zoomToCenterOfflineTile = () => {
-    setIsZoomToCenterOffline(true);
+  // Frame the downloaded tiles the same way the custom maps list frames a map, so how much of the download is
+  // on screen tells you what it covers. Takes the id rather than reading currentBasemap, which the caller has
+  // only just changed. Redux center/zoom cannot do this: the camera reads them solely when the image basemap
+  // or strat section changes, and panning writes them straight back.
+  const zoomToOfflineMapTiles = async (mapId) => {
+    const bbox = await getMapTilesBbox(mapId);
+    if (isEmpty(bbox)) return console.warn('No tiles found to zoom to for', mapId);
+    zoomToCustomMap(bbox.join(','));
   };
 
   // Fly the map to the current location

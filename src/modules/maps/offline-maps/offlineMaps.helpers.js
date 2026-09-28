@@ -2,13 +2,6 @@ import {CUSTOM_MAP_SOURCES} from '../custom-maps/customMaps.constants';
 
 export const checkIfZipStatusReady = data => data.status === 'Zip File Ready.';
 
-export const getMedian = (arr) => {
-  arr = arr.slice(0); // create copy
-  const middle = (arr.length + 1) / 2;
-  const sorted = arr.sort((a, b) => a - b);
-  return (sorted.length % 2) ? sorted[middle - 1] : (sorted[middle - 1.5] + sorted[middle - 0.5]) / 2;
-};
-
 export const getOfflineMapTitle = (map) => {
   if (!map.name) return map.id;
   return map.name;
