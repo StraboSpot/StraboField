@@ -343,36 +343,6 @@
       "relevant": "",
       "calculation": "",
       "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "__version__",
-      "label": "",
-      "required": false,
-      "read_only": false,
-      "relevant": "",
-      "calculation": "'vpSRWLYg7xtLSMswzEzCvi'",
-      "$given_name": ""
-    },
-    {
-      "type": "calculate",
-      "name": "_version_",
-      "label": "",
-      "required": false,
-      "read_only": "",
-      "relevant": "",
-      "calculation": "'vgSJ65Wgsw4aosJiNG5H9J'",
-      "$given_name": "__version__"
-    },
-    {
-      "type": "calculate",
-      "name": "_version__001",
-      "label": "",
-      "required": "",
-      "read_only": "",
-      "relevant": "",
-      "calculation": "'vjs6HiwTBSoqnBbKxDDfPM'",
-      "$given_name": "__version__"
     }
   ],
   "choices": [
