@@ -123,7 +123,9 @@ const useSamples = () => {
   // turn it into a second sample record on the server.
   const getSelectedSample = () => {
     if (selectedSpot.properties?.isSample) return getSampleMetadata(selectedSpot);
-    const sample = selectedAttributes?.[0];
+    // Read back off the Spot, which holds the sample as last saved, rather than the copy taken when it was opened
+    const sample = selectedSpot.properties?.[PAGE_KEYS.SAMPLES]?.find(s => s.id === selectedAttributes?.[0]?.id)
+      ?? selectedAttributes?.[0];
     return sample && !isSampleStub(sample) ? sample : undefined;
   };
 

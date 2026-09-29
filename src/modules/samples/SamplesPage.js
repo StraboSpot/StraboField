@@ -12,7 +12,14 @@ import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
 
-const SamplesPage = ({isReadOnly, page, registerGetValues, selectedSample, setSelectedSample}) => {
+const SamplesPage = ({
+                       isReadOnly,
+                       page,
+                       registerGetValues,
+                       registerSaveChanges,
+                       selectedSample,
+                       setSelectedSample,
+                     }) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -70,6 +77,7 @@ const SamplesPage = ({isReadOnly, page, registerGetValues, selectedSample, setSe
       isReadOnly={isReadOnly}
       page={page}
       registerGetValues={registerGetValues}
+      registerSaveChanges={registerSaveChanges}
       selectedFeature={sampleToDisplay}
     />
   );
