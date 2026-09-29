@@ -37,8 +37,8 @@ const BasicListItem = ({
       case PAGE_KEYS.ROCK_TYPE_FAULT:
       case PAGE_KEYS.ROCK_TYPE_SEDIMENTARY:
       case PAGE_KEYS.EARTHQUAKES:
-        return title;
       case PAGE_KEYS.LITHOLOGIES:
+        return title;
       case PAGE_KEYS.BEDDING:
         return 'Lithology ' + (index + 1) + ': ' + title;
       // A tephra label names the layer rather than titling it, so the layer type is shown after it either way
