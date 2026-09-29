@@ -25,7 +25,8 @@ import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import IGSNModal from '../samples/igsn/IGSNModal';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
-import {getRequiredLithologyKeys} from '../sed/sed.helpers';
+import {getRequiredLithologyKeys, hasOtherLithologyTabData} from '../sed/sed.helpers';
+import SedRockLithologyNote from '../sed/SedRockLithologyNote';
 import useSed from '../sed/useSed';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
@@ -71,6 +72,7 @@ const BasicPageDetail = ({
   const [igsnFormValues, setIgsnFormValues] = useState(null);
   const [initialValues, setInitialValues] = useState(selectedFeature);
   const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
+  const [isFormDirty, setIsFormDirty] = useState(false);
   const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
@@ -92,8 +94,11 @@ const BasicPageDetail = ({
   // it is already on SESAR and reachable to be updated in place
   const isSesarRegistrationBlocked = isIGSNChecked && (!sesar.sesarToken.access
     || (isEmpty(sesar.selectedUserCode) && !(selectedFeature.isOnMySesar && isInternetReachable)));
+  // A feature with nothing changed has nothing to save, and saving a sample with an IGSN would send the same data
+  // to SESAR again. A template is left out, as its name is edited outside the form and can be saved on its own.
+  const isFeatureUnchanged = !isTemplate && !isFormDirty;
   // Every reason the save itself is refused, held at the button rather than failing once it is pressed
-  const isSaveDisabled = isRegisteredSampleOffline || isSesarRegistrationBlocked;
+  const isSaveDisabled = isRegisteredSampleOffline || isSesarRegistrationBlocked || isFeatureUnchanged;
   // Pages whose form fills one orientation field in from another name the pairs it uses
   const orientationFields = page.key === PAGE_KEYS.THREE_D_STRUCTURES ? THREE_D_STRUCTURE_ORIENTATION_FIELDS
     : page.key === PAGE_KEYS.EARTHQUAKES ? EARTHQUAKE_ORIENTATION_FIELDS
@@ -364,6 +369,7 @@ const BasicPageDetail = ({
           onReset={() => console.log('Resetting form...')}
           onSubmit={onSubmitForm}
           setInvalidFields={setInvalidFields}
+          setIsFormDirty={setIsFormDirty}
           setIsFormInvalid={setIsFormInvalid}
           validate={values => validateFeature(formName, values)}
         >
@@ -430,6 +436,10 @@ const BasicPageDetail = ({
               </>
             )}
             {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon'}*/}
+            {page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY && !isTemplate
+              && hasOtherLithologyTabData(selectedFeature) && (
+              <SedRockLithologyNote lithology={selectedFeature}/>
+            )}
             <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
               {renderFormFields()}
             </FormFlatList>

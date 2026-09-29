@@ -60,8 +60,25 @@ describe('getDefaultLabel', () => {
   });
 
   it('gives the pages titled by position alone nothing to fill a label in with', () => {
-    [PAGE_KEYS.STRUCTURES, PAGE_KEYS.DIAGENESIS, PAGE_KEYS.FOSSILS, PAGE_KEYS.INTERPRETATIONS].forEach(
+    [PAGE_KEYS.STRUCTURES, PAGE_KEYS.DIAGENESIS, PAGE_KEYS.INTERPRETATIONS].forEach(
       pageKey => expect(getDefaultLabel(pageKey, {id: 1}, getLabel, getLabels)).toBeUndefined());
+  });
+
+  // Only the first field of each part: a second Body field and Descriptive are filled in too, and left out
+  it('names a fossil by its first Body field, then its first Trace field', () => {
+    const fossil = {invertebrate: ['mollusca'], mollusca: ['bivalve'], diversity: 'low', descriptive: ['burrowed']};
+    expect(getDefaultLabel(PAGE_KEYS.FOSSILS, fossil, getLabel, getLabels)).toBe('L(mollusca) (L(low) Diversity)');
+  });
+
+  it('names a fossil by Descriptive when it has no Diversity, reading \'other\' as what was typed', () => {
+    const fossil = {vertebrate: ['other'], other_vertebrate: 'fish scale', descriptive: ['track', 'trail']};
+    expect(getDefaultLabel(PAGE_KEYS.FOSSILS, fossil, getLabel, getLabels)).toBe('Fish Scale (L(track), L(trail))');
+  });
+
+  it('names a fossil by whichever part it has', () => {
+    expect(getDefaultLabel(PAGE_KEYS.FOSSILS, {chordate: 'fish'}, getLabel, getLabels)).toBe('L(fish)');
+    expect(getDefaultLabel(PAGE_KEYS.FOSSILS, {diversity: 'high'}, getLabel, getLabels)).toBe('L(high) Diversity');
+    expect(getDefaultLabel(PAGE_KEYS.FOSSILS, {notes: 'a note'}, getLabel, getLabels)).toBeUndefined();
   });
 
   it('names a sample by the name the user gave it', () => {
@@ -143,6 +160,41 @@ describe('resolveLabelOnSave', () => {
     expect(wasAsked()).toBe(false);
   });
 
+  describe('on a page whose default can run out', () => {
+    const resolveFossil = (previousFeature, values) => resolveLabelOnSave(
+      {pageKey: PAGE_KEYS.FOSSILS, previousFeature: previousFeature, values: values, getLabel: getLabel,
+        getLabels: getLabels});
+    const previousFossil = {id: 1, chordate: 'fish', label: 'L(fish)'};
+
+    // Cleared, so the list falls back to titling the fossil by its position
+    it('asks before clearing a label that was filled in, and clears it when told to', async () => {
+      const wasAsked = answerPrompt('Update');
+      expect(await resolveFossil(previousFossil, {id: 1, label: 'L(fish)'})).toEqual({id: 1});
+      expect(wasAsked()).toBe(true);
+      expect(alert.mock.calls[0][2].map(option => option.text)).toEqual(['Keep', 'Clear']);
+    });
+
+    it('keeps a label that was filled in when told to', async () => {
+      answerPrompt('Keep');
+      const values = {id: 1, label: 'L(fish)'};
+      expect(await resolveFossil(previousFossil, values)).toEqual(values);
+    });
+
+    it('never asks about a label the user typed', async () => {
+      const wasAsked = answerPrompt('Update');
+      const values = {id: 1, label: 'Fish bed'};
+      expect(await resolveFossil({...previousFossil, label: 'Fish bed'}, values)).toEqual(values);
+      expect(wasAsked()).toBe(false);
+    });
+
+    it('leaves a fossil with nothing to label it by unlabeled', async () => {
+      const wasAsked = answerPrompt('Update');
+      const values = {id: 1, notes: 'a note'};
+      expect(await resolveFossil({id: 1}, values)).toBe(values);
+      expect(wasAsked()).toBe(false);
+    });
+  });
+
   it('hands back the values untouched on a page with no label to give', async () => {
     const values = {id: 1, text: 'a note'};
     const resolved = await resolveLabelOnSave({pageKey: PAGE_KEYS.NOTES, previousFeature: {id: 1}, values: values,
@@ -165,6 +217,6 @@ describe('getFeatureTitle', () => {
   });
 
   it('gives nothing for a page with neither', () => {
-    expect(getFeatureTitle(PAGE_KEYS.FOSSILS, {id: 1}, getLabel, getLabels)).toBeUndefined();
+    expect(getFeatureTitle(PAGE_KEYS.STRUCTURES, {id: 1}, getLabel, getLabels)).toBeUndefined();
   });
 });

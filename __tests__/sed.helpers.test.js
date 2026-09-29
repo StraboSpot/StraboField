@@ -4,6 +4,7 @@ import {
   getSedRockTitle,
   getSiliciclasticGrainSize,
   getSiliciclasticGrainSizeKey,
+  hasOtherLithologyTabData,
   hasSedRockData,
   validateImageOverlay,
 } from '../src/modules/sed/sed.helpers';
@@ -104,6 +105,19 @@ describe('getSedRockTitle', () => {
   it('leaves the Composition notes out', () => {
     expect(getSedRockTitle({primary_lithology: 'chert', notes: 'looks odd'}, getLabel, getLabels))
       .toBe('L(chert)');
+  });
+});
+
+describe('hasOtherLithologyTabData', () => {
+  it('counts a field from the Composition, Texture or Stratification tab', () => {
+    expect(hasOtherLithologyTabData({id: 1, minerals_present: ['quartz']})).toBe(true);
+    expect(hasOtherLithologyTabData({id: 1, sorting: 'well'})).toBe(true);
+    expect(hasOtherLithologyTabData({id: 1, stratification: ['strat_bedding']})).toBe(true);
+  });
+
+  it('does not count a field the Sedimentary Rocks form already shows', () => {
+    expect(hasOtherLithologyTabData({id: 1, primary_lithology: 'chert', notes: 'n', volcaniclastic_type: ['tuff']}))
+      .toBe(false);
   });
 });
 

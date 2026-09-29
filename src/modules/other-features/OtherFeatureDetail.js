@@ -45,6 +45,7 @@ const OtherFeatureDetail = ({
   // this ref holding the form as it was before it.
   const savedValuesRef = useRef(null);
 
+  const [isFormDirty, setIsFormDirty] = useState(false);
   const [isFormInvalid, setIsFormInvalid] = useState(false);
 
   /* Side Effects */
@@ -198,6 +199,7 @@ const OtherFeatureDetail = ({
           enableReinitialize={true}
           initialValues={initialFeatureValues}
           innerRef={formRef}
+          setIsFormDirty={setIsFormDirty}
           setIsFormInvalid={setIsFormInvalid}
           validate={validateFeature}
         >
@@ -275,7 +277,7 @@ const OtherFeatureDetail = ({
       {!isReadOnly && (
         <SaveAndCancelButtons
           cancel={cancelForm}
-          getIsDisabled={isFormInvalid}
+          getIsDisabled={isFormInvalid || !isFormDirty}
           save={() => saveForm(formRef.current)}
         />
       )}

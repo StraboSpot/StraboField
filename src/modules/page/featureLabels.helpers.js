@@ -7,7 +7,7 @@ import {getTitle as getOtherFeatureTitle} from '../other-features/otherFeatures.
 import {getMineralTitle} from '../petrology/minerals/minerals.helpers';
 import {getReactionTextureTitle} from '../petrology/reaction-textures/reactionTextures.helpers';
 import {getPetRockTitle} from '../petrology/rocks/rocks.helpers';
-import {getBeddingTitle, getSedRockTitle} from '../sed/sed.helpers';
+import {getBeddingTitle, getFossilTitle, getSedRockTitle} from '../sed/sed.helpers';
 import {getThreeDStructureTitle} from '../three-d-structures/threeDStructures.helpers';
 
 // The label a feature is given when the user does not type one: the title its list would otherwise build from
@@ -26,6 +26,8 @@ export const getDefaultLabel = (pageKey, feature, getLabel, getLabels) => {
       return getLabel(feature.earthquake_feature, ['general', PAGE_KEYS.EARTHQUAKES]);
     case PAGE_KEYS.FABRICS:
       return getFabricTitle(feature, getLabel, getLabels);
+    case PAGE_KEYS.FOSSILS:
+      return getFossilTitle(feature, getLabels);
     case PAGE_KEYS.LITHOLOGIES:
     case PAGE_KEYS.ROCK_TYPE_SEDIMENTARY:
       return getSedRockTitle(feature, getLabel, getLabels);
@@ -59,14 +61,15 @@ export const getFeatureTitle = (pageKey, feature, getLabel, getLabels) => featur
   || getDefaultLabel(pageKey, feature, getLabel, getLabels);
 
 // alert is callback-based on native and a window.confirm polyfill on web, so give it back as something a save
-// can wait on. Keeping is the cancel option, so dismissing the prompt leaves the label alone.
+// can wait on. Keeping is the cancel option, so dismissing the prompt leaves the label alone. A default can run
+// out (a fossil emptied of its Body and Trace fields), and then the other option is to clear the label.
 const confirmLabelUpdate = (storedLabel, newLabel) => new Promise(resolve => alert(
   'Update Label?',
   'This feature\'s label was filled in for it, and its data has since changed.'
-  + '\n\nKeep "' + storedLabel + '" or update it to "' + newLabel + '"?',
+  + '\n\nKeep "' + storedLabel + '" or ' + (newLabel ? 'update it to "' + newLabel + '"' : 'clear it') + '?',
   [
     {text: 'Keep', style: 'cancel', onPress: () => resolve(false)},
-    {text: 'Update', onPress: () => resolve(true)},
+    {text: newLabel ? 'Update' : 'Clear', onPress: () => resolve(true)},
   ],
   {cancelable: false},
 ));
@@ -76,10 +79,9 @@ const confirmLabelUpdate = (storedLabel, newLabel) => new Promise(resolve => ale
 // previousFeature is the feature as the form opened it, and is left out when one is being created.
 export const resolveLabelOnSave = async ({pageKey, previousFeature, values, getLabel, getLabels}) => {
   const newLabel = getDefaultLabel(pageKey, values, getLabel, getLabels);
-  if (isEmpty(newLabel)) return values;
 
   // An unlabeled feature is labeled for it, which is also how clearing the field asks for the default back
-  if (isEmpty(values.label)) return {...values, label: newLabel};
+  if (isEmpty(values.label)) return isEmpty(newLabel) ? values : {...values, label: newLabel};
   // Typed into this save, so it is the user's own and stands however it compares to the default
   if (values.label !== previousFeature?.label) return values;
   if (newLabel === values.label) return values;
