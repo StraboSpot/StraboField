@@ -2,8 +2,9 @@ import {getDefaultLabel, getFeatureTitle, resolveLabelOnSave} from './featureLab
 import {PAGE_KEYS} from './pageKeys.constants';
 
 // The real dictionary lookups are the forms' business, not this router's: stub them so a case can be read as
-// 'this page asks for these fields', and so a survey gaining a choice cannot break these tests
-const getLabel = key => (key === undefined || key === null ? '' : 'L(' + key + ')');
+// 'this page asks for these fields', and so a survey gaining a choice cannot break these tests. An empty value
+// reads as 'Unknown', as it does in useForm, so a title that forgets to check for one shows up here.
+const getLabel = key => (key === undefined || key === null || key === '' ? 'Unknown' : 'L(' + key + ')');
 const getLabels = keys => (Array.isArray(keys) ? keys : [keys]).map(getLabel).join(', ');
 
 describe('getDefaultLabel', () => {
@@ -99,6 +100,13 @@ describe('getDefaultLabel', () => {
     expect(getDefaultLabel(PAGE_KEYS.FOSSILS, {chordate: 'fish'}, getLabel, getLabels)).toBe('L(fish)');
     expect(getDefaultLabel(PAGE_KEYS.FOSSILS, {diversity: 'high'}, getLabel, getLabels)).toBe('L(high) Diversity');
     expect(getDefaultLabel(PAGE_KEYS.FOSSILS, {notes: 'a note'}, getLabel, getLabels)).toBeUndefined();
+  });
+
+  // The list numbers a bed with no package geometry, so there is no label to store for one
+  it('names a bed by its package geometry, and one without any not at all', () => {
+    expect(getDefaultLabel(PAGE_KEYS.BEDDING, {package_geometry: 'tabular'}, getLabel, getLabels))
+      .toBe('L(tabular)');
+    expect(getDefaultLabel(PAGE_KEYS.BEDDING, {notes: 'a note'}, getLabel, getLabels)).toBeUndefined();
   });
 
   it('names a sample by the name the user gave it', () => {

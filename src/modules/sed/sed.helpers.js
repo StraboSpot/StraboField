@@ -26,8 +26,8 @@ export const getBasicLithologyIndex = (lithology) => {
 };
 
 // getLabels is passed in because a plain helper cannot call useForm
-export const getBeddingTitle = (bedding, getLabels) => getLabels(bedding.package_geometry, ['sed', 'bedding'])
-  || 'Unknown Bed';
+export const getBeddingTitle = (bedding, getLabels) => (isEmpty(bedding.package_geometry) ? undefined
+  : getLabels(bedding.package_geometry, ['sed', 'bedding']));
 
 // The overlay fields are typed as text, so read the numbers out of them for saving. Everything but the image id is
 // a number: a width or height is kept only as a pair of positive numbers, and anything that is not a number at all
@@ -71,7 +71,7 @@ export const getFossilTitle = (fossil, getLabels) => {
   return bodyText && traceText ? bodyText + ' (' + traceText + ')' : bodyText || traceText;
 };
 
-// The types with data, as in 'Environment, Process Interpretation'. The list numbers the rows itself.
+// The types with data, as in 'Environment, Process Interpretation'.
 export const getInterpretationTitle = (interpretation) => {
   const typesText = getFilledSectionsTitle(INTERPRETATIONS_TABS, interpretation);
   return typesText && typesText + ' Interpretation';

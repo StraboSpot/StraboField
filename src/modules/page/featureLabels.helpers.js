@@ -17,8 +17,7 @@ import {
 import {getThreeDStructureTitle} from '../three-d-structures/threeDStructures.helpers';
 
 // The label a feature is given when the user does not type one: the title its list would otherwise build from
-// the feature's own fields, and only that part. What a list adds at render time is left out - the 'Lithology N'
-// prefixes and interpretation numbers, which are positions and go stale as soon as a sibling is deleted, and a
+// the feature's own fields, and only that part. What a list adds at render time is left out - a
 // measurement's orientation numbers, which follow the user's measurement convention setting.
 // Undefined where there is nothing to derive: a feature with no data its title is built from, and tephra, whose
 // label is a short identifier the layer type is shown after rather than a title, filled in by TephraPage.
