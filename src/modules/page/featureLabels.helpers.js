@@ -7,7 +7,7 @@ import {getTitle as getOtherFeatureTitle} from '../other-features/otherFeatures.
 import {getMineralTitle} from '../petrology/minerals/minerals.helpers';
 import {getReactionTextureTitle} from '../petrology/reaction-textures/reactionTextures.helpers';
 import {getPetRockTitle} from '../petrology/rocks/rocks.helpers';
-import {getBeddingTitle, getDiagenesisTitle, getFossilTitle, getSedRockTitle} from '../sed/sed.helpers';
+import {getBeddingTitle, getDiagenesisTitle, getFossilTitle, getSedRockTitle, getStructureTitle} from '../sed/sed.helpers';
 import {getThreeDStructureTitle} from '../three-d-structures/threeDStructures.helpers';
 
 // The label a feature is given when the user does not type one: the title its list would otherwise build from
@@ -49,6 +49,8 @@ export const getDefaultLabel = (pageKey, feature, getLabel, getLabels) => {
     // A sample is already named by the user, so that name is what its label is filled in with
     case PAGE_KEYS.SAMPLES:
       return feature.sample_id_name;
+    case PAGE_KEYS.STRUCTURES:
+      return getStructureTitle(feature);
     case PAGE_KEYS.THREE_D_STRUCTURES:
       return getThreeDStructureTitle(feature, getLabel);
     default:
@@ -64,7 +66,7 @@ export const getFeatureTitle = (pageKey, feature, getLabel, getLabels) => featur
 
 // alert is callback-based on native and a window.confirm polyfill on web, so give it back as something a save
 // can wait on. Keeping is the cancel option, so dismissing the prompt leaves the label alone. A default can run
-// out (a fossil or diagenesis emptied of its data), and then the other option is to clear the label.
+// out (a fossil, diagenesis or structure emptied of its data), and then the other option is to clear the label.
 const confirmLabelUpdate = (storedLabel, newLabel) => new Promise(resolve => alert(
   'Update Label?',
   'This feature\'s label was filled in for it, and its data has since changed.'

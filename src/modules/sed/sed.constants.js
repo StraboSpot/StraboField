@@ -4,6 +4,11 @@ import sedLithologiesComposition from '../../assets/forms/sed/lithologies-compos
 import sedLithologiesLithology from '../../assets/forms/sed/lithologies-lithology.json';
 import sedLithologiesStratification from '../../assets/forms/sed/lithologies-stratification.json';
 import sedLithologiesTexture from '../../assets/forms/sed/lithologies-texture.json';
+import sedStructuresBeddingPlane from '../../assets/forms/sed/structures-bedding-plane.json';
+import sedStructuresBioturbation from '../../assets/forms/sed/structures-bioturbation.json';
+import sedStructuresPedogenic from '../../assets/forms/sed/structures-pedogenic.json';
+import sedStructuresPhysical from '../../assets/forms/sed/structures-physical.json';
+import {toTitleCase} from '../../shared/helpers';
 
 export const ROCK_SECOND_ORDER_TYPE_FIELDS = [
   'siliciclastic_type',
@@ -84,6 +89,20 @@ export const STRUCTURE_SUBPAGES = {
   PEDOGENIC: 'pedogenic',
   PHYSICAL: 'physical',
 };
+
+// The Structures tabs in tab order, each named as SubpageTabs names it and with the fields it asks for. Every tab
+// shows the same Notes field, so a note is data on none of them.
+export const STRUCTURE_TABS = [
+  [STRUCTURE_SUBPAGES.BEDDING_PLANE, sedStructuresBeddingPlane],
+  [STRUCTURE_SUBPAGES.BIOTURBATION, sedStructuresBioturbation],
+  [STRUCTURE_SUBPAGES.PEDOGENIC, sedStructuresPedogenic],
+  [STRUCTURE_SUBPAGES.PHYSICAL, sedStructuresPhysical],
+].map(([subpageKey, form]) => ({
+  label: toTitleCase(subpageKey.replace(/_/g, ' ')),
+  fieldNames: form.survey
+    .filter(field => !field.type.includes('group') && !['label', 'notes'].includes(field.name))
+    .map(field => field.name),
+}));
 
 export const INTERPRETATIONS_SUBPAGES = {
   ARCHITECTURE: 'architecture',

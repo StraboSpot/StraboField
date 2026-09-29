@@ -10,6 +10,7 @@ import {
   ROCK_OTHER_TEXT_FIELDS,
   ROCK_SECOND_ORDER_TYPE_FIELDS,
   SED_ROCK_FIELDS,
+  STRUCTURE_TABS,
 } from './sed.constants';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {isStratInterval} from '../spots/spots.helpers';
@@ -41,11 +42,13 @@ export const getCleanedImageOverlay = (values) => {
   }, {});
 };
 
-// The headings of the sections with anything filled in, in form order
-export const getDiagenesisTitle = diagenesis => DIAGENESIS_SECTIONS
-  .filter(section => section.fieldNames.some(fieldName => !isEmpty(diagenesis[fieldName])))
+// The names of the sections with anything filled in, in form order
+const getFilledSectionsTitle = (sections, feature) => sections
+  .filter(section => section.fieldNames.some(fieldName => !isEmpty(feature[fieldName])))
   .map(section => section.label)
   .join(', ') || undefined;
+
+export const getDiagenesisTitle = diagenesis => getFilledSectionsTitle(DIAGENESIS_SECTIONS, diagenesis);
 
 // The first Body field filled in, then the first Trace field in parentheses - not capitalized like a second order
 // type, since the traces are not a kind of body fossil. Diversity is only a level, so it is named with it.
@@ -127,6 +130,8 @@ export const getSiliciclasticGrainSizeKey = (siliciclasticType) => {
       return undefined;
   }
 };
+
+export const getStructureTitle = structure => getFilledSectionsTitle(STRUCTURE_TABS, structure);
 
 // Whether a lithology has anything on the tabs the Sedimentary Rocks form leaves out
 export const hasOtherLithologyTabData = lithology => LITHOLOGY_OTHER_TAB_FIELDS

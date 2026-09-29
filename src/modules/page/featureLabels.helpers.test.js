@@ -59,9 +59,20 @@ describe('getDefaultLabel', () => {
     expect(getDefaultLabel(PAGE_KEYS.TEPHRA, {layer_type: 'ash'}, getLabel, getLabels)).toBeUndefined();
   });
 
-  it('gives the pages titled by position alone nothing to fill a label in with', () => {
-    [PAGE_KEYS.STRUCTURES, PAGE_KEYS.INTERPRETATIONS].forEach(
-      pageKey => expect(getDefaultLabel(pageKey, {id: 1}, getLabel, getLabels)).toBeUndefined());
+  it('gives the page titled by position alone nothing to fill a label in with', () => {
+    expect(getDefaultLabel(PAGE_KEYS.INTERPRETATIONS, {id: 1}, getLabel, getLabels)).toBeUndefined();
+  });
+
+  // Tab order, whatever order the tabs were filled in
+  it('names a structure by the tabs it has data on', () => {
+    expect(getDefaultLabel(PAGE_KEYS.STRUCTURES, {paleosol_horizons: ['a']}, getLabel, getLabels)).toBe('Pedogenic');
+    const structure = {lag_type: 'x', bedding_plane_features: ['x']};
+    expect(getDefaultLabel(PAGE_KEYS.STRUCTURES, structure, getLabel, getLabels)).toBe('Bedding Plane, Physical');
+  });
+
+  // Every tab shows the same Notes field, so it cannot say which tab was filled in
+  it('does not count a note as data on any tab', () => {
+    expect(getDefaultLabel(PAGE_KEYS.STRUCTURES, {notes: 'a note'}, getLabel, getLabels)).toBeUndefined();
   });
 
   // Any field under a heading counts, not only its first, and the headings keep form order whatever order the
@@ -235,6 +246,6 @@ describe('getFeatureTitle', () => {
   });
 
   it('gives nothing for a page with neither', () => {
-    expect(getFeatureTitle(PAGE_KEYS.STRUCTURES, {id: 1}, getLabel, getLabels)).toBeUndefined();
+    expect(getFeatureTitle(PAGE_KEYS.INTERPRETATIONS, {id: 1}, getLabel, getLabels)).toBeUndefined();
   });
 });
