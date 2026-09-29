@@ -202,7 +202,8 @@ stringifies a numeric key, and the server returns image ids as strings — not a
 constraint validation, and a label dictionary. Rendered by `/src/modules/form/`. To add a field: edit the form JSON, add
 a custom component in `form/` if needed, wire validation and slice state. Every form is set up through
 `form/FormikWrapper.js` — the only place `<Formik>` is used — which derives the survey validation from a `formName`
-prop; passing it `setIsFormInvalid` also validates as the user types so Save can be disabled while errors remain.
+prop; passing it `setIsFormInvalid` also validates as the user types so Save can be disabled while errors remain,
+and `setIsFormDirty` reports whether anything has changed, which the detail pages use to hold Save until it has.
 The input fields (`TextInputField`, `NumberInputField`, `DateInputField`, `SelectInputField`, `AcknowledgeInput`)
 read their own value, errors and setter from Formik through `useField`, so each is given a `name` and rendered
 directly — Formik's `<Field>` and `<Form>` are not used anywhere. Read the errors off the form bag, never
