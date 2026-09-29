@@ -258,7 +258,7 @@ const BasicPageDetail = ({
       const {errors, values} = await submitAndShowErrors(formRef.current || formCurrent, isLeavingPage);
       // page.key rather than pageKey: a deprecated fabric is stored with the 3D structures but is still titled
       // as a fabric
-      const editedFeatureData = await resolveLabelOnSave(
+      const editedFeatureData = resolveLabelOnSave(
         {pageKey: page.key, previousFeature: selectedFeature, values: values, getLabel: getLabel,
           getLabels: getLabels});
       console.log('Saving', page.label, 'data', editedFeatureData, 'to Spot', pageData);

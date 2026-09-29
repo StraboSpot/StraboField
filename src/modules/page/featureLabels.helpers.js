@@ -1,6 +1,5 @@
 import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty} from '../../shared/helpers';
-import alert from '../../shared/ui/alert';
 import {getFabricTitle} from '../fabrics/fabrics.helpers';
 import {getMeasurementTypeText} from '../measurements/measurements.helpers';
 import {getTitle as getOtherFeatureTitle} from '../other-features/otherFeatures.helpers';
@@ -64,36 +63,18 @@ export const getDefaultLabel = (pageKey, feature, getLabel, getLabels) => {
 export const getFeatureTitle = (pageKey, feature, getLabel, getLabels) => feature?.label
   || getDefaultLabel(pageKey, feature, getLabel, getLabels);
 
-// alert is callback-based on native and a window.confirm polyfill on web, so give it back as something a save
-// can wait on. Keeping is the cancel option, so dismissing the prompt leaves the label alone. A default can run
-// out (a fossil, diagenesis or structure emptied of its data), and then the other option is to clear the label.
-const confirmLabelUpdate = (storedLabel, newLabel) => new Promise(resolve => alert(
-  'Update Label?',
-  'This feature\'s label was filled in for it, and its data has since changed.'
-  + '\n\nKeep "' + storedLabel + '" or ' + (newLabel ? 'update it to "' + newLabel + '"' : 'clear it') + '?',
-  [
-    {text: 'Keep', style: 'cancel', onPress: () => resolve(false)},
-    {text: newLabel ? 'Update' : 'Clear', onPress: () => resolve(true)},
-  ],
-  {cancelable: false},
-));
-
-// The label to save with a feature, asking first where the answer is the user's to give. Returns the values
-// unchanged when there is nothing to label them with, so a page can hand its values straight through.
+// The label to save with a feature. One the user typed stands; one filled in for them follows the data, and is
+// cleared where the data it was filled in from is gone. Returns the values unchanged when the label stays as it
+// is, so a page can hand its values straight through.
 // previousFeature is the feature as the form opened it, and is left out when one is being created.
-export const resolveLabelOnSave = async ({pageKey, previousFeature, values, getLabel, getLabels}) => {
+export const resolveLabelOnSave = ({pageKey, previousFeature, values, getLabel, getLabels}) => {
   const newLabel = getDefaultLabel(pageKey, values, getLabel, getLabels);
-
-  // An unlabeled feature is labeled for it, which is also how clearing the field asks for the default back
-  if (isEmpty(values.label)) return isEmpty(newLabel) ? values : {...values, label: newLabel};
-  // Typed into this save, so it is the user's own and stands however it compares to the default
-  if (values.label !== previousFeature?.label) return values;
   if (newLabel === values.label) return values;
 
-  // Whether the stored label was filled in for the user is recomputed rather than remembered: if it still
-  // matches what the feature read as when the form opened, nothing has been typed over it. A label that does
-  // not match was written by hand, and is left alone.
-  const previousLabel = getDefaultLabel(pageKey, previousFeature, getLabel, getLabels);
-  if (previousFeature.label !== previousLabel) return values;
-  return (await confirmLabelUpdate(values.label, newLabel)) ? {...values, label: newLabel} : values;
+  // Whether a label was typed is recomputed rather than remembered: typed into this save, or no longer what the
+  // feature read as when the form opened. An empty field is never typed, which is how clearing it asks for the
+  // default back.
+  const isTyped = !isEmpty(values.label) && (values.label !== previousFeature?.label
+    || values.label !== getDefaultLabel(pageKey, previousFeature, getLabel, getLabels));
+  return isTyped ? values : {...values, label: newLabel};
 };

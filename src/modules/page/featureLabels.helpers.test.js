@@ -1,24 +1,10 @@
 import {getDefaultLabel, getFeatureTitle, resolveLabelOnSave} from './featureLabels.helpers';
 import {PAGE_KEYS} from './pageKeys.constants';
-import alert from '../../shared/ui/alert';
-
-jest.mock('../../shared/ui/alert');
 
 // The real dictionary lookups are the forms' business, not this router's: stub them so a case can be read as
 // 'this page asks for these fields', and so a survey gaining a choice cannot break these tests
 const getLabel = key => (key === undefined || key === null ? '' : 'L(' + key + ')');
 const getLabels = keys => (Array.isArray(keys) ? keys : [keys]).map(getLabel).join(', ');
-
-// Answers the label prompt the way a user would, and reports whether it was actually asked
-const answerPrompt = (choice) => {
-  alert.mockImplementation((title, description, options) => {
-    const option = options.find(o => (choice === 'Update' ? o.style !== 'cancel' : o.style === 'cancel'));
-    option.onPress();
-  });
-  return () => alert.mock.calls.length > 0;
-};
-
-beforeEach(() => jest.clearAllMocks());
 
 describe('getDefaultLabel', () => {
   // The orientation numbers are deliberately left out: they are added at render time so they keep following
@@ -129,64 +115,46 @@ describe('resolveLabelOnSave', () => {
     {pageKey: PAGE_KEYS.THREE_D_STRUCTURES, previousFeature: previousFeature, values: values,
       getLabel: getLabel, getLabels: getLabels});
 
-  it('labels a feature being created', async () => {
-    const wasAsked = answerPrompt('Keep');
+  it('labels a feature being created', () => {
     const values = {id: 1, type: 'fault', feature_type: 'thrust'};
-    expect(await resolve(undefined, values)).toEqual({...values, label: 'Fault - L(THRUST)'});
-    expect(wasAsked()).toBe(false);
+    expect(resolve(undefined, values)).toEqual({...values, label: 'Fault - L(THRUST)'});
   });
 
-  it('keeps a label the user typed as it is being created', async () => {
+  it('keeps a label the user typed as it is being created', () => {
     const values = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Big fault'};
-    expect(await resolve(undefined, values)).toEqual(values);
+    expect(resolve(undefined, values)).toEqual(values);
   });
 
-  it('fills in a label for a feature saved before there were labels', async () => {
-    const wasAsked = answerPrompt('Keep');
+  it('fills in a label for a feature saved before there were labels', () => {
     const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust'};
-    expect(await resolve(previousFeature, {...previousFeature})).toEqual(
-      {...previousFeature, label: 'Fault - L(THRUST)'});
-    expect(wasAsked()).toBe(false);
+    expect(resolve(previousFeature, {...previousFeature})).toEqual({...previousFeature, label: 'Fault - L(THRUST)'});
   });
 
   // The field's hint promises a default when none is given, so clearing it asks for that default back
-  it('gives the default back when the user clears the field', async () => {
+  it('gives the default back when the user clears the field', () => {
     const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Big fault'};
-    expect(await resolve(previousFeature, {...previousFeature, label: ''})).toEqual(
+    expect(resolve(previousFeature, {...previousFeature, label: ''})).toEqual(
       {...previousFeature, label: 'Fault - L(THRUST)'});
   });
 
-  it('asks before moving a label that was filled in, and keeps it when told to', async () => {
+  it('moves a label that was filled in along with the data', () => {
     const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Fault - L(THRUST)'};
     const values = {...previousFeature, feature_type: 'normal'};
-    const wasAsked = answerPrompt('Keep');
-    expect(await resolve(previousFeature, values)).toEqual(values);
-    expect(wasAsked()).toBe(true);
-  });
-
-  it('moves a label that was filled in when told to update it', async () => {
-    const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Fault - L(THRUST)'};
-    const values = {...previousFeature, feature_type: 'normal'};
-    answerPrompt('Update');
-    expect(await resolve(previousFeature, values)).toEqual({...values, label: 'Fault - L(NORMAL)'});
+    expect(resolve(previousFeature, values)).toEqual({...values, label: 'Fault - L(NORMAL)'});
   });
 
   // Whether a label was filled in is recomputed from the feature as the form opened it, not remembered, so a
   // label that does not match what the feature read as back then was typed by hand
-  it('never asks about a label the user typed, and leaves it alone', async () => {
+  it('leaves a label the user typed alone when the data changes', () => {
     const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Big fault by the creek'};
     const values = {...previousFeature, feature_type: 'normal'};
-    const wasAsked = answerPrompt('Update');
-    expect(await resolve(previousFeature, values)).toEqual(values);
-    expect(wasAsked()).toBe(false);
+    expect(resolve(previousFeature, values)).toEqual(values);
   });
 
-  it('does not ask when an edit leaves the label where it already was', async () => {
+  it('keeps a label typed into this save, even over a data change', () => {
     const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Fault - L(THRUST)'};
-    const values = {...previousFeature, notes: 'added a note'};
-    const wasAsked = answerPrompt('Update');
-    expect(await resolve(previousFeature, values)).toEqual(values);
-    expect(wasAsked()).toBe(false);
+    const values = {...previousFeature, feature_type: 'normal', label: 'Big fault'};
+    expect(resolve(previousFeature, values)).toEqual(values);
   });
 
   describe('on a page whose default can run out', () => {
@@ -195,38 +163,25 @@ describe('resolveLabelOnSave', () => {
         getLabels: getLabels});
     const previousFossil = {id: 1, chordate: 'fish', label: 'L(fish)'};
 
-    // Cleared, so the list falls back to titling the fossil by its position
-    it('asks before clearing a label that was filled in, and clears it when told to', async () => {
-      const wasAsked = answerPrompt('Update');
-      expect(await resolveFossil(previousFossil, {id: 1, label: 'L(fish)'})).toEqual({id: 1});
-      expect(wasAsked()).toBe(true);
-      expect(alert.mock.calls[0][2].map(option => option.text)).toEqual(['Keep', 'Clear']);
+    // So the list falls back to titling the fossil by its position
+    it('clears a label that was filled in once its data is gone', () => {
+      expect(resolveFossil(previousFossil, {id: 1, label: 'L(fish)'}).label).toBeUndefined();
     });
 
-    it('keeps a label that was filled in when told to', async () => {
-      answerPrompt('Keep');
-      const values = {id: 1, label: 'L(fish)'};
-      expect(await resolveFossil(previousFossil, values)).toEqual(values);
-    });
-
-    it('never asks about a label the user typed', async () => {
-      const wasAsked = answerPrompt('Update');
+    it('leaves a label the user typed', () => {
       const values = {id: 1, label: 'Fish bed'};
-      expect(await resolveFossil({...previousFossil, label: 'Fish bed'}, values)).toEqual(values);
-      expect(wasAsked()).toBe(false);
+      expect(resolveFossil({...previousFossil, label: 'Fish bed'}, values)).toEqual(values);
     });
 
-    it('leaves a fossil with nothing to label it by unlabeled', async () => {
-      const wasAsked = answerPrompt('Update');
+    it('leaves a fossil with nothing to label it by unlabeled', () => {
       const values = {id: 1, notes: 'a note'};
-      expect(await resolveFossil({id: 1}, values)).toBe(values);
-      expect(wasAsked()).toBe(false);
+      expect(resolveFossil({id: 1}, values)).toBe(values);
     });
   });
 
-  it('hands back the values untouched on a page with no label to give', async () => {
+  it('hands back the values untouched on a page with no label to give', () => {
     const values = {id: 1, text: 'a note'};
-    const resolved = await resolveLabelOnSave({pageKey: PAGE_KEYS.NOTES, previousFeature: {id: 1}, values: values,
+    const resolved = resolveLabelOnSave({pageKey: PAGE_KEYS.NOTES, previousFeature: {id: 1}, values: values,
       getLabel: getLabel, getLabels: getLabels});
     expect(resolved).toBe(values);
   });
