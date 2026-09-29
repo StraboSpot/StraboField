@@ -60,6 +60,7 @@ const MeasurementDetail = ({
 
   const [formName, setFormName] = useState([]);
   const [isAddingAssociatedMeasurementAfterSave, setIsAddingAssociatedMeasurementAfterSave] = useState(false);
+  const [isFormDirty, setIsFormDirty] = useState(false);
   const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [selectedMeasurement, setSelectedMeasurement] = useState(null);
 
@@ -414,7 +415,8 @@ const MeasurementDetail = ({
     return (
       <SaveAndCancelButtons
         cancel={cancelFormAndGo}
-        getIsDisabled={isFormInvalid}
+        // Nothing changed means nothing to save. A template is left out, as its name is edited outside the form.
+        getIsDisabled={isFormInvalid || (!isTemplate && !isFormDirty)}
         save={() => isTemplate ? saveTemplateForm(formRef.current) : saveFormAndGo()}
       />
     );
@@ -432,6 +434,7 @@ const MeasurementDetail = ({
             initialValues={selectedMeasurement}
             innerRef={formRef}
             onReset={() => console.log('Resetting form...')}
+            setIsFormDirty={setIsFormDirty}
             setIsFormInvalid={setIsFormInvalid}
           >
             {formProps => (

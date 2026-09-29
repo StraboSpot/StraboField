@@ -72,6 +72,7 @@ const BasicPageDetail = ({
   const [igsnFormValues, setIgsnFormValues] = useState(null);
   const [initialValues, setInitialValues] = useState(selectedFeature);
   const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
+  const [isFormDirty, setIsFormDirty] = useState(false);
   const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
@@ -93,8 +94,11 @@ const BasicPageDetail = ({
   // it is already on SESAR and reachable to be updated in place
   const isSesarRegistrationBlocked = isIGSNChecked && (!sesar.sesarToken.access
     || (isEmpty(sesar.selectedUserCode) && !(selectedFeature.isOnMySesar && isInternetReachable)));
+  // A feature with nothing changed has nothing to save, and saving a sample with an IGSN would send the same data
+  // to SESAR again. A template is left out, as its name is edited outside the form and can be saved on its own.
+  const isFeatureUnchanged = !isTemplate && !isFormDirty;
   // Every reason the save itself is refused, held at the button rather than failing once it is pressed
-  const isSaveDisabled = isRegisteredSampleOffline || isSesarRegistrationBlocked;
+  const isSaveDisabled = isRegisteredSampleOffline || isSesarRegistrationBlocked || isFeatureUnchanged;
   // Pages whose form fills one orientation field in from another name the pairs it uses
   const orientationFields = page.key === PAGE_KEYS.THREE_D_STRUCTURES ? THREE_D_STRUCTURE_ORIENTATION_FIELDS
     : page.key === PAGE_KEYS.EARTHQUAKES ? EARTHQUAKE_ORIENTATION_FIELDS
@@ -365,6 +369,7 @@ const BasicPageDetail = ({
           onReset={() => console.log('Resetting form...')}
           onSubmit={onSubmitForm}
           setInvalidFields={setInvalidFields}
+          setIsFormDirty={setIsFormDirty}
           setIsFormInvalid={setIsFormInvalid}
           validate={values => validateFeature(formName, values)}
         >
