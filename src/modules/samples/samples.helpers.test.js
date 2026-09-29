@@ -5,6 +5,7 @@ import {
   getSampleTitle,
   getUnlinkedSample,
   isLinkedToOtherFieldSample,
+  isSampleStub,
 } from './samples.helpers';
 
 const sample = {id: 's1', sample_id_name: 'JG-1'};
@@ -83,12 +84,22 @@ describe('getLinkedSample', () => {
       strabosamples_id: 'ab12cd34-ef56-4a78-9b01-23456789abcd',
       sample_id_name: 'Old field name',
       color: 'black',
+      sample_description: 'Cored from the flow top',
+      material_type: 'intact_rock',
+      main_sampling_purpose: 'petrology',
     });
   });
 
   it('keeps a numeric StraboSamples id as a string', () => {
     expect(getLinkedSample({id: 1}, {id: 17794148544769}).strabosamples_id).toBe('17794148544769');
     expect(getLinkedSample({id: 1}, {id: '0017794148544769'}).strabosamples_id).toBe('0017794148544769');
+  });
+});
+
+describe('isSampleStub', () => {
+  it('knows the placeholder a parent Spot keeps from a sample', () => {
+    expect(isSampleStub({id: 1})).toBe(true);
+    expect(isSampleStub({id: 1, sample_id_name: 'A'})).toBe(false);
   });
 });
 

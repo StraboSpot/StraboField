@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
 
-import {ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import IGSNLogo from './igsn/IGSNLogo';
@@ -9,7 +9,8 @@ import IGSNModal from './igsn/IGSNModal';
 import {getSampleMetadata, getSampleTitle} from './samples.helpers';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
-import {truncateText} from '../../shared/helpers';
+import {isEmpty, truncateText} from '../../shared/helpers';
+import {BLACK} from '../../shared/styles.constants';
 import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import CheckboxList from '../../shared/ui/CheckboxList';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
@@ -67,57 +68,68 @@ const SampleListItem = ({
 
   return (
     <>
-    <ListItem
-      containerStyle={commonStyles.listItem}
-      key={'SampleListItem' + sampleMetadata.id}
-      onPress={() => isCheckedList ? handleCheckBoxPressed() : onPress(sample)}
-    >
-      {isShowAvatar && (
-        <AvatarWrapper
-          size={20}
-          source={getSampleSpotIconSource()}
-        />
-      )}
-      <ListItem.Content style={sampleStyles.listContentContainer}>
-        <View>
-          <ListItem.Title style={{...commonStyles.listItemTitle, textAlign: 'left'}}>
-            {getSampleTitle(sample)}
-          </ListItem.Title>
-          {isShowSubtitle && (
-            <ListItem.Subtitle>
-              {oriented} - {sampleMetadata.sample_description ? truncateText(sampleMetadata.sample_description,
-              25) : 'No Description'}
-            </ListItem.Subtitle>
-          )}
-        </View>
-        {(isShowIGSN || sampleMetadata.Sample_IGSN) && (
-          <View>
-            <IGSNLogo
-              item={sampleMetadata}
-              onIGSNButtonPressed={handleIGSNButtonPressed}
-            />
-          </View>
+      <ListItem
+        containerStyle={commonStyles.listItem}
+        key={'SampleListItem' + sampleMetadata.id}
+        onPress={() => isCheckedList ? handleCheckBoxPressed() : onPress(sample)}
+      >
+        {isShowAvatar && (
+          <AvatarWrapper
+            size={20}
+            source={getSampleSpotIconSource()}
+          />
         )}
-      </ListItem.Content>
-      {isCheckedList ? (
-        <CheckboxList
-          handleCheckBoxPressed={handleCheckBoxPressed}
-          isItemChecked={isItemChecked}
-          isReadOnly={isReadOnly}
-        />
-      ) : (
-        <>
-          <SpotDataIcons isReadOnly={isReadOnly} spot={sample.properties?.isSample ? sample : undefined}/>
-          <ListItem.Chevron/>
-        </>
-      )}
-    </ListItem>
-    <IGSNModal
-      isVisible={isIGSNModalVisible}
-      onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN))}
-      onModalCancel={() => setIsIGSNModalVisible(false)}
-      sampleValues={sampleMetadata}
-    />
+        <ListItem.Content style={sampleStyles.listContentContainer}>
+          <View style={{flexShrink: 1}}>
+            <ListItem.Title style={{...commonStyles.listItemTitle, textAlign: 'left'}}>
+              {getSampleTitle(sample)}
+            </ListItem.Title>
+            {isShowSubtitle && (
+              <ListItem.Subtitle>
+                {oriented} - {sampleMetadata.sample_description ? truncateText(sampleMetadata.sample_description,
+                25) : 'No Description'}
+              </ListItem.Subtitle>
+            )}
+          </View>
+          <View style={{alignItems: 'center', flexDirection: 'row', gap: 10}}>
+            {/* Linked to a StraboSamples sample, so it is shared with StraboMicro and StraboExperimental */}
+            {!isEmpty(sampleMetadata.strabosamples_id) && (
+              <Icon
+                accessibilityLabel={'Linked to StraboSamples'}
+                color={BLACK}
+                iconStyle={{transform: [{rotate: '-45deg'}]}}
+                name={'link'}
+                size={22}
+                type={'ionicon'}
+              />
+            )}
+            {(isShowIGSN || sampleMetadata.Sample_IGSN) && (
+              <IGSNLogo
+                item={sampleMetadata}
+                onIGSNButtonPressed={handleIGSNButtonPressed}
+              />
+            )}
+          </View>
+        </ListItem.Content>
+        {isCheckedList ? (
+          <CheckboxList
+            handleCheckBoxPressed={handleCheckBoxPressed}
+            isItemChecked={isItemChecked}
+            isReadOnly={isReadOnly}
+          />
+        ) : (
+          <>
+            <SpotDataIcons isReadOnly={isReadOnly} spot={sample.properties?.isSample ? sample : undefined}/>
+            <ListItem.Chevron/>
+          </>
+        )}
+      </ListItem>
+      <IGSNModal
+        isVisible={isIGSNModalVisible}
+        onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN))}
+        onModalCancel={() => setIsIGSNModalVisible(false)}
+        sampleValues={sampleMetadata}
+      />
     </>
   );
 };

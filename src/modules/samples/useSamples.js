@@ -2,7 +2,7 @@ import * as turf from '@turf/turf';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getLinkedSample, getSampleMetadata, getUnlinkedSample} from './samples.helpers';
+import {getLinkedSample, getSampleMetadata, getUnlinkedSample, isSampleStub} from './samples.helpers';
 import {isEmpty} from '../../shared/helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
@@ -119,8 +119,13 @@ const useSamples = () => {
   };
 
   // The selected sample's record, whether it is a rich sample or a sample kept on its parent Spot
-  const getSelectedSample = () => selectedSpot.properties?.isSample ? getSampleMetadata(selectedSpot)
-    : selectedAttributes?.[0];
+  // A stub on a parent Spot is not a sample of its own, so it is never given back to be linked: filling it in would
+  // turn it into a second sample record on the server.
+  const getSelectedSample = () => {
+    if (selectedSpot.properties?.isSample) return getSampleMetadata(selectedSpot);
+    const sample = selectedAttributes?.[0];
+    return sample && !isSampleStub(sample) ? sample : undefined;
+  };
 
   const linkSample = strabosample => saveSelectedSample(getLinkedSample(getSelectedSample(), strabosample));
 

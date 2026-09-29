@@ -93,8 +93,7 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
   /* Logic Helpers */
 
   const getLinkWarnings = (strabosample) => {
-    const warnings = getSamplesLinkedTo(spots, getStraboSamplesId(strabosample), fieldSample.id)
-      .map(sample => `${getSampleTitle(sample)} in this project is already linked to this sample.`);
+    const warnings = getSamplesLinkedTo(spots, getStraboSamplesId(strabosample), fieldSample.id).map(sample => `${getSampleTitle(sample)} in this project is already linked to this sample.`);
     if (isEmpty(warnings) && isLinkedToOtherFieldSample(strabosample, fieldSample.id)) {
       warnings.push('StraboSamples already has this sample linked to a different Field sample.');
     }
@@ -102,6 +101,11 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
   };
 
   const link = (strabosample) => {
+    if (isEmpty(getSelectedSample())) {
+      setErrorMessage('This sample can\'t be linked from here. Open the Sample itself and link it there.');
+      setSampleToConfirm(null);
+      return;
+    }
     linkSample(strabosample);
     closeModal();
     toast.show(`Linked to ${strabosample.name || 'StraboSamples sample'}`, {type: 'success'});
@@ -111,13 +115,12 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
     try {
       setErrorMessage('');
       setIsLoading(true);
-      const response = await getMySamples();
-      const allSamples = response?.samples || [];
       // mysamples also returns samples shared with the user, which can't be linked yet, so offer only their own.
-      // userpkey and straboUserId may differ in type, so compare them as strings.
-      const ownSamples = isEmpty(straboUserId) ? allSamples
-        : allSamples.filter(sample => String(sample.userpkey) === String(straboUserId));
-      setSamples(ownSamples);
+      // Without the user's id there is no telling which those are, so offer none rather than risk a shared one.
+      if (isEmpty(straboUserId)) throw new Error('Your user profile has not loaded yet. Please try again shortly.');
+      const response = await getMySamples();
+      // userpkey and straboUserId may differ in type, so compare them as strings
+      setSamples((response?.samples || []).filter(sample => String(sample.userpkey) === String(straboUserId)));
     }
     catch (err) {
       console.error('Error getting samples from StraboSamples', err);

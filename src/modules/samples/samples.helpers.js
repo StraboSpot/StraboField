@@ -21,18 +21,24 @@ export const getStraboSamplesId = strabosample => typeof strabosample.id === 'st
   : String(strabosample.id);
 
 // A Field sample linked to a StraboSamples sample. Only the fields the user left empty are filled in, so nothing typed
-// in the field is overwritten. A sample linked to Field before carries that Field record as field_data, which is
-// preferred over mapping its StraboSamples fields. The sample keeps its own id, which is what the Spot and its parent
-// know it by - the link lives only in strabosamples_id.
+// in the field is overwritten. A sample linked to Field before carries that Field record as field_data, whose keys are
+// preferred over the mapped StraboSamples fields wherever both have one. The sample keeps its own id, which is what
+// the Spot and its parent know it by - the link lives only in strabosamples_id.
 export const getLinkedSample = (fieldSample, strabosample) => {
   const {id: _id, strabosamples_id: _strabosamplesId, ...fieldData} = strabosample.field_data || {};
-  const values = !isEmpty(strabosample.field_data) ? fieldData
-    : Object.fromEntries(Object.entries(STRABOSAMPLES_FIELD_MAP).map(([key, fieldKey]) => [fieldKey, strabosample[key]]));
+  const mappedValues = Object.fromEntries(
+    Object.entries(STRABOSAMPLES_FIELD_MAP).map(([key, fieldKey]) => [fieldKey, strabosample[key]]),
+  );
+  const values = {...mappedValues, ...Object.fromEntries(Object.entries(fieldData).filter(([, v]) => !isEmpty(v)))};
   const valuesToFill = Object.fromEntries(
     Object.entries(values).filter(([key, value]) => !isEmpty(value) && isEmpty(fieldSample[key])),
   );
   return {...fieldSample, ...valuesToFill, strabosamples_id: getStraboSamplesId(strabosample)};
 };
+
+// The placeholder a parent Spot keeps for a sample promoted to its own Spot: the id and nothing else. The server tells
+// a stub from a sample by that shape, so any other key turns it into a second, blank copy of the sample.
+export const isSampleStub = sample => Object.keys(sample).length === 1 && 'id' in sample;
 
 // A Field sample unlinked from StraboSamples becomes a separate sample again under its own id
 export const getUnlinkedSample = (fieldSample) => {
