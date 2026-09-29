@@ -1,3 +1,4 @@
+import sedFossils from '../../assets/forms/sed/fossils.json';
 import sedLithologiesComposition from '../../assets/forms/sed/lithologies-composition.json';
 import sedLithologiesLithology from '../../assets/forms/sed/lithologies-lithology.json';
 import sedLithologiesStratification from '../../assets/forms/sed/lithologies-stratification.json';
@@ -30,12 +31,26 @@ export const ROCK_COMPOSITION_TITLE_FIELDS = compositionSurvey
   .filter(field => field.name && !field.type.includes('group'))
   .map(field => field.name);
 
-// The text field shown once 'other' is selected, keyed by the field it is selected in, across both tabs a sed rock's
-// title reads from
-export const ROCK_OTHER_TEXT_FIELDS = [...sedLithologiesLithology.survey, ...compositionSurvey].reduce((acc, field) => {
-  const selectFieldName = field.type === 'text' && field.relevant?.match(/^selected\(\$\{(\w+)\}, 'other'\)$/)?.[1];
+// The text field shown once 'other' is selected, keyed by the field it is selected in. A select_multiple asks for it
+// with selected(${field}, 'other') and a select_one with ${field} = 'other'.
+const getOtherTextFields = survey => survey.reduce((acc, field) => {
+  const selectFieldName = field.type === 'text' && field.relevant?.match(/\$\{(\w+)\}.*'other'/)?.[1];
   return selectFieldName ? {...acc, [selectFieldName]: field.name} : acc;
 }, {});
+
+// Across both tabs a sed rock's title reads from
+export const ROCK_OTHER_TEXT_FIELDS = getOtherTextFields([...sedLithologiesLithology.survey, ...compositionSurvey]);
+
+export const FOSSIL_OTHER_TEXT_FIELDS = getOtherTextFields(sedFossils.survey);
+
+// The fields a fossil's title can use, in form order: the Body group's choices, then two of the Trace group's
+const fossilsSurvey = sedFossils.survey;
+export const FOSSIL_BODY_TITLE_FIELDS = fossilsSurvey
+  .slice(fossilsSurvey.findIndex(field => field.label === 'Body'),
+    fossilsSurvey.findIndex(field => field.label === 'Trace'))
+  .filter(field => field.type.startsWith('select'))
+  .map(field => field.name);
+export const FOSSIL_TRACE_TITLE_FIELDS = ['diversity', 'descriptive'];
 
 // An image overlay's width and height are only ever saved together, and each is worked out from the other, so
 // they are kept as a pair - width first, so the two are always read the same way round

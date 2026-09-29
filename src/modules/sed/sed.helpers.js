@@ -1,4 +1,7 @@
 import {
+  FOSSIL_BODY_TITLE_FIELDS,
+  FOSSIL_OTHER_TEXT_FIELDS,
+  FOSSIL_TRACE_TITLE_FIELDS,
   IMAGE_OVERLAY_SIZE_KEYS,
   LITHOLOGY_INTERVAL_CHARACTERS,
   LITHOLOGY_OTHER_TAB_FIELDS,
@@ -35,6 +38,26 @@ export const getCleanedImageOverlay = (values) => {
     if (IMAGE_OVERLAY_SIZE_KEYS.includes(key)) return hasImageSize ? {...acc, [key]: number} : acc;
     return isNaN(number) ? acc : {...acc, [key]: number};
   }, {});
+};
+
+// The first Body field filled in, then the first Trace field in parentheses - not capitalized like a second order
+// type, since the traces are not a kind of body fossil. Diversity is only a level, so it is named with it.
+// getLabels is passed in because a plain helper cannot call useForm
+export const getFossilTitle = (fossil, getLabels) => {
+  const getFirstFieldText = (fieldNames) => {
+    const fieldName = fieldNames.find(name => !isEmpty(fossil[name]));
+    if (!fieldName) return undefined;
+    // A choice of 'other' reads as whatever was typed for it, if anything was
+    const choicesText = [fossil[fieldName]].flat()
+      .map(value => (value === 'other' && fossil[FOSSIL_OTHER_TEXT_FIELDS[fieldName]])
+        || getLabels(value, ['sed', 'fossils']))
+      .join(', ');
+    return toTitleCase(choicesText) + (fieldName === 'diversity' ? ' Diversity' : '');
+  };
+
+  const bodyText = getFirstFieldText(FOSSIL_BODY_TITLE_FIELDS);
+  const traceText = getFirstFieldText(FOSSIL_TRACE_TITLE_FIELDS);
+  return bodyText && traceText ? bodyText + ' (' + traceText + ')' : bodyText || traceText;
 };
 
 // The fields a lithology has to answer when the Spot it belongs to is an interval mapped on a strat section. Their
