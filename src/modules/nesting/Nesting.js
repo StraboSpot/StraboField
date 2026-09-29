@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 
 import NestingImageCard from './NestingImageCard';
 import useNesting from './useNesting';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, isSameId} from '../../shared/helpers';
 import {BLACK, SAMPLES_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import PageHeader from '../page/PageHeader';
@@ -25,7 +25,7 @@ const Nesting = ({page}) => {
   const spots = useSelector(state => state.spot.spots);
 
   const {getChildrenGenerationsSpots, getParentGenerationsSpots} = useNesting();
-  const {getSpotWithThisImageBasemap, handleSpotSelected} = useSpots();
+  const {handleSpotSelected} = useSpots();
 
   /* Local State */
 
@@ -45,13 +45,17 @@ const Nesting = ({page}) => {
 
   /* Logic Helpers */
 
+  // Searches every Dataset, as the nest does. The id can arrive as an object key, so a string.
+  const getSpotWithThisImage = imageId => Object.values(spots).find(
+    spot => spot.properties.images?.some(image => isSameId(image.id, imageId)));
+
   const updateNest = () => {
     if (!isEmpty(selectedSpot)) {
       console.log(`Updating Nest for ${selectedSpot.properties.isSample ? 'Sample\'s Parent Spot' : 'Selected Spot'}`,
         selectedSpot, '...');
       const parentSpots = getParentGenerationsSpots(selectedSpot, 10);
       setParentGenerations(parentSpots);
-      const childrenSpots = getChildrenGenerationsSpots(selectedSpot, 10);
+      const childrenSpots = getChildrenGenerationsSpots(selectedSpot, 10, true);
       setChildrenGenerations(childrenSpots);
     }
   };
@@ -104,7 +108,7 @@ const Nesting = ({page}) => {
   const renderGroup = (type, i, [imageBasemapKey, group], b) => {
     console.log('renderGroup', type, i, group, b);
     console.log('renderGroup', type, i, imageBasemapKey, group, b);
-    const spotWithThisImageBasemap = imageBasemapKey !== 'undefined' && getSpotWithThisImageBasemap(imageBasemapKey);
+    const spotWithThisImageBasemap = imageBasemapKey !== 'undefined' && getSpotWithThisImage(imageBasemapKey);
     const isGroupNestedInSample = spotWithThisImageBasemap?.properties?.isSample;
     return (
       <View
@@ -160,7 +164,8 @@ const Nesting = ({page}) => {
   };
 
   const renderSelf = (self) => {
-    const spotWithThisImageBasemap = getSpotWithThisImageBasemap(self.properties?.image_basemap);
+    const imageBasemapId = self.properties?.image_basemap;
+    const spotWithThisImageBasemap = imageBasemapId && getSpotWithThisImage(imageBasemapId);
     const isSampleORSampleChild = self.properties?.isSample || spotWithThisImageBasemap?.properties?.isSample;
     return (
       <View style={{

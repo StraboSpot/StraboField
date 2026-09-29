@@ -20,10 +20,10 @@ const useNesting = () => {
   /* Internal Functions */
 
   // Get the children of an array of Spots
-  const getChildrenOfSpots = (spots1, activeSpots) => {
+  const getChildrenOfSpots = (spots1, activeSpots, searchedSpots) => {
     let allChildrenSpots = [];
     spots1.forEach((spot) => {
-      const childrenSpots = getChildrenSpots(spot, activeSpots);
+      const childrenSpots = getChildrenSpots(spot, activeSpots, searchedSpots);
       if (!isEmpty(childrenSpots)) allChildrenSpots.push(childrenSpots);
     });
     return allChildrenSpots.flat();
@@ -31,29 +31,29 @@ const useNesting = () => {
 
   // Get all the children Spots of thisSpot, based on sample, image basemaps, strat sections and geometry
   // & also Spots stored in spot.properties.nesting not nested through geometry
-  const getChildrenSpots = (thisSpot, activeSpots) => {
+  const getChildrenSpots = (thisSpot, activeSpots, searchedSpots) => {
     console.log('Getting Children Spots...');
     let childrenSpots = [];
-    // Find active children spots based on sample
+    // Find children spots based on sample
     if (!thisSpot.properties.isSample && thisSpot.properties.samples) {
       const sampleIds = thisSpot.properties.samples.map(sample => sample.id);
       const sampleChildrenSpots = sampleIds.map(sampleId => spots[sampleId]).filter(Boolean);
       childrenSpots.push(sampleChildrenSpots);
     }
-    // Find active children spots based on image basemap
+    // Find children spots based on image basemap
     if (thisSpot.properties.images) {
       const imageBasemaps = thisSpot.properties.images.map(image => image.id);
-      const imageBasemapChildrenSpots = activeSpots.filter(
+      const imageBasemapChildrenSpots = searchedSpots.filter(
         spot => imageBasemaps.includes(spot.properties.image_basemap));
       childrenSpots.push(imageBasemapChildrenSpots);
     }
-    // Find active children spots based on strat section
+    // Find children spots based on strat section
     if (thisSpot.properties.sed && thisSpot.properties.sed.strat_section) {
-      const stratSectionChildrenSpots = activeSpots.filter(
+      const stratSectionChildrenSpots = searchedSpots.filter(
         spot => thisSpot.properties.sed.strat_section.strat_section_id === spot.properties.strat_section_id);
       childrenSpots.push(stratSectionChildrenSpots);
     }
-    // Find active children spots not nested through geometry - nested directly in spot.properties.nesting
+    // Find children spots not nested through geometry - nested directly in spot.properties.nesting
     if (thisSpot.properties.nesting) {
       let nonGeomChildrenSpots = [];
       thisSpot.properties.nesting.forEach((spotId) => {
@@ -77,10 +77,10 @@ const useNesting = () => {
   };
 
   // Get the parents (not Samples) of an array of Spots
-  const getParentsOfSpots = (spots1, activeSpots) => {
+  const getParentsOfSpots = (spots1, activeSpots, allSpots) => {
     let allParentSpots = [];
     spots1.forEach((spot) => {
-      const parentSpots = getParentSpots(spot, activeSpots);
+      const parentSpots = getParentSpots(spot, activeSpots, allSpots);
       if (!isEmpty(parentSpots)) allParentSpots.push(parentSpots);
     });
     return allParentSpots.flat();
@@ -88,28 +88,28 @@ const useNesting = () => {
 
   // Get all the parent Spots of thisSpot, based on sample, image basemaps, strat sections and geometry
   // & also Spots stored in spot.properties.nesting not nested through geometry
-  const getParentSpots = (thisSpot, activeSpots) => {
+  const getParentSpots = (thisSpot, activeSpots, allSpots) => {
     console.log('Getting Parent Spots...');
     let parentSpots = [];
-    // Find active parent spots based on sample
+    // Find parent spots based on sample
     if (thisSpot?.properties.isSample) {
       const parentSpot = getSpotWithThisSample(thisSpot.properties.id);
-      parentSpots.push(parentSpot);
+      if (!isEmpty(parentSpot)) parentSpots.push(parentSpot);
     }
-    // Find active parent spots based on image basemap
+    // Find parent spots based on image basemap
     if (thisSpot?.properties.image_basemap) {
-      const parentImageBasemapSpot = activeSpots.find(spot => spot.properties.images && spot.properties.images.find(
+      const parentImageBasemapSpot = allSpots.find(spot => spot.properties.images && spot.properties.images.find(
         image => image.id === thisSpot.properties.image_basemap));
       if (!isEmpty(parentImageBasemapSpot)) parentSpots.push(parentImageBasemapSpot);
     }
-    // Find active parent spots based on strat section
+    // Find parent spots based on strat section
     if (thisSpot.properties.strat_section_id) {
-      const parentStratSectionSpot = activeSpots.find(
+      const parentStratSectionSpot = allSpots.find(
         spot => spot.properties?.sed?.strat_section?.strat_section_id === thisSpot.properties.strat_section_id);
       if (!isEmpty(parentStratSectionSpot)) parentSpots.push(parentStratSectionSpot);
     }
-    // Find active parent Spots not nested through geometry - nested directly in spot.properties.nesting
-    const parentNonGeomSpot = activeSpots.find(
+    // Find parent Spots not nested through geometry - nested directly in spot.properties.nesting
+    const parentNonGeomSpot = allSpots.find(
       spot => spot.properties.nesting && spot.properties.nesting.includes(thisSpot.properties.id));
     if (!isEmpty(parentNonGeomSpot)) parentSpots.push(parentNonGeomSpot);
     parentSpots = parentSpots.flat();
@@ -128,13 +128,15 @@ const useNesting = () => {
 
   /* Exported Functions */
 
-  // Get i generations of active children spots for thisSpot
-  const getChildrenGenerationsSpots = (thisSpot, i) => {
+  // Get i generations of children spots for thisSpot. Children on an image basemap or strat section come from every
+  // Dataset only if isAllDatasets, which the map leaves off so selecting there never picks up Spots it has not drawn
+  const getChildrenGenerationsSpots = (thisSpot, i, isAllDatasets = false) => {
     const activeSpots = Object.values(getActiveSpotsObj());
+    const searchedSpots = isAllDatasets ? Object.values(spots) : activeSpots;
     let childrenGenerations = [];
     let childSpots = [thisSpot];
     Array.from({length: i}, () => {
-      childSpots = getChildrenOfSpots(childSpots, activeSpots);
+      childSpots = getChildrenOfSpots(childSpots, activeSpots, searchedSpots);
       // Remove a child Spot if already in the list of children generation Spots
       childSpots = childSpots.filter(childSpot => !childrenGenerations.flat().find(
         knownChildSpot => childSpot.properties.id === knownChildSpot.properties.id));
@@ -144,13 +146,14 @@ const useNesting = () => {
     return childrenGenerations;
   };
 
-  // Get i generations of active parent spots for thisSpot
+  // Get i generations of parent spots for thisSpot, from every Dataset except for those nested by geometry
   const getParentGenerationsSpots = (thisSpot, i) => {
     const activeSpots = Object.values(getActiveSpotsObj());
+    const allSpots = Object.values(spots);
     let parentGenerations = [];
     let parentSpots = [thisSpot];
     Array.from({length: i}, () => {
-      parentSpots = getParentsOfSpots(parentSpots, activeSpots);
+      parentSpots = getParentsOfSpots(parentSpots, activeSpots, allSpots);
       // Remove a parent Spot if already in the list of parent generation Spots
       parentSpots = parentSpots.filter(parentSpot => !parentGenerations.flat().find(
         knownParentSpot => parentSpot.properties.id === knownParentSpot.properties.id));

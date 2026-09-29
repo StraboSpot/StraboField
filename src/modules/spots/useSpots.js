@@ -80,13 +80,15 @@ const useSpots = () => {
 
   /* Internal Functions */
 
-  // Turn on the Dataset of the Spot holding an image basemap or strat section, if it is off, so the map can open
-  const activateDatasetWithSpot = (spot, mapName) => {
-    const datasetId = getDatasetIdFromSpotId(spot.properties.id);
-    if (isEmpty(datasetId) || getActiveDatasets().some(dataset => isSameId(dataset.id, datasetId))) return;
-    dispatch(setActiveDatasets({bool: true, dataset: datasetId}));
+  // Turn on the Datasets holding these Spots that are off, with one toast for them all
+  const activateDatasetsWithSpots = (spotsToShow) => {
+    const datasetIds = [...new Set(spotsToShow.map(spot => getDatasetIdFromSpotId(spot.properties.id)))].filter(
+      datasetId => !isEmpty(datasetId) && !getActiveDatasets().some(dataset => isSameId(dataset.id, datasetId)));
+    if (isEmpty(datasetIds)) return;
+    datasetIds.forEach(datasetId => dispatch(setActiveDatasets({bool: true, dataset: datasetId})));
     dispatch(clearedSpotsInMapExtentIds());
-    toast.show(`Dataset ${datasets[datasetId].name} turned on to show the ${mapName} this Spot is on.`,
+    const datasetNames = datasetIds.map(datasetId => datasets[datasetId].name).join(', ');
+    toast.show(`${datasetIds.length === 1 ? 'Dataset' : 'Datasets'} ${datasetNames} turned on to show this Spot.`,
       {duration: 5000});
   };
 
@@ -665,23 +667,25 @@ const useSpots = () => {
     return Object.values(getActiveSpotsObj()).filter(spot => !spot.properties?.isSample);
   };
 
+  // Select a Spot and open the map it is on, turning on its Dataset and that of the Spot holding the map if either is
+  // off (the Nesting page lists Spots from every Dataset). The map is read straight off the Spot holding it, found in
+  // every Dataset, because a Dataset turned on here is not active in the store until the next render.
   const handleSpotSelected = (spot) => {
     dispatch(setSelectedSpot(spot));
+    const spotsToShow = [spot];
 
     // Set correct map for type of selected Spot
     if (isOnGeoMap(spot)) {
       if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
       if (stratSection) dispatch(clearedStratSection());
     }
-    // The Spot holding the map is searched for in every Dataset, and the map is read straight off it, because
-    // a Dataset turned on here is not active in the store until the next render
     else if (isOnImageBasemap(spot)
       && (!currentImageBasemap || currentImageBasemap.id !== spot.properties.image_basemap)) {
       const isThisImageBasemap = imageBasemap => isSameId(imageBasemap.id, spot.properties.image_basemap);
       const spotWithImageBasemap = Object.values(spots).find(s => getImageBasemapsInSpot(s).some(isThisImageBasemap));
       if (stratSection) dispatch(clearedStratSection());
       if (spotWithImageBasemap) {
-        activateDatasetWithSpot(spotWithImageBasemap, 'image basemap');
+        spotsToShow.push(spotWithImageBasemap);
         dispatch(setCurrentImageBasemap(getImageBasemapsInSpot(spotWithImageBasemap).find(isThisImageBasemap)));
       }
       else dispatch(setCurrentImageBasemap(undefined));
@@ -692,10 +696,11 @@ const useSpots = () => {
         s => isSameId(s.properties?.sed?.strat_section?.strat_section_id, spot.properties.strat_section_id));
       if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
       if (spotWithStratSection) {
-        activateDatasetWithSpot(spotWithStratSection, 'strat section');
+        spotsToShow.push(spotWithStratSection);
         dispatch(setStratSection(spotWithStratSection.properties.sed.strat_section));
       }
     }
+    activateDatasetsWithSpots(spotsToShow);
   };
 
   // An image basemap or strat section is locked exactly when the Spot holding it is read only. Nothing new
