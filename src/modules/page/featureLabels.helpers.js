@@ -7,7 +7,7 @@ import {getTitle as getOtherFeatureTitle} from '../other-features/otherFeatures.
 import {getMineralTitle} from '../petrology/minerals/minerals.helpers';
 import {getReactionTextureTitle} from '../petrology/reaction-textures/reactionTextures.helpers';
 import {getPetRockTitle} from '../petrology/rocks/rocks.helpers';
-import {getBeddingTitle, getFossilTitle, getSedRockTitle} from '../sed/sed.helpers';
+import {getBeddingTitle, getDiagenesisTitle, getFossilTitle, getSedRockTitle} from '../sed/sed.helpers';
 import {getThreeDStructureTitle} from '../three-d-structures/threeDStructures.helpers';
 
 // The label a feature is given when the user does not type one: the title its list would otherwise build from
@@ -22,6 +22,8 @@ export const getDefaultLabel = (pageKey, feature, getLabel, getLabels) => {
   switch (pageKey) {
     case PAGE_KEYS.BEDDING:
       return getBeddingTitle(feature, getLabels);
+    case PAGE_KEYS.DIAGENESIS:
+      return getDiagenesisTitle(feature);
     case PAGE_KEYS.EARTHQUAKES:
       return getLabel(feature.earthquake_feature, ['general', PAGE_KEYS.EARTHQUAKES]);
     case PAGE_KEYS.FABRICS:
@@ -62,7 +64,7 @@ export const getFeatureTitle = (pageKey, feature, getLabel, getLabels) => featur
 
 // alert is callback-based on native and a window.confirm polyfill on web, so give it back as something a save
 // can wait on. Keeping is the cancel option, so dismissing the prompt leaves the label alone. A default can run
-// out (a fossil emptied of its Body and Trace fields), and then the other option is to clear the label.
+// out (a fossil or diagenesis emptied of its data), and then the other option is to clear the label.
 const confirmLabelUpdate = (storedLabel, newLabel) => new Promise(resolve => alert(
   'Update Label?',
   'This feature\'s label was filled in for it, and its data has since changed.'

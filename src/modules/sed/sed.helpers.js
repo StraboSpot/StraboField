@@ -1,4 +1,5 @@
 import {
+  DIAGENESIS_SECTIONS,
   FOSSIL_BODY_TITLE_FIELDS,
   FOSSIL_OTHER_TEXT_FIELDS,
   FOSSIL_TRACE_TITLE_FIELDS,
@@ -39,6 +40,12 @@ export const getCleanedImageOverlay = (values) => {
     return isNaN(number) ? acc : {...acc, [key]: number};
   }, {});
 };
+
+// The headings of the sections with anything filled in, in form order
+export const getDiagenesisTitle = diagenesis => DIAGENESIS_SECTIONS
+  .filter(section => section.fieldNames.some(fieldName => !isEmpty(diagenesis[fieldName])))
+  .map(section => section.label)
+  .join(', ') || undefined;
 
 // The first Body field filled in, then the first Trace field in parentheses - not capitalized like a second order
 // type, since the traces are not a kind of body fossil. Diversity is only a level, so it is named with it.

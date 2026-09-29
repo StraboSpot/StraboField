@@ -476,7 +476,7 @@
     {
       "type": "begin_group",
       "name": "group_fn8sm12",
-      "label": "Porosity type",
+      "label": "Porosity Type",
       "required": false,
       "relevant": "",
       "appearance": "",

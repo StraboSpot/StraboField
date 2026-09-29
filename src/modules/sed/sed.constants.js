@@ -1,3 +1,4 @@
+import sedDiagenesis from '../../assets/forms/sed/diagenesis.json';
 import sedFossils from '../../assets/forms/sed/fossils.json';
 import sedLithologiesComposition from '../../assets/forms/sed/lithologies-composition.json';
 import sedLithologiesLithology from '../../assets/forms/sed/lithologies-lithology.json';
@@ -51,6 +52,17 @@ export const FOSSIL_BODY_TITLE_FIELDS = fossilsSurvey
   .filter(field => field.type.startsWith('select'))
   .map(field => field.name);
 export const FOSSIL_TRACE_TITLE_FIELDS = ['diversity', 'descriptive'];
+
+// The Diagenesis form's sections in form order, each with the fields under its heading
+const diagenesisSurvey = sedDiagenesis.survey;
+export const DIAGENESIS_SECTIONS = diagenesisSurvey
+  .map((field, i) => field.type === 'begin_group' && {
+    label: field.label,
+    fieldNames: diagenesisSurvey
+      .slice(i + 1, diagenesisSurvey.findIndex((endField, j) => j > i && endField.type === 'end_group'))
+      .map(sectionField => sectionField.name),
+  })
+  .filter(Boolean);
 
 // An image overlay's width and height are only ever saved together, and each is worked out from the other, so
 // they are kept as a pair - width first, so the two are always read the same way round

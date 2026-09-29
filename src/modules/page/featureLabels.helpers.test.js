@@ -60,8 +60,26 @@ describe('getDefaultLabel', () => {
   });
 
   it('gives the pages titled by position alone nothing to fill a label in with', () => {
-    [PAGE_KEYS.STRUCTURES, PAGE_KEYS.DIAGENESIS, PAGE_KEYS.INTERPRETATIONS].forEach(
+    [PAGE_KEYS.STRUCTURES, PAGE_KEYS.INTERPRETATIONS].forEach(
       pageKey => expect(getDefaultLabel(pageKey, {id: 1}, getLabel, getLabels)).toBeUndefined());
+  });
+
+  // Any field under a heading counts, not only its first, and the headings keep form order whatever order the
+  // fields were filled in
+  it('names a diagenesis by the headings of its sections with data', () => {
+    const diagenesis = {other_diagenetic_features: ['stylolites'], cement_composition: ['calcite'], vein_width: 2};
+    expect(getDefaultLabel(PAGE_KEYS.DIAGENESIS, diagenesis, getLabel, getLabels))
+      .toBe('Cement, Veins, Other Diagenetic Features');
+    expect(getDefaultLabel(PAGE_KEYS.DIAGENESIS, {notes: 'a note'}, getLabel, getLabels)).toBeUndefined();
+  });
+
+  it('names a fully filled in diagenesis by every heading', () => {
+    const diagenesis = {cement_composition: ['calcite'], vein_type: 'x', fracture_type: 'x',
+      nodules_concretions_size: 'x', replacement_type: 'x', recrystallization_type: 'x',
+      other_diagenetic_features: ['x'], fabric_selective: ['x'], carbonate_desicc_and_diss: ['x']};
+    expect(getDefaultLabel(PAGE_KEYS.DIAGENESIS, diagenesis, getLabel, getLabels)).toBe('Cement, Veins, Fractures, '
+      + 'Nodules/Concretions, Replacement, Recrystallization, Other Diagenetic Features, Porosity Type, '
+      + 'Carbonate Desiccation and Dissolution');
   });
 
   // Only the first field of each part: a second Body field and Descriptive are filled in too, and left out
