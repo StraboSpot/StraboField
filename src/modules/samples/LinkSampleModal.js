@@ -5,7 +5,13 @@ import {ListItem} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
 import {useSelector} from 'react-redux';
 
-import {getSamplesLinkedTo, getSampleTitle, getStraboSamplesId, isLinkedToOtherFieldSample} from './samples.helpers';
+import {
+  getSamplesLinkedTo,
+  getSampleTitle,
+  getStraboSampleFromResponse,
+  getStraboSamplesId,
+  isLinkedToOtherFieldSpot,
+} from './samples.helpers';
 import useSamples from './useSamples';
 import useServerRequests from '../../services/network/useServerRequests';
 import commonStyles from '../../shared/common.styles';
@@ -22,6 +28,7 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
   /* Data Hooks */
 
   const {isConnected, isInternetReachable} = useSelector(state => state.connections.isOnline);
+  const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
   const straboUserId = useSelector(state => state.user.straboUserId);
 
@@ -63,8 +70,7 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
     try {
       setErrorMessage('');
       setIsLoading(true);
-      const response = await getStraboSample(getStraboSamplesId(item));
-      const strabosample = response?.sample ?? response;
+      const strabosample = getStraboSampleFromResponse(await getStraboSample(getStraboSamplesId(item)));
       // Only ever link the id the user picked, so a response for anything else is an error rather than a link
       if (isEmpty(strabosample?.id) || getStraboSamplesId(strabosample) !== getStraboSamplesId(item)) {
         throw new Error('StraboSamples returned a different sample than the one picked.');
@@ -86,7 +92,9 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
 
   const getLinkWarnings = (strabosample) => {
     const warnings = getSamplesLinkedTo(spots, getStraboSamplesId(strabosample), fieldSample.id).map(sample => `${getSampleTitle(sample)} in this project is already linked to this sample.`);
-    if (isEmpty(warnings) && isLinkedToOtherFieldSample(strabosample, fieldSample.id)) {
+    // The server knows a link by the Spot holding the sample, which is the Spot open in the notebook either way: a rich
+    // sample's own Spot, or the parent of a sample kept on it
+    if (isEmpty(warnings) && isLinkedToOtherFieldSpot(strabosample, selectedSpot.properties.id)) {
       warnings.push('StraboSamples already has this sample linked to a different Field sample.');
     }
     return warnings;

@@ -54,8 +54,24 @@ export const getSamplesLinkedTo = (spots, strabosamplesId, fieldSampleId) => Obj
   ),
 );
 
-// Whether the server already has this StraboSamples sample linked to a different Field sample. The reference_id is
-// whatever the server stored, so both ids are compared as strings.
-export const isLinkedToOtherFieldSample = (strabosample, fieldSampleId) => (strabosample.subsystem_links || []).some(
-  link => link.subsystem === 'field' && String(link.reference_id) !== String(fieldSampleId),
+// The sample in a /samplesdb/sample response. The sample's own fields may come wrapped in a `sample` object, with
+// what the doc lists beside them (subsystem_links, field_data and the rest) either inside it or next to it, so both
+// levels are read and the sample's own fields win where the two share a key.
+export const getStraboSampleFromResponse = response => response?.sample ? {...response, ...response.sample}
+  : response;
+
+// A Field link's reference_id is the id of the Spot holding the sample, not the sample's own id: a rich sample's own
+// Spot, whose id is the sample's, or the parent Spot of a sample kept on it (which the link marks rich: false). It is
+// whatever the server stored, so the ids are compared as strings.
+const isFieldLinkTo = (link, spotId) => link.subsystem === 'field' && String(link.reference_id) === String(spotId);
+
+// Whether the server has this StraboSamples sample linked to the sample in this Spot, which it only does once the Spot
+// carrying the link has been uploaded
+export const isLinkedToFieldSpot = (strabosample, spotId) => (strabosample.subsystem_links || []).some(
+  link => isFieldLinkTo(link, spotId),
+);
+
+// Whether the server already has this StraboSamples sample linked to a sample in a different Spot
+export const isLinkedToOtherFieldSpot = (strabosample, spotId) => (strabosample.subsystem_links || []).some(
+  link => link.subsystem === 'field' && !isFieldLinkTo(link, spotId),
 );

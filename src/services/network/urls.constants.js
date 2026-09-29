@@ -59,6 +59,7 @@ const samplesDB = '/samplesdb';
 export const SAMPLES_PATHS = {
   MY_SAMPLES: samplesDB + '/mysamples/',
   SAMPLE: samplesDB + '/sample/',
+  WEB_SAMPLE: straboSpotAPI + '/samples/',
 };
 
 export const SESAR_PATHS = {

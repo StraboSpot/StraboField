@@ -2,9 +2,11 @@ import {
   getLinkedSample,
   getSampleMetadata,
   getSamplesLinkedTo,
+  getStraboSampleFromResponse,
   getSampleTitle,
   getUnlinkedSample,
-  isLinkedToOtherFieldSample,
+  isLinkedToFieldSpot,
+  isLinkedToOtherFieldSpot,
   isSampleStub,
 } from './samples.helpers';
 
@@ -122,11 +124,47 @@ describe('getSamplesLinkedTo', () => {
   });
 });
 
-describe('isLinkedToOtherFieldSample', () => {
+describe('getStraboSampleFromResponse', () => {
+  const links = [{subsystem: 'field', reference_id: '17'}];
+
+  it('reads a sample sent on its own', () => {
+    expect(getStraboSampleFromResponse({id: 'a', subsystem_links: links})).toEqual({id: 'a', subsystem_links: links});
+  });
+
+  it('keeps what sits beside a wrapped sample', () => {
+    expect(getStraboSampleFromResponse({sample: {id: 'a', name: 'A'}, subsystem_links: links}))
+      .toEqual({id: 'a', name: 'A', sample: {id: 'a', name: 'A'}, subsystem_links: links});
+  });
+
+  it('keeps what sits inside a wrapped sample', () => {
+    expect(getStraboSampleFromResponse({sample: {id: 'a', subsystem_links: links}}).subsystem_links).toBe(links);
+  });
+});
+
+describe('isLinkedToFieldSpot', () => {
+  it('finds the link the server made once the sample was uploaded', () => {
+    const strabosample = {subsystem_links: [{subsystem: 'micro', reference_id: '17'}, {subsystem: 'field', reference_id: '17'}]};
+    expect(isLinkedToFieldSpot(strabosample, 17)).toBe(true);
+    expect(isLinkedToFieldSpot(strabosample, 18)).toBe(false);
+    expect(isLinkedToFieldSpot({subsystem_links: [{subsystem: 'micro', reference_id: '17'}]}, 17)).toBe(false);
+    expect(isLinkedToFieldSpot({}, 17)).toBe(false);
+  });
+
+  // As the server sent it for a sample kept on its parent Spot: the reference is the parent, not the sample
+  it('knows a sample kept on a parent Spot by the parent', () => {
+    const strabosample = {
+      subsystem_links: [{subsystem: 'field', reference_id: '17570006372284', reference_metadata: {rich: false}}],
+    };
+    expect(isLinkedToFieldSpot(strabosample, 17570006372284)).toBe(true);
+    expect(isLinkedToFieldSpot(strabosample, 17715350147590)).toBe(false);
+  });
+});
+
+describe('isLinkedToOtherFieldSpot', () => {
   it('reads the Field link off the server record', () => {
     const strabosample = {subsystem_links: [{subsystem: 'micro', reference_id: '5'}, {subsystem: 'field', reference_id: '17'}]};
-    expect(isLinkedToOtherFieldSample(strabosample, 17)).toBe(false);
-    expect(isLinkedToOtherFieldSample(strabosample, 18)).toBe(true);
-    expect(isLinkedToOtherFieldSample({}, 18)).toBe(false);
+    expect(isLinkedToOtherFieldSpot(strabosample, 17)).toBe(false);
+    expect(isLinkedToOtherFieldSpot(strabosample, 18)).toBe(true);
+    expect(isLinkedToOtherFieldSpot({}, 18)).toBe(false);
   });
 });
