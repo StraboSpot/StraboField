@@ -1,5 +1,7 @@
 import sedLithologiesComposition from '../../assets/forms/sed/lithologies-composition.json';
 import sedLithologiesLithology from '../../assets/forms/sed/lithologies-lithology.json';
+import sedLithologiesStratification from '../../assets/forms/sed/lithologies-stratification.json';
+import sedLithologiesTexture from '../../assets/forms/sed/lithologies-texture.json';
 
 export const ROCK_SECOND_ORDER_TYPE_FIELDS = [
   'siliciclastic_type',
@@ -13,6 +15,12 @@ export const ROCK_SECOND_ORDER_TYPE_FIELDS = [
 // The Sedimentary Rocks form's fields (the Lithology tab's), without the label every save fills in
 export const SED_ROCK_FIELDS = sedLithologiesLithology.survey
   .filter(field => field.name && field.name !== 'label' && !field.type.includes('group'))
+  .map(field => field.name);
+
+// The fields only the Composition, Texture and Stratification tabs show, which the Sedimentary Rocks form leaves out
+export const LITHOLOGY_OTHER_TAB_FIELDS = [
+  ...sedLithologiesComposition.survey, ...sedLithologiesTexture.survey, ...sedLithologiesStratification.survey,
+].filter(field => field.name && !field.type.includes('group') && !SED_ROCK_FIELDS.includes(field.name))
   .map(field => field.name);
 
 // The Composition fields a sed rock's title can use, in tab order, stopping before Notes

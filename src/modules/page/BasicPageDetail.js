@@ -25,7 +25,8 @@ import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import IGSNModal from '../samples/igsn/IGSNModal';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
-import {getRequiredLithologyKeys} from '../sed/sed.helpers';
+import {getRequiredLithologyKeys, hasOtherLithologyTabData} from '../sed/sed.helpers';
+import SedRockLithologyNote from '../sed/SedRockLithologyNote';
 import useSed from '../sed/useSed';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
@@ -430,6 +431,10 @@ const BasicPageDetail = ({
               </>
             )}
             {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon'}*/}
+            {page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY && !isTemplate
+              && hasOtherLithologyTabData(selectedFeature) && (
+              <SedRockLithologyNote lithology={selectedFeature}/>
+            )}
             <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
               {renderFormFields()}
             </FormFlatList>

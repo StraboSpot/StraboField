@@ -1,6 +1,7 @@
 import {
   IMAGE_OVERLAY_SIZE_KEYS,
   LITHOLOGY_INTERVAL_CHARACTERS,
+  LITHOLOGY_OTHER_TAB_FIELDS,
   ROCK_COMPOSITION_TITLE_FIELDS,
   ROCK_OTHER_TEXT_FIELDS,
   ROCK_SECOND_ORDER_TYPE_FIELDS,
@@ -96,6 +97,10 @@ export const getSiliciclasticGrainSizeKey = (siliciclasticType) => {
       return undefined;
   }
 };
+
+// Whether a lithology has anything on the tabs the Sedimentary Rocks form leaves out
+export const hasOtherLithologyTabData = lithology => LITHOLOGY_OTHER_TAB_FIELDS
+  .some(fieldName => !isEmpty(lithology[fieldName]));
 
 // Whether a lithology is also a sed rock. One filled in only on the Composition, Texture or Stratification tab has
 // nothing to show in the Sedimentary Rocks form, so it is listed under Lithologies alone.
