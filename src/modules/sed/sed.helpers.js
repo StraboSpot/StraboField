@@ -4,6 +4,7 @@ import {
   FOSSIL_OTHER_TEXT_FIELDS,
   FOSSIL_TRACE_TITLE_FIELDS,
   IMAGE_OVERLAY_SIZE_KEYS,
+  INTERPRETATIONS_TABS,
   LITHOLOGY_INTERVAL_CHARACTERS,
   LITHOLOGY_OTHER_TAB_FIELDS,
   ROCK_COMPOSITION_TITLE_FIELDS,
@@ -68,6 +69,12 @@ export const getFossilTitle = (fossil, getLabels) => {
   const bodyText = getFirstFieldText(FOSSIL_BODY_TITLE_FIELDS);
   const traceText = getFirstFieldText(FOSSIL_TRACE_TITLE_FIELDS);
   return bodyText && traceText ? bodyText + ' (' + traceText + ')' : bodyText || traceText;
+};
+
+// The types with data, as in 'Environment, Process Interpretation'. The list numbers the rows itself.
+export const getInterpretationTitle = (interpretation) => {
+  const typesText = getFilledSectionsTitle(INTERPRETATIONS_TABS, interpretation);
+  return typesText && typesText + ' Interpretation';
 };
 
 // The fields a lithology has to answer when the Spot it belongs to is an interval mapped on a strat section. Their

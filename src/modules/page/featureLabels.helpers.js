@@ -6,14 +6,21 @@ import {getTitle as getOtherFeatureTitle} from '../other-features/otherFeatures.
 import {getMineralTitle} from '../petrology/minerals/minerals.helpers';
 import {getReactionTextureTitle} from '../petrology/reaction-textures/reactionTextures.helpers';
 import {getPetRockTitle} from '../petrology/rocks/rocks.helpers';
-import {getBeddingTitle, getDiagenesisTitle, getFossilTitle, getSedRockTitle, getStructureTitle} from '../sed/sed.helpers';
+import {
+  getBeddingTitle,
+  getDiagenesisTitle,
+  getFossilTitle,
+  getInterpretationTitle,
+  getSedRockTitle,
+  getStructureTitle,
+} from '../sed/sed.helpers';
 import {getThreeDStructureTitle} from '../three-d-structures/threeDStructures.helpers';
 
 // The label a feature is given when the user does not type one: the title its list would otherwise build from
 // the feature's own fields, and only that part. What a list adds at render time is left out - the 'Lithology N'
-// prefixes, which are positions and go stale as soon as a sibling is deleted, and a measurement's orientation
-// numbers, which follow the user's measurement convention setting.
-// Undefined where there is nothing to derive: pages whose rows are titled by position alone, and tephra, whose
+// prefixes and interpretation numbers, which are positions and go stale as soon as a sibling is deleted, and a
+// measurement's orientation numbers, which follow the user's measurement convention setting.
+// Undefined where there is nothing to derive: a feature with no data its title is built from, and tephra, whose
 // label is a short identifier the layer type is shown after rather than a title, filled in by TephraPage.
 // getLabel and getLabels are passed in because a plain helper cannot call useForm.
 export const getDefaultLabel = (pageKey, feature, getLabel, getLabels) => {
@@ -29,6 +36,8 @@ export const getDefaultLabel = (pageKey, feature, getLabel, getLabels) => {
       return getFabricTitle(feature, getLabel, getLabels);
     case PAGE_KEYS.FOSSILS:
       return getFossilTitle(feature, getLabels);
+    case PAGE_KEYS.INTERPRETATIONS:
+      return getInterpretationTitle(feature);
     case PAGE_KEYS.LITHOLOGIES:
     case PAGE_KEYS.ROCK_TYPE_SEDIMENTARY:
       return getSedRockTitle(feature, getLabel, getLabels);

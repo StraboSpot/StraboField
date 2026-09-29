@@ -45,8 +45,13 @@ describe('getDefaultLabel', () => {
     expect(getDefaultLabel(PAGE_KEYS.TEPHRA, {layer_type: 'ash'}, getLabel, getLabels)).toBeUndefined();
   });
 
-  it('gives the page titled by position alone nothing to fill a label in with', () => {
-    expect(getDefaultLabel(PAGE_KEYS.INTERPRETATIONS, {id: 1}, getLabel, getLabels)).toBeUndefined();
+  // The row number is left to the list, which keeps it right when a row is deleted
+  it('names an interpretation by the types it has data on, without a number', () => {
+    expect(getDefaultLabel(PAGE_KEYS.INTERPRETATIONS, {energy: 'x'}, getLabel, getLabels)).toBe('Process Interpretation');
+    const interpretation = {geometry: 'x', clastic: 'x', notes: 'a note'};
+    expect(getDefaultLabel(PAGE_KEYS.INTERPRETATIONS, interpretation, getLabel, getLabels))
+      .toBe('Environment, Surfaces Interpretation');
+    expect(getDefaultLabel(PAGE_KEYS.INTERPRETATIONS, {notes: 'a note'}, getLabel, getLabels)).toBeUndefined();
   });
 
   // Tab order, whatever order the tabs were filled in
@@ -201,6 +206,6 @@ describe('getFeatureTitle', () => {
   });
 
   it('gives nothing for a page with neither', () => {
-    expect(getFeatureTitle(PAGE_KEYS.INTERPRETATIONS, {id: 1}, getLabel, getLabels)).toBeUndefined();
+    expect(getFeatureTitle(PAGE_KEYS.NOTES, {id: 1}, getLabel, getLabels)).toBeUndefined();
   });
 });

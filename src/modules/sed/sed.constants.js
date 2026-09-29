@@ -1,5 +1,9 @@
 import sedDiagenesis from '../../assets/forms/sed/diagenesis.json';
 import sedFossils from '../../assets/forms/sed/fossils.json';
+import sedInterpretationsArchitecture from '../../assets/forms/sed/interpretations-architecture.json';
+import sedInterpretationsEnvironment from '../../assets/forms/sed/interpretations-environment.json';
+import sedInterpretationsProcess from '../../assets/forms/sed/interpretations-process.json';
+import sedInterpretationsSurfaces from '../../assets/forms/sed/interpretations-surfaces.json';
 import sedLithologiesComposition from '../../assets/forms/sed/lithologies-composition.json';
 import sedLithologiesLithology from '../../assets/forms/sed/lithologies-lithology.json';
 import sedLithologiesStratification from '../../assets/forms/sed/lithologies-stratification.json';
@@ -83,6 +87,15 @@ export const LITHOLOGY_SUBPAGES = {
   STRATIFICATION: 'stratification',
 };
 
+// A feature's subpage tabs in tab order, each named as SubpageTabs names it and with the fields it asks for. Every
+// tab shows the same Notes field, so a note is data on none of them.
+const getSubpageTabs = subpageForms => subpageForms.map(([subpageKey, form]) => ({
+  label: toTitleCase(subpageKey.replace(/_/g, ' ')),
+  fieldNames: form.survey
+    .filter(field => !field.type.includes('group') && !['label', 'notes'].includes(field.name))
+    .map(field => field.name),
+}));
+
 export const STRUCTURE_SUBPAGES = {
   BEDDING_PLANE: 'bedding_plane',
   BIOTURBATION: 'bioturbation',
@@ -90,19 +103,12 @@ export const STRUCTURE_SUBPAGES = {
   PHYSICAL: 'physical',
 };
 
-// The Structures tabs in tab order, each named as SubpageTabs names it and with the fields it asks for. Every tab
-// shows the same Notes field, so a note is data on none of them.
-export const STRUCTURE_TABS = [
+export const STRUCTURE_TABS = getSubpageTabs([
   [STRUCTURE_SUBPAGES.BEDDING_PLANE, sedStructuresBeddingPlane],
   [STRUCTURE_SUBPAGES.BIOTURBATION, sedStructuresBioturbation],
   [STRUCTURE_SUBPAGES.PEDOGENIC, sedStructuresPedogenic],
   [STRUCTURE_SUBPAGES.PHYSICAL, sedStructuresPhysical],
-].map(([subpageKey, form]) => ({
-  label: toTitleCase(subpageKey.replace(/_/g, ' ')),
-  fieldNames: form.survey
-    .filter(field => !field.type.includes('group') && !['label', 'notes'].includes(field.name))
-    .map(field => field.name),
-}));
+]);
 
 export const INTERPRETATIONS_SUBPAGES = {
   ARCHITECTURE: 'architecture',
@@ -110,6 +116,13 @@ export const INTERPRETATIONS_SUBPAGES = {
   PROCESS: 'process',
   SURFACES: 'surfaces',
 };
+
+export const INTERPRETATIONS_TABS = getSubpageTabs([
+  [INTERPRETATIONS_SUBPAGES.ARCHITECTURE, sedInterpretationsArchitecture],
+  [INTERPRETATIONS_SUBPAGES.ENVIRONMENT, sedInterpretationsEnvironment],
+  [INTERPRETATIONS_SUBPAGES.PROCESS, sedInterpretationsProcess],
+  [INTERPRETATIONS_SUBPAGES.SURFACES, sedInterpretationsSurfaces],
+]);
 
 export const INTERVAL_FIELDS = ['character', 'interval_thickness', 'thickness_units'];
 

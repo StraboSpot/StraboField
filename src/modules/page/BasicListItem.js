@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Icon, ListItem} from '@rn-vui/base';
 
-import {getFeatureTitle} from './featureLabels.helpers';
+import {getDefaultLabel, getFeatureTitle} from './featureLabels.helpers';
 import {PAGE_KEYS} from './pageKeys.constants';
 import commonStyles from '../../shared/common.styles';
 import {MEDIUMGREY} from '../../shared/styles.constants';
@@ -50,8 +50,11 @@ const BasicListItem = ({
       case PAGE_KEYS.STRUCTURES:
       case PAGE_KEYS.DIAGENESIS:
       case PAGE_KEYS.FOSSILS:
-      case PAGE_KEYS.INTERPRETATIONS:
         return title || 'Lithology ' + (index + 1);
+      // Numbered unless the user typed the label, which then reads as they wrote it
+      case PAGE_KEYS.INTERPRETATIONS:
+        return item.label && item.label !== getDefaultLabel(page.key, item, getLabel, getLabels) ? item.label
+          : (title || 'Interpretation') + ' ' + (index + 1);
       default:
         return 'Unknown';
     }
