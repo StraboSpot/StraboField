@@ -29,7 +29,12 @@ import {
 import {deepCopyWithNewIds, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
-import {clearedStratSection, setCurrentImageBasemap, setStratSection} from '../maps/maps.slice';
+import {
+  clearedSpotsInMapExtentIds,
+  clearedStratSection,
+  setCurrentImageBasemap,
+  setStratSection,
+} from '../maps/maps.slice';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {
   addedNewSpotIdsToDataset,
@@ -38,6 +43,7 @@ import {
   deletedSpotIdFromReports,
   deletedSpotIdFromTags,
   restoredSpotReferences,
+  setActiveDatasets,
   updatedModifiedTimestampsBySpotsIds,
   updatedProject,
   updatedProjectPreference,
@@ -73,6 +79,16 @@ const useSpots = () => {
   const toast = useToast();
 
   /* Internal Functions */
+
+  // Turn on the Dataset of the Spot holding an image basemap or strat section, if it is off, so the map can open
+  const activateDatasetWithSpot = (spot, mapName) => {
+    const datasetId = getDatasetIdFromSpotId(spot.properties.id);
+    if (isEmpty(datasetId) || getActiveDatasets().some(dataset => isSameId(dataset.id, datasetId))) return;
+    dispatch(setActiveDatasets({bool: true, dataset: datasetId}));
+    dispatch(clearedSpotsInMapExtentIds());
+    toast.show(`Dataset ${datasets[datasetId].name} turned on to show the ${mapName} this Spot is on.`,
+      {duration: 5000});
+  };
 
   const getNewSpotNameObj = (newSpot) => {
     let namePrefix = preferences.spot_prefix || '';
@@ -164,12 +180,6 @@ const useSpots = () => {
   const getSpotWithThisMap = (imageBasemapId, stratSectionId) => {
     if (imageBasemapId) return getSpotWithThisImageBasemap(imageBasemapId);
     return stratSectionId ? getSpotWithThisStratSection(stratSectionId) : undefined;
-  };
-
-  const getStratSectionSettings = (stratSectionId) => {
-    const spot = getSpotWithThisStratSection(stratSectionId);
-    return spot && spot.properties && spot.properties.sed
-    && spot.properties.sed.strat_section ? spot.properties.sed.strat_section : undefined;
   };
 
   const removeSpotAndReferences = (spotId) => {
@@ -495,13 +505,6 @@ const useSpots = () => {
     }, []);
   };
 
-  // Get parent Spot for image basemap
-  const getImageBasemapBySpot = (spot) => {
-    const imageBasemapFound = getActiveImageBasemaps().find(
-      imageBasemap => imageBasemap.id === spot.properties.image_basemap);
-    return imageBasemapFound;
-  };
-
   // Get Active Spots (not Samples) with Valid Geometry
   const getMappableSpots = () => {
     const allSpotsCopyFiltered = Object.values(getActiveSpotsObj()).filter((spot) => {
@@ -670,17 +673,28 @@ const useSpots = () => {
       if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
       if (stratSection) dispatch(clearedStratSection());
     }
+    // The Spot holding the map is searched for in every Dataset, and the map is read straight off it, because
+    // a Dataset turned on here is not active in the store until the next render
     else if (isOnImageBasemap(spot)
       && (!currentImageBasemap || currentImageBasemap.id !== spot.properties.image_basemap)) {
-      const imageBasemap = getImageBasemapBySpot(spot);
+      const isThisImageBasemap = imageBasemap => isSameId(imageBasemap.id, spot.properties.image_basemap);
+      const spotWithImageBasemap = Object.values(spots).find(s => getImageBasemapsInSpot(s).some(isThisImageBasemap));
       if (stratSection) dispatch(clearedStratSection());
-      dispatch(setCurrentImageBasemap(imageBasemap));
+      if (spotWithImageBasemap) {
+        activateDatasetWithSpot(spotWithImageBasemap, 'image basemap');
+        dispatch(setCurrentImageBasemap(getImageBasemapsInSpot(spotWithImageBasemap).find(isThisImageBasemap)));
+      }
+      else dispatch(setCurrentImageBasemap(undefined));
     }
     else if (isOnStratSection(spot)
       && (!stratSection || stratSection.strat_section_id !== spot.properties.strat_section_id)) {
-      const stratSectionSettings = getStratSectionSettings(spot.properties.strat_section_id);
+      const spotWithStratSection = Object.values(spots).find(
+        s => isSameId(s.properties?.sed?.strat_section?.strat_section_id, spot.properties.strat_section_id));
       if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
-      if (stratSectionSettings) dispatch(setStratSection(stratSectionSettings));
+      if (spotWithStratSection) {
+        activateDatasetWithSpot(spotWithStratSection, 'strat section');
+        dispatch(setStratSection(spotWithStratSection.properties.sed.strat_section));
+      }
     }
   };
 
@@ -729,7 +743,6 @@ const useSpots = () => {
     getAllIntervalSpotsOnStratSection,
     getAllSpotsOnImageBasemap,
     getAllSpotsOnStratSection,
-    getImageBasemapBySpot,
     getMappableSpots,
     getNewSpotName,
     getReadOnlyReason,
