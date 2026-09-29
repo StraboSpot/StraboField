@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {FlatList, Pressable, Text, View} from 'react-native';
 
-import {Icon, ListItem} from '@rn-vui/base';
+import {ListItem} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
 import {useSelector} from 'react-redux';
 
@@ -26,7 +26,7 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
   const straboUserId = useSelector(state => state.user.straboUserId);
 
   const {getMySamples, getStraboSample} = useServerRequests();
-  const {getSelectedSample, linkSample, unlinkSample} = useSamples();
+  const {getSelectedSample, linkSample} = useSamples();
   const toast = useToast();
 
   /* Local State */
@@ -42,12 +42,10 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
 
   const isOnline = isConnected && isInternetReachable;
   const fieldSample = getSelectedSample() ?? {};
-  const linkedId = fieldSample.strabosamples_id;
   const searchTextLowerCase = searchText.trim().toLowerCase();
   const filteredSamples = isEmpty(searchTextLowerCase) ? samples
     : samples.filter(sample => sample.name?.toLowerCase().includes(searchTextLowerCase));
   const isConfirming = !isLoading && !isEmpty(sampleToConfirm);
-  const isUnlinkShown = !isLoading && isEmpty(sampleToConfirm) && !isEmpty(linkedId);
 
   /* Side Effects */
 
@@ -82,12 +80,6 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
     finally {
       setIsLoading(false);
     }
-  };
-
-  const onUnlinkPressed = () => {
-    unlinkSample();
-    closeModal();
-    toast.show('Sample unlinked from StraboSamples', {type: 'success'});
   };
 
   /* Logic Helpers */
@@ -180,7 +172,6 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
       <ListItem.Content>
         <ListItem.Title style={commonStyles.listItemTitle}>{item.name || 'Unnamed Sample'}</ListItem.Title>
       </ListItem.Content>
-      {getStraboSamplesId(item) === linkedId && <Icon color={PRIMARY_ACCENT_COLOR} name={'checkmark'} type={'ionicon'}/>}
     </ListItem>
   );
 
@@ -188,15 +179,15 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
 
   return (
     <ModalWrapper
-      actionTitle={isConfirming ? 'Link Anyway' : 'Unlink Sample'}
+      actionTitle={'Link Anyway'}
       closeModal={closeModal}
       headerTitle={'Link Sample'}
       isChildrenFilled
       isVisible={isVisible}
-      onActionPressed={isConfirming ? onLinkAnywayPressed : onUnlinkPressed}
+      onActionPressed={onLinkAnywayPressed}
       onBackdropPress={closeModal}
       overlayStyleOverride={{maxHeight: '80%'}}
-      showActionButton={isConfirming || isUnlinkShown}
+      showActionButton={isConfirming}
       showCancelButton={false}
       showCloseButton
     >
