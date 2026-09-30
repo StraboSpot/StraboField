@@ -267,6 +267,24 @@ const useMapsOffline = () => {
     ];
   };
 
+  // A downloaded tile standing in for the map in a list. Which tiles were downloaded is only known from the
+  // directory, so one is picked from it rather than computed from the map's extent: the middle tile of the
+  // deepest zoom, which sits nearest the center of whatever area was downloaded.
+  const getThumbnailTilePath = async (map) => {
+    const tileTemplate = map.sources?.['raster-tiles']?.tiles?.[0];
+    if (!tileTemplate || !APP_DIRECTORIES.ROOT_PATH) return;
+    const entries = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, map.id);
+    if (isEmpty(entries)) return;   // the read reports its own failure and hands back nothing
+    // Anything else sitting in the directory would make every number NaN and name a tile that does not exist
+    const tiles = entries.map(entry => entry.replace('.png', '').split('_').map(Number))
+      .filter(tile => tile.length === 3 && tile.every(Number.isFinite));
+    if (isEmpty(tiles)) return;
+    const zoom = Math.max(...tiles.map(([z]) => z));
+    const tilesAtZoom = tiles.filter(([z]) => z === zoom).sort(([, aX, aY], [, bX, bY]) => aX - bX || aY - bY);
+    const [z, x, y] = tilesAtZoom[Math.floor(tilesAtZoom.length / 2)];
+    return tileTemplate.replace('{z}', z).replace('{x}', x).replace('{y}', y);
+  };
+
   const getSavedMapsFromDevice = async () => {
     try {
       console.count('getSavedMapsFromDevice');
@@ -446,6 +464,7 @@ const useMapsOffline = () => {
     getMapTiles,
     getMapTilesBbox,
     getSavedMapsFromDevice,
+    getThumbnailTilePath,
     initializeSaveMap,
     moveFiles,
     moveTile,

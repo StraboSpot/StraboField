@@ -1,36 +1,41 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 
 import {useSelector} from 'react-redux';
 
 import CustomOverlayLayer from './CustomOverlayLayer';
+import {getVisibleCustomOverlays} from '../custom-maps/customMaps.helpers';
+import {isPreviewedMap} from '../offline-maps/offlineMaps.helpers';
+import useMapURL from '../useMapURL';
 
 const CustomOverlayLayers = ({basemap}) => {
   /* Data Hooks */
 
   const customMaps = useSelector(state => state.map.customMaps);
+  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
+  const previewedOfflineMapId = useSelector(state => state.offlineMap.previewedOfflineMapId);
+
+  const {buildOverlayTileURL} = useMapURL();
 
   /* Derived State */
 
-  // Use useMemo to ensure we get a new array reference when isViewable changes
-  const visibleOverlays = useMemo(() => {
-    const overlays = Object.values(customMaps)
-      .filter(customMap => customMap && customMap.id && customMap.overlay && customMap.isViewable);
-
-    console.log('CustomOverlayLayers filtering overlays. Total maps:', Object.keys(customMaps).length);
-    console.log('Visible overlays:', overlays.map(m => `${m.id} (isViewable: ${m.isViewable})`));
-
-    return overlays;
-  }, [customMaps]);
+  // A previewed map is not drawn over itself: its live tiles would hide the gaps the preview is there to show. An
+  // overlay with no tiles to draw - none reachable and none downloaded - is left off until it has some, and stays
+  // switched on meanwhile.
+  const overlaysToDraw = getVisibleCustomOverlays(customMaps, offlineMaps)
+    .filter(map => !isPreviewedMap(map, previewedOfflineMapId))
+    .map(map => ({map: map, tileUrlTemplate: buildOverlayTileURL(map)}))
+    .filter(({tileUrlTemplate}) => tileUrlTemplate);
 
   /* View */
 
   return (
     <>
-      {visibleOverlays.map(customMap => (
+      {overlaysToDraw.map(({map, tileUrlTemplate}) => (
         <CustomOverlayLayer
           basemap={basemap}
-          customMap={customMap}
-          key={`overlay-${customMap.id}-${customMap.isViewable}`}
+          customMap={map}
+          key={`overlay-${map.id}`}
+          tileUrlTemplate={tileUrlTemplate}
         />
       ))}
     </>

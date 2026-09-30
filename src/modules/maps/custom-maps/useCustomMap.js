@@ -1,7 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 
 import {CUSTOM_MAP_SOURCES} from './customMaps.constants';
-import {normalizeCustomMapId} from './customMaps.helpers';
+import {findCustomMap, normalizeCustomMapId} from './customMaps.helpers';
 import {STRABO_APIS} from '../../../services/network/urls.constants';
 import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/helpers';
@@ -16,8 +16,10 @@ import {
   setCurrentBasemap,
   updateCustomMap,
 } from '../maps.slice';
+import {setOfflineMap} from '../offline-maps/offlineMaps.slice';
 import useMapsOffline from '../offline-maps/useMapsOffline';
 import useMap from '../useMap';
+import useMapThumbnail from '../useMapThumbnail';
 import useMapURL from '../useMapURL';
 import useMapCoords from '../view/useMapCoords';
 
@@ -32,6 +34,7 @@ const useCustomMap = () => {
 
   const {setBasemap} = useMap();
   const {getMyMapsBboxCoords} = useMapCoords();
+  const {deletePreviousThumbnail, deleteThumbnail} = useMapThumbnail();
   const {renameOfflineMapTiles} = useMapsOffline();
   const {buildStyleURL, buildTileURL} = useMapURL();
   const {testCustomMapUrl} = useServerRequests();
@@ -49,15 +52,24 @@ const useCustomMap = () => {
     return providerInfo;
   };
 
-  const viewCustomMap = (map) => {
-    console.log('Setting current basemap to a custom basemap...');
-    dispatch(setCurrentBasemap(map));
+  // Overlay display is stored with the map: in the project for one of its own custom maps, and on the downloaded
+  // copy for a map saved to this device under another project, which the project has nowhere to keep.
+  const saveDisplaySettings = (map, settings) => {
+    const customMap = findCustomMap(customMaps, map);
+    if (customMap) updateMap({...settings, id: customMap.id});
+    else dispatch(setOfflineMap({...map, ...settings}));
   };
 
   /* Exported Functions */
 
   const deleteMap = async (mapId) => {
     console.log('Deleting Custom Map:', mapId);
+    // The saved thumbnail is only ever read for a map that is in the list, so it goes with it. Reported and
+    // stepped over rather than thrown: a few kilobytes left on the device is not a reason to keep the map.
+    if (customMaps[mapId]) {
+      await deleteThumbnail(customMaps[mapId]).catch(
+        err => console.warn('Error deleting the saved thumbnail for map', mapId, err));
+    }
     const projectCopy = {...project};
     const customMapsCopy = {...customMaps};
     delete customMapsCopy[mapId];
@@ -81,8 +93,16 @@ const useCustomMap = () => {
     const isIdChanged = !!previousId && previousId !== mapId;
     const providerInfo = getProviderInfo(map.source);
     // A changed id points at a different source map, so drop the stored extent rather than carrying it over — an
-    // empty bbox is also what makes getMyMapsBboxCoords go and fetch the new one.
-    const customMap = {...map, ...providerInfo, id: mapId, source: map.source, ...(isIdChanged && {bbox: ''})};
+    // empty bbox is also what makes getMyMapsBboxCoords go and fetch the new one. Merged onto the stored map so
+    // the keys the form does not carry — the overlay display settings — survive being saved under the new id.
+    const customMap = {
+      ...(customMaps[previousId] || customMaps[mapId]),
+      ...map,
+      ...providerInfo,
+      id: mapId,
+      source: map.source,
+      ...(isIdChanged && {bbox: ''}),
+    };
     const tileUrl = buildTileURL(customMap);
     let testTileUrl = tileUrl.replace(/({z}\/{x}\/{y})/, '0/0/0');
     // Test against customMap.id, not map.id: normalizeCustomMapId trimmed it, and validating a different string
@@ -105,7 +125,7 @@ const useCustomMap = () => {
       // either one. currentBasemap is null until a map has been shown.
       const isCurrentBasemap = currentBasemap?.id === savedCustomMap.id
         || (isIdChanged && currentBasemap?.id === previousId);
-      if (map.overlay && isCurrentBasemap) {
+      if (customMap.overlay && isCurrentBasemap) {
         console.log('Setting Basemap to Mapbox Topo...');
         await setBasemap(null);
       }
@@ -127,6 +147,8 @@ const useCustomMap = () => {
       dispatch(addedCustomMap(savedCustomMap));
       if (isIdChanged) {
         await renameOfflineMapTiles(previousId, savedCustomMap);
+        await deletePreviousThumbnail(previousId, savedCustomMap).catch(
+          err => console.warn('Error deleting the saved thumbnail for map', previousId, err));
         // Re-point the basemap directly: setBasemap looks the map up in this render's customMaps, which predates
         // the dispatch above and so would not find the new id. Skipped for an overlay, which just cleared the basemap.
         if (isCurrentBasemap && !savedCustomMap.overlay) {
@@ -138,19 +160,21 @@ const useCustomMap = () => {
     else throw (`${customMap.id} is not a valid ID for this map.  Please check the id and try again.`);
   };
 
-  const setCustomMapSwitchValue = (value, map) => {
-    console.log('Custom Map Switch Value:', value, 'Map Id:', map.id);
-    if (customMaps[map.id]) {
-      dispatch(addedCustomMap({...customMaps[map.id], isViewable: value}));
-      if (value && !customMaps[map.id].overlay) viewCustomMap(map);
-    }
+  const setCustomMapOpacity = (map, opacity) => saveDisplaySettings(map, {opacity: opacity});
+
+  // The switch in the map layers menu means exactly "draw this over the basemap", so both keys move together
+  const setCustomMapOverlay = (map, isOverlayOn) => {
+    console.log('Custom Map Overlay:', isOverlayOn, 'Map Id:', map.id);
+    saveDisplaySettings(map, {isViewable: isOverlayOn, overlay: isOverlayOn});
   };
 
   const updateMap = (map) => {
-    const customMapsCopy = {...customMaps};
-    customMapsCopy[map.id] = map;
+    // Merged onto the stored map so a caller holding only part of it leaves the rest in place - the edit form no
+    // longer carries the overlay display settings, which are switched from the map layers menu instead.
+    const updatedCustomMap = {...customMaps[map.id], ...map};
+    const customMapsCopy = {...customMaps, [updatedCustomMap.id]: updatedCustomMap};
     console.log('Updated Custom Maps:', customMapsCopy);
-    dispatch(updateCustomMap(map));
+    dispatch(updateCustomMap(updatedCustomMap));
     dispatch(updatedProject({field: 'other_maps', value: Object.values(customMapsCopy)}));
   };
 
@@ -158,7 +182,8 @@ const useCustomMap = () => {
     deleteMap,
     getCustomMapDetails,
     saveCustomMap,
-    setCustomMapSwitchValue,
+    setCustomMapOpacity,
+    setCustomMapOverlay,
     updateMap,
   };
 };
