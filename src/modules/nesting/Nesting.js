@@ -2,15 +2,17 @@ import React, {useEffect, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import NestingImageCard from './NestingImageCard';
 import useNesting from './useNesting';
 import {isEmpty, isSameId} from '../../shared/helpers';
 import {BLACK, SAMPLES_COLOR} from '../../shared/styles.constants';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
+import {openFeatureInNotebook} from '../notebook-panel/notebook.helpers';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
+import SampleListItem from '../samples/SampleListItem';
 import SpotsListItem from '../spots/SpotsListItem';
 import useSpots from '../spots/useSpots';
 
@@ -19,6 +21,7 @@ const Nesting = ({page}) => {
 
   /* Data Hooks */
 
+  const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
@@ -42,6 +45,15 @@ const Nesting = ({page}) => {
     console.log('UE Nesting [activeDatasetsIds, spots, selectedSpot]');
     if (notebookPageVisible === PAGE_KEYS.NESTING) updateNest();
   }, [activeDatasetsIds, spots, selectedSpot]);
+
+  /* Event Handlers */
+
+  // A legacy sample has no Spot to select, so select the Spot it is kept on and open the sample on its Samples
+  // page. The page is opened after selecting, since selecting a Spot drops whatever feature was open.
+  const handleLegacySamplePressed = ({legacySample, parentSpot}) => {
+    handleSpotSelected(parentSpot);
+    openFeatureInNotebook(dispatch, PAGE_KEYS.SAMPLES, legacySample);
+  };
 
   /* Logic Helpers */
 
@@ -153,6 +165,17 @@ const Nesting = ({page}) => {
   };
 
   const renderName = (spot) => {
+    if (spot.legacySample) {
+      return (
+        <SampleListItem
+          isOutlined
+          isShowAvatar
+          onPress={() => handleLegacySamplePressed(spot)}
+          parentSpot={spot.parentSpot}
+          sample={spot.legacySample}
+        />
+      );
+    }
     return (
       <SpotsListItem
         isSample={spot.properties?.isSample}

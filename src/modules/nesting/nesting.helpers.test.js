@@ -31,9 +31,33 @@ describe('getChildSpots', () => {
     expect(getIds(getChildSpots(parent, {activeSpots: [], searchedSpots: [], spots}))).toEqual([2, 3]);
   });
 
-  it('skips a sample or nesting list entry whose Spot is missing', () => {
+  it('skips a rich sample or nesting list entry whose Spot is missing', () => {
     const parent = makeSpot(1, {nesting: [3], samples: [{id: 2}]});
     expect(getChildSpots(parent, {activeSpots: [], searchedSpots: [], spots: toSpotsObj([parent])})).toEqual([]);
+  });
+
+  it('carries a legacy sample with its parent alongside the rich samples', () => {
+    const legacySample = {id: 3, sample_id_name: 'JG-3'};
+    const parent = makeSpot(1, {samples: [{id: 2}, legacySample]});
+    const spots = toSpotsObj([parent, makeSpot(2, {isSample: true})]);
+    const children = getChildSpots(parent, {activeSpots: [], searchedSpots: [], spots});
+    expect(getIds(children)).toEqual([2, 3]);
+    expect(children[1]).toEqual({legacySample, parentSpot: parent, properties: {id: 3}});
+  });
+
+  it('finds nothing nested in a legacy sample', () => {
+    const polygon = makeSpot(1, {samples: [{id: 2, sample_id_name: 'JG-2'}]}, square(0, 0, 10, 10));
+    const inside = makeSpot(3, {}, point(5, 5));
+    const context = {activeSpots: [polygon, inside], searchedSpots: [polygon, inside], spots: toSpotsObj([polygon])};
+    const legacyEntry = getChildSpots(polygon, context).find(child => child.legacySample);
+    expect(getChildSpots(legacyEntry, context)).toEqual([]);
+  });
+
+  it('lists a legacy sample in the generation below its parent, however far down', () => {
+    const parent = makeSpot(1, {nesting: [2]});
+    const child = makeSpot(2, {samples: [{id: 3, sample_id_name: 'JG-3'}]});
+    const context = {activeSpots: [], searchedSpots: [], spots: toSpotsObj([parent, child])};
+    expect(getGenerations(parent, 10, spot => getChildSpots(spot, context)).map(getIds)).toEqual([[2], [3]]);
   });
 
   it('finds the Spots within a polygon among the active Spots only', () => {

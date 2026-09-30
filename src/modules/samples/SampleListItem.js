@@ -10,6 +10,7 @@ import {getSampleMetadata, getSampleTitle} from './samples.helpers';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
+import {SAMPLES_COLOR} from '../../shared/styles.constants';
 import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import CheckboxList from '../../shared/ui/CheckboxList';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
@@ -22,6 +23,7 @@ const SampleListItem = ({
                           canPickReadOnly,
                           isCheckedList,
                           isItemChecked,
+                          isOutlined,
                           isShowAvatar,
                           isShowIGSN,
                           isShowSubtitle,
@@ -68,7 +70,7 @@ const SampleListItem = ({
   return (
     <>
     <ListItem
-      containerStyle={commonStyles.listItem}
+      containerStyle={[commonStyles.listItem, isOutlined && {borderColor: SAMPLES_COLOR, borderWidth: 2.5}]}
       key={'SampleListItem' + sampleMetadata.id}
       onPress={() => isCheckedList ? handleCheckBoxPressed() : onPress(sample)}
     >

@@ -53,13 +53,20 @@ const isNestedByGeometry = (child, parent) => child.properties.id !== parent.pro
   && !child.properties.isSample && !parent.properties.isSample && !!child.geometry && isPolygon(parent)
   && isOnSameMap(child, parent) && isWithin(child, parent);
 
+// A sample's Spot, or for a legacy sample, which has none, an entry holding the sample and the Spot it is kept on.
+// A sample that is only an id is a rich sample whose Spot is missing, so it is skipped.
+const getSampleChild = (sample, parentSpot, spots) => {
+  if (spots[sample.id]) return spots[sample.id];
+  if (Object.keys(sample).length > 1) return {legacySample: sample, parentSpot, properties: {id: sample.id}};
+};
+
 // The children of a Spot: its samples and the Spots in its nesting list, looked up in spots; the Spots on its image
 // basemaps or strat section, found among searchedSpots; and the Spots within it, found among activeSpots.
 export const getChildSpots = (thisSpot, {activeSpots, searchedSpots, spots}) => {
   const {images, isSample, nesting, samples, sed} = thisSpot.properties;
   const stratSectionId = sed?.strat_section?.strat_section_id;
   const children = [];
-  if (!isSample && samples) children.push(...samples.map(sample => spots[sample.id]));
+  if (!isSample && samples) children.push(...samples.map(sample => getSampleChild(sample, thisSpot, spots)));
   if (images) {
     const imageIds = images.map(image => image.id);
     children.push(...searchedSpots.filter(spot => imageIds.includes(spot.properties.image_basemap)));
