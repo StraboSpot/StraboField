@@ -78,6 +78,10 @@ export const isOnSameImageBasemap = (spot1, spot2) => {
     && spot1.properties.image_basemap === spot2.properties.image_basemap;
 };
 
+// Both on the geo map, the same image basemap or the same strat section
+export const isOnSameMap = (spot1, spot2) => (isOnGeoMap(spot1) && isOnGeoMap(spot2))
+  || isOnSameImageBasemap(spot1, spot2) || isOnSameStratSection(spot1, spot2);
+
 export const isOnSameStratSection = (spot1, spot2) => {
   return isOnStratSection(spot1) && isOnStratSection(spot2)
     && spot1.properties.strat_section_id === spot2.properties.strat_section_id;

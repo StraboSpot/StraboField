@@ -39,15 +39,27 @@ const Nesting = ({page}) => {
   /* Side Effects */
 
   useEffect(() => {
-    console.log('UE Nesting [spots, selectedSpot]', spots, selectedSpot);
+    console.log('UE Nesting [activeDatasetsIds, spots, selectedSpot]');
     if (notebookPageVisible === PAGE_KEYS.NESTING) updateNest();
   }, [activeDatasetsIds, spots, selectedSpot]);
 
   /* Logic Helpers */
 
-  // Searches every Dataset, as the nest does. The id can arrive as an object key, so a string.
-  const getSpotWithThisImage = imageId => Object.values(spots).find(
-    spot => spot.properties.images?.some(image => isSameId(image.id, imageId)));
+  // Group a generation's Spots by the image basemap they are on, with those on none grouped together
+  const getImageBasemapGroups = (generation) => {
+    const groups = new Map();
+    generation.forEach((spot) => {
+      const imageBasemapId = spot.properties.image_basemap;
+      if (!groups.has(imageBasemapId)) groups.set(imageBasemapId, []);
+      groups.get(imageBasemapId).push(spot);
+    });
+    return [...groups].map(([imageBasemapId, groupSpots]) => ({imageBasemapId, groupSpots}));
+  };
+
+  // Whether an image basemap is on a sample, searched for in every Dataset as the nest is. isSameId because the
+  // server returns image ids as strings.
+  const isSampleImageBasemap = imageBasemapId => !!imageBasemapId && !!Object.values(spots).find(
+    spot => spot.properties.images?.some(image => isSameId(image.id, imageBasemapId)))?.properties.isSample;
 
   const updateNest = () => {
     if (!isEmpty(selectedSpot)) {
@@ -62,16 +74,9 @@ const Nesting = ({page}) => {
 
   /* Render Functions */
 
-  const renderGeneration = (type, generation, i, length) => {
-    const levelNum = type === 'Parents' ? length - i : i + 1;
+  const renderGeneration = (type, generation, generationIndex, generationsCount) => {
+    const levelNum = type === 'Parents' ? generationsCount - generationIndex : generationIndex + 1;
     const generationText = levelNum + (levelNum === 1 ? ' Level' : ' Levels') + (type === 'Parents' ? ' Up' : ' Down');
-    const groupedGeneration = generation.reduce((r, v) => {
-      const k = v.properties.image_basemap;
-      if (!r[k]) r[k] = [];
-      r[k].push(v);
-      return r;
-    }, {});
-    console.log('groupedGeneration', groupedGeneration);
     return (
       <>
         {type === 'Children' && (
@@ -79,10 +84,9 @@ const Nesting = ({page}) => {
         )}
         <Text style={{paddingLeft: 10}}>{generationText}</Text>
         <FlatList
-          data={Object.entries(groupedGeneration)}
-          keyExtractor={index => `${type}${index}`}
-          listKey={`${type}${i}`}
-          renderItem={({item, index}) => renderGroup(type, i, item, index)}
+          data={getImageBasemapGroups(generation)}
+          keyExtractor={({imageBasemapId}) => `${type}${imageBasemapId}`}
+          renderItem={({item, index}) => renderGroup(item, index)}
         />
         {type === 'Parents' && (
           <Icon containerStyle={{paddingLeft: 8, alignItems: 'flex-start'}} name={'north'} type={'material-icons'}/>
@@ -98,24 +102,20 @@ const Nesting = ({page}) => {
         <FlatList
           data={type === 'Parents' ? [...generationData].reverse() : generationData}
           keyExtractor={(item, index) => `${type}${index}`}
-          listKey={type}
           renderItem={({item, index}) => renderGeneration(type, item, index, generationData.length)}
         />
       );
     }
   };
 
-  const renderGroup = (type, i, [imageBasemapKey, group], b) => {
-    console.log('renderGroup', type, i, group, b);
-    console.log('renderGroup', type, i, imageBasemapKey, group, b);
-    const spotWithThisImageBasemap = imageBasemapKey !== 'undefined' && getSpotWithThisImage(imageBasemapKey);
-    const isGroupNestedInSample = spotWithThisImageBasemap?.properties?.isSample;
+  const renderGroup = ({imageBasemapId, groupSpots}, groupIndex) => {
+    const isGroupNestedInSample = isSampleImageBasemap(imageBasemapId);
     return (
       <View
         style={{
           flex: 1,
           flexDirection: 'row',
-          borderWidth: imageBasemapKey !== 'undefined' && isGroupNestedInSample ? 2.5 : 1,
+          borderWidth: isGroupNestedInSample ? 2.5 : 1,
           borderColor: isGroupNestedInSample ? SAMPLES_COLOR : BLACK,
           marginLeft: 10,
           marginRight: 10,
@@ -123,13 +123,12 @@ const Nesting = ({page}) => {
           marginBottom: 2,
         }}
       >
-        {imageBasemapKey !== 'undefined' && <NestingImageCard imageBasemapId={imageBasemapKey} index={b}/>}
+        {!!imageBasemapId && <NestingImageCard imageBasemapId={imageBasemapId} index={groupIndex}/>}
         <View style={{flex: 1}}>
           <FlatList
             ItemSeparatorComponent={FlatListItemSeparator}
-            data={group}
+            data={groupSpots}
             keyExtractor={item => `NestedItem${item.properties.id}`}
-            listKey={`${type}${i}${b}`}
             renderItem={({item}) => renderName(item)}
           />
         </View>
@@ -164,14 +163,12 @@ const Nesting = ({page}) => {
   };
 
   const renderSelf = (self) => {
-    const imageBasemapId = self.properties?.image_basemap;
-    const spotWithThisImageBasemap = imageBasemapId && getSpotWithThisImage(imageBasemapId);
-    const isSampleORSampleChild = self.properties?.isSample || spotWithThisImageBasemap?.properties?.isSample;
+    const isSampleOrSampleChild = self.properties?.isSample || isSampleImageBasemap(self.properties?.image_basemap);
     return (
       <View style={{
-        borderTopWidth: isSampleORSampleChild ? 2.5 : 1,
-        borderBottomWidth: isSampleORSampleChild ? 2.5 : 1,
-        borderColor: isSampleORSampleChild ? SAMPLES_COLOR : BLACK,
+        borderTopWidth: isSampleOrSampleChild ? 2.5 : 1,
+        borderBottomWidth: isSampleOrSampleChild ? 2.5 : 1,
+        borderColor: isSampleOrSampleChild ? SAMPLES_COLOR : BLACK,
       }}>
         {renderItem(self)}
       </View>
