@@ -167,7 +167,12 @@ const MainMenuPanel = forwardRef(({
 
       // Maps
       case MAIN_MENU_ITEMS.MAPS.CUSTOM:
-        return <ManageCustomMaps zoomToCustomMap={mapComponentRef?.current?.zoomToCustomMap}/>;
+        return (
+          <ManageCustomMaps
+            zoomToCustomMap={mapComponentRef?.current?.zoomToCustomMap}
+            zoomToOfflineMapTiles={mapComponentRef?.current?.zoomToOfflineMapTiles}
+          />
+        );
       case MAIN_MENU_ITEMS.MAPS.IMAGE_BASEMAPS :
         return <ImageBasemapsList closeManMenuPanel={closeMainMenuPanel} openDatasetsPage={openDatasetsPage}/>;
       case MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS:
