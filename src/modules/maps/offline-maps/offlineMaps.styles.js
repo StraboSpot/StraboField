@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
   },
-  // Takes the width the controls leave, so the whole line opens the rename modal rather than the text alone
+  // Takes the width the controls leave, pushing them to the end of the row
   nameContainer: {
     flex: 1,
     marginLeft: 10,
@@ -52,10 +52,6 @@ const styles = StyleSheet.create({
   // is what sets the row height rather than its contents. The button keeps its own internal padding.
   previewButtonContainer: {
     paddingVertical: 0,
-  },
-  // The accent color is the only thing saying a name can be tapped to rename it
-  renameableTitle: {
-    color: themes.PRIMARY_ACCENT_COLOR,
   },
 });
 

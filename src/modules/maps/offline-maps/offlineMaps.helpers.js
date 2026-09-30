@@ -1,6 +1,50 @@
+import {isEmpty} from '../../../shared/helpers';
 import {CUSTOM_MAP_SOURCES} from '../custom-maps/customMaps.constants';
 
 export const checkIfZipStatusReady = data => data.status === 'Zip File Ready.';
+
+// Tiles are named z_x_y.png. Anything else sitting in the directory would make every number NaN, so it is left out.
+export const parseTileNames = names => names.map(name => name.replace('.png', '').split('_').map(Number))
+  .filter(tile => tile.length === 3 && tile.every(Number.isFinite));
+
+// The extent a set of tiles covers. A tile's coordinate is its north west corner, so the south and east edges come
+// from the tile after the last one.
+export const getTilesBbox = (tiles) => {
+  if (isEmpty(tiles)) return;
+  // Deeper tiles cover the same ground in more pieces, so past this the extra precision buys nothing
+  const zoom = Math.min(Math.max(...tiles.map(([z]) => z)), 14);
+  const tilesAtZoom = tiles.filter(([z]) => z === zoom);
+  if (isEmpty(tilesAtZoom)) return;
+  const xs = tilesAtZoom.map(([, x]) => x);
+  const ys = tilesAtZoom.map(([, , y]) => y);
+  return [
+    tile2long(Math.min(...xs), zoom),
+    tile2lat(Math.max(...ys) + 1, zoom),
+    tile2long(Math.max(...xs) + 1, zoom),
+    tile2lat(Math.min(...ys), zoom),
+  ];
+};
+
+// What a downloaded map's tile files add up to: how many there are at each zoom, the room they take and the extent
+// they cover. Each file is {name, size}.
+export const getTileStats = (files) => {
+  const tiles = parseTileNames(files.map(file => file.name));
+  const zoomCounts = {};
+  tiles.forEach(([z]) => {
+    zoomCounts[z] = (zoomCounts[z] || 0) + 1;
+  });
+  return {
+    bbox: getTilesBbox(tiles),
+    size: files.reduce((total, file) => total + Number(file.size), 0),
+    zoomCounts,
+  };
+};
+
+export const formatTilesSize = (bytes) => {
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+};
 
 export const getOfflineMapTitle = (map) => {
   if (!map.name) return map.id;

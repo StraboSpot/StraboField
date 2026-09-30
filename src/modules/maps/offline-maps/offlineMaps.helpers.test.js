@@ -1,4 +1,4 @@
-import {getOfflineMap} from './offlineMaps.helpers';
+import {formatTilesSize, getOfflineMap, getTileStats, parseTileNames} from './offlineMaps.helpers';
 import {CUSTOM_MAP_SOURCES} from '../custom-maps/customMaps.constants';
 
 describe('getOfflineMap', () => {
@@ -22,5 +22,52 @@ describe('getOfflineMap', () => {
 
   it('finds nothing for a map that was never downloaded', () => {
     expect(getOfflineMap({}, style)).toBeUndefined();
+  });
+});
+
+describe('parseTileNames', () => {
+  it('reads the zoom, x and y out of each tile', () => {
+    expect(parseTileNames(['12_851_1556.png', '3_1_2.png'])).toEqual([[12, 851, 1556], [3, 1, 2]]);
+  });
+
+  it('leaves out anything that is not a tile', () => {
+    expect(parseTileNames(['.DS_Store', 'tiles.zip', '12_851_1556.png'])).toEqual([[12, 851, 1556]]);
+  });
+});
+
+describe('getTileStats', () => {
+  const files = [
+    {name: '1_0_0.png', size: 1000},
+    {name: '2_0_0.png', size: 2000},
+    {name: '2_1_1.png', size: 3000},
+    {name: '.DS_Store', size: 50},
+  ];
+
+  it('counts the tiles at each zoom', () => {
+    expect(getTileStats(files).zoomCounts).toEqual({1: 1, 2: 2});
+  });
+
+  it('adds up the room every file takes', () => {
+    expect(getTileStats(files).size).toBe(6050);
+  });
+
+  it('frames the tiles at the deepest zoom', () => {
+    const [west, south, east, north] = getTileStats(files).bbox;
+    expect(west).toBe(-180);
+    expect(east).toBe(0);
+    expect(north).toBeCloseTo(85.0511);
+    expect(south).toBeCloseTo(0);
+  });
+
+  it('has no extent for a map with no tiles', () => {
+    expect(getTileStats([])).toEqual({bbox: undefined, size: 0, zoomCounts: {}});
+  });
+});
+
+describe('formatTilesSize', () => {
+  it('picks the unit that keeps the number readable', () => {
+    expect(formatTilesSize(2048)).toBe('2.0 KB');
+    expect(formatTilesSize(5.5 * 1024 * 1024)).toBe('5.5 MB');
+    expect(formatTilesSize(1.25 * 1024 * 1024 * 1024)).toBe('1.25 GB');
   });
 });

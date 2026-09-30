@@ -85,6 +85,7 @@ export const SIDE_PANEL_VIEWS = {
   IMPORT_PROJECT: 'Import Project',
   MANAGE_CUSTOM_MAP: 'manageCustomMap',
   NEW_PROJECT: 'New Project',
+  OFFLINE_MAP_DETAILS: 'offlineMapDetails',
   OPEN_PROJECT: 'Open Project',
   TAG_ADD_REMOVE_FEATURES: 'add remove tag features',
   TAG_ADD_REMOVE_REPORTS: 'add remove tag reports',

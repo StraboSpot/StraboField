@@ -2,7 +2,7 @@ import {unzip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {
-  checkIfZipStatusReady, getOfflineMap, getTileFolderName, tile2lat, tile2long,
+  checkIfZipStatusReady, getOfflineMap, getTileFolderName, getTilesBbox, parseTileNames,
 } from './offlineMaps.helpers';
 import {
   addMapFromDevice,
@@ -259,28 +259,12 @@ const useMapsOffline = () => {
   };
 
   // The extent the downloaded tiles actually cover, so a preview can frame what was downloaded rather than
-  // sit at a fixed zoom over the middle of it. Tiles are named z_x_y and a tile's coordinate is its north west
-  // corner, so the south and east edges come from the tile after the last one.
+  // sit at a fixed zoom over the middle of it
   const getMapTilesBbox = async (mapId) => {
     if (!APP_DIRECTORIES.ROOT_PATH) return;
     const entries = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, mapId);
     if (isEmpty(entries)) return;   // the read reports its own failure and hands back nothing
-    // Anything else sitting in the directory would make every number NaN and lose the extent entirely
-    const tiles = entries.map(entry => entry.replace('.png', '').split('_').map(Number))
-      .filter(tile => tile.length === 3 && tile.every(Number.isFinite));
-    if (isEmpty(tiles)) return;
-    // Deeper tiles cover the same ground in more pieces, so past this the extra precision buys nothing
-    const zoom = Math.min(Math.max(...tiles.map(([z]) => z)), 14);
-    const tilesAtZoom = tiles.filter(([z]) => z === zoom);
-    if (isEmpty(tilesAtZoom)) return;
-    const xs = tilesAtZoom.map(([, x]) => x);
-    const ys = tilesAtZoom.map(([, , y]) => y);
-    return [
-      tile2long(Math.min(...xs), zoom),
-      tile2lat(Math.max(...ys) + 1, zoom),
-      tile2long(Math.max(...xs) + 1, zoom),
-      tile2lat(Math.min(...ys), zoom),
-    ];
+    return getTilesBbox(parseTileNames(entries));
   };
 
   // A downloaded tile standing in for the map in a list. Which tiles were downloaded is only known from the
@@ -291,9 +275,7 @@ const useMapsOffline = () => {
     if (!tileTemplate || !APP_DIRECTORIES.ROOT_PATH) return;
     const entries = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, map.id);
     if (isEmpty(entries)) return;   // the read reports its own failure and hands back nothing
-    // Anything else sitting in the directory would make every number NaN and name a tile that does not exist
-    const tiles = entries.map(entry => entry.replace('.png', '').split('_').map(Number))
-      .filter(tile => tile.length === 3 && tile.every(Number.isFinite));
+    const tiles = parseTileNames(entries);
     if (isEmpty(tiles)) return;
     const zoom = Math.max(...tiles.map(([z]) => z));
     const tilesAtZoom = tiles.filter(([z]) => z === zoom).sort(([, aX, aY], [, bX, bY]) => aX - bX || aY - bY);

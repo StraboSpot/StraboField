@@ -18,6 +18,7 @@ import CustomMapDetails from '../maps/custom-maps/CustomMapDetails';
 import ManageCustomMaps from '../maps/custom-maps/ManageCustomMaps';
 import ImageBasemapsList from '../maps/ImageBasemapsList';
 import ManageOfflineMapsMenu from '../maps/offline-maps/ManageOfflineMaps';
+import OfflineMapDetails from '../maps/offline-maps/OfflineMapDetails';
 import StratSectionsList from '../maps/strat-section/StratSectionsList';
 import MicroProjectsList from '../micro/MicroProjectsList';
 import AddingNewSpots from '../preferences/AddingNewSpots';
@@ -231,6 +232,8 @@ const MainMenuPanel = forwardRef(({
         return <CustomMapDetails/>;
       case SIDE_PANEL_VIEWS.NEW_PROJECT:
         return <NewProject closeNotebookPanel={closeNotebookPanel}/>;
+      case SIDE_PANEL_VIEWS.OFFLINE_MAP_DETAILS:
+        return <OfflineMapDetails/>;
       case SIDE_PANEL_VIEWS.OPEN_PROJECT:
         return <OpenProject closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:

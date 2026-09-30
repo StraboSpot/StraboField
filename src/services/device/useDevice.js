@@ -438,6 +438,14 @@ const useDevice = () => {
     }
   };
 
+  // Like readDirectoryForMapTiles, but with each tile's size as well as its name
+  const readMapTileFiles = async (mapId) => {
+    const tilesDirectory = APP_DIRECTORIES.TILE_CACHE + mapId.split('/').pop() + '/tiles';
+    if (!await RNFS.exists(tilesDirectory)) return [];
+    const files = await RNFS.readDir(tilesDirectory);
+    return files.map(({name, size}) => ({name, size}));
+  };
+
   const readFile = async (source) => {
     try {
       return await RNFS.readFile(source);
@@ -589,6 +597,7 @@ const useDevice = () => {
     readDirectory,
     readDirectoryForMapFiles,
     readDirectoryForMapTiles,
+    readMapTileFiles,
     readFile,
     pruneOldProjectSaves,
     saveProjectToDevice,
