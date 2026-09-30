@@ -386,8 +386,7 @@ const MapContainer = forwardRef(({
     };
   };
 
-  const getTileCount = async (zoomLevel) => {
-    const extentString = await getExtentString();
+  const getTileCount = async (extentString, zoomLevel) => {
     try {
       //Assign the promise unresolved first then get the data using the JSON method.
       console.log('sending this extent to server: ', extentString);

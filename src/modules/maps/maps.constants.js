@@ -1,5 +1,6 @@
 import {GLYPHS_URL} from './glyphs/glyphs.constants';
 import {STRABO_APIS} from '../../services/network/urls.constants';
+import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import config from '../../utils/config';
 
 export const LATITUDE = 39.828175;      // Geographic center of US;
@@ -24,6 +25,9 @@ export const SPOTS_EXTENT_ZOOM_DELAY = 500;
 // a press directly on the feature (e.g. Macrostrat).
 export const PRESS_BOX_PADDING = 10;
 export const PRESS_BOX_PADDING_PRECISE = 1;
+
+// Marks a button that saves a map to the device for offline use
+export const DOWNLOAD_ICON = {color: PRIMARY_ACCENT_COLOR, name: 'cloud-download-outline', type: 'ionicon'};
 
 export const MAPBOX_TOKEN = config.get('mapbox_access_token');
 

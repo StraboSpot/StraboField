@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, Text, View} from 'react-native';
+import {ActivityIndicator, Text, useWindowDimensions, View} from 'react-native';
 
 import MultiSelect from 'react-native-multiple-select';
 import ProgressBar from 'react-native-progress/Bar';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getTileFolderName} from './offlineMaps.helpers';
+import {getScreenFitZoom, getTileFolderName} from './offlineMaps.helpers';
 import {calculateScaleRatio} from './scale';
 import useMapsOffline from './useMapsOffline';
 import useDevice from '../../../services/device/useDevice';
@@ -35,6 +35,11 @@ const dropdownFieldStyle = {...formStyles.fieldValue, marginBottom: 15, paddingB
 const dropdownLabelStyle = {...formStyles.fieldLabel, alignSelf: 'flex-start'};
 // Supporting detail under the dropdowns, kept quieter than the choices themselves
 const noteStyle = {color: themes.DARKGREY, fontSize: themes.SMALL_TEXT_SIZE, paddingBottom: 5};
+const warningStyle = {...noteStyle, color: themes.WARNING_COLOR};
+// The space zoomToCustomMap leaves on each side of a map it frames
+const FRAME_PADDING = 100;
+// Past this a download is flagged as large: at a typical 20-50 KB a tile, that is a few hundred megabytes
+const LARGE_DOWNLOAD_TILE_COUNT = 10000;
 const mapNameStyle = {
   fontSize: themes.MEDIUM_TEXT_SIZE,
   fontWeight: 'bold',
@@ -51,6 +56,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customMaps = useSelector(state => state.map.customMaps);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
+  const offlineMapToSaveId = useSelector(state => state.home.offlineMapToSaveId);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
   const statusMessages = useSelector(state => state.home.statusMessages);
 
@@ -65,6 +71,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
     updateMapTileCountWhenSaving,
   } = useMapsOffline();
   const {getTileBaseUrl} = useServerRequests();
+  const {height: windowHeight, width: windowWidth} = useWindowDimensions();
 
   /* Local State */
 
@@ -75,7 +82,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   const [isError, setIsError] = useState(false);
   const [isLoadingCircle, setIsLoadingCircle] = useState(false);
   const [isLoadingWave, setIsLoadingWave] = useState(false);
-  const [mapToSaveId, setMapToSaveId] = useState(currentBasemap.id);
+  const [mapToSaveId, setMapToSaveId] = useState(offlineMapToSaveId ?? currentBasemap.id);
   const [percentDone, setPercentDone] = useState(0);
   const [showComplete, setShowComplete] = useState(false);
   const [showLoadingBar, setShowLoadingBar] = useState(false);
@@ -87,9 +94,11 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
 
   /* Derived Variables */
 
+  // A custom map saved from its own page is saved whole, over its own extent rather than the area on screen
+  const mapToSaveWhole = customMaps[offlineMapToSaveId];
   // An overlay is a map in its own right, so it can be the one saved. Only the ones drawn from a provider are
   // offered: an overlay that is already a copy on this device has nothing left to download.
-  const savableMaps = [
+  const savableMaps = mapToSaveWhole ? [mapToSaveWhole] : [
     currentBasemap,
     ...getVisibleCustomOverlays(customMaps, offlineMaps).filter(map => isLiveCustomMapSource(map.source)),
   ];
@@ -99,6 +108,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   const mapChoices = savableMaps.map(map => ({label: map.title || map.name, value: map.id}));
   // Tiles already on the device for this map, which a download adds to rather than replaces
   const savedTileCount = offlineMaps[getTileFolderName(mapToSave.id, mapToSave.source)]?.count;
+  const isLargeDownload = tileCount > LARGE_DOWNLOAD_TILE_COUNT;
 
   /* Side Effects */
 
@@ -115,28 +125,14 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   useEffect(() => {
     console.log('UE SaveMapsModal [getCurrentZoom]');
     if (getCurrentZoom) {
-      getCurrentZoom().then((zoom) => {
-        let initialZoom = [];
-        let currentZoom = Math.round(zoom);
-        setDownloadZoom(Math.round(zoom));
-        const numZoomLevels = maxZoom ? Math.min(maxZoom - currentZoom + 1, 6) : 5;
-        for (let i = 0; i < numZoomLevels; i++) {
-          initialZoom.push(currentZoom + i);
-        }
-        setZoomLevels(initialZoom);
-      });
-      getExtentString().then((ex) => {
-        console.log('Extent String', ex);
-        setExtentString(ex);
-      });
+      setExtentAndZoomLevels().catch(err => console.error('Error getting the area to save', err));
     }
   }, [getCurrentZoom, mapToSaveId]);
 
   useEffect(() => {
-    console.log('UE SaveMapsModal [downloadZoom]', downloadZoom);
-    console.log('extentString is UE', extentString);
+    console.log('UE SaveMapsModal [downloadZoom, extentString]', downloadZoom, extentString);
     shouldDownload().catch(err => console.error('Error in SaveMapsModal shouldDownload()', err));
-  }, [downloadZoom]);
+  }, [downloadZoom, extentString]);
 
   /* Render Functions */
 
@@ -273,8 +269,22 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
     }
   };
 
+  // A map saved whole starts at the zoom it is being framed at, which the map may still be animating towards
+  const setExtentAndZoomLevels = async () => {
+    const extent = mapToSaveWhole ? mapToSaveWhole.bbox : await getExtentString();
+    setExtentString(extent);
+    const currentZoom = mapToSaveWhole
+      ? getScreenFitZoom(extent.split(',').map(Number), windowWidth - 2 * FRAME_PADDING,
+        windowHeight - 2 * FRAME_PADDING)
+      : Math.round(await getCurrentZoom());
+    // None when the map is already deeper than its provider goes
+    const numZoomLevels = maxZoom ? Math.max(0, Math.min(maxZoom - currentZoom + 1, 6)) : 5;
+    setDownloadZoom(currentZoom);
+    setZoomLevels(Array.from({length: numZoomLevels}, (_, i) => currentZoom + i));
+  };
+
   const shouldDownload = async () => {
-    if (downloadZoom > 0) {
+    if (downloadZoom > 0 && extentString) {
       setIsLoadingCircle(true);
       updateCount().then(() => {
         console.log('TileCount', tileCount);
@@ -306,7 +316,7 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   };
 
   const updateCount = async () => {
-    const tc = await getTileCount(downloadZoom);
+    const tc = await getTileCount(extentString, downloadZoom);
     if (tc?.count) {
       console.log('downloadZoom from updateCount: ', downloadZoom);
       console.log('downloadZoom tc: ', tc.count);
@@ -357,8 +367,15 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
                   && renderDropdown('Map', mapChoices, mapToSaveId, value => setMapToSaveId(value), 'a map')}
                 {renderDropdown('Max Zoom', getZoomChoices(), downloadZoom, value => updatePicker(value), 'a zoom level')}
                 <Text style={noteStyle}>
-                  Saves the area shown on the map, down to the zoom level picked above.
+                  {mapToSaveWhole ? 'Saves the whole map' : 'Saves the area shown on the map'}, down to the zoom level
+                  picked above.
                 </Text>
+                {isLargeDownload && (
+                  <Text style={warningStyle}>
+                    {tileCount.toLocaleString()} tiles is a large download, which can take a long time and a lot of
+                    space on this device. Each deeper zoom level holds about four times the tiles of the one above it.
+                  </Text>
+                )}
                 {/* Downloading again adds to what is already there - moveTile keeps the tiles it finds and
                     fetches only the rest - so a map's saved area is extended by framing more of it and saving. */}
                 {savedTileCount > 0 && (

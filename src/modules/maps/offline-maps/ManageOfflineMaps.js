@@ -21,6 +21,7 @@ import {setIsOfflineMapsModalVisible} from '../../home/home.slice';
 import {SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import {isOfflineMapOverlayOn} from '../custom-maps/customMaps.helpers';
+import {DOWNLOAD_ICON} from '../maps.constants';
 
 const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
   console.log('Rendering ManageOfflineMaps...');
@@ -166,6 +167,7 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
     <>
       <OutlineButton
         disabled={!isInternetReachable || isSelected || !!previewedOfflineMapId}
+        icon={DOWNLOAD_ICON}
         onPress={handleDownloadMapTilesPressed}
         title={'Download Tiles of Current Map'}
       />

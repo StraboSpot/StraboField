@@ -229,7 +229,12 @@ const MainMenuPanel = forwardRef(({
       case SIDE_PANEL_VIEWS.IMPORT_PROJECT:
         return <ImportProjectFromZip/>;
       case SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP:
-        return <CustomMapDetails/>;
+        return (
+          <CustomMapDetails
+            closeMainMenuPanel={closeMainMenuPanel}
+            zoomToCustomMap={mapComponentRef?.current?.zoomToCustomMap}
+          />
+        );
       case SIDE_PANEL_VIEWS.NEW_PROJECT:
         return <NewProject closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.OFFLINE_MAP_DETAILS:

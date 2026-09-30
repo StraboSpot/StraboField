@@ -46,6 +46,15 @@ export const formatTilesSize = (bytes) => {
   return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
 };
 
+// The zoom a map sits at once an extent is framed to fill a screen of this size, as zoomToCustomMap does: whole
+// zooms only, rounded down so the extent still fits. Mapbox zooms count a 512px world, whatever the tile size.
+export const getScreenFitZoom = ([west, south, east, north], width, height) => {
+  const worldShareWide = long2tileFraction(east, 0) - long2tileFraction(west, 0);
+  const worldShareHigh = lat2tileFraction(south, 0) - lat2tileFraction(north, 0);
+  const zoom = Math.log2(Math.min(width / (worldShareWide * 512), height / (worldShareHigh * 512)));
+  return Math.max(0, Math.floor(zoom));
+};
+
 export const getOfflineMapTitle = (map) => {
   if (!map.name) return map.id;
   return map.name;

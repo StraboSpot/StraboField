@@ -17,22 +17,19 @@ import SectionDivider from '../../../shared/ui/SectionDivider';
 import useIsConnectionAvailable from '../../connections/useConnectionStatus';
 import {getOfflineMap} from '../offline-maps/offlineMaps.helpers';
 import useMapsOffline from '../offline-maps/useMapsOffline';
-import useMap from '../useMap';
 
 const ManageCustomMaps = ({zoomToCustomMap, zoomToOfflineMapTiles}) => {
   // console.log('Rendering ManageCustomMaps...');
 
   /* Data Hooks */
 
-  const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customMaps = useSelector(state => state.map.customMaps);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const {isSelected, endpoint} = useSelector(state => state.connections.databaseEndpoint);
 
   const isConnectionAvailable = useIsConnectionAvailable();
 
-  const {getCustomMapDetails, setCustomMapOverlay} = useCustomMap();
-  const {setBasemap} = useMap();
+  const {getCustomMapDetails, showCustomMap} = useCustomMap();
   const {setOfflineMapTiles} = useMapsOffline();
 
   /* Derived Variables */
@@ -49,14 +46,7 @@ const ManageCustomMaps = ({zoomToCustomMap, zoomToOfflineMapTiles}) => {
 
   const viewCustomMap = async (item) => {
     if (!isConnectionAvailable) return viewDownloadedMap(item);
-    let bbox = item.bbox;
-    if (item.overlay) {
-      setCustomMapOverlay(item, true);
-      // A map cannot be the basemap and an overlay at once, so only a basemap that is this map is handed back
-      if (currentBasemap?.id === item.id) await setBasemap();
-    }
-    // Setting the basemap fetches the map's extent when it has none yet
-    else bbox = (await setBasemap(item.id))?.bbox;
+    const bbox = await showCustomMap(item);
     if (bbox) zoomToCustomMap(bbox);
   };
 

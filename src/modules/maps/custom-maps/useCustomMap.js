@@ -168,6 +168,16 @@ const useCustomMap = () => {
     saveDisplaySettings(map, {isViewable: isOverlayOn, overlay: isOverlayOn});
   };
 
+  // Draws the map over the basemap if it is an overlay, otherwise as the basemap. Hands back its extent, which
+  // setting it as the basemap fetches when it has none yet.
+  const showCustomMap = async (map) => {
+    if (!map.overlay) return (await setBasemap(map.id))?.bbox;
+    setCustomMapOverlay(map, true);
+    // A map cannot be the basemap and an overlay at once, so only a basemap that is this map is handed back
+    if (currentBasemap?.id === map.id) await setBasemap();
+    return map.bbox;
+  };
+
   const updateMap = (map) => {
     // Merged onto the stored map so a caller holding only part of it leaves the rest in place - the edit form no
     // longer carries the overlay display settings, which are switched from the map layers menu instead.
@@ -184,6 +194,7 @@ const useCustomMap = () => {
     saveCustomMap,
     setCustomMapOpacity,
     setCustomMapOverlay,
+    showCustomMap,
     updateMap,
   };
 };
