@@ -2,7 +2,14 @@ import * as turf from '@turf/turf';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getLinkedSample, getSampleMetadata, getUnlinkedSample, isSampleStub} from './samples.helpers';
+import {SAMPLE_LOCATION_KEY} from './samples.constants';
+import {
+  getLinkedSample,
+  getSampleMetadata,
+  getStraboSampleLocation,
+  getUnlinkedSample,
+  isSampleStub,
+} from './samples.helpers';
 import {isEmpty} from '../../shared/helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
@@ -68,7 +75,8 @@ const useSamples = () => {
   /* Exported Functions */
 
   // Create new Sample Spot
-  const createRichSample = (spot, selectedSample, sampleImages = []) => {
+  // The geometry is the parent's location unless one is given, as it is when linking takes StraboSamples'
+  const createRichSample = (spot, selectedSample, sampleImages = [], geometry = getSampleGeometry(spot)) => {
     // Nowhere to file the new Sample Spot without a target, so stop before anything is created rather than
     // leaving one behind in no dataset
     const targetDataset = getTargetDatasetFromId();
@@ -84,7 +92,7 @@ const useSamples = () => {
     d.setMilliseconds(0);
 
     const newEnrichedSample = {
-      geometry: getSampleGeometry(spot),
+      geometry: geometry,
       properties: {
         date: d.toISOString(),
         id: selectedSample.id,
@@ -129,7 +137,26 @@ const useSamples = () => {
     return sample && !isSampleStub(sample) ? sample : undefined;
   };
 
-  const linkSample = strabosample => saveSelectedSample(getLinkedSample(getSelectedSample(), strabosample));
+  // Where the selected sample is: its own Spot's geometry, or for one kept on its parent Spot, the geometry it would
+  // be given as a Sample Spot of its own
+  const getSelectedSampleGeometry = () => selectedSpot.properties?.isSample ? selectedSpot.geometry
+    : getSampleGeometry(selectedSpot);
+
+  // Link the selected sample, taking the StraboSamples values for the keys picked. Linking adds data to the sample, so
+  // one kept on its parent Spot is made a Sample Spot of its own with the linked record. False if it could not be.
+  // The StraboSamples location is taken too if picked, which moves the Sample Spot there.
+  const linkSample = (strabosample, keysToTake = []) => {
+    const linkedSample = getLinkedSample(getSelectedSample(), strabosample, keysToTake);
+    const location = keysToTake.includes(SAMPLE_LOCATION_KEY) && getStraboSampleLocation(strabosample);
+    const geometry = location ? turf.point(location).geometry : getSelectedSampleGeometry();
+    if (selectedSpot.properties.isSample) {
+      // The geometry goes first, so the sample saved after it is saved onto the Spot as moved
+      if (location) dispatch(editedOrCreatedSpot({...selectedSpot, geometry: geometry}));
+      saveSelectedSample(linkedSample);
+    }
+    else if (!createRichSample(selectedSpot, linkedSample, [], geometry)) return false;
+    return true;
+  };
 
   const unlinkSample = () => saveSelectedSample(getUnlinkedSample(getSelectedSample()));
 
@@ -157,6 +184,7 @@ const useSamples = () => {
     createRichSample,
     deleteRichSample,
     getSelectedSample,
+    getSelectedSampleGeometry,
     linkSample,
     unlinkSample,
   };

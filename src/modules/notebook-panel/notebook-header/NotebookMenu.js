@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {FlatList, Text} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
@@ -10,14 +10,12 @@ import RockdModal from '../../../services/data-intergration/macrostrat/RockdModa
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
-import alert from '../../../shared/ui/alert';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import WarningModal from '../../../shared/ui/modals/WarningModal';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
-import LinkSampleModal from '../../samples/LinkSampleModal';
 import useSamples from '../../samples/useSamples';
 import useSpots from '../../spots/useSpots';
 import {setInitialSesarState} from '../../user/userProfile.slice';
@@ -31,7 +29,6 @@ const NotebookMenu = ({
                         isReadOnly,
                         isSample,
                         parentSpot,
-                        sampleChangesRef,
                         zoomToSpots,
                       }) => {
   /* Data Hooks */
@@ -45,7 +42,7 @@ const NotebookMenu = ({
 
   const navigation = useNavigation();
   const toast = useToast();
-  const {deleteRichSample, getSelectedSample, unlinkSample} = useSamples();
+  const {deleteRichSample} = useSamples();
   const {checkIsSafeDelete, copySpot, deleteSpot, isSpotOnReadOnlyMap, isStratInterval} = useSpots();
   const {deleteInterval} = useStratSection();
 
@@ -53,20 +50,15 @@ const NotebookMenu = ({
 
   const [errorMessage, setErrorMessage] = useState('');
   const [isDeleteSpotModalVisible, setIsDeleteSpotModalVisible] = useState(false);
-  const [isLinkSampleModalVisible, setIsLinkSampleModalVisible] = useState(false);
   const [isRockdModalVisible, setIsRockdModalVisible] = useState(false);
-  // Unlinking is made on the render after it is asked for, so it starts from the sample as any save just stored it
-  const [isUnlinkPending, setIsUnlinkPending] = useState(false);
 
   /* Derived Variables */
 
   const type = isSample ? 'Sample' : 'Spot';
-  const isLinked = isSample && !isEmpty(getSelectedSample()?.strabosamples_id);
   const actions = [
     ...(!isSample && !isEmpty(targetDatasetId) ? [{key: 'copy', title: `Copy this ${type}`}] : []),
     {key: 'zoom', title: `Zoom to this ${type}`},
     {key: 'delete', title: `Delete this ${type}`},
-    ...(isSample ? [{key: 'linkSample', title: isLinked ? 'Unlink Sample' : 'Link Sample'}] : []),
     {key: 'geography', title: 'Show Geography'},
     {key: 'metadata', title: 'Show Metadata'},
     {key: 'nesting', title: 'Show Nesting'},
@@ -94,11 +86,6 @@ const NotebookMenu = ({
     else if (key === 'nesting') dispatch(setNotebookPageVisible(PAGE_KEYS.NESTING));
     else if (key === 'geography') dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY));
     else if (key === 'metadata') dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA));
-    else if (key === 'linkSample') {
-      closeNotebookMenu();
-      // iOS drops a modal or alert presented while another is still dismissing
-      setTimeout(() => confirmSaveBeforeLinking(isLinked), 400);
-    }
     else if (key === 'rockd') {
       closeNotebookMenu();
       setIsRockdModalVisible(true);
@@ -111,44 +98,7 @@ const NotebookMenu = ({
     closeNotebookMenu();
   };
 
-  /* Side Effects */
-
-  useEffect(() => {
-    if (isUnlinkPending) {
-      setIsUnlinkPending(false);
-      unlinkSample();
-      toast.show('Sample unlinked from StraboSamples', {type: 'success'});
-    }
-  }, [isUnlinkPending]);
-
   /* Logic Helpers */
-
-  // Linking and unlinking both rewrite the sample as stored, so changes still open in the sample form are saved first,
-  // or the sample is left as it is. A linked sample is unlinked; any other opens the picker to link it.
-  const confirmSaveBeforeLinking = (isUnlinking) => {
-    const openSampleForm = sampleChangesRef?.current;
-    // The picker waits out an alert still closing, for the same reason the menu is waited out
-    const continueLinking = (modalDelay) => {
-      if (isUnlinking) setIsUnlinkPending(true);
-      else setTimeout(() => setIsLinkSampleModalVisible(true), modalDelay);
-    };
-    if (!openSampleForm?.getHasUnsavedChanges()) continueLinking(0);
-    else {
-      alert('Unsaved Changes', `This sample has changes that need to be saved before it can be ${isUnlinking
-        ? 'unlinked' : 'linked'}. Save them now?`,
-        [{
-          text: 'Cancel',
-          style: 'cancel',
-        }, {
-          text: 'OK',
-          onPress: async () => {
-            if (await openSampleForm.saveChanges()) continueLinking(400);
-          },
-        }],
-        {cancelable: false},
-      );
-    }
-  };
 
   const continueDeleteSelectedSpot = () => {
     if (errorMessage) {
@@ -169,7 +119,7 @@ const NotebookMenu = ({
   /* Render Functions */
 
   const renderActionItem = ({item}) => {
-    if (isReadOnly && ['delete', 'copy', 'linkSample'].includes(item.key)) return;
+    if (isReadOnly && ['delete', 'copy'].includes(item.key)) return;
     // A copy keeps image_basemap/strat_section_id, so it would be a new Spot on a read only map
     else if (item.key === 'copy' && isSpotOnReadOnlyMap(spot)) return;
     else if (item.key === 'rockd' && !isTestingMode
@@ -232,10 +182,6 @@ const NotebookMenu = ({
       >
         {renderDeleteMessage()}
       </WarningModal>
-      <LinkSampleModal
-        closeModal={() => setIsLinkSampleModalVisible(false)}
-        isVisible={isLinkSampleModalVisible}
-      />
       <RockdModal
         closeModal={() => setIsRockdModalVisible(false)}
         isVisible={isRockdModalVisible}

@@ -56,6 +56,15 @@ const notebookFooterStyles = StyleSheet.create({
     padding: 0,
     paddingRight: 10,
   },
+  sampleButtonContainer: {
+    flex: 1,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
+  sampleButtonsContainer: {
+    gap: 10,
+    padding: 10,
+  },
 });
 
 export default notebookFooterStyles;

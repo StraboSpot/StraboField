@@ -4,7 +4,17 @@ import {Button} from '@rn-vui/base';
 
 import buttonStyles from './buttons.styles';
 
-const OutlineButton = ({backgroundColor, containerStyle, disabled, icon, iconContainerStyle, loading, onPress, title}) => {
+const OutlineButton = ({
+                         backgroundColor,
+                         containerStyle,
+                         disabled,
+                         icon,
+                         iconContainerStyle,
+                         loading,
+                         onPress,
+                         title,
+                         titleStyle,
+                       }) => {
   return (
     <Button
       buttonStyle={[buttonStyles.standardButton,
@@ -17,7 +27,7 @@ const OutlineButton = ({backgroundColor, containerStyle, disabled, icon, iconCon
       loading={loading}
       onPress={onPress}
       title={title}
-      titleStyle={[buttonStyles.standardButtonText, {textAlign: 'center'}]}
+      titleStyle={[buttonStyles.standardButtonText, {textAlign: 'center'}, titleStyle]}
       type={'outline'}
     />
   );

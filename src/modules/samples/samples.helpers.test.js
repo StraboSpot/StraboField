@@ -1,5 +1,6 @@
 import {
   getLinkedSample,
+  getSampleDifferences,
   getSampleMetadata,
   getSamplesLinkedTo,
   getStraboSampleFromResponse,
@@ -47,49 +48,106 @@ describe('getSampleTitle', () => {
   });
 });
 
+describe('getSampleDifferences', () => {
+  // As the server sent it: nothing to say about the IGSN, notes or location
+  const strabosample = {
+    id: '56470cab-9b17-4aa0-be82-59012c85e6af',
+    userpkey: 905,
+    name: 'Test 2',
+    igsn: null,
+    description: null,
+    notes: null,
+    latitude: null,
+    longitude: null,
+    display_sample_type: 'intact_rock',
+    display_sample_purpose: 'fabric___micro',
+  };
+
+  it('lists only the fields StraboSamples fills in differently', () => {
+    const fieldSample = {id: 1, sample_id_name: 'T-2', sample_notes: 'Kept', material_type: 'intact_rock'};
+    expect(getSampleDifferences(fieldSample, strabosample)).toEqual([
+      {key: 'sample_id_name', fieldValue: 'T-2', strabosamplesValue: 'Test 2'},
+      {key: 'label', fieldValue: undefined, strabosamplesValue: 'Test 2'},
+      {key: 'main_sampling_purpose', fieldValue: undefined, strabosamplesValue: 'fabric___micro'},
+    ]);
+  });
+
+  it('prefers the Field record the sample was linked with before, but not its id', () => {
+    const differences = getSampleDifferences({id: 1}, {
+      ...strabosample,
+      field_data: {id: 999, strabosamples_id: 'other', sample_id_name: 'Old field name', color: 'black'},
+    });
+    expect(differences.map(d => [d.key, d.strabosamplesValue])).toEqual([
+      ['sample_id_name', 'Old field name'],
+      ['label', 'Test 2'],
+      ['material_type', 'intact_rock'],
+      ['main_sampling_purpose', 'fabric___micro'],
+      ['color', 'black'],
+    ]);
+  });
+});
+
+describe('getSampleDifferences for location', () => {
+  const strabosample = {id: 'a', latitude: 44.12, longitude: '-110.5'};
+  const point = coordinates => ({type: 'Point', coordinates: coordinates});
+
+  it('compares to as many decimal places as StraboSamples gives', () => {
+    expect(getSampleDifferences({}, strabosample, point([-110.4987654, 44.1234567]))).toEqual([]);
+    expect(getSampleDifferences({}, strabosample, point([-110.4987654, 44.1298]))).toEqual([
+      {key: 'location', fieldValue: [-110.4987654, 44.1298], strabosamplesValue: [-110.5, 44.12]},
+    ]);
+  });
+
+  it('compares to no more than five decimal places', () => {
+    const precise = {id: 'a', latitude: 44.1234561, longitude: -110.1234561};
+    expect(getSampleDifferences({}, precise, point([-110.123456, 44.123456]))).toEqual([]);
+    expect(getSampleDifferences({}, precise, point([-110.12344, 44.123456]))).toHaveLength(1);
+  });
+
+  it('offers StraboSamples\' location to a sample with none, but never in place of a line', () => {
+    expect(getSampleDifferences({}, strabosample)).toEqual([
+      {key: 'location', fieldValue: undefined, strabosamplesValue: [-110.5, 44.12]},
+    ]);
+    expect(getSampleDifferences({}, strabosample, {type: 'LineString', coordinates: [[0, 0], [1, 1]]})).toEqual([]);
+  });
+
+  it('keeps the sample\'s location when StraboSamples has none', () => {
+    expect(getSampleDifferences({}, {id: 'a', latitude: null, longitude: null}, point([1, 1]))).toEqual([]);
+    expect(getSampleDifferences({}, {id: 'a', latitude: 44, longitude: null})).toEqual([]);
+  });
+});
+
 describe('getLinkedSample', () => {
   const strabosample = {
     id: 'ab12cd34-ef56-4a78-9b01-23456789abcd',
     name: 'Basalt core BC-14',
     igsn: null,
     description: 'Cored from the flow top',
-    notes: '',
     display_sample_type: 'intact_rock',
-    display_sample_purpose: 'petrology',
   };
+  const fieldSample = {id: 1, sample_id_name: 'BC-14 field', sample_notes: 'Kept', material_type: 'sediment'};
 
-  it('fills an empty sample from StraboSamples and records the link', () => {
-    expect(getLinkedSample({id: 17802944671123}, strabosample)).toEqual({
-      id: 17802944671123,
+  it('takes the StraboSamples values picked and keeps the rest', () => {
+    expect(getLinkedSample(fieldSample, strabosample, ['sample_id_name', 'sample_description'])).toEqual({
+      id: 1,
       strabosamples_id: 'ab12cd34-ef56-4a78-9b01-23456789abcd',
       sample_id_name: 'Basalt core BC-14',
       sample_description: 'Cored from the flow top',
-      material_type: 'intact_rock',
-      main_sampling_purpose: 'petrology',
+      sample_notes: 'Kept',
+      material_type: 'sediment',
     });
   });
 
-  it('keeps what was entered in the field', () => {
-    const linked = getLinkedSample({id: 1, sample_id_name: 'BC-14 field', material_type: 'sediment'}, strabosample);
-    expect(linked.sample_id_name).toBe('BC-14 field');
-    expect(linked.material_type).toBe('sediment');
-    expect(linked.sample_description).toBe('Cored from the flow top');
+  it('compares and takes the label as well as the name', () => {
+    const differences = getSampleDifferences({...fieldSample, label: 'BC-14 field'}, strabosample);
+    expect(differences.find(d => d.key === 'label')).toEqual(
+      {key: 'label', fieldValue: 'BC-14 field', strabosamplesValue: 'Basalt core BC-14'});
+    expect(getLinkedSample({...fieldSample, label: 'BC-14 field'}, strabosample, ['label']).label)
+      .toBe('Basalt core BC-14');
   });
 
-  it('prefers the Field record the sample was linked with before, but not its id', () => {
-    const linked = getLinkedSample({id: 1}, {
-      ...strabosample,
-      field_data: {id: 999, strabosamples_id: 'other', sample_id_name: 'Old field name', color: 'black'},
-    });
-    expect(linked).toEqual({
-      id: 1,
-      strabosamples_id: 'ab12cd34-ef56-4a78-9b01-23456789abcd',
-      sample_id_name: 'Old field name',
-      color: 'black',
-      sample_description: 'Cored from the flow top',
-      material_type: 'intact_rock',
-      main_sampling_purpose: 'petrology',
-    });
+  it('never takes an empty StraboSamples value', () => {
+    expect(getLinkedSample(fieldSample, strabosample, ['Sample_IGSN', 'sample_notes']).sample_notes).toBe('Kept');
   });
 
   it('keeps a numeric StraboSamples id as a string', () => {
@@ -166,5 +224,11 @@ describe('isLinkedToOtherFieldSpot', () => {
     expect(isLinkedToOtherFieldSpot(strabosample, 17)).toBe(false);
     expect(isLinkedToOtherFieldSpot(strabosample, 18)).toBe(true);
     expect(isLinkedToOtherFieldSpot({}, 18)).toBe(false);
+  });
+
+  it('knows a sample moving to its own Spot by either Spot', () => {
+    const strabosample = {subsystem_links: [{subsystem: 'field', reference_id: '17570006372284'}]};
+    expect(isLinkedToOtherFieldSpot(strabosample, [17570006372284, 17715350147590])).toBe(false);
+    expect(isLinkedToOtherFieldSpot(strabosample, [17715350147590])).toBe(true);
   });
 });

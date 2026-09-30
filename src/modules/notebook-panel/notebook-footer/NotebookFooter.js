@@ -10,11 +10,21 @@ import * as themes from '../../../shared/styles.constants';
 import {BLACK, PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import {NOTEBOOK_PAGES} from '../../page/page.constants';
 import usePage from '../../page/usePage';
+import LinkSampleModal from '../../samples/LinkSampleModal';
+import useLinkSampleAction from '../../samples/useLinkSampleAction';
 import useSamples from '../../samples/useSamples';
 
-const NotebookFooter = ({openPage, isRichSample, registerGetValues, selectedSample}) => {
+const NotebookFooter = ({
+                          isReadOnly,
+                          isRichSample,
+                          openPage,
+                          registerGetValues,
+                          sampleChangesRef,
+                          selectedSample,
+                        }) => {
   /* Data Hooks */
 
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
@@ -23,6 +33,8 @@ const NotebookFooter = ({openPage, isRichSample, registerGetValues, selectedSamp
 
   const {getAllRelevantPages} = usePage();
   const {createRichSample} = useSamples();
+  const {closeLinkSampleModal, isLinkSampleModalVisible, isLinked, linkOrUnlinkSample} = useLinkSampleAction(
+    sampleChangesRef);
 
   /* Local State */
 
@@ -63,17 +75,32 @@ const NotebookFooter = ({openPage, isRichSample, registerGetValues, selectedSamp
   return (
     <View style={footerStyle.footerContainer}>
       {(!isEmpty(selectedSample) && !isRichSample) ? (
-        <View style={[footerStyle.footerIconContainer, {padding: 5}]}>
-          <ClearButton
+        // A sample kept on its parent Spot has no notebook menu of its own to link it from, so it is linked here
+        <View style={[footerStyle.footerIconContainer, footerStyle.sampleButtonsContainer]}>
+          <OutlineButton
+            containerStyle={footerStyle.sampleButtonContainer}
             icon={{
               color: PRIMARY_ACCENT_COLOR,
               name: 'add',
               size: 20,
             }}
+            iconContainerStyle={{paddingRight: 0}}
             onPress={convertToRichSample}
-            title={'Add Data to Sample'}
-            titleProps={{style: {color: PRIMARY_ACCENT_COLOR, fontSize: themes.MEDIUM_TEXT_SIZE}}}
+            title={'Add Data'}
           />
+          {!isReadOnly && (
+            <OutlineButton
+              containerStyle={footerStyle.sampleButtonContainer}
+              icon={{
+                color: PRIMARY_ACCENT_COLOR,
+                name: isLinked ? 'unlink' : 'link',
+                size: 20,
+                type: 'ionicon',
+              }}
+              onPress={linkOrUnlinkSample}
+              title={isLinked ? 'Unlink Sample' : 'Link Sample'}
+            />
+          )}
         </View>
       ) : (
         <>
@@ -100,6 +127,11 @@ const NotebookFooter = ({openPage, isRichSample, registerGetValues, selectedSamp
           />
         </>
       )}
+      {/* Kept out of the sample's buttons, which go once linking makes the sample a Spot of its own */}
+      <LinkSampleModal
+        closeModal={closeLinkSampleModal}
+        isVisible={isLinkSampleModalVisible}
+      />
     </View>
   );
 };

@@ -52,7 +52,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   // The open sample form's current values, registered by the page that renders it so the footer's 'Add Data to
   // Sample' can carry the edits on screen into the sample it creates
   const getSampleValuesRef = useRef(null);
-  // The open sample form's unsaved changes and a way to save them, registered the same way, so the header's 'Link
+  // The open sample form's unsaved changes and a way to save them, registered the same way, so the footer's 'Link
   // Sample' can have them saved before the sample is linked
   const sampleChangesRef = useRef(null);
 
@@ -130,7 +130,6 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
             isReadOnly={isReadOnly}
             isSampleOrSampleChild={isSampleOrSampleChild}
             openMainMenuPanel={openMainMenuPanel}
-            sampleChangesRef={sampleChangesRef}
             selectedSample={selectedSample}
             setSelectedSample={setSelectedSample}
             zoomToSpots={zoomToSpots}
@@ -141,9 +140,11 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
             <Page {...pageProps}/>
           </View>
           <NotebookFooter
+            isReadOnly={isReadOnly}
             isRichSample={spot.properties?.isSample}
             openPage={openPage}
             registerGetValues={getSampleValuesRef}
+            sampleChangesRef={sampleChangesRef}
             selectedSample={selectedSample}
           />
         </View>
