@@ -28,7 +28,6 @@ const TestingMode = ({isTestingMode, textStyles}) => {
   /* Side Effects */
 
   useEffect(() => {
-    console.log('UE Miscellaneous [password]', password);
     if (isEmpty(password)) setIsErrorMessage(false);
   }, [password]);
 
