@@ -117,7 +117,8 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
   };
 
   const getLinkWarnings = (strabosample) => {
-    const warnings = getSamplesLinkedTo(spots, getStraboSamplesId(strabosample), fieldSample.id).map(sample => `${getSampleTitle(sample)} in this project is already linked to this sample.`);
+    const warnings = getSamplesLinkedTo(spots, getStraboSamplesId(strabosample), fieldSample.id).map(
+      sample => `${getSampleTitle(sample)} in this project is already linked to this sample.`);
     // The server knows a link by the Spot holding the sample, which is the Spot open in the notebook either way: a rich
     // sample's own Spot, or the parent of a sample kept on it. Linking moves that sample to a Spot of its own under its
     // own id, so a link to either one is this sample's.
@@ -166,8 +167,10 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
     const isTaking = keysToTake.includes(key);
     return (
       <View key={key} style={{paddingVertical: 5}}>
-        <Text style={[commonStyles.listItemTitle, {fontWeight: 'bold'}]}>{key === SAMPLE_LOCATION_KEY ? 'Location (Latitude, Longitude)'
-          : getLabel(key, SAMPLE_FORM_NAME)}</Text>
+        <Text
+          style={[commonStyles.listItemTitle, {fontWeight: 'bold'}]}>{key === SAMPLE_LOCATION_KEY ? 'Location (Latitude, Longitude)'
+          : getLabel(key, SAMPLE_FORM_NAME)}
+        </Text>
         {renderValueOption(key, false, !isTaking, 'This Sample', fieldValue)}
         {renderValueOption(key, true, isTaking, 'StraboSamples', strabosamplesValue)}
       </View>
@@ -223,7 +226,7 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={errorMessage ? null
-            : <ListEmptyText text={isEmpty(searchTextLowerCase) ? 'No Samples found' : 'No Samples match your search'}/>}
+            :            <ListEmptyText text={isEmpty(searchTextLowerCase) ? 'No Samples found' : 'No Samples match your search'}/>}
           data={filteredSamples}
           // id may be numeric or a UUID, so it is always kept as a string
           keyExtractor={item => getStraboSamplesId(item)}
@@ -262,7 +265,7 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
 
   return (
     <ModalWrapper
-      actionTitle={isEmpty(sampleToReview?.warnings) ? 'Link' : 'Link Anyway'}
+      actionTitle={isEmpty(sampleToReview?.warnings) ? 'Link' : 'Link Sample'}
       closeModal={closeModal}
       headerTitle={'Link Sample'}
       isChildrenFilled
