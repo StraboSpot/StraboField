@@ -1,16 +1,17 @@
 import React, {useState} from 'react';
 import {FlatList, TouchableOpacity} from 'react-native';
 
-import {ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {getOfflineMapTitle} from './offlineMaps.helpers';
-import {editedOfflineMap, startedOfflineMapPreview} from './offlineMaps.slice';
+import {editedOfflineMap} from './offlineMaps.slice';
 import styles from './offlineMaps.styles';
 import useMapsOffline from './useMapsOffline';
 import useDevice from '../../../services/device/useDevice';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, truncateText} from '../../../shared/helpers';
+import {MEDIUMGREY, PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
@@ -19,6 +20,7 @@ import Loading from '../../../shared/ui/Loading';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import TextInputModal from '../../../shared/ui/TextInputModal';
 import {setIsOfflineMapsModalVisible} from '../../home/home.slice';
+import {isOfflineMapOverlayOn} from '../custom-maps/customMaps.helpers';
 import {isDefaultMap} from '../maps.helpers';
 
 const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
@@ -27,13 +29,17 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const isOnline = useSelector(state => state.connections.isOnline);
   const {isSelected} = useSelector(state => state.connections.databaseEndpoint);
+  const customMaps = useSelector(state => state.map.customMaps);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const previewedOfflineMapId = useSelector(state => state.offlineMap.previewedOfflineMapId);
+  // Follows the map, which shows offline maps whenever the internet cannot be reached
+  const {isInternetReachable} = useSelector(state => state.connections.isOnline);
 
   const {deleteOfflineMap} = useDevice();
-  const {getSavedMapsFromDevice, stopOfflineMapPreview, switchToOfflineMap} = useMapsOffline();
+  const {
+    getSavedMapsFromDevice, setOfflineMapTiles, startOfflineMapPreview, stopOfflineMapPreview,
+  } = useMapsOffline();
 
   /* Local State */
 
@@ -82,7 +88,7 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
     setIsNameModalVisible(true);
   };
 
-  const handDownloadMapTilesPressed = () => {
+  const handleDownloadMapTilesPressed = () => {
     closeMainMenuPanel();
     dispatch(setIsOfflineMapsModalVisible(true));
   };
@@ -98,12 +104,24 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
   const toggleOfflineMapPreview = async (item) => {
     try {
       if (item.id === previewedOfflineMapId) return await stopOfflineMapPreview();
-      dispatch(startedOfflineMapPreview(item.id));
-      await switchToOfflineMap(item.id);
+      await startOfflineMapPreview(item.id);
       await zoomToOfflineMapTiles(item.id);
     }
     catch (err) {
       console.error('Error previewing offline map', err);
+    }
+  };
+
+  // Offline, the downloaded tiles are the map, so this is the custom maps' view button rather than a preview:
+  // show the map and frame what was downloaded of it. A map switched on as an overlay is already drawn, so it is
+  // only framed.
+  const viewOfflineMap = async (item) => {
+    try {
+      if (!isOfflineMapOverlayOn(customMaps, offlineMaps, item)) await setOfflineMapTiles(item);
+      await zoomToOfflineMapTiles(item.id);
+    }
+    catch (err) {
+      console.error('Error viewing offline map', err);
     }
   };
 
@@ -148,8 +166,9 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
         ListEmptyComponent={
           <ListEmptyText
             containerStyle={{padding: 20}}
-            text={'No Offline Maps.\n\nIf you just logged in press the reload button in the upper right to load your offline maps from the device.\n\nTo download a map select area and zoom'
-              + ' level on map then select "Download tiles of current map"'}
+            text={'No offline maps.\n\nIf you just logged in, tap the reload button above to find the offline maps'
+              + ' already on this device.\n\nTo save one, frame the area you need on the map, then tap'
+              + ' "Download Tiles of Current Map".'}
             textStyle={{textAlign: 'center'}}
           />}
         data={Object.values(offlineMaps)}
@@ -181,12 +200,23 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
               {item.count === 0 ? 'No tiles downloaded' : `${item.count} tiles`}
             </ListItem.Subtitle>
           </TouchableOpacity>
-          {isOnline.isInternetReachable && !item.overlay && (
+          {isInternetReachable && (
             <OutlineButton
               containerStyle={styles.previewButtonContainer}
               disabled={item.count === 0}
               onPress={() => toggleOfflineMapPreview(item)}
               title={isPreviewed ? 'Stop' : 'Preview'}
+            />
+          )}
+          {!isInternetReachable && (
+            <Icon
+              accessibilityLabel={'View on map'}
+              color={item.count === 0 ? MEDIUMGREY : PRIMARY_ACCENT_COLOR}
+              disabled={item.count === 0}
+              disabledStyle={{backgroundColor: 'transparent'}}
+              name={'map-search-outline'}
+              onPress={() => viewOfflineMap(item)}
+              type={'material-community'}
             />
           )}
         </ListItem.Content>
@@ -199,8 +229,8 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
   return (
     <>
       <OutlineButton
-        disabled={(!isOnline.isInternetReachable && !isOnline.isConnected) || isSelected || !!previewedOfflineMapId}
-        onPress={handDownloadMapTilesPressed}
+        disabled={!isInternetReachable || isSelected || !!previewedOfflineMapId}
+        onPress={handleDownloadMapTilesPressed}
         title={'Download Tiles of Current Map'}
       />
       <SectionDividerWithRightButton

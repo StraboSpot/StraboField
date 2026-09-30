@@ -1,7 +1,9 @@
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {checkIfZipStatusReady, getTileFolderName, tile2lat, tile2long} from './offlineMaps.helpers';
+import {
+  checkIfZipStatusReady, getOfflineMap, getTileFolderName, tile2lat, tile2long,
+} from './offlineMaps.helpers';
 import {
   addMapFromDevice,
   clearedMapsFromRedux,
@@ -19,6 +21,7 @@ import alert from '../../../shared/ui/alert';
 import config from '../../../utils/config';
 import {addedStatusMessage, removedLastStatusMessage} from '../../home/home.slice';
 import {CUSTOM_MAP_SOURCES} from '../custom-maps/customMaps.constants';
+import {canReachMapTiles} from '../custom-maps/customMaps.helpers';
 import {GLYPHS_URL} from '../glyphs/glyphs.constants';
 import {DEFAULT_MAPS} from '../maps.constants';
 import {setCurrentBasemap} from '../maps.slice';
@@ -29,6 +32,8 @@ let fileCount = 0;
 let neededTiles = 0;
 let notNeededTiles = 0;
 let zipUID;
+// The basemap a preview replaced, put back when it stops. Not in redux, since a preview never outlives a launch.
+let basemapIdBeforePreview;
 
 const useMapsOffline = () => {
   /* Data Hooks */
@@ -37,7 +42,7 @@ const useMapsOffline = () => {
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const customMaps = useSelector(state => state.map.customMaps);
-  const {isInternetReachable} = useSelector(state => state.connections.isOnline);
+  const isOnline = useSelector(state => state.connections.isOnline);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const previewedOfflineMapId = useSelector(state => state.offlineMap.previewedOfflineMapId);
   const user = useSelector(state => state.user);
@@ -66,7 +71,17 @@ const useMapsOffline = () => {
           dispatch(setOfflineMap(newOfflineMapCount));
         }
       }
-      else await addMapFromDeviceToRedux(file);
+      else {
+        // Older Mapbox style downloads are listed under their account/style id rather than their folder. That
+        // entry is dropped below, so its name is carried over to this one.
+        const legacyMapId = Object.keys(offlineMaps).find(id => id.includes('/') && id.split('/')[1] === file);
+        await addMapFromDeviceToRedux(file, offlineMaps[legacyMapId]?.name);
+      }
+    }
+    // A map whose folder is gone has no tiles left to show
+    for (const mapId of Object.keys(offlineMaps).filter(id => !files.includes(id))) {
+      if (mapId === previewedOfflineMapId) await stopOfflineMapPreview();
+      dispatch(deletedOfflineMap(mapId));
     }
   };
 
@@ -119,8 +134,8 @@ const useMapsOffline = () => {
 
   /* Exported Functions */
 
-  const addMapFromDeviceToRedux = async (mapId) => {
-    const map = await createOfflineMapObject(mapId);
+  const addMapFromDeviceToRedux = async (mapId, name) => {
+    const map = {...await createOfflineMapObject(mapId), ...(name && {name: name})};
     const mapSavedObject = Object.assign({}, {[map.id]: map});
     dispatch(addMapFromDevice(mapSavedObject));
   };
@@ -414,18 +429,25 @@ const useMapsOffline = () => {
     return mapStyleURL;
   };
 
-  // A preview stands the downloaded tiles in for the live basemap, so ending one puts the live basemap back.
-  // Offline there is none to go back to, and rebuilding a custom one asks the server for its bbox, so the
-  // preview is only cleared. A caller choosing its own next basemap dispatches clearedOfflineMapPreview instead.
+  // Switching from one preview to another keeps the basemap from before the first
+  const startOfflineMapPreview = async (mapId) => {
+    if (!previewedOfflineMapId) basemapIdBeforePreview = currentBasemap?.id;
+    dispatch(startedOfflineMapPreview(mapId));
+    await switchToOfflineMap(mapId);
+  };
+
+  // Puts back the basemap the preview replaced, if its tiles can be reached; otherwise the preview is only
+  // cleared. A caller choosing its own next basemap dispatches clearedOfflineMapPreview instead.
   const stopOfflineMapPreview = async () => {
     if (!previewedOfflineMapId) return;
     dispatch(clearedOfflineMapPreview());
-    if (isInternetReachable) await setBasemap(previewedOfflineMapId);
+    const basemapBeforePreview = customMaps[basemapIdBeforePreview] || {id: basemapIdBeforePreview};
+    if (canReachMapTiles(basemapBeforePreview, isOnline)) await setBasemap(basemapIdBeforePreview);
   };
 
   const switchToOfflineMap = async (mapId) => {
     if (!isEmpty(offlineMaps)) {
-      const selectedOfflineMap = mapId ? offlineMaps[mapId] : offlineMaps[currentBasemap.id];
+      const selectedOfflineMap = mapId ? offlineMaps[mapId] : getOfflineMap(offlineMaps, currentBasemap);
       if (selectedOfflineMap && selectedOfflineMap.count > 0) {
         console.log('SelectedOfflineMap', selectedOfflineMap);
         await setOfflineMapTiles(selectedOfflineMap);
@@ -472,6 +494,7 @@ const useMapsOffline = () => {
     renameOfflineMapTiles,
     saveZipMap,
     setOfflineMapTiles,
+    startOfflineMapPreview,
     stopOfflineMapPreview,
     switchToOfflineMap,
     updateMapTileCountWhenSaving,
