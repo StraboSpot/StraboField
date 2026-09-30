@@ -34,7 +34,7 @@ const useCustomMap = () => {
   const {getMyMapsBboxCoords} = useMapCoords();
   const {renameOfflineMapTiles} = useMapsOffline();
   const {buildStyleURL, buildTileURL} = useMapURL();
-  const {testCustomMapUrl, getMyMapsBbox} = useServerRequests();
+  const {testCustomMapUrl} = useServerRequests();
 
   /* Internal Functions */
 
@@ -72,17 +72,6 @@ const useCustomMap = () => {
   const getCustomMapDetails = (map) => {
     dispatch(selectedCustomMapToEdit(map));
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP}));
-  };
-
-  const getMyMapsBBox = async (mapId) => {
-    if (customDatabaseEndpoint.isSelected) {
-      console.log('My Maps Bbox Endpoint:', customDatabaseEndpoint.endpoint.replace('/db', '/geotiff/bbox/' + mapId));
-      const bboxEndpoint = customDatabaseEndpoint.endpoint.replace('/db', '/geotiff/bbox/' + mapId);
-      const response = await getMyMapsBbox(bboxEndpoint);
-      console.log('My Maps Bbox Response:', response);
-    }
-    const response = await getMyMapsBbox(STRABO_APIS.MY_MAPS_BBOX + mapId);
-    console.log('My Maps Bbox Response:', response);
   };
 
   // `previousId` is passed when editing an existing map's id — e.g. a shared Mapbox style re-created under the
@@ -168,7 +157,6 @@ const useCustomMap = () => {
   return {
     deleteMap,
     getCustomMapDetails,
-    getMyMapsBBox,
     saveCustomMap,
     setCustomMapSwitchValue,
     updateMap,
