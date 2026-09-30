@@ -73,11 +73,15 @@ export const getChildSpots = (thisSpot, {activeSpots, searchedSpots, spots}) => 
 };
 
 // The parents of a Spot: the Spots holding its sample, image basemap or strat section and the Spots listing it in
-// their nesting, found among allSpots; and the polygons it is within, found among activeSpots.
+// their nesting, found among allSpots; and the polygons it is within, found among activeSpots. A sample Spot is
+// never the one holding a sample, though it keeps its own record in its samples.
 export const getParentSpots = (thisSpot, {activeSpots, allSpots}) => {
   const {id, image_basemap: imageBasemapId, isSample, strat_section_id: stratSectionId} = thisSpot.properties;
   const parents = [];
-  if (isSample) parents.push(allSpots.find(spot => spot.properties.samples?.some(sample => sample.id === id)));
+  if (isSample) {
+    parents.push(allSpots.find(spot => !spot.properties.isSample
+      && spot.properties.samples?.some(sample => sample.id === id)));
+  }
   if (imageBasemapId) {
     parents.push(allSpots.find(spot => spot.properties.images?.some(image => image.id === imageBasemapId)));
   }

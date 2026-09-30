@@ -72,6 +72,12 @@ describe('getParentSpots', () => {
     expect(getIds(getParentSpots(sample, {activeSpots: [], allSpots}))).toEqual([1, 2, 3]);
   });
 
+  it('finds the Spot holding a rich sample, not the sample Spot holding its own record', () => {
+    const sample = makeSpot(4, {isSample: true, samples: [{id: 4, sample_id_name: 'JG-4'}]});
+    const sampleOwner = makeSpot(1, {samples: [{id: 4}]});
+    expect(getIds(getParentSpots(sample, {activeSpots: [], allSpots: [sample, sampleOwner]}))).toEqual([1]);
+  });
+
   it('leaves out a sample\'s missing parent instead of listing it as undefined', () => {
     const sample = makeSpot(4, {isSample: true});
     expect(getParentSpots(sample, {activeSpots: [], allSpots: [sample]})).toEqual([]);
