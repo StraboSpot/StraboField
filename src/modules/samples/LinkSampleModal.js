@@ -14,6 +14,7 @@ import {
   getStraboSamplesId,
   isLinkedToOtherFieldSpot,
 } from './samples.helpers';
+import sampleStyles from './samples.styles';
 import useSamples from './useSamples';
 import useServerRequests from '../../services/network/useServerRequests';
 import commonStyles from '../../shared/common.styles';
@@ -209,6 +210,14 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
     if (sampleToReview) return renderReview();
     return (
       <>
+        <View style={sampleStyles.infoCallout}>
+          <Icon color={PRIMARY_ACCENT_COLOR} name={'information-circle-outline'} size={22} type={'ionicon'}/>
+          <Text style={sampleStyles.infoCalloutText}>
+            Linking connects this StraboField sample to one of your StraboSamples samples, so it is shared with the
+            same sample in <Text style={sampleStyles.infoCalloutEmphasis}>StraboMicro</Text> and/or{' '}
+            <Text style={sampleStyles.infoCalloutEmphasis}>StraboExperimental</Text>.
+          </Text>
+        </View>
         <ListQueryBar onSearchChange={setSearchText} searchValue={searchText}/>
         {errorMessage ? <Text style={commonStyles.importantText}>{errorMessage}</Text> : null}
         <FlatList
