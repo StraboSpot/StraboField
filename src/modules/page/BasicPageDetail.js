@@ -444,7 +444,12 @@ const BasicPageDetail = ({
       <View style={{flex: 1}}>
         {(isTemplate || !isEmpty(selectedFeature)) && (
           <>
-            <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
+            {/* A tab showing its own content hides Save and Cancel, so it is left by the back button */}
+            <PageHeader
+              hideBackButton={!isReadOnly && !tabContent}
+              onPressBack={cancelForm}
+              pageTitle={title + ' Detail'}
+            />
             {PageTabsComponent && PageTabsComponent}
             {tabContent}
             {!isReadOnly && !tabContent && (
