@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Pressable, ScrollView, Text, View} from 'react-native';
+import {FlatList, Platform, Pressable, ScrollView, Text, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
@@ -7,6 +7,7 @@ import {useSelector} from 'react-redux';
 
 import {SAMPLE_FORM_NAME, SAMPLE_LOCATION_KEY} from './samples.constants';
 import {
+  getMicroProjectId,
   getSampleDifferences,
   getSamplesLinkedTo,
   getSampleTitle,
@@ -28,6 +29,7 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import {LABEL_DICTIONARY} from '../form/form.constants';
 import useForm from '../form/useForm';
+import useMicro from '../micro/useMicro';
 
 const LinkSampleModal = ({closeModal, isVisible}) => {
   /* Data Hooks */
@@ -39,6 +41,7 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
 
   const {getMySamples, getStraboSample} = useServerRequests();
   const {getLabel} = useForm();
+  const {downloadMicroProjectIfMissing} = useMicro();
   const {getSelectedSample, getSelectedSampleGeometry, linkSample} = useSamples();
   const toast = useToast();
 
@@ -137,6 +140,15 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
     closeModal();
     if (linkSample(strabosample, keys)) {
       toast.show(`Linked to ${strabosample.name || 'StraboSamples sample'}`, {type: 'success'});
+      // Get the StraboMicro project PDF while online, so the sample's Micro tab can open it offline
+      const microProjectId = getMicroProjectId(strabosample.micro_data);
+      if (Platform.OS !== 'web' && !isEmpty(microProjectId)) {
+        downloadMicroProjectIfMissing(microProjectId).catch((err) => {
+          console.error('Error downloading StraboMicro project PDF', err);
+          toast.show('Could not download the StraboMicro project PDF. Try again from the sample\'s Micro tab.',
+            {type: 'danger'});
+        });
+      }
     }
   };
 

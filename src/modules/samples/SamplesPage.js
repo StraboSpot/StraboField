@@ -5,9 +5,11 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import LinkedSampleDataView from './LinkedSampleDataView';
 import {SAMPLE_DETAIL_TABS} from './samples.constants';
+import {getMicroProjectId} from './samples.helpers';
 import SamplesList from './SamplesList';
 import {isEmpty} from '../../shared/helpers';
 import {setModalVisible} from '../home/home.slice';
+import MicroProjectPDFLink from '../micro/MicroProjectPDFLink';
 import {setNotebookPageVisible, setRequestedSampleDetailTab} from '../notebook-panel/notebook.slice';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
@@ -43,6 +45,7 @@ const SamplesPage = ({
   // Field is always there, and each other app's tab only once its data has been kept on the Sample Spot by linking
   const tabs = SAMPLE_DETAIL_TABS.filter(tab => !tab.dataKey || !isEmpty(spot.properties?.[tab.dataKey]));
   const selectedTab = tabs.find(tab => tab.key === selectedTabKey) ?? tabs[0];
+  const microProjectId = getMicroProjectId(spot.properties?.micro_data);
 
   /* Side Effects */
 
@@ -104,7 +107,12 @@ const SamplesPage = ({
       registerGetValues={registerGetValues}
       registerSaveChanges={registerSaveChanges}
       selectedFeature={sampleToDisplay}
-      tabContent={selectedTab.dataKey && <LinkedSampleDataView data={spot.properties[selectedTab.dataKey]}/>}
+      tabContent={selectedTab.dataKey && (
+        <>
+          {selectedTab.key === 'micro' && !isEmpty(microProjectId) && <MicroProjectPDFLink projectId={microProjectId}/>}
+          <LinkedSampleDataView data={spot.properties[selectedTab.dataKey]}/>
+        </>
+      )}
     />
   );
 

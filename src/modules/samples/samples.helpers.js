@@ -32,6 +32,9 @@ export const getStraboSampleValues = (strabosample) => {
   return Object.fromEntries(Object.entries({...mappedValues, ...fieldData}).filter(([, value]) => !isEmpty(value)));
 };
 
+// The id of the StraboMicro project a linked sample's Micro data comes from, if it has any
+export const getMicroProjectId = microData => microData?.project_strabo_id;
+
 // The StraboSamples sample's location as [longitude, latitude], or undefined unless it has both
 export const getStraboSampleLocation = (strabosample) => {
   const {latitude, longitude} = strabosample;
