@@ -3,8 +3,10 @@ import {Image, Platform, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 
+import {CUSTOM_MAP_SOURCES} from './custom-maps/customMaps.constants';
 import mapStyles from './maps.styles';
 import useMapsOffline from './offline-maps/useMapsOffline';
+import useMap from './useMap';
 import useMapThumbnail from './useMapThumbnail';
 import {MEDIUMGREY, PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 
@@ -33,6 +35,7 @@ const DEFAULT_BASEMAP_THUMBNAILS = {
 const MapThumbnail = ({isSelected, map}) => {
   /* Data Hooks */
 
+  const {storeMissingCustomMapBbox} = useMap();
   const {getThumbnailTilePath} = useMapsOffline();
   const {getKeptThumbnailUri, getThumbnailUri} = useMapThumbnail();
 
@@ -74,10 +77,17 @@ const MapThumbnail = ({isSelected, map}) => {
   }, [isOfflineMap, map.id]);
 
   // Re-run on a changed extent, which is what a map with no thumbnail yet has been waiting for: its extent is
-  // fetched after it is saved, and there is nowhere to point a tile at until it arrives. A map that cannot be
-  // fetched - a private Mapbox style, a zoom a map has no tiles at, no connection - is shown as its map type.
+  // fetched after it is saved, and there is nowhere to point a tile at until it arrives. A My Maps map that has
+  // none - one never shown as the basemap on this device - is sent to fetch it here, and its thumbnail follows
+  // once it is stored. A map that cannot be fetched - a private Mapbox style, a zoom a map has no tiles at, no
+  // connection - is shown as its map type.
   useEffect(() => {
     if (!isSavedMap) return;
+    if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS && !map.bbox) {
+      storeMissingCustomMapBbox(map)
+        .catch(err => console.warn('No extent for map', map.id, err));
+      return;
+    }
     getThumbnailUri(map)
       .then(setSavedTileUrl)
       .catch((err) => {
