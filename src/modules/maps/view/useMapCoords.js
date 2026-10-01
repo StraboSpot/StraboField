@@ -25,8 +25,10 @@ const useMapCoords = () => {
   const getCentroidOfSelectedSpot = () => turf.getCoord(turf.centroid(selectedSpot));
 
   // Only a My Maps map has an extent to ask for, and only until it has one. Nothing is returned when it cannot be
-  // asked for, or does not come back, and the map is then saved and shown without one.
-  const getMyMapsBboxCoords = async (map) => {
+  // asked for, or does not come back, and the map is then saved and shown without one. Quiet for a caller asking on
+  // the user's behalf rather than at their request, such as a list of thumbnails, where one popup per map would
+  // bury the list.
+  const getMyMapsBboxCoords = async (map, isQuiet = false) => {
     if (!isConnectionAvailable || !isEmpty(map.bbox) || map.source !== CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) return;
     // Only My Maps are served by a custom database endpoint
     const myMapsBboxUrl = isSelected ? endpoint.replace('/db', '/geotiff/bbox/') : STRABO_APIS.MY_MAPS_BBOX;
@@ -43,7 +45,9 @@ const useMapCoords = () => {
     catch (err) {
       console.error(`Error getting the bounding box for map ${map?.id} (${map?.source}) from ${myMapsBboxUrl}`,
         err);
-      dispatch(openedMessageModal({message: 'Cannot retrieve the bounding box for this map.', title: 'Error!'}));
+      if (!isQuiet) {
+        dispatch(openedMessageModal({message: 'Cannot retrieve the bounding box for this map.', title: 'Error!'}));
+      }
     }
   };
 
