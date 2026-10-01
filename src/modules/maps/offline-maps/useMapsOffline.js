@@ -61,14 +61,17 @@ const useMapsOffline = () => {
 
   /* Internal Functions */
 
+  // Returns how many maps were added, recounted and removed
   const adjustTileCount = async (files) => {
     console.log(`Adjusting Tile Count... ${files}`);
+    const changes = {added: 0, recounted: 0, removed: 0};
     for (const file of files) {
       if (offlineMaps[file]) {
         const tileCount = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, file);
         if (offlineMaps[file].count !== tileCount.length) {
           const newOfflineMapCount = {...offlineMaps[file], count: tileCount.length};
           dispatch(setOfflineMap(newOfflineMapCount));
+          changes.recounted++;
         }
       }
       else {
@@ -76,13 +79,16 @@ const useMapsOffline = () => {
         // entry is dropped below, so its name is carried over to this one.
         const legacyMapId = Object.keys(offlineMaps).find(id => id.includes('/') && id.split('/')[1] === file);
         await addMapFromDeviceToRedux(file, offlineMaps[legacyMapId]?.name);
+        changes.added++;
       }
     }
     // A map whose folder is gone has no tiles left to show
     for (const mapId of Object.keys(offlineMaps).filter(id => !files.includes(id))) {
       if (mapId === previewedOfflineMapId) await stopOfflineMapPreview();
       dispatch(deletedOfflineMap(mapId));
+      changes.removed++;
     }
+    return changes;
   };
 
   const createOfflineMapObject = async (mapId, customMap) => {
@@ -288,10 +294,12 @@ const useMapsOffline = () => {
       console.count('getSavedMapsFromDevice');
       const files = await readDirectoryForMapFiles();
       if (!isEmpty(files)) {
-        await adjustTileCount(files);
+        const changes = await adjustTileCount(files);
         console.log('Done adjusting Tiles');
+        return {...changes, mapCount: files.length};
       }
-      else dispatch(clearedMapsFromRedux());
+      dispatch(clearedMapsFromRedux());
+      return {added: 0, mapCount: 0, recounted: 0, removed: Object.keys(offlineMaps).length};
     }
     catch (err) {
       console.error('Error getting saved maps from device', err);

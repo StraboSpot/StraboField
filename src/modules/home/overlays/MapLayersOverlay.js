@@ -270,12 +270,7 @@ const MapLayersOverlay = ({onTouchOutside, visible, zoomToCustomMap}) => {
     let sectionTitle = 'Default Basemaps';
     let mapsToDisplay = BASEMAPS;
     if (!isWeb && !isInternetReachable) {
-      mapsToDisplay = Object.values(offlineMaps).reduce((acc, offlineMap) => {
-        return offlineMap.id === 'mapbox.outdoors' || offlineMap.id === 'mapbox.satellite' || offlineMap.id === 'osm'
-        || offlineMap.id === 'macrostrat' || offlineMap.id === 'usgs.hillshade'
-          ? [...acc, offlineMap]
-          : acc;
-      }, []);
+      mapsToDisplay = Object.values(offlineMaps).filter(isDefaultMap);
       sectionTitle = 'Offline Default Basemaps';
     }
     return (

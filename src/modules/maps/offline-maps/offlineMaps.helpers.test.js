@@ -1,5 +1,5 @@
 import {
-  formatTilesSize, getOfflineMap, getScreenFitZoom, getTileStats, parseTileNames,
+  formatTilesSize, getFoundMapsMessage, getOfflineMap, getScreenFitZoom, getTileStats, parseTileNames,
 } from './offlineMaps.helpers';
 import {CUSTOM_MAP_SOURCES} from '../custom-maps/customMaps.constants';
 
@@ -93,5 +93,32 @@ describe('getScreenFitZoom', () => {
 
   it('rounds down, so the extent still fits', () => {
     expect(getScreenFitZoom(wideExtent, 1000, 1000)).toBe(8);
+  });
+});
+
+describe('getFoundMapsMessage', () => {
+  const noChanges = {added: 0, recounted: 0, removed: 0};
+
+  it('says so when nothing changed', () => {
+    expect(getFoundMapsMessage({...noChanges, mapCount: 3}))
+      .toBe('Offline maps already up to date.');
+  });
+
+  it('lists each kind of change', () => {
+    expect(getFoundMapsMessage({added: 1, mapCount: 4, recounted: 2, removed: 1}))
+      .toBe('Offline maps updated: 1 added, 2 recounted, 1 removed.');
+  });
+
+  it('leaves out the kinds of change that did not happen', () => {
+    expect(getFoundMapsMessage({...noChanges, added: 1, mapCount: 1})).toBe('Offline maps updated: 1 added.');
+  });
+
+  it('says when there are none', () => {
+    expect(getFoundMapsMessage({...noChanges, mapCount: 0})).toBe('No offline maps found.');
+  });
+
+  it('says when the ones listed were removed because none are left', () => {
+    expect(getFoundMapsMessage({...noChanges, mapCount: 0, removed: 2}))
+      .toBe('No offline maps found. 2 removed.');
   });
 });

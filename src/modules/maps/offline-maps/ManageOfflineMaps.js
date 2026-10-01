@@ -1,12 +1,14 @@
 import React, {useState} from 'react';
-import {FlatList, View} from 'react-native';
+import {SectionList, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getOfflineMapTitle} from './offlineMaps.helpers';
+import {getFoundMapsMessage, getOfflineMapTitle} from './offlineMaps.helpers';
 import {selectedOfflineMap} from './offlineMaps.slice';
 import styles from './offlineMaps.styles';
+import OfflineMapsOverflowMenuModal from './OfflineMapsOverflowMenuModal';
 import useMapsOffline from './useMapsOffline';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, truncateText} from '../../../shared/helpers';
@@ -16,12 +18,14 @@ import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import Loading from '../../../shared/ui/Loading';
-import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
+import SectionDivider from '../../../shared/ui/SectionDivider';
 import {setIsOfflineMapsModalVisible} from '../../home/home.slice';
 import {SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
+import MainMenuPanelHeader from '../../main-menu-panel/MainMenuPanelHeader';
 import {isOfflineMapOverlayOn} from '../custom-maps/customMaps.helpers';
 import {DOWNLOAD_ICON} from '../maps.constants';
+import {isDefaultMap} from '../maps.helpers';
 
 const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
   console.log('Rendering ManageOfflineMaps...');
@@ -36,13 +40,21 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
   // Follows the map, which shows offline maps whenever the internet cannot be reached
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
 
+  const toast = useToast();
   const {
     getSavedMapsFromDevice, setOfflineMapTiles, startOfflineMapPreview, stopOfflineMapPreview,
   } = useMapsOffline();
 
   /* Local State */
 
+  const [isOverflowMenuVisible, setIsOverflowMenuVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  /* Derived Variables */
+
+  const customOfflineMaps = Object.values(offlineMaps).filter(map => !isDefaultMap(map));
+  const defaultOfflineMaps = Object.values(offlineMaps).filter(isDefaultMap);
+  const isDownloadDisabled = !isInternetReachable || isSelected || !!previewedOfflineMapId;
 
   /* Logic Helpers */
 
@@ -85,8 +97,9 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
   const updateMapsFromDevice = async () => {
     try {
       setLoading(true);
-      await getSavedMapsFromDevice();
+      const foundMaps = await getSavedMapsFromDevice();
       console.log('Got maps from device');
+      toast.show(getFoundMapsMessage(foundMaps));
     }
     catch (err) {
       console.error('Error getting maps from device', err);
@@ -100,21 +113,32 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
 
   /* Render Functions */
 
+  // Split by the same rule as the map layers menu. One list rather than one per section, since two lists in the
+  // panel would each take half its height.
   const renderMapsList = () => {
     return (
-      <FlatList
+      <SectionList
         ItemSeparatorComponent={FlatListItemSeparator}
-        ListEmptyComponent={
+        ListFooterComponent={isEmpty(offlineMaps) && (
           <ListEmptyText
             containerStyle={{padding: 20}}
-            text={'No offline maps.\n\nIf you just logged in, tap the reload button above to find the offline maps'
-              + ' already on this device.\n\nTo save one, frame the area you need on the map, then tap'
+            text={'If you just logged in, choose "Find Offline Maps on Device" from the menu at the top to find the'
+              + ' offline maps already on this device.\n\nTo save one, frame the area you need on the map, then tap'
               + ' "Download Tiles of Current Map".'}
             textStyle={{textAlign: 'center'}}
-          />}
-        data={Object.values(offlineMaps)}
+          />
+        )}
         keyExtractor={item => item.id}
         renderItem={({item}) => renderMapsListItem(item)}
+        renderSectionFooter={({section}) => section.data.length === 0 && (
+          <ListEmptyText containerStyle={{padding: 20}} text={`No ${section.title.toLowerCase()} downloaded.`}/>
+        )}
+        renderSectionHeader={({section}) => <SectionDivider dividerText={section.title}/>}
+        sections={[
+          {data: defaultOfflineMaps, title: 'Default Maps'},
+          {data: customOfflineMaps, title: 'Custom Maps'},
+        ]}
+        stickySectionHeadersEnabled={true}
       />
     );
   };
@@ -165,22 +189,27 @@ const ManageOfflineMaps = ({closeMainMenuPanel, zoomToOfflineMapTiles}) => {
 
   return (
     <>
+      <MainMenuPanelHeader onOverflowMenuPress={!loading && (() => setIsOverflowMenuVisible(true))}/>
       <OutlineButton
-        disabled={!isInternetReachable || isSelected || !!previewedOfflineMapId}
+        disabled={isDownloadDisabled}
         icon={DOWNLOAD_ICON}
         onPress={handleDownloadMapTilesPressed}
         title={'Download Tiles of Current Map'}
-      />
-      <SectionDividerWithRightButton
-        dividerText={'Offline Maps'}
-        iconName={'reload-outline'}
-        onPress={updateMapsFromDevice}
       />
       {!loading && renderMapsList()}
 
       <Loading
         isLoading={loading}
         text={'Checking and adjusting tile count'}
+      />
+
+      {/* Menus and Modals */}
+      <OfflineMapsOverflowMenuModal
+        closeMenu={() => setIsOverflowMenuVisible(false)}
+        isDownloadDisabled={isDownloadDisabled}
+        isVisible={isOverflowMenuVisible}
+        onDownloadPress={handleDownloadMapTilesPressed}
+        onFindMapsPress={updateMapsFromDevice}
       />
     </>
   );

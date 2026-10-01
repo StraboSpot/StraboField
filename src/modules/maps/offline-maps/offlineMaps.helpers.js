@@ -65,6 +65,19 @@ export const getOfflineMapTitle = (map) => {
 export const getTileFolderName = (id, source) => source === CUSTOM_MAP_SOURCES.MAPBOX_STYLES && id.includes('/')
   ? id.split('/')[1] : id;
 
+// What a search of the device for offline maps changed, kept short enough to read before its toast goes. Said
+// even when nothing changed, since the list then looks exactly as it did before.
+export const getFoundMapsMessage = ({added, mapCount, recounted, removed}) => {
+  if (mapCount === 0) return 'No offline maps found.' + (removed > 0 ? ` ${removed} removed.` : '');
+  const changes = [
+    added > 0 && `${added} added`,
+    recounted > 0 && `${recounted} recounted`,
+    removed > 0 && `${removed} removed`,
+  ].filter(Boolean);
+  if (changes.length === 0) return 'Offline maps already up to date.';
+  return `Offline maps updated: ${changes.join(', ')}.`;
+};
+
 // The copy of a map downloaded to this device. Keyed by its tile folder, or by its id for a Mapbox style downloaded
 // before offline maps were keyed that way.
 export const getOfflineMap = (offlineMaps, map) => offlineMaps[getTileFolderName(map.id, map.source)]

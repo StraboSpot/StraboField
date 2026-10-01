@@ -49,6 +49,13 @@ import Templates from '../templates/Templates';
 import UserConventions from '../user/UserConventions';
 import UserProfile from '../user/UserProfile';
 
+// Pages that render their own header, or none at all
+const PAGES_WITH_OWN_HEADER = [
+  MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES,
+  MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS,
+  MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS,
+];
+
 const MainMenuPanel = forwardRef(({
                                     closeMainMenuPanel,
                                     closeNotebookPanel,
@@ -91,10 +98,7 @@ const MainMenuPanel = forwardRef(({
   const renderMainMenuContent = () => {
     return (
       <>
-        {!isSidePanelVisible
-          && (!mainMenuPageVisible
-            || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS
-              && mainMenuPageVisible !== MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES))
+        {!isSidePanelVisible && !PAGES_WITH_OWN_HEADER.includes(mainMenuPageVisible)
           && <MainMenuPanelHeader onOverflowMenuPress={isTagsPage && (() => setIsTagsOverflowMenuVisible(true))}/>
         }
         {renderMainMenuList()}
