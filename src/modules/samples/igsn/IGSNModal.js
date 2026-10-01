@@ -227,9 +227,9 @@ const IGSNModal = forwardRef(({
           textStyle: {fontSize: 20, fontStyle: 'italic'},
           type: tokens.access ? 'success' : 'danger',
         });
-        const sesarCodesRes = await getAndSaveSesarCode(tokens);
+        const sesarCodes = await getAndSaveSesarCode(tokens);
         // Dispatch the full list of codes
-        dispatch(setSesarUserCodes(sesarCodesRes.results.sesar_codes[0].sesar_code));
+        dispatch(setSesarUserCodes(sesarCodes));
         dispatch(setLoadingStatus({view: 'home', bool: false}));
       }
       else if (tokens.errors.permissions) {
@@ -267,8 +267,8 @@ const IGSNModal = forwardRef(({
         return;
       }
 
-      // Step 1: Register/update with SESAR. postSampleToSesar throws on any non-success (top-level or per-sample
-      // error, or an unreadable/non-OK response), so reaching this point means SESAR accepted the sample.
+      // Step 1: Register/update with SESAR. sendToSesar throws on any non-success (a validation error, a non-OK
+      // status, or a response without an IGSN), so reaching this point means SESAR accepted the sample.
       const res = formValues.isOnMySesar
         ? await updateSampleWithSesar(mappedSesarValues)
         : await uploadSample(mappedSesarValues);
