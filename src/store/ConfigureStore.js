@@ -95,6 +95,7 @@ const notebookConfig = {
   storage: AsyncStorage,
   blacklist: [
     'isNotebookPanelVisible',
+    'requestedSampleDetailTab',
     'visibleNotebookPagesStack',
   ],
   timeout: null,

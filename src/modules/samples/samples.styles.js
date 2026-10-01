@@ -1,8 +1,10 @@
 import {StyleSheet} from 'react-native';
 
 import {
+  DARKGREY,
   PRIMARY_ACCENT_COLOR,
   PRIMARY_ACCENT_COLOR_FADED_20,
+  PRIMARY_ACCENT_COLOR_FADED_40,
   PRIMARY_TEXT_COLOR,
   SECONDARY_BACKGROUND_COLOR,
   SMALL_TEXT_SIZE,
@@ -54,6 +56,57 @@ const sampleStyles = StyleSheet.create({
     flex: 1,
     fontSize: SMALL_TEXT_SIZE,
     lineHeight: 20,
+  },
+  linkedCard: {
+    alignItems: 'center',
+    backgroundColor: SECONDARY_BACKGROUND_COLOR,
+    borderColor: PRIMARY_ACCENT_COLOR,
+    borderRadius: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  linkedCardContent: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  linkedCardPill: {
+    backgroundColor: PRIMARY_ACCENT_COLOR_FADED_20,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  linkedCardPillPressed: {
+    backgroundColor: PRIMARY_ACCENT_COLOR_FADED_40,
+  },
+  linkedCardPillText: {
+    color: PRIMARY_ACCENT_COLOR,
+    fontSize: SMALL_TEXT_SIZE,
+    fontWeight: TEXT_WEIGHT_500,
+  },
+  linkedCardPills: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  linkedCardStatus: {
+    color: DARKGREY,
+    fontSize: SMALL_TEXT_SIZE,
+    fontStyle: 'italic',
+  },
+  linkedCardStatusContainer: {
+    alignItems: 'center',
+  },
+  linkedCardTitle: {
+    color: PRIMARY_TEXT_COLOR,
+    fontSize: SMALL_TEXT_SIZE,
+    fontWeight: TEXT_WEIGHT_500,
   },
   listContentContainer: {
     alignItems: 'center',

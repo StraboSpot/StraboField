@@ -2,7 +2,7 @@ import * as turf from '@turf/turf';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {SAMPLE_LOCATION_KEY} from './samples.constants';
+import {SAMPLE_LOCATION_KEY, STRABOSAMPLES_LINKED_DATA_KEYS} from './samples.constants';
 import {
   getLinkedSample,
   getSampleMetadata,
@@ -145,6 +145,8 @@ const useSamples = () => {
   // Link the selected sample, taking the StraboSamples values for the keys picked. Linking adds data to the sample, so
   // one kept on its parent Spot is made a Sample Spot of its own with the linked record. False if it could not be.
   // The StraboSamples location is taken too if picked, which moves the Sample Spot there.
+  // What StraboMicro and StraboExperimental hold for the sample is kept on the Sample Spot, beside the sample record
+  // rather than in it, so it isn't sent back as part of the Field sample.
   const linkSample = (strabosample, keysToTake = []) => {
     const linkedSample = getLinkedSample(getSelectedSample(), strabosample, keysToTake);
     const location = keysToTake.includes(SAMPLE_LOCATION_KEY) && getStraboSampleLocation(strabosample);
@@ -155,10 +157,20 @@ const useSamples = () => {
       saveSelectedSample(linkedSample);
     }
     else if (!createRichSample(selectedSpot, linkedSample, [], geometry)) return false;
+    // A rich sample's Spot shares the sample's id. Any key the sample no longer has is cleared from a relink.
+    setLinkedData(linkedSample.id, strabosample);
     return true;
   };
 
-  const unlinkSample = () => saveSelectedSample(getUnlinkedSample(getSelectedSample()));
+  // Keep what StraboMicro and StraboExperimental hold for a linked sample on its Sample Spot, or clear it when none
+  const setLinkedData = (spotId, strabosample = {}) => STRABOSAMPLES_LINKED_DATA_KEYS.forEach(
+    key => dispatch(editedSpotProperties({field: key, value: strabosample[key], spotId: spotId})),
+  );
+
+  const unlinkSample = () => {
+    saveSelectedSample(getUnlinkedSample(getSelectedSample()));
+    if (selectedSpot.properties.isSample) setLinkedData(selectedSpot.properties.id);
+  };
 
   const deleteRichSample = (sampleToDelete, parentSpot) => {
     console.log('Deleting Sample', sampleToDelete, 'from Spot', parentSpot);

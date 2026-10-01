@@ -48,6 +48,9 @@ const BasicPageDetail = ({
                            // Reports the fields in error up to a tabbed page, so it can mark the tab holding one
                            setInvalidFields,
                            siblingSurvey,
+                           // Shown in place of the form, for a tab with something else to show. The form stays
+                           // mounted, hidden, so what is typed in it is still there on coming back to its tab.
+                           tabContent,
                          }) => {
   /* Data Hooks */
 
@@ -443,7 +446,8 @@ const BasicPageDetail = ({
           <>
             <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
             {PageTabsComponent && PageTabsComponent}
-            {!isReadOnly && (
+            {tabContent}
+            {!isReadOnly && !tabContent && (
               <>
                 {isRegisteredSampleOffline && (
                   <View>
@@ -471,9 +475,11 @@ const BasicPageDetail = ({
               && hasOtherLithologyTabData(selectedFeature) && (
               <SedRockLithologyNote lithology={selectedFeature}/>
             )}
-            <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
-              {renderFormFields()}
-            </FormFlatList>
+            <View style={tabContent ? {display: 'none'} : {flex: 1}}>
+              <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
+                {renderFormFields()}
+              </FormFlatList>
+            </View>
           </>
         )}
         <IGSNModal

@@ -6,19 +6,12 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import IGSNLogo from './igsn/IGSNLogo';
 import IGSNModal from './igsn/IGSNModal';
-import {
-  getSampleMetadata,
-  getSampleTitle,
-  getStraboSampleFromResponse,
-  isLinkedToFieldSpot,
-} from './samples.helpers';
+import {getSampleMetadata, getSampleTitle} from './samples.helpers';
 import sampleStyles from './samples.styles';
-import {SAMPLES_PATHS} from '../../services/network/urls.constants';
-import useServerRequests from '../../services/network/useServerRequests';
+import useStraboSampleWebPage from './useStraboSampleWebPage';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, openUrl, truncateText} from '../../shared/helpers';
+import {isEmpty, truncateText} from '../../shared/helpers';
 import {BLACK, SAMPLES_COLOR} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
 import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import CheckboxList from '../../shared/ui/CheckboxList';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
@@ -43,12 +36,10 @@ const SampleListItem = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const isInternetReachable = useSelector(state => state.connections.isOnline.isInternetReachable);
   const selectedTag = useSelector(state => state.project.selectedTag);
-  const straboUserId = useSelector(state => state.user.straboUserId);
 
-  const {getStraboSample} = useServerRequests();
   const {getSampleSpotIconSource, isSpotReadOnly} = useSpots();
+  const {getStraboSampleUrl, openStraboSampleWebPage} = useStraboSampleWebPage();
   const {addRemoveSpotFromTag} = useTags();
 
   /* Derived Variables */
@@ -58,10 +49,7 @@ const SampleListItem = ({
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
   // A linked sample's page on the StraboSamples website, which can only be opened online
   const isLinked = !isEmpty(sampleMetadata.strabosamples_id);
-  const sampleUrl = isLinked && isInternetReachable && !isEmpty(straboUserId)
-    ? `${SAMPLES_PATHS.WEB_SAMPLE}${encodeURIComponent(straboUserId)}/${encodeURIComponent(
-      sampleMetadata.strabosamples_id)}`
-    : undefined;
+  const sampleUrl = getStraboSampleUrl(sampleMetadata.strabosamples_id);
 
   /* Local State */
 
@@ -69,33 +57,9 @@ const SampleListItem = ({
 
   /* Event Handlers */
 
-  // The website only knows the sample is linked once the Spot carrying the link has been uploaded, so ask the server
-  // before opening it rather than land on a page that doesn't show the link yet
-  const handleLinkIconPressed = async () => {
-    try {
-      const response = await getStraboSample(sampleMetadata.strabosamples_id);
-      const strabosample = getStraboSampleFromResponse(response) ?? {};
-      // The server knows the link by the Spot holding the sample: its own Spot, or the parent it is kept on
-      const spotId = sample.properties?.isSample ? sample.properties.id : parentSpot.properties.id;
-      if (!isLinkedToFieldSpot(strabosample, spotId)) {
-        alert('Link Not Uploaded', 'This sample\'s link to StraboSamples hasn\'t been uploaded yet. Upload the'
-          + ' project, then try again.');
-        return;
-      }
-    }
-    catch (err) {
-      console.error('Error checking the sample on StraboSamples', err);
-      alert('Uh Oh!', 'Could not check this sample on StraboSamples. Please try again.');
-      return;
-    }
-    try {
-      await openUrl(sampleUrl);
-    }
-    catch (err) {
-      console.error('Can\'t open URL', err);
-      alert('Uh Oh!', `Can not open the url ${sampleUrl}`);
-    }
-  };
+  // The server knows the link by the Spot holding the sample: its own Spot, or the parent it is kept on
+  const handleLinkIconPressed = () => openStraboSampleWebPage(sampleMetadata.strabosamples_id,
+    sample.properties?.isSample ? sample.properties.id : parentSpot.properties.id);
 
   const handleIGSNButtonPressed = () => {
     if (sampleMetadata.Sample_IGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));

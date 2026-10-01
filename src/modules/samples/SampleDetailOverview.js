@@ -4,12 +4,14 @@ import {Text, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import IGSNModal from './igsn/IGSNModal';
+import LinkedSampleCard from './LinkedSampleCard';
 import LinkSampleModal from './LinkSampleModal';
 import SampleActionButton from './SampleActionButton';
 import sampleStyles from './samples.styles';
 import useLinkSampleAction from './useLinkSampleAction';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
+import alert from '../../shared/ui/alert';
 import useForm from '../form/useForm';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
@@ -59,6 +61,15 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
     dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
   };
 
+  // Unlinking drops the Micro and Experimental data that came with the link, so it is confirmed
+  const onUnlinkPressed = () => {
+    alert('Unlink Sample?', 'This sample will no longer be linked to StraboSamples, and its Micro and Experimental'
+      + ' data will be removed from it.', [
+      {text: 'Cancel', style: 'cancel'},
+      {text: 'Unlink', style: 'destructive', onPress: linkOrUnlinkSample},
+    ]);
+  };
+
   const onViewIGSNPressed = () => {
     if (sampleIGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
     else setIsIGSNModalVisible(true);
@@ -90,6 +101,7 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
           </Text>
         );
       })}
+      <LinkedSampleCard spot={spot}/>
       <View style={sampleStyles.actionButtonsContainer}>
         <SampleActionButton
           accessibilityHint={'Opens the full sample record'}
@@ -108,7 +120,7 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
             accessibilityHint={isLinked ? 'Removes the link to StraboSamples'
               : 'Links this sample to a sample in StraboSamples'}
             iconName={isLinked ? 'unlink-outline' : 'link-outline'}
-            onPress={linkOrUnlinkSample}
+            onPress={isLinked ? onUnlinkPressed : linkOrUnlinkSample}
             title={isLinked ? 'Unlink' : 'Link Sample'}
           />
         )}
