@@ -80,7 +80,7 @@ const AddEarthquakeModal = () => {
   const saveEarthquake = async () => {
     try {
       const {values} = await submitAndShowErrors(formRef.current);
-      const editedEarthquakeData = await resolveLabelOnSave(
+      const editedEarthquakeData = resolveLabelOnSave(
         {pageKey: pageKey, values: values, getLabel: getLabel, getLabels: getLabels});
       console.log('Saving earthquake data to Spot ...');
       let editedEarthquakesData = spot.properties.earthquakes

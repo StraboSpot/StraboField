@@ -1,14 +1,17 @@
 import {
+  DIAGENESIS_SECTIONS,
   FOSSIL_BODY_TITLE_FIELDS,
   FOSSIL_OTHER_TEXT_FIELDS,
   FOSSIL_TRACE_TITLE_FIELDS,
   IMAGE_OVERLAY_SIZE_KEYS,
+  INTERPRETATIONS_TABS,
   LITHOLOGY_INTERVAL_CHARACTERS,
   LITHOLOGY_OTHER_TAB_FIELDS,
   ROCK_COMPOSITION_TITLE_FIELDS,
   ROCK_OTHER_TEXT_FIELDS,
   ROCK_SECOND_ORDER_TYPE_FIELDS,
   SED_ROCK_FIELDS,
+  STRUCTURE_TABS,
 } from './sed.constants';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {isStratInterval} from '../spots/spots.helpers';
@@ -23,8 +26,8 @@ export const getBasicLithologyIndex = (lithology) => {
 };
 
 // getLabels is passed in because a plain helper cannot call useForm
-export const getBeddingTitle = (bedding, getLabels) => getLabels(bedding.package_geometry, ['sed', 'bedding'])
-  || 'Unknown Bed';
+export const getBeddingTitle = (bedding, getLabels) => (isEmpty(bedding.package_geometry) ? undefined
+  : getLabels(bedding.package_geometry, ['sed', 'bedding']));
 
 // The overlay fields are typed as text, so read the numbers out of them for saving. Everything but the image id is
 // a number: a width or height is kept only as a pair of positive numbers, and anything that is not a number at all
@@ -39,6 +42,14 @@ export const getCleanedImageOverlay = (values) => {
     return isNaN(number) ? acc : {...acc, [key]: number};
   }, {});
 };
+
+// The names of the sections with anything filled in, in form order
+const getFilledSectionsTitle = (sections, feature) => sections
+  .filter(section => section.fieldNames.some(fieldName => !isEmpty(feature[fieldName])))
+  .map(section => section.label)
+  .join(', ') || undefined;
+
+export const getDiagenesisTitle = diagenesis => getFilledSectionsTitle(DIAGENESIS_SECTIONS, diagenesis);
 
 // The first Body field filled in, then the first Trace field in parentheses - not capitalized like a second order
 // type, since the traces are not a kind of body fossil. Diversity is only a level, so it is named with it.
@@ -58,6 +69,12 @@ export const getFossilTitle = (fossil, getLabels) => {
   const bodyText = getFirstFieldText(FOSSIL_BODY_TITLE_FIELDS);
   const traceText = getFirstFieldText(FOSSIL_TRACE_TITLE_FIELDS);
   return bodyText && traceText ? bodyText + ' (' + traceText + ')' : bodyText || traceText;
+};
+
+// The types with data, as in 'Environment, Process Interpretation'.
+export const getInterpretationTitle = (interpretation) => {
+  const typesText = getFilledSectionsTitle(INTERPRETATIONS_TABS, interpretation);
+  return typesText && typesText + ' Interpretation';
 };
 
 // The fields a lithology has to answer when the Spot it belongs to is an interval mapped on a strat section. Their
@@ -120,6 +137,8 @@ export const getSiliciclasticGrainSizeKey = (siliciclasticType) => {
       return undefined;
   }
 };
+
+export const getStructureTitle = structure => getFilledSectionsTitle(STRUCTURE_TABS, structure);
 
 // Whether a lithology has anything on the tabs the Sedimentary Rocks form leaves out
 export const hasOtherLithologyTabData = lithology => LITHOLOGY_OTHER_TAB_FIELDS

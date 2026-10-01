@@ -108,7 +108,7 @@ const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCur
       // The values the survey validates and cleans, rather than what is sitting in the inputs: numbers converted
       // from text, text trimmed, and the fields a choice has made irrelevant left out of the sample
       const {values} = await submitAndShowErrors(formRefCurrent);
-      const sampleValues = await resolveLabelOnSave(
+      const sampleValues = resolveLabelOnSave(
         {pageKey: PAGE_KEYS.SAMPLES, values: values, getLabel: getLabel, getLabels: getLabels});
       const date = new Date().toISOString();
       const newId = getNewId();

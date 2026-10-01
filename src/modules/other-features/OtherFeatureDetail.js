@@ -133,7 +133,7 @@ const OtherFeatureDetail = ({
         otherFeatures = [];
         featureToEdit = selectedFeature;
       }
-      if (await updateFeature(featureToEdit, otherFeatures, formValues)) {
+      if (updateFeature(featureToEdit, otherFeatures, formValues)) {
         savedValuesRef.current = {...formRef.current.values};
         await formRef.current.resetForm();
         hideFeatureDetail();
@@ -144,7 +144,7 @@ const OtherFeatureDetail = ({
     }
   };
 
-  const updateFeature = async (feature, otherFeatures, formValues) => {
+  const updateFeature = (feature, otherFeatures, formValues) => {
     feature.name = formValues.name;
     if (formValues.type === 'other') {
       // Leaving the page rolls a field in error back to what it was, so the new type can still be missing here
@@ -156,11 +156,11 @@ const OtherFeatureDetail = ({
     else feature.type = formValues.type;
     feature.description = formValues.description;
     // Labeled last, since the title is built from the type and a custom type only arrives here
-    feature.label = (await resolveLabelOnSave({
+    feature.label = resolveLabelOnSave({
       pageKey: PAGE_KEYS.OTHER_FEATURES,
       previousFeature: selectedFeature, values: {...feature, label: formValues.label},
       getLabel: getLabel, getLabels: getLabels,
-    })).label;
+    }).label;
     otherFeatures.push(feature);
     const spotId = spot.properties.id;
     dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));

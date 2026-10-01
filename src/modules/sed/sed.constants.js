@@ -1,8 +1,18 @@
+import sedDiagenesis from '../../assets/forms/sed/diagenesis.json';
 import sedFossils from '../../assets/forms/sed/fossils.json';
+import sedInterpretationsArchitecture from '../../assets/forms/sed/interpretations-architecture.json';
+import sedInterpretationsEnvironment from '../../assets/forms/sed/interpretations-environment.json';
+import sedInterpretationsProcess from '../../assets/forms/sed/interpretations-process.json';
+import sedInterpretationsSurfaces from '../../assets/forms/sed/interpretations-surfaces.json';
 import sedLithologiesComposition from '../../assets/forms/sed/lithologies-composition.json';
 import sedLithologiesLithology from '../../assets/forms/sed/lithologies-lithology.json';
 import sedLithologiesStratification from '../../assets/forms/sed/lithologies-stratification.json';
 import sedLithologiesTexture from '../../assets/forms/sed/lithologies-texture.json';
+import sedStructuresBeddingPlane from '../../assets/forms/sed/structures-bedding-plane.json';
+import sedStructuresBioturbation from '../../assets/forms/sed/structures-bioturbation.json';
+import sedStructuresPedogenic from '../../assets/forms/sed/structures-pedogenic.json';
+import sedStructuresPhysical from '../../assets/forms/sed/structures-physical.json';
+import {toTitleCase} from '../../shared/helpers';
 
 export const ROCK_SECOND_ORDER_TYPE_FIELDS = [
   'siliciclastic_type',
@@ -52,6 +62,17 @@ export const FOSSIL_BODY_TITLE_FIELDS = fossilsSurvey
   .map(field => field.name);
 export const FOSSIL_TRACE_TITLE_FIELDS = ['diversity', 'descriptive'];
 
+// The Diagenesis form's sections in form order, each with the fields under its heading
+const diagenesisSurvey = sedDiagenesis.survey;
+export const DIAGENESIS_SECTIONS = diagenesisSurvey
+  .map((field, i) => field.type === 'begin_group' && {
+    label: field.label,
+    fieldNames: diagenesisSurvey
+      .slice(i + 1, diagenesisSurvey.findIndex((endField, j) => j > i && endField.type === 'end_group'))
+      .map(sectionField => sectionField.name),
+  })
+  .filter(Boolean);
+
 // An image overlay's width and height are only ever saved together, and each is worked out from the other, so
 // they are kept as a pair - width first, so the two are always read the same way round
 export const IMAGE_OVERLAY_SIZE_KEYS = ['image_width', 'image_height'];
@@ -66,6 +87,15 @@ export const LITHOLOGY_SUBPAGES = {
   STRATIFICATION: 'stratification',
 };
 
+// A feature's subpage tabs in tab order, each named as SubpageTabs names it and with the fields it asks for. Every
+// tab shows the same Notes field, so a note is data on none of them.
+const getSubpageTabs = subpageForms => subpageForms.map(([subpageKey, form]) => ({
+  label: toTitleCase(subpageKey.replace(/_/g, ' ')),
+  fieldNames: form.survey
+    .filter(field => !field.type.includes('group') && !['label', 'notes'].includes(field.name))
+    .map(field => field.name),
+}));
+
 export const STRUCTURE_SUBPAGES = {
   BEDDING_PLANE: 'bedding_plane',
   BIOTURBATION: 'bioturbation',
@@ -73,12 +103,26 @@ export const STRUCTURE_SUBPAGES = {
   PHYSICAL: 'physical',
 };
 
+export const STRUCTURE_TABS = getSubpageTabs([
+  [STRUCTURE_SUBPAGES.BEDDING_PLANE, sedStructuresBeddingPlane],
+  [STRUCTURE_SUBPAGES.BIOTURBATION, sedStructuresBioturbation],
+  [STRUCTURE_SUBPAGES.PEDOGENIC, sedStructuresPedogenic],
+  [STRUCTURE_SUBPAGES.PHYSICAL, sedStructuresPhysical],
+]);
+
 export const INTERPRETATIONS_SUBPAGES = {
   ARCHITECTURE: 'architecture',
   ENVIRONMENT: 'environment',
   PROCESS: 'process',
   SURFACES: 'surfaces',
 };
+
+export const INTERPRETATIONS_TABS = getSubpageTabs([
+  [INTERPRETATIONS_SUBPAGES.ARCHITECTURE, sedInterpretationsArchitecture],
+  [INTERPRETATIONS_SUBPAGES.ENVIRONMENT, sedInterpretationsEnvironment],
+  [INTERPRETATIONS_SUBPAGES.PROCESS, sedInterpretationsProcess],
+  [INTERPRETATIONS_SUBPAGES.SURFACES, sedInterpretationsSurfaces],
+]);
 
 export const INTERVAL_FIELDS = ['character', 'interval_thickness', 'thickness_units'];
 

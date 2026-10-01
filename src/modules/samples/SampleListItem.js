@@ -17,7 +17,7 @@ import {SAMPLES_PATHS} from '../../services/network/urls.constants';
 import useServerRequests from '../../services/network/useServerRequests';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, openUrl, truncateText} from '../../shared/helpers';
-import {BLACK} from '../../shared/styles.constants';
+import {BLACK, SAMPLES_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import CheckboxList from '../../shared/ui/CheckboxList';
@@ -31,6 +31,7 @@ const SampleListItem = ({
                           canPickReadOnly,
                           isCheckedList,
                           isItemChecked,
+                          isOutlined,
                           isShowAvatar,
                           isShowIGSN,
                           isShowSubtitle,
@@ -114,7 +115,7 @@ const SampleListItem = ({
   return (
     <>
       <ListItem
-        containerStyle={commonStyles.listItem}
+        containerStyle={[commonStyles.listItem, isOutlined && {borderColor: SAMPLES_COLOR, borderWidth: 2.5}]}
         key={'SampleListItem' + sampleMetadata.id}
         onPress={() => isCheckedList ? handleCheckBoxPressed() : onPress(sample)}
       >

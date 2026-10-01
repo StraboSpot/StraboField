@@ -251,7 +251,7 @@ const useSed = () => {
       const {errors, values} = await submitAndShowErrors(formCurrent, isLeavingPage);
       // The shared bedding record is not a row in any list - the beds within it are - so it is not labeled
       const editedFeatureData = pageKey === PAGE_KEYS.BEDDING && !subKey ? values
-        : await resolveLabelOnSave({pageKey: pageKey, previousFeature: previousFeature, values: values,
+        : resolveLabelOnSave({pageKey: pageKey, previousFeature: previousFeature, values: values,
           getLabel: getLabel, getLabels: getLabels});
       let editedSpot = JSON.parse(JSON.stringify(spot));
       let editedSedData = editedSpot.properties.sed ? JSON.parse(JSON.stringify(editedSpot.properties.sed)) : {};

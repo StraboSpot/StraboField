@@ -278,7 +278,7 @@ const MeasurementDetail = ({
       // A bulk edit leaves the label out below, along with everything else that names one measurement rather
       // than the group, so only a single measurement is labeled here
       if (selectedAttributes.length === 1) {
-        formValues = await resolveLabelOnSave({pageKey: PAGE_KEYS.MEASUREMENTS,
+        formValues = resolveLabelOnSave({pageKey: PAGE_KEYS.MEASUREMENTS,
           previousFeature: selectedMeasurement, values: formValues, getLabel: getLabel, getLabels: getLabels});
       }
       console.log('Saving form data to Spot ...');
