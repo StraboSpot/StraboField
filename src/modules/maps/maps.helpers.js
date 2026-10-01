@@ -1,6 +1,6 @@
 import proj4 from 'proj4';
 
-import {DEFAULT_MAPS, GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
+import {DEFAULT_MAPS, GEO_LAT_LNG_PROJECTION, MAP_MODES, MAP_PROVIDERS, PIXEL_PROJECTION} from './maps.constants';
 import {isEmpty} from '../../shared/helpers';
 
 // proj4 definition for a UTM zone on the WGS84 datum
@@ -90,6 +90,26 @@ export const getClosestSpotDistanceAndIndex = (distancesFromSpot) => {
 export const getUtmDisplayString = ([lng, lat]) => {
   const {easting, northing, zone} = convertLatLngToUtm([lng, lat]);
   return `UTM ${zone}  ${Math.round(easting)} mE  ${Math.round(northing)} mN`;
+};
+
+// A map downloaded to the device is stored under a source of its own, so the provider it actually came from is
+// recovered from the custom map source kept beside it, or from the default map it is a copy of.
+export const getMapProviderSource = map => MAP_PROVIDERS[map?.source] ? map.source
+  : map?.customMapSource || DEFAULT_MAPS.find(defaultMap => defaultMap.id === map?.id)?.source;
+
+// The one credit line a list of maps owes: the map's own attribution control speaks only for the map being
+// rendered, not for the tiles drawn beside the names in the list. Built from each provider's `credits` rather than
+// its `attributions` sentence, which is worded for that control and repeats a name when several are joined. A
+// provider that only serves maps its users contribute holds no copyright in them, so it goes after the bullet
+// rather than inside the copyright clause.
+export const getAttributionText = (maps) => {
+  const providers = maps.map(map => MAP_PROVIDERS[getMapProviderSource(map)]);
+  const credits = [...new Set(providers.flatMap(provider => provider?.credits || []))];
+  const contributedVia = [...new Set(providers.flatMap(provider => provider?.contributedVia || []))];
+  const clauses = [];
+  if (!isEmpty(credits)) clauses.push(`Map data © ${credits.join(', ')}`);
+  if (!isEmpty(contributedVia)) clauses.push(`Custom maps contributed via ${contributedVia.join(', ')}`);
+  return clauses.join(' · ');
 };
 
 // A basemap the app ships. Read the list rather than restating its ids, which drifts as maps are added.

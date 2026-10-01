@@ -1,7 +1,9 @@
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {checkIfZipStatusReady, getTileFolderName, tile2lat, tile2long} from './offlineMaps.helpers';
+import {
+  checkIfZipStatusReady, getOfflineMap, getTileFolderName, getTilesBbox, parseTileNames,
+} from './offlineMaps.helpers';
 import {
   addMapFromDevice,
   clearedMapsFromRedux,
@@ -19,6 +21,7 @@ import alert from '../../../shared/ui/alert';
 import config from '../../../utils/config';
 import {addedStatusMessage, removedLastStatusMessage} from '../../home/home.slice';
 import {CUSTOM_MAP_SOURCES} from '../custom-maps/customMaps.constants';
+import {canReachMapTiles} from '../custom-maps/customMaps.helpers';
 import {GLYPHS_URL} from '../glyphs/glyphs.constants';
 import {DEFAULT_MAPS} from '../maps.constants';
 import {setCurrentBasemap} from '../maps.slice';
@@ -29,6 +32,8 @@ let fileCount = 0;
 let neededTiles = 0;
 let notNeededTiles = 0;
 let zipUID;
+// The basemap a preview replaced, put back when it stops. Not in redux, since a preview never outlives a launch.
+let basemapIdBeforePreview;
 
 const useMapsOffline = () => {
   /* Data Hooks */
@@ -37,7 +42,7 @@ const useMapsOffline = () => {
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const customMaps = useSelector(state => state.map.customMaps);
-  const {isInternetReachable} = useSelector(state => state.connections.isOnline);
+  const isOnline = useSelector(state => state.connections.isOnline);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const previewedOfflineMapId = useSelector(state => state.offlineMap.previewedOfflineMapId);
   const user = useSelector(state => state.user);
@@ -56,18 +61,34 @@ const useMapsOffline = () => {
 
   /* Internal Functions */
 
+  // Returns how many maps were added, recounted and removed
   const adjustTileCount = async (files) => {
     console.log(`Adjusting Tile Count... ${files}`);
+    const changes = {added: 0, recounted: 0, removed: 0};
     for (const file of files) {
       if (offlineMaps[file]) {
         const tileCount = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, file);
         if (offlineMaps[file].count !== tileCount.length) {
           const newOfflineMapCount = {...offlineMaps[file], count: tileCount.length};
           dispatch(setOfflineMap(newOfflineMapCount));
+          changes.recounted++;
         }
       }
-      else await addMapFromDeviceToRedux(file);
+      else {
+        // Older Mapbox style downloads are listed under their account/style id rather than their folder. That
+        // entry is dropped below, so its name is carried over to this one.
+        const legacyMapId = Object.keys(offlineMaps).find(id => id.includes('/') && id.split('/')[1] === file);
+        await addMapFromDeviceToRedux(file, offlineMaps[legacyMapId]?.name);
+        changes.added++;
+      }
     }
+    // A map whose folder is gone has no tiles left to show
+    for (const mapId of Object.keys(offlineMaps).filter(id => !files.includes(id))) {
+      if (mapId === previewedOfflineMapId) await stopOfflineMapPreview();
+      dispatch(deletedOfflineMap(mapId));
+      changes.removed++;
+    }
+    return changes;
   };
 
   const createOfflineMapObject = async (mapId, customMap) => {
@@ -119,8 +140,8 @@ const useMapsOffline = () => {
 
   /* Exported Functions */
 
-  const addMapFromDeviceToRedux = async (mapId) => {
-    const map = await createOfflineMapObject(mapId);
+  const addMapFromDeviceToRedux = async (mapId, name) => {
+    const map = {...await createOfflineMapObject(mapId), ...(name && {name: name})};
     const mapSavedObject = Object.assign({}, {[map.id]: map});
     dispatch(addMapFromDevice(mapSavedObject));
   };
@@ -190,13 +211,13 @@ const useMapsOffline = () => {
     }
   };
 
-  // Start getting the tiles to download by creating a zip url
-  const getMapTiles = async (extentString, downloadZoom) => {
+  // Start getting the tiles to download by creating a zip url. `map` is whichever map is being saved - the
+  // basemap, or an overlay the user picked out of the ones currently drawn over it.
+  const getMapTiles = async (extentString, downloadZoom, map = currentBasemap) => {
     try {
       let layer, id, username;
       let startZipURL = 'unset';
-      let mapKey = currentBasemap.id;
-      const layerSource = currentBasemap.source;
+      const layerSource = map.source;
       const tilehost = STRABO_APIS.TILE_HOST;
       const endpointTilehost = customDatabaseEndpoint.isSelected ? getTileBaseUrl() : tilehost;
 
@@ -205,8 +226,9 @@ const useMapsOffline = () => {
         //configure advanced URL for custom map types here.
         //first, figure out what kind of map we are downloading...
 
-        let downloadMap = {};
-        if (customMaps[mapKey].id === currentBasemap.id) downloadMap = customMaps[mapKey];
+        // The project's copy carries the provider fields, but a map being saved is not always one the project
+        // holds, so fall back to the map itself rather than indexing customMaps and trusting the result.
+        const downloadMap = customMaps[map.id] || map;
 
         console.log('DownloadMap: ', downloadMap);
 
@@ -229,7 +251,7 @@ const useMapsOffline = () => {
         }
       }
       else {
-        layer = currentBasemap.id;
+        layer = map.id;
         startZipURL = endpointTilehost + '/asynczip?layer=' + layer + '&extent=' + extentString + '&zoom=' + downloadZoom;
       }
 
@@ -243,28 +265,28 @@ const useMapsOffline = () => {
   };
 
   // The extent the downloaded tiles actually cover, so a preview can frame what was downloaded rather than
-  // sit at a fixed zoom over the middle of it. Tiles are named z_x_y and a tile's coordinate is its north west
-  // corner, so the south and east edges come from the tile after the last one.
+  // sit at a fixed zoom over the middle of it
   const getMapTilesBbox = async (mapId) => {
     if (!APP_DIRECTORIES.ROOT_PATH) return;
     const entries = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, mapId);
     if (isEmpty(entries)) return;   // the read reports its own failure and hands back nothing
-    // Anything else sitting in the directory would make every number NaN and lose the extent entirely
-    const tiles = entries.map(entry => entry.replace('.png', '').split('_').map(Number))
-      .filter(tile => tile.length === 3 && tile.every(Number.isFinite));
+    return getTilesBbox(parseTileNames(entries));
+  };
+
+  // A downloaded tile standing in for the map in a list. Which tiles were downloaded is only known from the
+  // directory, so one is picked from it rather than computed from the map's extent: the middle tile of the
+  // deepest zoom, which sits nearest the center of whatever area was downloaded.
+  const getThumbnailTilePath = async (map) => {
+    const tileTemplate = map.sources?.['raster-tiles']?.tiles?.[0];
+    if (!tileTemplate || !APP_DIRECTORIES.ROOT_PATH) return;
+    const entries = await readDirectoryForMapTiles(APP_DIRECTORIES.TILE_CACHE, map.id);
+    if (isEmpty(entries)) return;   // the read reports its own failure and hands back nothing
+    const tiles = parseTileNames(entries);
     if (isEmpty(tiles)) return;
-    // Deeper tiles cover the same ground in more pieces, so past this the extra precision buys nothing
-    const zoom = Math.min(Math.max(...tiles.map(([z]) => z)), 14);
-    const tilesAtZoom = tiles.filter(([z]) => z === zoom);
-    if (isEmpty(tilesAtZoom)) return;
-    const xs = tilesAtZoom.map(([, x]) => x);
-    const ys = tilesAtZoom.map(([, , y]) => y);
-    return [
-      tile2long(Math.min(...xs), zoom),
-      tile2lat(Math.max(...ys) + 1, zoom),
-      tile2long(Math.max(...xs) + 1, zoom),
-      tile2lat(Math.min(...ys), zoom),
-    ];
+    const zoom = Math.max(...tiles.map(([z]) => z));
+    const tilesAtZoom = tiles.filter(([z]) => z === zoom).sort(([, aX, aY], [, bX, bY]) => aX - bX || aY - bY);
+    const [z, x, y] = tilesAtZoom[Math.floor(tilesAtZoom.length / 2)];
+    return tileTemplate.replace('{z}', z).replace('{x}', x).replace('{y}', y);
   };
 
   const getSavedMapsFromDevice = async () => {
@@ -272,10 +294,12 @@ const useMapsOffline = () => {
       console.count('getSavedMapsFromDevice');
       const files = await readDirectoryForMapFiles();
       if (!isEmpty(files)) {
-        await adjustTileCount(files);
+        const changes = await adjustTileCount(files);
         console.log('Done adjusting Tiles');
+        return {...changes, mapCount: files.length};
       }
-      else dispatch(clearedMapsFromRedux());
+      dispatch(clearedMapsFromRedux());
+      return {added: 0, mapCount: 0, recounted: 0, removed: Object.keys(offlineMaps).length};
     }
     catch (err) {
       console.error('Error getting saved maps from device', err);
@@ -283,9 +307,9 @@ const useMapsOffline = () => {
     }
   };
 
-  const initializeSaveMap = async (extentString, downloadZoom) => {
+  const initializeSaveMap = async (extentString, downloadZoom, map = currentBasemap) => {
     try {
-      const startZipUrl = await getMapTiles(extentString, downloadZoom);
+      const startZipUrl = await getMapTiles(extentString, downloadZoom, map);
       await saveZipMap(startZipUrl);
       return zipUID;
     }
@@ -295,13 +319,13 @@ const useMapsOffline = () => {
     }
   };
 
-  const moveFiles = async (zipUId) => {
+  const moveFiles = async (zipUId, map = currentBasemap) => {
     fileCount = 0;
     neededTiles = 0;
     notNeededTiles = 0;
     try {
       let result;
-      const mapID = getTileFolderName(currentBasemap.id, currentBasemap.source);
+      const mapID = getTileFolderName(map.id, map.source);
       let folderExists = await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + mapID);
       if (!folderExists) {
         console.log('FOLDER DOESN\'T EXIST! ', APP_DIRECTORIES.TILE_CACHE + mapID);
@@ -317,8 +341,8 @@ const useMapsOffline = () => {
     }
   };
 
-  const moveTile = async (tile, zipID) => {
-    const mapID = getTileFolderName(currentBasemap.id, currentBasemap.source);
+  const moveTile = async (tile, zipID, map = currentBasemap) => {
+    const mapID = getTileFolderName(map.id, map.source);
     let zipId = zipUID ?? zipID;
     fileCount++;
     let fileExists = await doesDeviceDirExist(APP_DIRECTORIES.TILE_CACHE + mapID + '/tiles/' + tile);
@@ -395,18 +419,25 @@ const useMapsOffline = () => {
     return mapStyleURL;
   };
 
-  // A preview stands the downloaded tiles in for the live basemap, so ending one puts the live basemap back.
-  // Offline there is none to go back to, and rebuilding a custom one asks the server for its bbox, so the
-  // preview is only cleared. A caller choosing its own next basemap dispatches clearedOfflineMapPreview instead.
+  // Switching from one preview to another keeps the basemap from before the first
+  const startOfflineMapPreview = async (mapId) => {
+    if (!previewedOfflineMapId) basemapIdBeforePreview = currentBasemap?.id;
+    dispatch(startedOfflineMapPreview(mapId));
+    await switchToOfflineMap(mapId);
+  };
+
+  // Puts back the basemap the preview replaced, if its tiles can be reached; otherwise the preview is only
+  // cleared. A caller choosing its own next basemap dispatches clearedOfflineMapPreview instead.
   const stopOfflineMapPreview = async () => {
     if (!previewedOfflineMapId) return;
     dispatch(clearedOfflineMapPreview());
-    if (isInternetReachable) await setBasemap(previewedOfflineMapId);
+    const basemapBeforePreview = customMaps[basemapIdBeforePreview] || {id: basemapIdBeforePreview};
+    if (canReachMapTiles(basemapBeforePreview, isOnline)) await setBasemap(basemapIdBeforePreview);
   };
 
   const switchToOfflineMap = async (mapId) => {
     if (!isEmpty(offlineMaps)) {
-      const selectedOfflineMap = mapId ? offlineMaps[mapId] : offlineMaps[currentBasemap.id];
+      const selectedOfflineMap = mapId ? offlineMaps[mapId] : getOfflineMap(offlineMaps, currentBasemap);
       if (selectedOfflineMap && selectedOfflineMap.count > 0) {
         console.log('SelectedOfflineMap', selectedOfflineMap);
         await setOfflineMapTiles(selectedOfflineMap);
@@ -446,12 +477,14 @@ const useMapsOffline = () => {
     getMapTiles,
     getMapTilesBbox,
     getSavedMapsFromDevice,
+    getThumbnailTilePath,
     initializeSaveMap,
     moveFiles,
     moveTile,
     renameOfflineMapTiles,
     saveZipMap,
     setOfflineMapTiles,
+    startOfflineMapPreview,
     stopOfflineMapPreview,
     switchToOfflineMap,
     updateMapTileCountWhenSaving,

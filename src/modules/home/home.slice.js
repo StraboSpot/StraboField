@@ -31,6 +31,8 @@ const initialHomeState = {
   isProjectLoadSelectionModalVisible: false,
   isSessionExpiredModalVisible: false,
   isOfflineMapModalVisible: false,
+  // A custom map to save whole rather than the area on screen, or null
+  offlineMapToSaveId: null,
   isImageModalVisible: false,
   isMainMenuPanelVisible: false,
   isUploadModalVisible: false,
@@ -69,6 +71,10 @@ const homeSlice = createSlice({
       const {message, title} = action.payload;
       state.messageModal = {isVisible: true, message, title};
     },
+    openedOfflineMapsModalForMap(state, action) {
+      state.isOfflineMapModalVisible = true;
+      state.offlineMapToSaveId = action.payload;
+    },
     removedLastStatusMessage(state) {
       state.statusMessages = state.statusMessages.slice(0, -1);
     },
@@ -96,6 +102,8 @@ const homeSlice = createSlice({
     },
     setIsOfflineMapsModalVisible(state, action) {
       state.isOfflineMapModalVisible = action.payload;
+      // A map picked to save is for that one opening
+      if (!action.payload) state.offlineMapToSaveId = null;
     },
     setIsProgressModalVisible(state, action) {
       state.isProgressModalVisible = action.payload;
@@ -170,6 +178,7 @@ export const {
   clearedStatusMessages,
   closedMessageModal,
   openedMessageModal,
+  openedOfflineMapsModalForMap,
   removedLastStatusMessage,
   resetHiddenWarnings,
   resetHomeState,

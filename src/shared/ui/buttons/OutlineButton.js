@@ -3,6 +3,7 @@ import React from 'react';
 import {Button} from '@rn-vui/base';
 
 import buttonStyles from './buttons.styles';
+import {MEDIUMGREY} from '../../styles.constants';
 
 const OutlineButton = ({
                          backgroundColor,
@@ -22,7 +23,8 @@ const OutlineButton = ({
       ]}
       containerStyle={[buttonStyles.standardButtonContainer, containerStyle]}
       disabled={disabled}
-      icon={icon}
+      // The button grays its title when disabled but leaves an icon its own color
+      icon={icon && disabled ? {...icon, color: MEDIUMGREY} : icon}
       iconContainerStyle={[{paddingRight: 5}, iconContainerStyle]}
       loading={loading}
       onPress={onPress}

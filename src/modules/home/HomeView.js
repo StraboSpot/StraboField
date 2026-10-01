@@ -73,6 +73,7 @@ const HomeView = forwardRef(({
         dialogs={dialogs}
         openMainMenuPanel={openMainMenuPanel}
         toggleDialog={toggleDialog}
+        zoomToCustomMap={bbox => mapComponentRef?.current?.zoomToCustomMap(bbox)}
       />
 
       <Animated.View style={[notebookStyles.notebookDrawer, animateNotebookDrawer]}>

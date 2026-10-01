@@ -1,21 +1,11 @@
-import React, {useEffect, memo} from 'react';
+import React, {memo} from 'react';
 
 import MapboxGL from '@rnmapbox/maps';
 
-import useMapURL from '../useMapURL';
+import {getOverlayOpacity} from '../custom-maps/customMaps.helpers';
 
-const CustomOverlayLayer = ({basemap, customMap}) => {
-
-  const {buildTileURL} = useMapURL();
-
-  useEffect(() => {
-    console.log('CustomOverlayLayer mounted/updated for map:', customMap.id, 'isViewable:', customMap.isViewable);
-    return () => {
-      // Cleanup: When component unmounts, the layer should be automatically removed by React
-      // But we can add explicit cleanup if needed
-      console.log('CustomOverlayLayer unmounting for map:', customMap.id);
-    };
-  }, [customMap.id, customMap.isViewable]);
+const CustomOverlayLayer = ({basemap, customMap, tileUrlTemplate}) => {
+  /* View */
 
   // Defensive checks to ensure customMap and basemap are valid
   if (!customMap || !customMap.id) {
@@ -33,7 +23,7 @@ const CustomOverlayLayer = ({basemap, customMap}) => {
       id={customMap.id}
       key={customMap.id}
       tileSize={256}
-      tileUrlTemplates={[buildTileURL(customMap)]}
+      tileUrlTemplates={[tileUrlTemplate]}
     >
       <MapboxGL.RasterLayer
         aboveLayerID={basemap.id}
@@ -41,9 +31,7 @@ const CustomOverlayLayer = ({basemap, customMap}) => {
         key={customMap.id + 'Layer'}
         sourceID={customMap.id}
         style={{
-          rasterOpacity: customMap.opacity && parseFloat(customMap.opacity.toString())
-          && parseFloat(customMap.opacity.toString()) >= 0 && parseFloat(customMap.opacity.toString()) <= 1
-            ? parseFloat(customMap.opacity.toString()) : 1,
+          rasterOpacity: getOverlayOpacity(customMap),
           visibility: 'visible',
         }}
       />
@@ -55,8 +43,8 @@ const CustomOverlayLayer = ({basemap, customMap}) => {
 const areEqual = (prevProps, nextProps) => {
   return (
     prevProps.customMap.id === nextProps.customMap.id
-    && prevProps.customMap.isViewable === nextProps.customMap.isViewable
-    && prevProps.customMap.opacity === nextProps.customMap.opacity
+    && getOverlayOpacity(prevProps.customMap) === getOverlayOpacity(nextProps.customMap)
+    && prevProps.tileUrlTemplate === nextProps.tileUrlTemplate
     && prevProps.basemap.id === nextProps.basemap.id
   );
 };

@@ -4,7 +4,7 @@ import {Platform, View} from 'react-native';
 import * as turf from '@turf/turf';
 import {useDispatch, useSelector} from 'react-redux';
 
-import useCustomMap from './custom-maps/useCustomMap';
+import {canReachMapTiles, findCustomMap} from './custom-maps/customMaps.helpers';
 import SelectSpotsAtPressModal from './editing/SelectSpotsAtPressModal';
 import SetInCurrentViewOverlay from './editing/SetInCurrentViewOverlay';
 import useMapEditor from './editing/useMapEditor';
@@ -46,6 +46,7 @@ const MapContainer = forwardRef(({
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const connectionStatus = useSelector(state => state.connections.isOnline);
   const customBasemap = useSelector(state => state.map.customMaps);
   const intervalDragState = useSelector(state => state.map.intervalDragState);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
@@ -53,12 +54,10 @@ const MapContainer = forwardRef(({
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
   const isStatusMessagesModalVisible = useSelector(state => state.home.isStatusMessagesModalVisible);
-  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
   const userEmail = useSelector(state => state.user.email);
 
-  const {setCustomMapSwitchValue} = useCustomMap();
   const {setImageHeightAndWidth} = useImageSize();
   const {getExtentAndZoomCall, setBasemap} = useMap();
   const {convertFeatureGeometryToImagePixels} = useMapCoords();
@@ -237,11 +236,14 @@ const MapContainer = forwardRef(({
 
   useEffect(() => {
     // console.log('UE MapContainer [userEmail, isOnline]');
+    // A custom basemap shown from its offline map carries that map's tile folder as its id, which for a Mapbox
+    // style is not the map's own id
+    const customMap = currentBasemap && findCustomMap(customBasemap, currentBasemap);
     if (isOnline) {
       if (!currentBasemap) setBasemap().catch(console.error);
       // Custom basemaps: rebuild (URL may need rebuilding) and surface a fallback if it fails.
-      else if (customBasemap[currentBasemap.id]) {
-        setBasemap(currentBasemap.id).catch((err) => {
+      else if (customMap) {
+        setBasemap(customMap.id).catch((err) => {
           console.error('Error Setting Basemap', err);
           dispatch(openedMessageModal({
             message: `Setting basemap to Mapbox Topo.\n\n${err}`,
@@ -254,10 +256,10 @@ const MapContainer = forwardRef(({
       // making the style fail to load so Spot layers never attach. Rebuild from current runtime. Issue #919.
       else setBasemap(currentBasemap.id).catch(console.error);
     }
-    else if (isOnline === false && currentBasemap && Platform.OS !== 'web') {
-      Object.values(customBasemap).forEach((map) => {
-        if (offlineMaps[map.id]?.id !== map.id) setCustomMapSwitchValue(false, map);
-      });
+    // A custom server's basemap still loads over the network it is on, so only a basemap out of reach is swapped
+    // for its offline map
+    else if (isOnline === false && currentBasemap && Platform.OS !== 'web'
+      && !canReachMapTiles(currentBasemap, connectionStatus)) {
       switchToOfflineMap().catch(err => console.error('Error Setting Offline Basemap', err));
     }
     clearVertexes();
@@ -384,8 +386,7 @@ const MapContainer = forwardRef(({
     };
   };
 
-  const getTileCount = async (zoomLevel) => {
-    const extentString = await getExtentString();
+  const getTileCount = async (extentString, zoomLevel) => {
     try {
       //Assign the promise unresolved first then get the data using the JSON method.
       console.log('sending this extent to server: ', extentString);

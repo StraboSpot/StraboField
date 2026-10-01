@@ -7,6 +7,9 @@ const initialOfflineMapsState = {
   // The one downloaded map standing in for the live basemap, or null. Held here rather than on each map
   // because only one is ever previewed, and because a map is a Mapbox style object with no room for app state.
   previewedOfflineMapId: null,
+  // The map whose details are open in the side panel. An id rather than a copy, so the details follow a rename
+  // or a recount of its tiles.
+  selectedOfflineMapId: null,
 };
 
 const offlineMapsSlice = createSlice({
@@ -47,6 +50,9 @@ const offlineMapsSlice = createSlice({
       state.offlineMaps = action.payload;
       if (!state.offlineMaps[state.previewedOfflineMapId]) state.previewedOfflineMapId = null;
     },
+    selectedOfflineMap(state, action) {
+      state.selectedOfflineMapId = action.payload;
+    },
     // Only one map is previewed at a time, so choosing another simply replaces it
     startedOfflineMapPreview(state, action) {
       state.previewedOfflineMapId = action.payload;
@@ -61,6 +67,7 @@ export const {
   deletedOfflineMap,
   editedOfflineMap,
   resetOfflineMapsState,
+  selectedOfflineMap,
   setOfflineMap,
   setOfflineMapsFromImport,
   startedOfflineMapPreview,
