@@ -12,7 +12,8 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 const LinkedSampleDataView = ({data}) => {
   /* Logic Helpers */
 
-  const getKeyLabel = key => toTitleCase(String(key).replace(/_/g, ' '));
+  // A key ending in id is split before it, so sampleid reads as Sample Id
+  const getKeyLabel = key => toTitleCase(String(key).replace(/_/g, ' ').replace(/(\w)id$/i, '$1 id'));
 
   /* Render Functions */
 
