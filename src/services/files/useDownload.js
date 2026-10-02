@@ -92,6 +92,7 @@ const useDownload = () => {
       const res = await getDatasets(selectedProject.id, encodedLoginScoped);
       const datasets = res?.datasets || [];
       console.log('Datasets Response:', JSON.stringify(res));
+      let isTargetDatasetCleared = false;
 
       // If same project set active and target dataset to same as before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
@@ -105,7 +106,9 @@ const useDownload = () => {
         // A target that is not shown would take new Spots out of sight, so the previous target is kept only if it
         // is still among the shown datasets. Otherwise there is none, and which dataset takes new Spots stays the
         // user's choice
-        dispatch(setTargetDataset(activeDatasetIds.includes(prevTargetDatasetId) ? prevTargetDatasetId : undefined));
+        const isPrevTargetDatasetKept = activeDatasetIds.includes(prevTargetDatasetId);
+        dispatch(setTargetDataset(isPrevTargetDatasetKept ? prevTargetDatasetId : undefined));
+        isTargetDatasetCleared = !!prevTargetDatasetId && !isPrevTargetDatasetKept;
       }
       else if (datasets.length >= 1) {
         dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
@@ -123,6 +126,11 @@ const useDownload = () => {
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Downloaded ' + spotsToSave.length + ' Spots\nDownloaded '
         + Object.keys(datasetsObjToSave).length + ' Datasets\nFinished Downloading Datasets'));
+      // The user had a target and did not choose to drop it
+      if (isTargetDatasetCleared) {
+        dispatch(addedStatusMessage('The previous target dataset was removed or is turned off, so no target '
+          + 'dataset is set. Choose one to add new Spots.'));
+      }
     }
     catch (err) {
       console.error('Error getting datasets:', err);
