@@ -52,10 +52,13 @@ const useStraboSampleWebPage = () => {
       : undefined;
   };
 
-  // Whether the server has the link yet, which it only does once the Spot holding the sample has been uploaded
+  // Whether the server has the link yet, which it only does once the Spot holding the sample has been uploaded. Another
+  // user's sample came down from the server already linked, and the samples API won't show it to a collaborator even
+  // where the web page will, so it isn't asked.
   const getIsLinkUploaded = async (strabosamplesId, spotId) => {
-    const strabosample = getStraboSampleFromResponse(
-      await getStraboSample(strabosamplesId, getSampleOwnerId(spotId))) ?? {};
+    const ownerId = getSampleOwnerId(spotId);
+    if (String(ownerId) !== String(straboUserId)) return true;
+    const strabosample = getStraboSampleFromResponse(await getStraboSample(strabosamplesId, ownerId)) ?? {};
     return isLinkedToFieldSpot(strabosample, spotId);
   };
 
