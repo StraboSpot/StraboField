@@ -2,6 +2,8 @@ import {StyleSheet} from 'react-native';
 
 import {
   DARKGREY,
+  LIGHTGREY,
+  MEDIUMGREY,
   PRIMARY_ACCENT_COLOR,
   PRIMARY_ACCENT_COLOR_FADED_20,
   PRIMARY_ACCENT_COLOR_FADED_40,
@@ -56,6 +58,32 @@ const sampleStyles = StyleSheet.create({
     flex: 1,
     fontSize: SMALL_TEXT_SIZE,
     lineHeight: 20,
+  },
+  linkSampleDate: {
+    color: DARKGREY,
+    fontSize: SMALL_TEXT_SIZE,
+  },
+  linkSampleHeader: {
+    backgroundColor: LIGHTGREY,
+    borderBottomColor: MEDIUMGREY,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    flexDirection: 'row',
+    gap: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  linkSampleHeaderText: {
+    color: DARKGREY,
+    fontSize: SMALL_TEXT_SIZE,
+    fontWeight: TEXT_WEIGHT_700,
+  },
+  linkSampleName: {
+    flex: 1,
+  },
+  linkSampleRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
   },
   linkedCard: {
     alignItems: 'center',

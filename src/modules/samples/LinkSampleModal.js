@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {FlatList, Platform, Pressable, ScrollView, Text, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
+import moment from 'moment';
 import {useToast} from 'react-native-toast-notifications';
 import {useSelector} from 'react-redux';
 
@@ -240,6 +241,12 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
         </View>
         <ListQueryBar onSearchChange={setSearchText} searchValue={searchText}/>
         {errorMessage ? <Text style={commonStyles.importantText}>{errorMessage}</Text> : null}
+        {!isEmpty(filteredSamples) && (
+          <View style={sampleStyles.linkSampleHeader}>
+            <Text style={[sampleStyles.linkSampleHeaderText, sampleStyles.linkSampleName]}>Sample Name</Text>
+            <Text style={sampleStyles.linkSampleHeaderText}>Last Updated</Text>
+          </View>
+        )}
         <FlatList
           ItemSeparatorComponent={FlatListItemSeparator}
           ListEmptyComponent={errorMessage ? null
@@ -254,13 +261,21 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
     );
   };
 
-  const renderSampleItem = ({item}) => (
-    <ListItem containerStyle={commonStyles.listItem} onPress={() => onSamplePressed(item)}>
-      <ListItem.Content>
-        <ListItem.Title style={commonStyles.listItemTitle}>{item.name || 'Unnamed Sample'}</ListItem.Title>
-      </ListItem.Content>
-    </ListItem>
-  );
+  const renderSampleItem = ({item}) => {
+    // moment() of nothing is now, so a sample without a date shows none
+    const modifiedDate = item.modified_at && moment(item.modified_at);
+    return (
+      <ListItem containerStyle={commonStyles.listItem} onPress={() => onSamplePressed(item)}>
+        <ListItem.Content style={sampleStyles.linkSampleRow}>
+          <Text numberOfLines={1} style={[commonStyles.listItemTitle, sampleStyles.linkSampleName]}>
+            {item.name || 'Unnamed Sample'}
+          </Text>
+          <Text style={sampleStyles.linkSampleDate}>{modifiedDate?.isValid() ? modifiedDate.format(
+            'MMM D, YYYY') : ''}</Text>
+        </ListItem.Content>
+      </ListItem>
+    );
+  };
 
   const renderValueOption = (key, isStraboSamplesValue, isChecked, source, value) => (
     <Pressable
