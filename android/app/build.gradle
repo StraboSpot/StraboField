@@ -95,7 +95,7 @@ android {
         applicationId "com.strabospot2"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1080
+        versionCode 1081
         versionName "2.32.0"
     }
     signingConfigs {
@@ -143,6 +143,9 @@ android {
 configurations.all {
     exclude group: "androidx.sqlite", module: "sqlite-bundled"
     exclude group: "androidx.sqlite", module: "sqlite-bundled-android"
+    // react-native-pdf pins pdfiumandroid 1.0.32, whose getPageLinks drops every link with a valid rectangle, so no
+    // link in a PDF can be tapped. 1.0.33 fixes that check without adding dependencies.
+    resolutionStrategy.force "io.legere:pdfiumandroid:1.0.33"
 }
 
 dependencies {

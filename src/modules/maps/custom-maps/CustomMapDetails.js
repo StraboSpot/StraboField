@@ -5,7 +5,7 @@ import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {CUSTOM_MAP_SOURCES, CUSTOM_MAP_TYPES} from './customMaps.constants';
-import {getMapTypeName, normalizeCustomMapId} from './customMaps.helpers';
+import {getMapTypeName, normalizeCustomMapId, stripOverlayDisplaySettings} from './customMaps.helpers';
 import customMapStyles from './customMaps.styles';
 import useCustomMap from './useCustomMap';
 import commonStyles from '../../../shared/common.styles';
@@ -14,30 +14,40 @@ import {BLUE, DARKGREY} from '../../../shared/styles.constants';
 import alert from '../../../shared/ui/alert';
 import ActionButton from '../../../shared/ui/buttons/ActionButton';
 import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import Loading from '../../../shared/ui/Loading';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
-import SliderBar from '../../../shared/ui/SliderBar';
-import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
 import formStyles from '../../form/form.styles';
 import FormikWrapper from '../../form/FormikWrapper';
 import TextInputField from '../../form/inputs/TextInputField';
-import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
+import {openedOfflineMapsModalForMap} from '../../home/home.slice';
+import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
+import {DOWNLOAD_ICON} from '../maps.constants';
 import {selectedCustomMapToEdit} from '../maps.slice';
+import {getOfflineMap} from '../offline-maps/offlineMaps.helpers';
+import {selectedOfflineMap} from '../offline-maps/offlineMaps.slice';
 
+// Web keeps no maps on the device
+const isWeb = Platform.OS === 'web';
 const urlKeyboardType = Platform.OS === 'ios' ? 'url' : 'default';
 
-const CustomMapDetails = () => {
+const CustomMapDetails = ({closeMainMenuPanel, zoomToCustomMap}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const customMaps = useSelector(state => state.map.customMaps);
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
+  const {isSelected} = useSelector(state => state.connections.databaseEndpoint);
+  const {isInternetReachable} = useSelector(state => state.connections.isOnline);
+  const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
+  const previewedOfflineMapId = useSelector(state => state.offlineMap.previewedOfflineMapId);
 
-  const {deleteMap, saveCustomMap, updateMap} = useCustomMap();
+  const {deleteMap, saveCustomMap, showCustomMap, updateMap} = useCustomMap();
 
   /* Local State */
 
@@ -49,10 +59,14 @@ const CustomMapDetails = () => {
 
   /* Derived Variables */
 
-  // Seeded with the whole map, so the keys the form never shows - its url, its stored extent - survive the save
-  const initialCustomMapValues = isEmpty(customMapToEdit)
-    ? {title: '', opacity: 1, overlay: false, id: '', source: ''}
-    : customMapToEdit;
+  // Seeded with the whole map, so the keys the form never shows - its url, its stored extent - survive the save.
+  // Overlay display is the exception: it is switched from the map layers menu while the map is on screen, so a
+  // form opened before that change must not write the settings it was opened with back over it.
+  const initialCustomMapValues = isEmpty(customMapToEdit) ? {title: '', id: '', source: ''}
+    : stripOverlayDisplaySettings(customMapToEdit);
+  // The stored map rather than the copy opened for editing, which misses an extent fetched since
+  const savedCustomMap = customMaps[customMapToEdit?.id];
+  const offlineMap = savedCustomMap && getOfflineMap(offlineMaps, savedCustomMap);
 
   /* Event Handlers */
 
@@ -114,6 +128,28 @@ const CustomMapDetails = () => {
       ],
       {cancelable: false},
     );
+  };
+
+  // Side panels do not stack, so Back from the offline map's details lands on the Custom Maps list
+  const openOfflineMapDetails = () => {
+    dispatch(selectedCustomMapToEdit({}));
+    dispatch(selectedOfflineMap(offlineMap.id));
+    dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.OFFLINE_MAP_DETAILS}));
+  };
+
+  // Shows the map framed to its extent, so what is being saved is in view behind the modal
+  const saveWholeMapForOffline = async () => {
+    try {
+      closeSidePanel();
+      closeMainMenuPanel();
+      const bbox = await showCustomMap(savedCustomMap);
+      if (bbox) zoomToCustomMap(bbox);
+      dispatch(openedOfflineMapsModalForMap(savedCustomMap.id));
+    }
+    catch (err) {
+      console.error('Error opening the whole map to save for offline use', err);
+      alert('Error', `Unable to save ${savedCustomMap.title} for offline use.`);
+    }
   };
 
   const saveMap = async (customMapValues) => {
@@ -227,7 +263,48 @@ const CustomMapDetails = () => {
             {mapUrl}
           </Text>
         </View>}
+        {!isWeb && !isEmpty(customMapToEdit) && renderOfflineTiles(formProps)}
+        {/* Only a map with an extent can be saved whole. Held while there are unsaved changes, since leaving for
+            the map drops them, and otherwise when Download Tiles of Current Map is. */}
+        {!isWeb && !isEmpty(savedCustomMap?.bbox) && (
+          <>
+            <OutlineButton
+              disabled={formProps.dirty || !isInternetReachable || isSelected || !!previewedOfflineMapId}
+              icon={DOWNLOAD_ICON}
+              onPress={saveWholeMapForOffline}
+              title={'Save Map for Offline Use'}
+            />
+            <View style={customMapStyles.mapTypeInfoContainer}>
+              <Text style={customMapStyles.mapTypeInfoText}>
+                To save one area in more detail than the rest, frame it on the map and save it again at a deeper zoom,
+                from the map actions menu or Offline Maps. It adds to what is already saved.
+              </Text>
+            </View>
+          </>
+        )}
       </>
+    );
+  };
+
+  // Held while there are unsaved changes, since opening the offline map's details leaves this page
+  const renderOfflineTiles = (formProps) => {
+    const hasTiles = offlineMap?.count > 0;
+    return (
+      <ListItem
+        containerStyle={commonStyles.listItemFormField}
+        disabled={!hasTiles || formProps.dirty}
+        onPress={openOfflineMapDetails}
+      >
+        <ListItem.Content>
+          <View style={formStyles.fieldLabelContainer}>
+            <Text style={formStyles.fieldLabel}>{'Offline Tiles'}</Text>
+          </View>
+          <Text style={formStyles.fieldValue}>
+            {hasTiles ? `${offlineMap.count.toLocaleString()} tiles on this device` : 'Not saved for offline use'}
+          </Text>
+        </ListItem.Content>
+        {hasTiles && <ListItem.Chevron/>}
+      </ListItem>
     );
   };
 
@@ -251,51 +328,6 @@ const CustomMapDetails = () => {
       )}
     </View>
   );
-
-  const renderOverlaySection = (formProps) => {
-    // An opacity never set, or saved outside the slider's range, shows as fully opaque
-    const savedOpacity = formProps.values.opacity;
-    const opacity = savedOpacity && typeof savedOpacity === 'number' && savedOpacity >= 0 && savedOpacity <= 1
-      ? savedOpacity : 1;
-    const sliderValuePercent = Math.round(opacity * 100).toFixed(0);
-    return (
-      <>
-        <SectionDivider
-          dividerText={'Overlay Settings'}
-          subtitle={'To save this map as an overlay for offline use first save as a basemap then switch it to an'
-            + ' overlay.'}
-        />
-        <ListItem containerStyle={commonStyles.listItem}>
-          <ListItem.Content>
-            <ListItem.Title style={commonStyles.listItemTitle}>Display as overlay</ListItem.Title>
-          </ListItem.Content>
-          <SwitchWrapper
-            onValueChange={val => formProps.setFieldValue('overlay', val)}
-            value={formProps.values.overlay}
-          />
-        </ListItem>
-        {formProps.values.overlay && (
-          <ListItem containerStyle={commonStyles.listItem}>
-            <ListItem.Content>
-              <ListItem.Title style={commonStyles.listItemTitle}>Opacity</ListItem.Title>
-              <ListItem.Subtitle style={{paddingLeft: 10}}>{sliderValuePercent}%</ListItem.Subtitle>
-            </ListItem.Content>
-            <View style={{flex: 2}}>
-              <SliderBar
-                labels={['5%', '50%', '100%']}
-                maximumValue={1}
-                minimumValue={0.05}
-                onValueChange={val => formProps.setFieldValue('opacity', val)}
-                rotateLabels
-                step={0.05}
-                value={opacity}
-              />
-            </View>
-          </ListItem>
-        )}
-      </>
-    );
-  };
 
   const renderSidePanelHeader = formProps => (
     <SidePanelHeader
@@ -336,7 +368,6 @@ const CustomMapDetails = () => {
               style={{flex: 1}}
             >
               {renderTitle()}
-              {renderOverlaySection(formProps)}
               {isEmpty(customMapToEdit) && renderMapTypeList(formProps)}
               {!isEmpty(formProps.values.source) && renderMapDetails(formProps)}
             </ScrollView>

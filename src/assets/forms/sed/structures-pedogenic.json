@@ -27,7 +27,9 @@
       "label": "O Horizon thickness (cm)",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${paleosol_horizons}, 'o')"
+      "relevant": "selected(${paleosol_horizons}, 'o')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -35,7 +37,9 @@
       "label": "A Horizon thickness (cm)",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${paleosol_horizons}, 'a')"
+      "relevant": "selected(${paleosol_horizons}, 'a')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -43,7 +47,9 @@
       "label": "E Horizon thickness (cm)",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${paleosol_horizons}, 'e')"
+      "relevant": "selected(${paleosol_horizons}, 'e')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -51,7 +57,9 @@
       "label": "B Horizon thickness (cm)",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${paleosol_horizons}, 'b')"
+      "relevant": "selected(${paleosol_horizons}, 'b')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -59,7 +67,9 @@
       "label": "K Horizon thickness (cm)",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${paleosol_horizons}, 'k')"
+      "relevant": "selected(${paleosol_horizons}, 'k')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -67,7 +77,9 @@
       "label": "C Horizon thickness (cm)",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${paleosol_horizons}, 'c')"
+      "relevant": "selected(${paleosol_horizons}, 'c')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -75,7 +87,9 @@
       "label": "R Horizon thickness (cm)",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${paleosol_horizons}, 'r')"
+      "relevant": "selected(${paleosol_horizons}, 'r')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -83,7 +97,9 @@
       "label": "Compound thickness (cm)",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${paleosol_horizons}, 'compound')"
+      "relevant": "selected(${paleosol_horizons}, 'compound')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
@@ -91,7 +107,9 @@
       "label": "Composite thickness (cm)",
       "required": "false",
       "read_only": "false",
-      "relevant": "selected(${paleosol_horizons}, 'composite')"
+      "relevant": "selected(${paleosol_horizons}, 'composite')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "select_multiple lg4oy98",

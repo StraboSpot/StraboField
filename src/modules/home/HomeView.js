@@ -5,7 +5,7 @@ import LeftSideButtons from './buttons/LeftSideButtons';
 import RightSideButtons from './buttons/RightSideButtons';
 import DeviceInfo from './DeviceInfo';
 import MapContainer from '../maps/MapContainer';
-import OfflineMapLabel from '../maps/offline-maps/OfflineMapsLabel';
+import OfflineMapPreviewBanner from '../maps/offline-maps/OfflineMapPreviewBanner';
 import notebookStyles from '../notebook-panel/notebook.styles';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
 import VersionCheckLabel from '../version-check/VersionCheckLabel';
@@ -47,7 +47,7 @@ const HomeView = forwardRef(({
       />
 
       <DeviceInfo/>
-      <OfflineMapLabel/>
+      <OfflineMapPreviewBanner/>
       <VersionCheckLabel/>
 
       <RightSideButtons
@@ -73,6 +73,7 @@ const HomeView = forwardRef(({
         dialogs={dialogs}
         openMainMenuPanel={openMainMenuPanel}
         toggleDialog={toggleDialog}
+        zoomToCustomMap={bbox => mapComponentRef?.current?.zoomToCustomMap(bbox)}
       />
 
       <Animated.View style={[notebookStyles.notebookDrawer, animateNotebookDrawer]}>

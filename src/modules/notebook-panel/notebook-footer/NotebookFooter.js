@@ -14,7 +14,7 @@ import {NOTEBOOK_PAGES} from '../../page/page.constants';
 import usePage from '../../page/usePage';
 import useSamples from '../../samples/useSamples';
 
-const NotebookFooter = ({openPage, isRichSample, registerGetValues, selectedSample}) => {
+const NotebookFooter = ({openPage, isReadOnly, isRichSample, registerGetValues, selectedSample}) => {
   /* Data Hooks */
 
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
@@ -64,16 +64,19 @@ const NotebookFooter = ({openPage, isRichSample, registerGetValues, selectedSamp
     <View style={footerStyle.footerContainer}>
       {(!isEmpty(selectedSample) && !isRichSample) ? (
         <View style={[footerStyle.footerIconContainer, {padding: 5}]}>
-          <ClearButton
-            icon={{
-              color: PRIMARY_ACCENT_COLOR,
-              name: 'add',
-              size: 20,
-            }}
-            onPress={convertToRichSample}
-            title={'Add Data to Sample'}
-            titleProps={{style: {color: PRIMARY_ACCENT_COLOR, fontSize: themes.MEDIUM_TEXT_SIZE}}}
-          />
+          {/* Adding data rewrites the sample, so a read-only Spot doesn't offer it */}
+          {!isReadOnly && (
+            <ClearButton
+              icon={{
+                color: PRIMARY_ACCENT_COLOR,
+                name: 'add',
+                size: 20,
+              }}
+              onPress={convertToRichSample}
+              title={'Add Data to Sample'}
+              titleProps={{style: {color: PRIMARY_ACCENT_COLOR, fontSize: themes.MEDIUM_TEXT_SIZE}}}
+            />
+          )}
         </View>
       ) : (
         <>

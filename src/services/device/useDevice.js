@@ -92,7 +92,6 @@ const useDevice = () => {
   const deleteOfflineMap = async (map) => {
     let mapID = map.id;
     console.log(`Deleting Map, ${map.name}, with ID of ${map.id} Here`);
-    mapID === 'mapwarper' ? map.name : map.id;
     // Mapbox Styles map ids are 'username/styleId', but tiles are cached under the styleId only
     // (see getTileFolderName). Offline maps carry source 'direct from filesystem', not 'mapbox_styles',
     // so key off the '/' in the id to strip the account prefix and avoid orphaning the cached tiles.
@@ -439,6 +438,14 @@ const useDevice = () => {
     }
   };
 
+  // Like readDirectoryForMapTiles, but with each tile's size as well as its name
+  const readMapTileFiles = async (mapId) => {
+    const tilesDirectory = APP_DIRECTORIES.TILE_CACHE + mapId.split('/').pop() + '/tiles';
+    if (!await RNFS.exists(tilesDirectory)) return [];
+    const files = await RNFS.readDir(tilesDirectory);
+    return files.map(({name, size}) => ({name, size}));
+  };
+
   const readFile = async (source) => {
     try {
       return await RNFS.readFile(source);
@@ -590,6 +597,7 @@ const useDevice = () => {
     readDirectory,
     readDirectoryForMapFiles,
     readDirectoryForMapTiles,
+    readMapTileFiles,
     readFile,
     pruneOldProjectSaves,
     saveProjectToDevice,

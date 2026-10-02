@@ -4,6 +4,7 @@ import {NOTEBOOK_PAGES, PAGES_HIDDEN_IN_SAMPLE, PAGES_SECTIONS, PET_PAGES, SED_P
 import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty} from '../../shared/helpers';
 import {getReportsAtSpot, getReportsToList} from '../reports/reports.helpers';
+import {hasSedRockData} from '../sed/sed.helpers';
 import useTags from '../tags/useTags';
 
 const usePage = () => {
@@ -73,8 +74,8 @@ const usePage = () => {
             || spot?.properties?.pet?.rock_type?.includes(page.key)) isPopulated = true;
           break;
         case PAGE_KEYS.ROCK_TYPE_SEDIMENTARY:
-          if (spot.properties.sed && spot.properties.sed[PAGE_KEYS.LITHOLOGIES]
-            && Array.isArray(spot.properties.sed[PAGE_KEYS.LITHOLOGIES])) isPopulated = true;
+          if (Array.isArray(spot.properties.sed?.[PAGE_KEYS.LITHOLOGIES])
+            && spot.properties.sed[PAGE_KEYS.LITHOLOGIES].some(hasSedRockData)) isPopulated = true;
           break;
         case PAGE_KEYS.INTERVAL:
           if (spot.properties.sed && (spot.properties.sed.character

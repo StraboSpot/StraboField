@@ -1,6 +1,3 @@
-STABILITY
-• Crash fix: loading or switching projects no longer crashes the app on iOS
-
 FORMS & VALIDATION
 • Live form validation: errors show as you type and Save stays disabled until they're fixed
 • Find the problem field: the tab holding an unanswered field is marked so you know where to look
@@ -10,11 +7,12 @@ FORMS & VALIDATION
 COMPASS
 • Automatic declination: magnetic declination is recorded and kept up to date in your project data
 • Declination without GPS: falls back through your project location and nearby Spots to stay corrected, with clearer warnings when it can't
-• Compass over template: a fresh compass reading now takes priority over an active template
 
 MEASUREMENTS
 • Bulk strike/dip: calculate missing strikes and dip directions for every record that holds a plane
 • Steadier validation: planar+linear and 3D-structure measurements are checked and hinted more reliably
+• Compass over template: a fresh compass reading now takes priority over an active template
+• Strike from dip direction: entering a dip direction fills in the strike instead of writing NaN
 
 TAGS
 • Memos on tags: add, remove, count, and list a tag's memos from its detail page
@@ -38,7 +36,8 @@ LISTS & DATASETS
 
 READ-ONLY DATASETS
 • Read-only everywhere: read-only status now carries through image basemaps, strat sections, and forms
-• Protected moves: a Spot can't be moved into or out of a read-only dataset
+• Spots stay out of read-only datasets: Spots can no longer be moved, copied, or created into a read-only dataset
+• Locked samples and features: Add Data to Sample, Get IGSN, and Other Feature fields are disabled on read-only Spots
 
 STRAT SECTIONS
 • Image overlays: set up, save, and draw image overlays under a strat section in the right order
@@ -48,6 +47,8 @@ SAMPLES & IGSN
 • Steadier SESAR: improved login and token handling for IGSN registration
 • Safer saves: Save is disabled when SESAR registration can't go through
 • Correct sample location: a sample from an image-basemap Spot gets a real-world location
+• SESAR sign-in when saving: saving a sample with an IGSN prompts you to sign in to SESAR when needed
+• Works with SESAR's new system: signing in, registering, and updating IGSNs now use SESAR's latest API
 
 SHORTCUTS
 • Straight to the Notebook: each shortcut opens its new Spot in the Notebook
@@ -58,9 +59,6 @@ MAPS
 • Remembered map view: the map view is saved once the camera settles
 • Single name label: a Spot with multiple measurements draws its name label once
 
-SMALL TOUCHES
-• Copied Spots: a copied Spot gets its own feature ids
-• Mineral lookup: mineral data you already entered is kept when a mineral is looked up
-• Project visibility: an owner's project is listed again once its collaboration is halted
+Full notes: https://github.com/StraboSpot/StraboField/releases/tag/v2.32.0
 
 Thanks for using StraboSpot!

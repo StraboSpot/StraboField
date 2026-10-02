@@ -64,7 +64,7 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
   const get3dStructureTitle = (threeDStructure) => {
     return threeDStructure.label
       || toTitleCase(getLabel(threeDStructure.feature_type || threeDStructure.fault_or_sz_type,
-        ['_3d_structures', threeDStructure.type]).toUpperCase())
+        ['_3d_structures', threeDStructure.type]))
       || '';
   };
 

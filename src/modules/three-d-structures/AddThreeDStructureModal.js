@@ -82,7 +82,7 @@ const AddThreeDStructureModal = () => {
   const save3DStructure = async () => {
     try {
       const {values} = await submitAndShowErrors(formRef.current);
-      const edited3DStructureData = await resolveLabelOnSave(
+      const edited3DStructureData = resolveLabelOnSave(
         {pageKey: PAGE_KEYS.THREE_D_STRUCTURES, values: values, getLabel: getLabel, getLabels: getLabels});
       console.log('Saving 3D Structure data to Spot ...');
       let edited3DStructuresData = spot.properties[groupKey] ? JSON.parse(JSON.stringify(spot.properties[groupKey]))

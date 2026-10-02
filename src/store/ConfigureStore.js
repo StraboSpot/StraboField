@@ -83,6 +83,7 @@ const homeConfig = {
     'messageModal',
     'modalValues',
     'modalVisible',
+    'offlineMapToSaveId',
     'statusMessageModalTitle',
     'statusMessages',
   ],

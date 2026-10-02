@@ -13,7 +13,9 @@
       "name": "gps_accuracy",
       "label": "GPS Accuracy (m)",
       "hint": "Accuracy level of the latitude and longitude coordinates in meters.",
-      "required": "false"
+      "required": "false",
+      "constraint": ". >= 0",
+      "constraint_message": "Value must be 0 or greater."
     },
     {
       "type": "decimal",
@@ -26,7 +28,9 @@
       "type": "decimal",
       "name": "spot_radius",
       "label": "Radius (m)",
-      "required": "false"
+      "required": "false",
+      "constraint": ". >= 0",
+      "constraint_message": "Value must be 0 or greater."
     },
     {
       "type": "calculate",

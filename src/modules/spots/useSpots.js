@@ -29,7 +29,12 @@ import {
 import {deepCopyWithNewIds, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
-import {clearedStratSection, setCurrentImageBasemap, setStratSection} from '../maps/maps.slice';
+import {
+  clearedSpotsInMapExtentIds,
+  clearedStratSection,
+  setCurrentImageBasemap,
+  setStratSection,
+} from '../maps/maps.slice';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {
   addedNewSpotIdsToDataset,
@@ -38,6 +43,7 @@ import {
   deletedSpotIdFromReports,
   deletedSpotIdFromTags,
   restoredSpotReferences,
+  setActiveDatasets,
   updatedModifiedTimestampsBySpotsIds,
   updatedProject,
   updatedProjectPreference,
@@ -74,6 +80,18 @@ const useSpots = () => {
   const toast = useToast();
 
   /* Internal Functions */
+
+  // Turn on the Datasets holding these Spots that are off, with one toast for them all
+  const activateDatasetsWithSpots = (spotsToShow) => {
+    const datasetIds = [...new Set(spotsToShow.map(spot => getDatasetIdFromSpotId(spot.properties.id)))].filter(
+      datasetId => !isEmpty(datasetId) && !getActiveDatasets().some(dataset => isSameId(dataset.id, datasetId)));
+    if (isEmpty(datasetIds)) return;
+    datasetIds.forEach(datasetId => dispatch(setActiveDatasets({bool: true, dataset: datasetId})));
+    dispatch(clearedSpotsInMapExtentIds());
+    const datasetNames = datasetIds.map(datasetId => datasets[datasetId].name).join(', ');
+    toast.show(`${datasetIds.length === 1 ? 'Dataset' : 'Datasets'} ${datasetNames} turned on to show this Spot.`,
+      {duration: 5000});
+  };
 
   const getNewSpotNameObj = (newSpot) => {
     let namePrefix = preferences.spot_prefix || '';
@@ -165,12 +183,6 @@ const useSpots = () => {
   const getSpotWithThisMap = (imageBasemapId, stratSectionId) => {
     if (imageBasemapId) return getSpotWithThisImageBasemap(imageBasemapId);
     return stratSectionId ? getSpotWithThisStratSection(stratSectionId) : undefined;
-  };
-
-  const getStratSectionSettings = (stratSectionId) => {
-    const spot = getSpotWithThisStratSection(stratSectionId);
-    return spot && spot.properties && spot.properties.sed
-    && spot.properties.sed.strat_section ? spot.properties.sed.strat_section : undefined;
   };
 
   const removeSpotAndReferences = (spotId) => {
@@ -496,13 +508,6 @@ const useSpots = () => {
     }, []);
   };
 
-  // Get parent Spot for image basemap
-  const getImageBasemapBySpot = (spot) => {
-    const imageBasemapFound = getActiveImageBasemaps().find(
-      imageBasemap => imageBasemap.id === spot.properties.image_basemap);
-    return imageBasemapFound;
-  };
-
   // Get Active Spots (not Samples) with Valid Geometry
   const getMappableSpots = () => {
     const allSpotsCopyFiltered = Object.values(getActiveSpotsObj()).filter((spot) => {
@@ -666,8 +671,12 @@ const useSpots = () => {
     return Object.values(getActiveSpotsObj()).filter(spot => !spot.properties?.isSample);
   };
 
+  // Select a Spot and open the map it is on, turning on its Dataset and that of the Spot holding the map if either is
+  // off (the Nesting page lists Spots from every Dataset). The map is read straight off the Spot holding it, found in
+  // every Dataset, because a Dataset turned on here is not active in the store until the next render.
   const handleSpotSelected = (spot) => {
     dispatch(setSelectedSpot(spot));
+    const spotsToShow = [spot];
 
     // Set correct map for type of selected Spot
     if (isOnGeoMap(spot)) {
@@ -676,16 +685,26 @@ const useSpots = () => {
     }
     else if (isOnImageBasemap(spot)
       && (!currentImageBasemap || currentImageBasemap.id !== spot.properties.image_basemap)) {
-      const imageBasemap = getImageBasemapBySpot(spot);
+      const isThisImageBasemap = imageBasemap => isSameId(imageBasemap.id, spot.properties.image_basemap);
+      const spotWithImageBasemap = Object.values(spots).find(s => getImageBasemapsInSpot(s).some(isThisImageBasemap));
       if (stratSection) dispatch(clearedStratSection());
-      dispatch(setCurrentImageBasemap(imageBasemap));
+      if (spotWithImageBasemap) {
+        spotsToShow.push(spotWithImageBasemap);
+        dispatch(setCurrentImageBasemap(getImageBasemapsInSpot(spotWithImageBasemap).find(isThisImageBasemap)));
+      }
+      else dispatch(setCurrentImageBasemap(undefined));
     }
     else if (isOnStratSection(spot)
       && (!stratSection || stratSection.strat_section_id !== spot.properties.strat_section_id)) {
-      const stratSectionSettings = getStratSectionSettings(spot.properties.strat_section_id);
+      const spotWithStratSection = Object.values(spots).find(
+        s => isSameId(s.properties?.sed?.strat_section?.strat_section_id, spot.properties.strat_section_id));
       if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
-      if (stratSectionSettings) dispatch(setStratSection(stratSectionSettings));
+      if (spotWithStratSection) {
+        spotsToShow.push(spotWithStratSection);
+        dispatch(setStratSection(spotWithStratSection.properties.sed.strat_section));
+      }
     }
+    activateDatasetsWithSpots(spotsToShow);
   };
 
   // An image basemap or strat section is locked exactly when the Spot holding it is read only. Nothing new
@@ -734,7 +753,6 @@ const useSpots = () => {
     getAllIntervalSpotsOnStratSection,
     getAllSpotsOnImageBasemap,
     getAllSpotsOnStratSection,
-    getImageBasemapBySpot,
     getMappableSpots,
     getNewSpotName,
     getReadOnlyReason,

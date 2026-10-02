@@ -38,7 +38,7 @@ const usePetrology = () => {
   const savePetFeature = async (key, spot, formCurrent, isLeavingPage, previousFeature) => {
     try {
       const {errors, values} = await submitAndShowErrors(formCurrent, isLeavingPage);
-      const editedFeatureData = await resolveLabelOnSave(
+      const editedFeatureData = resolveLabelOnSave(
         {pageKey: key, previousFeature: previousFeature, values: values, getLabel: getLabel, getLabels: getLabels});
       console.log('Saving', key, 'data to Spot ...');
       const spotId = spot.properties.id;

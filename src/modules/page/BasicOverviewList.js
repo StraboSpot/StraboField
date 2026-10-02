@@ -12,6 +12,7 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {openFeatureInNotebook} from '../notebook-panel/notebook.helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {hasSedRockData} from '../sed/sed.helpers';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const BasicOverviewList = ({page}) => {
@@ -38,13 +39,17 @@ const BasicOverviewList = ({page}) => {
 
   const addIdForSS1ImportedSedData = (item, i) => {
     let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
-    item = {...item, id: getNewUUID()};
-    if (page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY) editedSedData[PAGE_KEYS.LITHOLOGIES].splice(i, 1, item);
-    else if (page.key === PAGE_KEYS.BEDDING) editedSedData[page.key].beds.splice(i, 1, item);
-    else editedSedData[page.key].splice(i, 1, item);
+    const itemWithId = {...item, id: getNewUUID()};
+    // Sed rocks are a filtered list, so a row's place in it is not its place in the Spot
+    if (page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY) {
+      const lithologyIndex = spot.properties.sed[PAGE_KEYS.LITHOLOGIES].indexOf(item);
+      editedSedData[PAGE_KEYS.LITHOLOGIES].splice(lithologyIndex, 1, itemWithId);
+    }
+    else if (page.key === PAGE_KEYS.BEDDING) editedSedData[page.key].beds.splice(i, 1, itemWithId);
+    else editedSedData[page.key].splice(i, 1, itemWithId);
     dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
-    openFeatureInNotebook(dispatch, page.key, item);
+    openFeatureInNotebook(dispatch, page.key, itemWithId);
   };
 
   const getData = () => {
@@ -58,7 +63,9 @@ const BasicOverviewList = ({page}) => {
     }
     else if (isSed && spot.properties.sed) data = spot.properties.sed[page.key] || [];
     if (page.key === PAGE_KEYS.STRAT_SECTION) data = [data];
-    else if (page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY) data = spot.properties.sed[PAGE_KEYS.LITHOLOGIES] || [];
+    else if (page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY) {
+      data = spot.properties.sed[PAGE_KEYS.LITHOLOGIES]?.filter(hasSedRockData) || [];
+    }
     else if (page.key === PAGE_KEYS.BEDDING && spot.properties?.sed[page.key]
       && spot.properties?.sed[page.key].beds) data = spot.properties.sed[page.key].beds || [];
 

@@ -136,6 +136,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
             <Page {...pageProps}/>
           </View>
           <NotebookFooter
+            isReadOnly={isReadOnly}
             isRichSample={spot.properties?.isSample}
             openPage={openPage}
             registerGetValues={getSampleValuesRef}

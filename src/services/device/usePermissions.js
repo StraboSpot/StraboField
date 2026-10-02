@@ -12,21 +12,21 @@ const PERMISSION_CONFIG = {
     android: PERMISSIONS.ANDROID.CAMERA,
     ios: PERMISSIONS.IOS.CAMERA,
     blocked: ['Camera Permission Denied',
-      'To take photos, allow camera access in Settings -> Apps -> StraboSpot2 -> Camera.'],
+      'To take photos, allow camera access in Settings -> Apps -> StraboField -> Camera.'],
     unavailable: ['Camera Unavailable', 'The camera is not available on this device.'],
   },
   location: {
     android: PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION,
     ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
     blocked: ['Location Permission Denied',
-      'To use your location, allow location access in Settings -> Apps -> StraboSpot2 -> Location.'],
+      'To use your location, allow location access in Settings -> Apps -> StraboField -> Location.'],
     unavailable: ['Location Unavailable', 'Location services are not available on this device.'],
   },
   storage: {
     android: PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
     ios: null,  // iOS uses the app sandbox; no runtime storage permission is needed
     blocked: ['Storage Permission Denied',
-      'To save files, allow storage access in Settings -> Apps -> StraboSpot2 -> Files and media.'],
+      'To save files, allow storage access in Settings -> Apps -> StraboField -> Files and media.'],
     unavailable: ['Storage Unavailable', 'Storage access is not available on this device.'],
   },
 };

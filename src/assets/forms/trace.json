@@ -245,7 +245,8 @@
       "label": "Length of Scale Bar",
       "required": "false",
       "relevant": "${trace_type} = 'scale_bar'",
-      "constraint": ". > 0"
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "select_one vt86z05",

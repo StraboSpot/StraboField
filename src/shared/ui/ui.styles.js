@@ -87,6 +87,23 @@ const styles = StyleSheet.create({
   littleSpacer: {
     padding: 5,
   },
+  // On a card of its own, since callers set their own backdrop, from the dimmed default to none at all
+  loadingText: {
+    backgroundColor: WHITE,
+    borderRadius: 10,
+    color: PRIMARY_TEXT_COLOR,
+    fontSize: MEDIUM_TEXT_SIZE,
+    marginHorizontal: 20,
+    marginTop: 15,
+    overflow: 'hidden',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    textAlign: 'center',
+  },
+  loadingWithText: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   sectionDivider: {
     backgroundColor: PRIMARY_BACKGROUND_COLOR,
     paddingHorizontal: 10,

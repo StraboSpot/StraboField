@@ -5,11 +5,14 @@ import DeviceInfo from 'react-native-device-info';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import styles from './about.styles';
-import RELEASE_NOTES, {COMMIT_BASE_URL} from '../../../assets/releaseNotes';
+import RELEASE_NOTES, {COMMIT_BASE_URL, RELEASES_URL} from '../../../assets/releaseNotes';
 import {VERSION_NUMBER} from '../../../shared/app.constants';
 import {openUrl} from '../../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+
+// How many releases the What's New modal lists before pointing to GitHub for the rest
+const RELEASES_SHOWN = 3;
 
 // Compare two "x.y.z" version strings; returns true if a <= b.
 const isVersionAtMost = (a, b) => {
@@ -26,9 +29,11 @@ const About = () => {
 
   // Only show notes for releases at or below the running build (guards against the bundled file
   // getting ahead of the app during an rc). In dev builds, also show the not-yet-shipped release
-  // (flagged "unreleased") so we can preview the next version's highlights.
+  // (flagged "unreleased") so we can preview the next version's highlights. Only the most recent few are
+  // listed; older ones are on the GitHub releases page.
   const releases = RELEASE_NOTES
     .filter(entry => __DEV__ || isVersionAtMost(entry.version, VERSION_NUMBER))
+    .slice(0, RELEASES_SHOWN)
     .map(entry => ({...entry, isUnreleased: !isVersionAtMost(entry.version, VERSION_NUMBER)}));
 
   const hasReleaseNotes = releases.length > 0;
@@ -109,7 +114,7 @@ const About = () => {
           {releases.map(release => (
             <View key={release.version} style={styles.releaseVersionSection}>
               <Text style={styles.releaseSeriesHeading}>
-                {release.version} New Features
+                {release.version}
                 {release.isUnreleased && <Text style={styles.releaseUnreleasedTag}>{'  · unreleased'}</Text>}
               </Text>
               {release.groups.length === 0
@@ -124,7 +129,8 @@ const About = () => {
                         {highlight.commit && (
                           <TouchableOpacity
                             hitSlop={{bottom: 8, left: 8, right: 8, top: 8}}
-                            onPress={() => openUrl(`${COMMIT_BASE_URL}${highlight.commit}`).catch(() => {})}
+                            onPress={() => openUrl(`${COMMIT_BASE_URL}${highlight.commit}`).catch(() => {
+                            })}
                             style={styles.commitLink}
                           >
                             <Ionicons color={PRIMARY_ACCENT_COLOR} name={'logo-github'} size={16}/>
@@ -136,6 +142,14 @@ const About = () => {
                 ))}
             </View>
           ))}
+          <TouchableOpacity
+            onPress={() => openUrl(RELEASES_URL).catch(() => {
+            })}
+            style={styles.allReleasesLink}
+          >
+            <Ionicons color={PRIMARY_ACCENT_COLOR} name={'logo-github'} size={16}/>
+            <Text style={styles.allReleasesLinkText}>See notes for earlier versions on GitHub</Text>
+          </TouchableOpacity>
         </View>
       </ModalWrapper>
     </View>
