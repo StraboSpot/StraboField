@@ -59,6 +59,22 @@ const useMeasurements = () => {
     let measurements = [];
     if (compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR)) {
       let newPlanarMeasurement = {type: 'planar_orientation'};
+      if (useMeasurementTemplates && !isEmpty(activeMeasurementTemplates)) {
+        const planarTemplate = activeMeasurementTemplates.find(t => t.values?.type === 'planar_orientation'
+          || t.type === 'planar_orientation');
+        if (!isEmpty(planarTemplate)) Object.assign(newPlanarMeasurement, planarTemplate.values);
+        else {
+          const tabularTemplate = activeMeasurementTemplates.find(t => t.values?.type === 'tabular_orientation'
+            || t.subType === 'tabular_orientation');
+          if (!isEmpty(tabularTemplate)) {
+            Object.assign(newPlanarMeasurement, tabularTemplate.values);
+            // Set after the template, since one matched on its subType can carry a different type of its own
+            newPlanarMeasurement.type = 'tabular_orientation';
+          }
+        }
+      }
+      // The reading goes on last. A template prefills a measurement; it must never overrule what was measured,
+      // and the template form is the whole measurement form, so it can hold a strike or dip of its own.
       if (!compassMeasurements.manual) {
         newPlanarMeasurement = {
           ...newPlanarMeasurement,
@@ -68,23 +84,16 @@ const useMeasurements = () => {
           quality: compassMeasurements.quality,
         };
       }
-      if (useMeasurementTemplates && !isEmpty(activeMeasurementTemplates)) {
-        const planarTemplate = activeMeasurementTemplates.find(t => t.values?.type === 'planar_orientation'
-          || t.type === 'planar_orientation');
-        if (!isEmpty(planarTemplate)) Object.assign(newPlanarMeasurement, planarTemplate.values);
-        else {
-          const tabularTemplate = activeMeasurementTemplates.find(t => t.values?.type === 'tabular_orientation'
-            || t.subType === 'tabular_orientation');
-          if (!isEmpty(tabularTemplate)) {
-            newPlanarMeasurement.type = 'tabular_orientation';
-            Object.assign(newPlanarMeasurement, tabularTemplate.values);
-          }
-        }
-      }
       measurements.push(newPlanarMeasurement);
     }
     if (compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR)) {
       let newLinearMeasurement = {type: 'linear_orientation'};
+      if (useMeasurementTemplates && !isEmpty(activeMeasurementTemplates)) {
+        const linearTemplate = activeMeasurementTemplates.find(t => t.values?.type === 'linear_orientation'
+          || t.type === 'linear_orientation');
+        if (!isEmpty(linearTemplate)) Object.assign(newLinearMeasurement, linearTemplate.values);
+      }
+      // The reading goes on last, for the same reason as the planar measurement above
       if (!compassMeasurements.manual) {
         newLinearMeasurement = {
           ...newLinearMeasurement,
@@ -94,11 +103,6 @@ const useMeasurements = () => {
           rake_calculated: 'yes',
           quality: compassMeasurements.quality,
         };
-      }
-      if (useMeasurementTemplates && !isEmpty(activeMeasurementTemplates)) {
-        const linearTemplate = activeMeasurementTemplates.find(t => t.values?.type === 'linear_orientation'
-          || t.type === 'linear_orientation');
-        if (!isEmpty(linearTemplate)) Object.assign(newLinearMeasurement, linearTemplate.values);
       }
       measurements.push(newLinearMeasurement);
     }
