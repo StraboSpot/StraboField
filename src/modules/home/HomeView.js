@@ -61,6 +61,7 @@ const HomeView = forwardRef(({
         mapMode={mapMode}
         onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}
+        openMainMenuPanel={openMainMenuPanel}
         openNotebookPanel={openNotebookPanel}
         selectingMode={selectingMode}
       />

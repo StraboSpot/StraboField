@@ -10,7 +10,6 @@ import MicroProjectsStatusOverlay from './MicroProjectsStatusOverlay';
 import useMicro from './useMicro';
 import useMicroZips from './useMicroZips';
 import useDevice from '../../services/device/useDevice';
-import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {LIGHTGREY, MEDIUMGREY, PRIMARY_ACCENT_COLOR, PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
@@ -27,7 +26,7 @@ const MicroProjectsList = () => {
   const userData = useSelector(state => state.user);
 
   const {doesMicroProjectPDFExist, getSavedMicroProjectModifiedTimestamp} = useDevice();
-  const {getAllLocalMicroProjects, getAllServerMicroProjects} = useMicro();
+  const {getAllLocalMicroProjects, getAllServerMicroProjects, getMicroProjectPDFDoc} = useMicro();
   const {
     clearStatus,
     downloadZip,
@@ -80,13 +79,7 @@ const MicroProjectsList = () => {
     }
     else {
       console.log('PDF available');
-      setDoc({
-        id: item.id,
-        platform: ['ios', 'android'],
-        label: 'StraboMicroProject',
-        name: item.name,
-        file: {uri: APP_DIRECTORIES.MICRO + item.id + '/' + 'project.pdf'},
-      });
+      setDoc(getMicroProjectPDFDoc(item.id, item.name));
       setVisible(true);
     }
   };

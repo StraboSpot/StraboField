@@ -14,6 +14,7 @@ const OutlineButton = ({
                          loading,
                          onPress,
                          title,
+                         titleStyle,
                        }) => {
   return (
     <Button
@@ -28,7 +29,7 @@ const OutlineButton = ({
       loading={loading}
       onPress={onPress}
       title={title}
-      titleStyle={[buttonStyles.standardButtonText, {textAlign: 'center'}]}
+      titleStyle={[buttonStyles.standardButtonText, {textAlign: 'center'}, titleStyle]}
       type={'outline'}
     />
   );

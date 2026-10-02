@@ -53,6 +53,15 @@ export const MICRO_PATHS = {
   WEB_PROJECT: microDB + '/webProject',
 };
 
+// StraboSamples
+const samplesDB = '/samplesdb';
+
+export const SAMPLES_PATHS = {
+  MY_SAMPLES: samplesDB + '/mysamples/',
+  SAMPLE: samplesDB + '/sample/',
+  WEB_SAMPLE: straboSpotAPI + '/samples/',
+};
+
 export const SESAR_PATHS = {
   // `strabospot` is the connection id SESAR stamps on the tokens it issues for this app.
   GET_TOKEN: '/auth/token/strabospot/',

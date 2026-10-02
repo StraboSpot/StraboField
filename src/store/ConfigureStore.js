@@ -53,7 +53,7 @@ export const persistConfig = {
 const connectionsConfig = {
   key: 'connections',
   storage: AsyncStorage,
-  blacklist: ['isAutoSaving', 'isForceOffline', 'nextAutoSaveTime', 'projectSaveStatus'],
+  blacklist: ['isAutoSaving', 'isForceOffline', 'nextAutoSaveTime', 'projectSaveStatus', 'spotsUploadedTimestamp'],
   timeout: null,
 };
 
@@ -95,6 +95,7 @@ const notebookConfig = {
   storage: AsyncStorage,
   blacklist: [
     'isNotebookPanelVisible',
+    'requestedSampleDetailTab',
     'visibleNotebookPagesStack',
   ],
   timeout: null,

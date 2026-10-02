@@ -241,8 +241,13 @@ const useProject = () => {
   const toggleActiveDataset = async (val, dataset) => {
     try {
       dispatch(setActiveDatasets({bool: val, dataset: dataset.id}));
-      // A dataset that is no longer shown cannot go on taking new Spots, so it gives up the target with it
-      if (!val && dataset.id === targetDatasetId) dispatch(setTargetDataset(undefined));
+      // A dataset that is no longer shown cannot go on taking new Spots, so it gives up the target with it. The
+      // user only asked to hide it, so they are told.
+      if (!val && dataset.id === targetDatasetId) {
+        dispatch(setTargetDataset(undefined));
+        toast.show(`Turning off ${dataset.name} also cleared the target dataset.`,
+          {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
+      }
       dispatch(clearedSpotsInMapExtentIds());
       if (!val && !isEmpty(selectedSpot) && dataset.spotIds?.includes(selectedSpot.properties.id)) {
         if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
@@ -260,14 +265,14 @@ const useProject = () => {
   const toggleTargetDataset = (datasetId) => {
     if (datasetId === targetDatasetId) {
       toast.show('Target Dataset deselected.',
-        {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
+        {type: 'normal', animationType: 'slide-in', duration: 3000, placement: 'top'});
       toast.hideAll();
       dispatch(setTargetDataset(undefined));
     }
     else {
       const datasetName = datasets[datasetId].name;
       toast.show(`Target Dataset switched to ${datasetName}!`,
-        {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
+        {type: 'success', animationType: 'slide-in', duration: 3000, placement: 'top'});
       toast.hideAll();
       dispatch(setTargetDataset(datasetId));
     }

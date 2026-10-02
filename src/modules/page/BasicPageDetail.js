@@ -50,11 +50,15 @@ const BasicPageDetail = ({
                            isReadOnly,
                            page,
                            registerGetValues,
+                           registerSaveChanges,
                            saveTemplate,
                            selectedFeature,
                            // Reports the fields in error up to a tabbed page, so it can mark the tab holding one
                            setInvalidFields,
                            siblingSurvey,
+                           // Shown in place of the form, for a tab with something else to show. The form stays
+                           // mounted, hidden, so what is typed in it is still there on coming back to its tab.
+                           tabContent,
                          }) => {
   /* Data Hooks */
 
@@ -143,6 +147,7 @@ const BasicPageDetail = ({
     setInitialValues(selectedFeature);
     return () => {
       if (registerGetValues) registerGetValues.current = null;
+      if (registerSaveChanges) registerSaveChanges.current = null;
       dispatch(setSelectedAttributes([]));
     };
   }, []);
@@ -397,6 +402,28 @@ const BasicPageDetail = ({
     }
   };
 
+  // Save the open form in place for a parent-owned action that needs the stored record up to date before it goes on
+  // (see NotebookMenu's Link Sample), resolving whether it was saved. A sample registered with SESAR is left for its
+  // own Save, which updates SESAR as well and opens a modal of its own to do it.
+  const saveOpenChanges = async () => {
+    const formCurrent = formRef.current;
+    if (formCurrent.values.Sample_IGSN && formCurrent.values.isOnMySesar) {
+      alert('Save Sample First', 'This sample is registered with SESAR, so its changes have to be saved with the'
+        + ' Save button, which updates SESAR too. Save them there and then link the sample.');
+      return false;
+    }
+    try {
+      await saveFeature(formCurrent);
+      savedValuesRef.current = {...(formRef.current || formCurrent).values};
+      return true;
+    }
+    catch (err) {
+      // The form refused the values and has said why, so nothing was saved
+      console.error('Open changes not saved', err);
+      return false;
+    }
+  };
+
   const saveTemplateForm = async (formCurrent) => {
     const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
     // A template's values are copied wholesale into every feature made from it, so a label would be shared by
@@ -423,6 +450,9 @@ const BasicPageDetail = ({
 
   // Expose the values to a parent-owned button that carries this form's edits somewhere (see NotebookFooter)
   if (registerGetValues) registerGetValues.current = getOpenFeatureValues;
+  if (registerSaveChanges && !isReadOnly) {
+    registerSaveChanges.current = {getHasUnsavedChanges: hasUnsavedChanges, saveChanges: saveOpenChanges};
+  }
 
   /* Render Functions */
 
@@ -482,9 +512,15 @@ const BasicPageDetail = ({
       <View style={{flex: 1}}>
         {(isTemplate || !isEmpty(selectedFeature)) && (
           <>
-            <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
+            {/* A tab showing its own content hides Save and Cancel, so it is left by the back button */}
+            <PageHeader
+              hideBackButton={!isReadOnly && !tabContent}
+              onPressBack={cancelForm}
+              pageTitle={title + ' Detail'}
+            />
             {PageTabsComponent && PageTabsComponent}
-            {!isReadOnly && (
+            {tabContent}
+            {!isReadOnly && !tabContent && (
               <>
                 {isRegisteredSampleOffline && (
                   <View>
@@ -523,9 +559,11 @@ const BasicPageDetail = ({
               && hasOtherLithologyTabData(selectedFeature) && (
               <SedRockLithologyNote lithology={selectedFeature}/>
             )}
-            <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
-              {renderFormFields()}
-            </FormFlatList>
+            <View style={tabContent ? {display: 'none'} : {flex: 1}}>
+              <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
+                {renderFormFields()}
+              </FormFlatList>
+            </View>
           </>
         )}
         <IGSNModal

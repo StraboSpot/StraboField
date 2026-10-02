@@ -26,10 +26,13 @@ import {
   setActiveDatasetsMultiple,
   setTargetDataset,
 } from '../../modules/project/projects.slice';
+import {MISSING_STRABO_USER_ID_MESSAGE, STRABOSAMPLES_LINKED_DATA_KEYS} from '../../modules/samples/samples.constants';
+import {getSampleMetadata, getStraboSampleFromResponse} from '../../modules/samples/samples.helpers';
 import {addedSpotsFromServer} from '../../modules/spots/spots.slice';
 import {setUserData} from '../../modules/user/userProfile.slice';
 import {isEmpty, toError} from '../../shared/helpers';
 import {MODAL_TRANSITION_DELAY} from '../../shared/ui/modals/modal.constants';
+import {store} from '../../store/ConfigureStore';
 import useResetState from '../../store/useResetState';
 import useDevice from '../device/useDevice';
 import useServerRequests from '../network/useServerRequests';
@@ -61,7 +64,15 @@ const useDownload = () => {
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
   const {doesImageExistOnDevice, gatherNeededImages} = useImages();
   const {clearProject} = useResetState();
-  const {getDatasets, getDatasetSpots, getProfile, getProfileImage, getProject, testCustomMapUrl} = useServerRequests();
+  const {
+    getDatasets,
+    getDatasetSpots,
+    getProfile,
+    getProfileImage,
+    getProject,
+    getStraboSample,
+    testCustomMapUrl,
+  } = useServerRequests();
 
   const resetDownloadState = () => {
     customMapsToSave = {};
@@ -104,34 +115,23 @@ const useDownload = () => {
       datasetsObjToSave = Object.fromEntries(Object.entries(newestDatasetsById).map(
         ([id, dataset]) => [id, {...dataset, modified_timestamp: dataset.modified_timestamp || Date.now()}]));
       const datasets = Object.values(datasetsObjToSave);
+      let isTargetDatasetCleared = false;
 
       // Same project re-downloaded — restore active/target from before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
         const newDatasetIds = datasets.map(d => d.id);
         const retainedActiveDatasetIds = prevActiveDatasetsIds.filter(id => newDatasetIds.includes(id));
-        if (retainedActiveDatasetIds.length >= 1) {
-          if (retainedActiveDatasetIds.length === 1) {
-            dispatch(setActiveDatasets({bool: true, dataset: retainedActiveDatasetIds[0]}));
-          }
-          else dispatch(setActiveDatasetsMultiple(retainedActiveDatasetIds));
-          const prevTargetDataset = datasets.find(d => d.id === prevTargetDatasetId);
-          if (prevTargetDataset && isWritableDataset(prevTargetDataset)) {
-            dispatch(setActiveDatasets({bool: true, dataset: prevTargetDatasetId}));
-            dispatch(setTargetDataset(prevTargetDatasetId));
-          }
-          else {
-            const firstWritableDataset = datasets.find(
-              d => retainedActiveDatasetIds.includes(d.id) && isWritableDataset(d))
-              || datasets.find(isWritableDataset);
-            if (firstWritableDataset) {
-              dispatch(setActiveDatasets({bool: true, dataset: firstWritableDataset.id}));
-              dispatch(setTargetDataset(firstWritableDataset.id));
-            }
-            // Nothing writable to fall back on, so drop the target rather than leave the read only one set
-            else dispatch(setTargetDataset(undefined));
-          }
-        }
-        else setFirstWritableActiveAndTarget(datasets);
+        const fallbackDataset = datasets.find(isWritableDataset) || datasets[0];
+        const activeDatasetIds = isEmpty(retainedActiveDatasetIds) ? [fallbackDataset.id] : retainedActiveDatasetIds;
+        dispatch(setActiveDatasetsMultiple(activeDatasetIds));
+        // A target that is not shown would take new Spots out of sight, and a read only one would take Spots that
+        // could never be edited, so the previous target is kept only if it is still shown and writable. Otherwise
+        // there is none, and which dataset takes new Spots stays the user's choice
+        const prevTargetDataset = datasets.find(d => d.id === prevTargetDatasetId);
+        const isPrevTargetDatasetKept = activeDatasetIds.includes(prevTargetDatasetId) && !!prevTargetDataset
+          && isWritableDataset(prevTargetDataset);
+        dispatch(setTargetDataset(isPrevTargetDatasetKept ? prevTargetDatasetId : undefined));
+        isTargetDatasetCleared = !!prevTargetDatasetId && !isPrevTargetDatasetKept;
       }
       else if (datasets.length >= 1) setFirstWritableActiveAndTarget(datasets);
       // No else: a project that arrives with no datasets is left with none. clearProject has already emptied
@@ -140,11 +140,48 @@ const useDownload = () => {
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Downloaded ' + spotsToSave.length + ' Spots\nDownloaded '
         + Object.keys(datasetsObjToSave).length + ' Datasets\nFinished Downloading Datasets'));
+      // The user had a target and did not choose to drop it
+      if (isTargetDatasetCleared) {
+        dispatch(addedStatusMessage('The previous target dataset was removed or is turned off, so no target '
+          + 'dataset is set. Choose one to add new Spots.'));
+      }
     }
     catch (err) {
       console.error('Error getting datasets:', err);
       throw err;
     }
+  };
+
+  // A linked Sample Spot's StraboMicro and StraboExperimental data can change after it was uploaded, so fetch it
+  // fresh. A sample that can't be fetched keeps what came down with its Spot.
+  const downloadLinkedSampleData = async (encodedLoginScoped) => {
+    const linkedSpots = spotsToSave.filter(
+      spot => spot.properties?.isSample && !isEmpty(getSampleMetadata(spot).strabosamples_id));
+    if (isEmpty(linkedSpots)) return;
+    if (isEmpty(store.getState().user.straboUserId)) {
+      dispatch(addedStatusMessage(`Linked Sample Data Not Downloaded\n${MISSING_STRABO_USER_ID_MESSAGE}`));
+      return;
+    }
+    let fetchedCount = 0;
+    dispatch(addedStatusMessage('Downloading Linked Sample Data...'));
+    for (const spot of linkedSpots) {
+      const strabosamplesId = getSampleMetadata(spot).strabosamples_id;
+      try {
+        const strabosample = getStraboSampleFromResponse(
+          await getStraboSample(strabosamplesId, undefined, encodedLoginScoped));
+        if (isEmpty(strabosample?.id)) throw Error('No sample returned');
+        STRABOSAMPLES_LINKED_DATA_KEYS.forEach((key) => {
+          if (isEmpty(strabosample[key])) delete spot.properties[key];
+          else spot.properties[key] = strabosample[key];
+        });
+        fetchedCount++;
+      }
+      catch (err) {
+        console.warn(spot.properties.id + ': Error Downloading Linked Sample Data for', strabosamplesId, err);
+      }
+    }
+    dispatch(removedLastStatusMessage());
+    dispatch(addedStatusMessage(`Downloaded Linked Sample Data for ${fetchedCount} of ${linkedSpots.length} Samples`));
   };
 
   // Download Project Properties
@@ -362,6 +399,7 @@ const useDownload = () => {
       dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
       await downloadProject(selectedProject, encodedLoginScoped);
       await downloadDatasets(selectedProject, encodedLoginScoped);
+      await downloadLinkedSampleData(encodedLoginScoped);
       console.log('Download Complete! Spots Downloaded!');
       dispatch(addedStatusMessage('------------------'));
       dispatch(addedSpotsFromServer(spotsToSave));

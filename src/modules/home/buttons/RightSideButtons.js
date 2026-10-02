@@ -27,6 +27,7 @@ const RightSideButtons = ({
                             mapMode,
                             onCancel,
                             onEndDrawPressed,
+                            openMainMenuPanel,
                             openNotebookPanel,
                             selectingMode,
                           }) => {
@@ -87,7 +88,9 @@ const RightSideButtons = ({
             selectingMode={selectingMode}
           />
         </View>
-        {hasDrawTools && <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode}/>}
+        {hasDrawTools && (
+          <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode} openMainMenuPanel={openMainMenuPanel}/>
+        )}
       </Animated.View>
     </>
   );
