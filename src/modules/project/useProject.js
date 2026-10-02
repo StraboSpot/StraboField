@@ -252,14 +252,14 @@ const useProject = () => {
   const toggleTargetDataset = (datasetId) => {
     if (datasetId === targetDatasetId) {
       toast.show('Target Dataset deselected.',
-        {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
+        {type: 'normal', animationType: 'slide-in', duration: 3000, placement: 'top'});
       toast.hideAll();
       dispatch(setTargetDataset(undefined));
     }
     else {
       const datasetName = datasets[datasetId].name;
       toast.show(`Target Dataset switched to ${datasetName}!`,
-        {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
+        {type: 'success', animationType: 'slide-in', duration: 3000, placement: 'top'});
       toast.hideAll();
       dispatch(setTargetDataset(datasetId));
     }

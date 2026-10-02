@@ -36,6 +36,8 @@ export const POSITIVE_COLOR = GREEN;
 export const NEGATIVE_COLOR = RED;
 export const NEUTRAL_COLOR = PRIMARY_ACCENT_COLOR;
 export const WARNING_COLOR = RED;
+// The warning toasts' orange (react-native-toast-notifications' default), for anything that should match them
+export const CAUTION_COLOR = '#ed6c02';
 
 export const LIST_BORDER_COLOR = MEDIUMGREY;
 
