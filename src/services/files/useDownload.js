@@ -100,10 +100,12 @@ const useDownload = () => {
           console.log('Checking if active dataset still exists:', prevActiveDatasetId);
           return newDatasetIds.includes(prevActiveDatasetId) ? [...acc, prevActiveDatasetId] : acc;
         }, []);
-        if (!isEmpty(updatedActiveDatasetIds)) dispatch(setActiveDatasetsMultiple(updatedActiveDatasetIds));
-        else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        if (newDatasetIds.includes(prevTargetDatasetId)) dispatch(setTargetDataset(prevTargetDatasetId));
-        else dispatch(setTargetDataset(datasets[0].id));
+        const activeDatasetIds = isEmpty(updatedActiveDatasetIds) ? [datasets[0].id] : updatedActiveDatasetIds;
+        dispatch(setActiveDatasetsMultiple(activeDatasetIds));
+        // A target that is not shown would take new Spots out of sight, so the previous target is kept only if it
+        // is still among the shown datasets. Otherwise there is none, and which dataset takes new Spots stays the
+        // user's choice
+        dispatch(setTargetDataset(activeDatasetIds.includes(prevTargetDatasetId) ? prevTargetDatasetId : undefined));
       }
       else if (datasets.length >= 1) {
         dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
