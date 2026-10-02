@@ -209,6 +209,7 @@ const OtherFeatureDetail = ({
                 <ListItem.Content>
                   <Field
                     component={TextInputField}
+                    editable={!isReadOnly}
                     key={'label'}
                     label={'Label'}
                     name={'label'}
@@ -219,6 +220,7 @@ const OtherFeatureDetail = ({
                 <ListItem.Content>
                   <Field
                     component={TextInputField}
+                    editable={!isReadOnly}
                     key={'name'}
                     label={'Name'}
                     name={'name'}
@@ -228,10 +230,12 @@ const OtherFeatureDetail = ({
               <ListItem containerStyle={commonStyles.listItemFormField}>
                 <ListItem.Content>
                   <Field
-                    choices={featureTypes.map(featureType => ({label: featureType, value: featureType}))}
+                    choices={featureTypes.map(
+                      featureType => ({disabled: isReadOnly, label: featureType, value: featureType}))}
                     component={formProps => (
                       SelectInputField({setFieldValue: formProps.form.setFieldValue, ...formProps.field, ...formProps})
                     )}
+                    isReadOnly={isReadOnly}
                     key={'type'}
                     label={'Feature Type'}
                     name={'type'}
@@ -247,6 +251,7 @@ const OtherFeatureDetail = ({
                         <Text style={formStyles.fieldLabel}>{'Other Feature Type'}</Text>
                       </View>
                       <TextInput
+                        editable={!isReadOnly}
                         onChangeText={newType => setOtherType(newType)}
                         placeholder={'Type of feature ...'}
                         placeholderTextColor={themes.MEDIUMGREY}
@@ -262,6 +267,7 @@ const OtherFeatureDetail = ({
                   <Field
                     appearance={'multiline'}
                     component={TextInputField}
+                    editable={!isReadOnly}
                     key={'description'}
                     label={'Feature Description'}
                     name={'description'}
