@@ -35,6 +35,7 @@ const SampleListItem = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isOwner} = useSelector(state => state.project.project);
   const selectedTag = useSelector(state => state.project.selectedTag);
 
   const {getSampleSpotIconSource, isSpotReadOnly} = useSpots();
@@ -94,8 +95,9 @@ const SampleListItem = ({
             </ListItem.Subtitle>
           )}
         </View>
-        {/* Viewing an existing IGSN is fine read-only; getting one would register and change the sample */}
-        {(sampleMetadata.Sample_IGSN || (isShowIGSN && !isSampleReadOnly)) && (
+        {/* Anyone may view an existing IGSN, but getting one registers and changes the sample, which only the project
+         owner may do and only outside a read-only dataset */}
+        {(sampleMetadata.Sample_IGSN || (isShowIGSN && !isSampleReadOnly && isOwner !== false)) && (
           <View>
             <IGSNLogo
               item={sampleMetadata}

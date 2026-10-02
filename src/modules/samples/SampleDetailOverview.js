@@ -17,6 +17,7 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {isOwner} = useSelector(state => state.project.project);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel, getSurvey} = useForm();
@@ -30,8 +31,9 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
 
   const sampleValues = spot.properties?.samples?.[0];
   const sampleIGSN = sampleValues?.Sample_IGSN;
-  // Viewing an existing IGSN is fine read-only; getting one would register and change the sample
-  const isGetIGSNHidden = !sampleIGSN && isSpotInReadOnlyDataset(spot.properties?.id);
+  // Anyone may view an existing IGSN, but getting one registers and changes the sample, which only the project
+  // owner may do and only outside a read-only dataset
+  const isGetIGSNHidden = !sampleIGSN && (isOwner === false || isSpotInReadOnlyDataset(spot.properties?.id));
 
   let sampleDetail = JSON.parse(JSON.stringify(sampleValues ?? {}));
   delete sampleDetail.id;

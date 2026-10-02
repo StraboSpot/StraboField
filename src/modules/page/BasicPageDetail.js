@@ -99,7 +99,9 @@ const BasicPageDetail = ({
     else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
   }
   const isTemplate = saveTemplate;
-  const isNonOwnerRegisteredSample = pageKey === PAGE_KEYS.SAMPLES && isOwner === false;
+  // Saving a sample with an IGSN updates its record on SESAR, which only the project owner may do
+  const isNonOwnerRegisteredSample = pageKey === PAGE_KEYS.SAMPLES && isOwner === false
+    && !!selectedFeature.Sample_IGSN;
   // A sample already registered with SESAR is updated there as well as here, so it cannot be saved offline
   const isRegisteredSampleOffline = !!selectedFeature.isOnMySesar && !!selectedFeature.Sample_IGSN
     && !isInternetReachable;
@@ -116,7 +118,7 @@ const BasicPageDetail = ({
   // Saving a sample already on SESAR updates it there, which needs a SESAR session: one was never made, was dropped
   // after a failed refresh, or can no longer be refreshed. The sign-in otherwise lives in the IGSN modal, which only
   // Save opens, so Save becomes the sign-in. An access token that has merely expired is refreshed on save instead.
-  // Only an owner may update the sample, so no one else is asked to sign in for a save they could not make.
+  // No one but the owner can save the sample, so no one else is asked to sign in for it.
   const isSesarSignInNeeded = !isNonOwnerRegisteredSample && !!selectedFeature.isOnMySesar
     && !!selectedFeature.Sample_IGSN && isInternetReachable
     && (!sesar?.sesarToken?.access || isTokenExpired(sesar.sesarToken.refresh));
@@ -362,7 +364,7 @@ const BasicPageDetail = ({
     try {
       console.log('Saving form...', formCurrent);
       if (isNonOwnerRegisteredSample) {
-        toast.show('Only project owners may update a sample with a registered IGSN', {type: 'warning'});
+        toast.show('Only the project owner may update a sample with an IGSN', {type: 'warning'});
         return;
       }
       if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
@@ -511,7 +513,7 @@ const BasicPageDetail = ({
                 />
                 {isNonOwnerRegisteredSample && (
                   <Text style={{color: RED, paddingBottom: 10, paddingHorizontal: 10, textAlign: 'center'}}>
-                    Only project owners may update a sample with a registered IGSN
+                    Only the project owner may update a sample with an IGSN
                   </Text>
                 )}
               </>
