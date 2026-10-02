@@ -170,7 +170,17 @@ export const getNewCopyId = () => Math.floor(10000000000000 + Math.random() * 90
 
 // return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
 //   c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-export const getNewId = () => Math.floor((new Date().getTime() + Math.random()) * 10);
+
+// Stays a number because Spot, dataset, project and image ids are the server's keys, and stays this length
+// deliberately: past Number.MAX_SAFE_INTEGER JavaScript drops an integer's low digits and two different ids
+// compare equal. A timestamp plus one random digit gave only 11 ids per millisecond, so a burst of mints
+// collided outright; stepping past the last id issued fixes that without costing a digit.
+let lastIdIssued = 0;
+
+export const getNewId = () => {
+  lastIdIssued = Math.max(Math.floor((Date.now() + Math.random()) * 10), lastIdIssued + 1);
+  return lastIdIssued;
+};
 
 export const getNewUUID = () => uuidv4();
 
