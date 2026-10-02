@@ -2,8 +2,9 @@
 //
 // An ordered list (newest release first) of what shipped in each PUBLIC release. Interim rc/patch
 // builds (e.g. the 2.30.x series) are not listed individually — their changes are rolled up into the
-// public release that ships them (e.g. 2.31.0). The About page shows every release at or below the
-// running version (plus, in dev builds, not-yet-shipped ones flagged "unreleased").
+// public release that ships them (e.g. 2.31.0). The About page shows the three most recent releases at or
+// below the running version (plus, in dev builds, not-yet-shipped ones flagged "unreleased"), then links to
+// RELEASES_URL for the rest. Older entries stay here, since scripts/release-notes.js reads them too.
 //
 // Each release's highlights are organized into `groups` of related changes: {title, items}, where
 // each item is {text, commit}. `text` is the user-facing blurb (the part before the first colon is
@@ -22,17 +23,12 @@
 
 // All git remotes redirect to StraboSpot/StraboField; commit hashes resolve there.
 export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit/';
+export const RELEASES_URL = 'https://github.com/StraboSpot/StraboField/releases';
 
 const RELEASE_NOTES = [
   {
     version: '2.32.0',
     groups: [
-      {
-        title: 'Stability',
-        items: [
-          {text: 'Crash fix: loading or switching projects no longer crashes the app on iOS', commit: '554e1c22d'},
-        ],
-      },
       {
         title: 'Forms & validation',
         items: [
@@ -64,10 +60,6 @@ const RELEASE_NOTES = [
           {
             text: 'Declination without GPS: falls back through your project location and nearby Spots to stay corrected, with clearer warnings when it can\'t',
             commit: 'cbf505d88',
-          },
-          {
-            text: 'Compass over template: a fresh compass reading now takes priority over an active template',
-            commit: 'e8935e8ae',
           },
         ],
       },
@@ -138,7 +130,6 @@ const RELEASE_NOTES = [
             text: 'Read-only everywhere: read-only status now carries through image basemaps, strat sections, and forms',
             commit: '1d7af9f55',
           },
-          {text: 'Protected moves: a Spot can\'t be moved into or out of a read-only dataset', commit: 'dacb7848c'},
         ],
       },
       {
@@ -190,14 +181,85 @@ const RELEASE_NOTES = [
         title: 'Small touches',
         items: [
           {text: 'Copied Spots: a copied Spot gets its own feature ids', commit: '4bc897794'},
+        ],
+      },
+    ],
+  },
+  {
+    version: '2.31.5',
+    groups: [
+      {
+        title: 'Measurements',
+        items: [
           {
-            text: 'Mineral lookup: mineral data you already entered is kept when a mineral is looked up',
-            commit: '25b763f5c',
+            text: 'Compass over template: a fresh compass reading now takes priority over an active template',
+            commit: 'fc842b740',
+            play: 'Compass readings no longer overwritten by templates',
           },
           {
-            text: 'Project visibility: an owner\'s project is listed again once its collaboration is halted',
-            commit: '3cde7a4b4',
+            text: 'Strike from dip direction: entering a dip direction fills in the strike instead of writing NaN',
+            commit: '001df3483',
           },
+        ],
+      },
+      {
+        title: 'Photos',
+        items: [
+          {
+            text: 'Photos picked together: several photos saved at once no longer collide and overwrite each other',
+            commit: '489ac7196',
+            play: 'Photos picked together no longer overwrite each other',
+          },
+        ],
+      },
+      {
+        title: 'Read-only datasets',
+        items: [
+          {
+            text: 'Spots stay out of read-only datasets: Spots can no longer be moved, copied, or created into a read-only dataset',
+            commit: 'f8a237a0f',
+          },
+          {
+            text: 'Locked samples and features: Add Data to Sample, Get IGSN, and Other Feature fields are disabled on read-only Spots',
+            commit: 'cdcc0817e',
+          },
+        ],
+      },
+      {
+        title: 'Samples & IGSN',
+        items: [
+          {
+            text: 'SESAR sign-in when saving: saving a sample with an IGSN prompts you to sign in to SESAR when needed',
+            commit: 'f9a5bcf27',
+          },
+        ],
+      },
+      {
+        title: 'Forms & data',
+        items: [
+          {text: 'Same-day date ranges: an equal start and end date no longer fails validation', commit: 'af49c8f88'},
+          {
+            text: 'Correct sed choices: "masses" (diagenesis) and "Supratidal" (environment) now save as their own values',
+            commit: 'a8e8657cc',
+          },
+          {
+            text: 'Mineral lookup: looking up a mineral keeps the data already entered, and a mineral with no name shows Unknown',
+            commit: '8d3b48a72',
+          },
+          {text: 'Template deletions sync: deleting a template marks the project as changed', commit: 'ba0dc7d04'},
+        ],
+      },
+      {
+        title: 'Small touches',
+        items: [
+          {text: 'Map editing: Edit goes straight to the selected Spot when it is on the current map', commit: '000aea5a6'},
+          {
+            text: 'Halted collaborations: an owner\'s project shows in the server list again once its collaboration is halted',
+            commit: '25ec904b4',
+          },
+          {text: 'Project screen on tablets: shows as a centered box instead of fullscreen', commit: '7a1c2626b'},
+          {text: 'Profile photo: a camera or gallery error no longer breaks setting a profile photo', commit: '595d86752'},
+          {text: 'StraboField naming: permission prompts and support email now say StraboField', commit: '048edfc6d'},
         ],
       },
     ],

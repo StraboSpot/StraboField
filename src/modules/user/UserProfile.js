@@ -110,7 +110,7 @@ const UserProfile = () => {
       if (await hasCameraPermission()) {
         await launchCamera({}, (response) => {
           console.log('Launch Camera Response', response);
-          if (response.didCancel) return;
+          if (response.didCancel || response.errorCode) return;
           if (response) setTempUserProfileImage({...response.assets[0], id: 'profileImage'});
           else return require('../../assets/images/noimage.jpg');
         });

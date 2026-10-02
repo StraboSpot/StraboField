@@ -102,11 +102,14 @@ export const isoToLocalDateTime = (isoString, type) => {
   return timeAndDate;
 };
 
-export const isTokenExpired = (accessToken) => {
-  if (!accessToken) return true; // No token = expired
+export const isTokenExpired = (token) => {
+  if (!token) return true; // No token = expired
   try {
-    const accessTokenParsed = JSON.parse(atob(accessToken.split('.')[1]));
-    return accessTokenParsed.exp < Math.floor(Date.now() / 1000); // Compare expiration to current time
+    // A JWT's payload is base64url (- and _, no padding), which atob rejects. Left as is, many valid tokens failed
+    // to decode and were reported as expired.
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const tokenParsed = JSON.parse(atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '=')));
+    return tokenParsed.exp < Math.floor(Date.now() / 1000); // Compare expiration to current time
   }
   catch (err) {
     return true; // If decoding fails, assume expired
