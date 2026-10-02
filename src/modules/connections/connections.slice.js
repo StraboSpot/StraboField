@@ -16,6 +16,8 @@ const initialConnectionsState = {
   },
   nextAutoSaveTime: null,
   projectSaveStatus: null,
+  // When Spots were last uploaded, so views showing what the server has can check again
+  spotsUploadedTimestamp: null,
 };
 
 const connectionsSlice = createSlice({
@@ -55,6 +57,9 @@ const connectionsSlice = createSlice({
     setProjectSaveStatus(state, action) {
       state.projectSaveStatus = action.payload;
     },
+    setSpotsUploadedTimestamp(state, action) {
+      state.spotsUploadedTimestamp = action.payload;
+    },
     setNextAutoSaveTime(state, action) {
       state.nextAutoSaveTime = action.payload;
     },
@@ -81,6 +86,7 @@ export const {
   setOnlineStatus,
   setProfileUploadNeeded,
   setProjectSaveStatus,
+  setSpotsUploadedTimestamp,
   updatedProjectTransferProgress,
 } = connectionsSlice.actions;
 

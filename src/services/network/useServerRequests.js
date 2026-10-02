@@ -10,9 +10,10 @@ import {
   postRequest,
   timeoutPromise,
 } from './serverRequests.helpers';
-import {MACROSTRAT_PATHS, MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
+import {MACROSTRAT_PATHS, MICRO_PATHS, ORCID_PATHS, SAMPLES_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
 import {userAgent} from './userAgent.constants';
 import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
+import {MISSING_STRABO_USER_ID_MESSAGE} from '../../modules/samples/samples.constants';
 import alert from '../../shared/ui/alert';
 import {store} from '../../store/ConfigureStore';
 
@@ -148,6 +149,13 @@ const useServerRequests = () => {
 
   const getMyMicroProjects = () => getRequest(`${domain}${MICRO_PATHS.MY_PROJECTS}`, basicAuth());
 
+  // The samples API sits beside /db on the same server, so a custom endpoint gets it too
+  const getSamplesBaseUrl = () => baseUrl.replace(/\/db\/?$/, '');
+
+  // Leave out the samples already in Field, so only the Micro and Experimental samples are offered to link
+  const getMySamples = () => getRequest(
+    `${getSamplesBaseUrl()}${SAMPLES_PATHS.MY_SAMPLES}?omit=field&include_subsystem_flags=1`, basicAuth());
+
   const getMyProjects = () => getRequest(`${baseUrl}/myProjects`, basicAuth());
 
   const getOrcidToken = async () => {
@@ -178,6 +186,15 @@ const useServerRequests = () => {
 
   const getProject = (projectId, encodedLogin) =>
     getRequest(`${baseUrl}/project/${projectId}`, basicAuth(encodedLogin));
+
+  // Without the owner's userpkey, a sample shared by a collaborator is a 404. With no owner given, it's the user's own,
+  // read from the store since a profile just loaded by a sign-in isn't in this render yet.
+  const getStraboSample = async (id, ownerId, encodedLogin) => {
+    const owner = ownerId || store.getState().user.straboUserId;
+    if (!owner) throw Error(MISSING_STRABO_USER_ID_MESSAGE);
+    return getRequest(`${getSamplesBaseUrl()}${SAMPLES_PATHS.SAMPLE}${encodeURIComponent(id)}?owner=${encodeURIComponent(owner)}`,
+      basicAuth(encodedLogin));
+  };
 
   const getSesarToken = async (orcidToken) => {
     // Exchanges the ORCID id token for a SESAR access/refresh pair tied to the StraboSpot connection. The token must
@@ -328,12 +345,14 @@ const useServerRequests = () => {
     getMyMapsBbox,
     getMyMicroProjects,
     getMyProjects,
+    getMySamples,
     getOrcidToken,
     getProfile,
     getProfileImage,
     getProfileImageURL,
     getProject,
     getSesarToken,
+    getStraboSample,
     getSesarUserCodes,
     getTileBaseUrl,
     getTilesFromHost,

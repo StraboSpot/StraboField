@@ -1,17 +1,22 @@
 import React, {useState} from 'react';
-import {Pressable, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
 import IGSNModal from './igsn/IGSNModal';
+import LinkedSampleCard from './LinkedSampleCard';
+import LinkSampleModal from './LinkSampleModal';
+import SampleActionButton from './SampleActionButton';
+import sampleStyles from './samples.styles';
+import useLinkSampleAction from './useLinkSampleAction';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
-import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
+import alert from '../../shared/ui/alert';
 import useForm from '../form/useForm';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import useProject from '../project/useProject';
 import {setSelectedAttributes} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
 
 const SampleDetailOverview = ({openMainMenuPanel}) => {
   /* Data Hooks */
@@ -20,7 +25,14 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel, getSurvey} = useForm();
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {
+    closeLinkSampleModal,
+    isLinkOrUnlinkDisabled,
+    isLinkSampleModalVisible,
+    isLinked,
+    linkOrUnlinkSample,
+  } = useLinkSampleAction();
+  const {isSpotReadOnly} = useSpots();
 
   /* Local State */
 
@@ -30,8 +42,9 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
 
   const sampleValues = spot.properties?.samples?.[0];
   const sampleIGSN = sampleValues?.Sample_IGSN;
+  const isReadOnly = isSpotReadOnly(spot);
   // Viewing an existing IGSN is fine read-only; getting one would register and change the sample
-  const isGetIGSNHidden = !sampleIGSN && isSpotInReadOnlyDataset(spot.properties?.id);
+  const isGetIGSNHidden = !sampleIGSN && isReadOnly;
 
   let sampleDetail = JSON.parse(JSON.stringify(sampleValues ?? {}));
   delete sampleDetail.id;
@@ -54,6 +67,15 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
   const onViewDetailPressed = () => {
     dispatch(setSelectedAttributes(spot.properties?.samples?.length > 0 ? [spot.properties.samples[0]] : []));
     dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
+  };
+
+  // Unlinking drops the Micro and Experimental data that came with the link, so it is confirmed
+  const onUnlinkPressed = () => {
+    alert('Unlink Sample?', 'This sample will no longer be linked to StraboSamples, and its Micro and Experimental'
+      + ' data will be removed from it.', [
+      {text: 'Cancel', style: 'cancel'},
+      {text: 'Unlink', style: 'destructive', onPress: linkOrUnlinkSample},
+    ]);
   };
 
   const onViewIGSNPressed = () => {
@@ -87,25 +109,36 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
           </Text>
         );
       })}
-      <View style={{
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        padding: 10,
-      }}>
-        <Pressable onPress={onViewDetailPressed}>
-          <Text style={[commonStyles.listItemTitle, {color: PRIMARY_ACCENT_COLOR, paddingTop: 5}]}>
-            View More Detail
-          </Text>
-        </Pressable>
+      <LinkedSampleCard spot={spot}/>
+      <View style={sampleStyles.actionButtonsContainer}>
+        <SampleActionButton
+          accessibilityHint={'Opens the full sample record'}
+          iconName={'document-text-outline'}
+          onPress={onViewDetailPressed}
+          title={'Details'}
+        />
         {!isGetIGSNHidden && (
-          <Pressable onPress={onViewIGSNPressed}>
-            <Text style={[commonStyles.listItemTitle, {color: PRIMARY_ACCENT_COLOR, paddingTop: 5}]}>
-              {sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}
-            </Text>
-          </Pressable>
+          <SampleActionButton
+            accessibilityHint={sampleIGSN ? 'Shows the sample\'s IGSN record' : 'Registers the sample for an IGSN'}
+            iconName={sampleIGSN ? 'barcode-outline' : 'add-circle-outline'}
+            onPress={onViewIGSNPressed}
+            title={sampleIGSN ? 'IGSN Data' : 'Get IGSN'}
+          />
+        )}
+        {!isReadOnly && (
+          <SampleActionButton
+            accessibilityHint={isLinked ? 'Removes the link to StraboSamples'
+              : 'Links this sample to a sample in StraboSamples'}
+            disabled={isLinkOrUnlinkDisabled}
+            iconName={isLinked ? 'unlink-outline' : 'link-outline'}
+            onPress={isLinked ? onUnlinkPressed : linkOrUnlinkSample}
+            title={isLinked ? 'Unlink' : 'Link Sample'}
+          />
         )}
       </View>
+      {!isReadOnly && isLinkOrUnlinkDisabled && (
+        <Text style={sampleStyles.offlineNote}>Linking a sample needs an internet connection</Text>
+      )}
       <IGSNModal
         isVisible={isIGSNModalVisible}
         onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
@@ -117,6 +150,10 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
           }, 300);
         }}
         sampleValues={sampleValues}
+      />
+      <LinkSampleModal
+        closeModal={closeLinkSampleModal}
+        isVisible={isLinkSampleModalVisible}
       />
     </View>
   );
