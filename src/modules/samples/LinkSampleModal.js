@@ -30,6 +30,7 @@ import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMe
 import {LABEL_DICTIONARY} from '../form/form.constants';
 import useForm from '../form/useForm';
 import useMicro from '../micro/useMicro';
+import useUserProfile from '../user/useUserProfile';
 
 const LinkSampleModal = ({closeModal, isVisible}) => {
   /* Data Hooks */
@@ -37,12 +38,12 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
   const {isConnected, isInternetReachable} = useSelector(state => state.connections.isOnline);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
-  const straboUserId = useSelector(state => state.user.straboUserId);
 
   const {getMySamples, getStraboSample} = useServerRequests();
   const {getLabel} = useForm();
   const {downloadMicroProjectIfMissing} = useMicro();
   const {getSelectedSample, getSelectedSampleGeometry, linkSample} = useSamples();
+  const {getStraboUserId} = useUserProfile();
   const toast = useToast();
 
   /* Local State */
@@ -158,10 +159,14 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
       setIsLoading(true);
       // mysamples also returns samples shared with the user, which can't be linked yet, so offer only their own.
       // Without the user's id there is no telling which those are, so offer none rather than risk a shared one.
-      if (isEmpty(straboUserId)) throw new Error('Your user profile has not loaded yet. Please try again shortly.');
+      const userId = await getStraboUserId();
+      if (isEmpty(userId)) {
+        throw new Error('Your samples couldn\'t be found because your StraboSpot account details didn\'t download.'
+          + ' Check your connection, then close this window and open it again.');
+      }
       const response = await getMySamples();
       // userpkey and straboUserId may differ in type, so compare them as strings
-      setSamples((response?.samples || []).filter(sample => String(sample.userpkey) === String(straboUserId)));
+      setSamples((response?.samples || []).filter(sample => String(sample.userpkey) === String(userId)));
     }
     catch (err) {
       console.error('Error getting samples from StraboSamples', err);

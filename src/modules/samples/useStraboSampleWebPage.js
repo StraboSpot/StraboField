@@ -1,3 +1,5 @@
+import {useEffect} from 'react';
+
 import {useSelector} from 'react-redux';
 
 import {getStraboSampleFromResponse, isLinkedToFieldSpot} from './samples.helpers';
@@ -5,6 +7,7 @@ import {SAMPLES_PATHS} from '../../services/network/urls.constants';
 import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty, openUrl} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
+import useUserProfile from '../user/useUserProfile';
 
 // A linked sample's page on the StraboSamples website, which can only be opened online
 const useStraboSampleWebPage = () => {
@@ -14,6 +17,14 @@ const useStraboSampleWebPage = () => {
   const straboUserId = useSelector(state => state.user.straboUserId);
 
   const {getStraboSample} = useServerRequests();
+  const {getStraboUserId} = useUserProfile();
+
+  /* Side Effects */
+
+  // The page's url needs the user's id
+  useEffect(() => {
+    if (isEmpty(straboUserId) && isInternetReachable) getStraboUserId();
+  }, [straboUserId, isInternetReachable]);
 
   /* Exported Functions */
 
