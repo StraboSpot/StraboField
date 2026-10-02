@@ -2,8 +2,9 @@
 //
 // An ordered list (newest release first) of what shipped in each PUBLIC release. Interim rc/patch
 // builds (e.g. the 2.30.x series) are not listed individually — their changes are rolled up into the
-// public release that ships them (e.g. 2.31.0). The About page shows every release at or below the
-// running version (plus, in dev builds, not-yet-shipped ones flagged "unreleased").
+// public release that ships them (e.g. 2.31.0). The About page shows the three most recent releases at or
+// below the running version (plus, in dev builds, not-yet-shipped ones flagged "unreleased"), then links to
+// RELEASES_URL for the rest. Older entries stay here, since scripts/release-notes.js reads them too.
 //
 // Each release's highlights are organized into `groups` of related changes: {title, items}, where
 // each item is {text, commit}. `text` is the user-facing blurb (the part before the first colon is
@@ -22,17 +23,12 @@
 
 // All git remotes redirect to StraboSpot/StraboField; commit hashes resolve there.
 export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit/';
+export const RELEASES_URL = 'https://github.com/StraboSpot/StraboField/releases';
 
 const RELEASE_NOTES = [
   {
     version: '2.32.0',
     groups: [
-      {
-        title: 'Stability',
-        items: [
-          {text: 'Crash fix: loading or switching projects no longer crashes the app on iOS', commit: '554e1c22d'},
-        ],
-      },
       {
         title: 'Forms & validation',
         items: [
@@ -64,10 +60,6 @@ const RELEASE_NOTES = [
           {
             text: 'Declination without GPS: falls back through your project location and nearby Spots to stay corrected, with clearer warnings when it can\'t',
             commit: 'cbf505d88',
-          },
-          {
-            text: 'Compass over template: a fresh compass reading now takes priority over an active template',
-            commit: 'e8935e8ae',
           },
         ],
       },
@@ -138,7 +130,6 @@ const RELEASE_NOTES = [
             text: 'Read-only everywhere: read-only status now carries through image basemaps, strat sections, and forms',
             commit: '1d7af9f55',
           },
-          {text: 'Protected moves: a Spot can\'t be moved into or out of a read-only dataset', commit: 'dacb7848c'},
         ],
       },
       {
@@ -190,14 +181,6 @@ const RELEASE_NOTES = [
         title: 'Small touches',
         items: [
           {text: 'Copied Spots: a copied Spot gets its own feature ids', commit: '4bc897794'},
-          {
-            text: 'Mineral lookup: mineral data you already entered is kept when a mineral is looked up',
-            commit: '25b763f5c',
-          },
-          {
-            text: 'Project visibility: an owner\'s project is listed again once its collaboration is halted',
-            commit: '3cde7a4b4',
-          },
         ],
       },
     ],

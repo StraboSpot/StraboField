@@ -4,6 +4,17 @@ import {LARGE_TEXT_SIZE, MEDIUM_TEXT_SIZE, MEDIUMGREY, PRIMARY_ACCENT_COLOR, SMA
   from '../../../shared/styles.constants';
 
 const styles = StyleSheet.create({
+  allReleasesLink: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: 8,
+  },
+  allReleasesLinkText: {
+    color: PRIMARY_ACCENT_COLOR,
+    fontSize: MEDIUM_TEXT_SIZE,
+    marginLeft: 6,
+  },
   bold: {
     fontWeight: '600',
   },
