@@ -142,7 +142,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
             : isActive || isReadOnly ? themes.MEDIUMGREY
               : themes.SECONDARY_BACKGROUND_COLOR}
           containerStyle={{paddingRight: 10}}
-          disabled={!isActive}
+          disabled={!isActive || isReadOnly}
           disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
           name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
           onPress={() => makeDatasetCurrent(dataset.id)}
