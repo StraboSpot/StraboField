@@ -9,6 +9,7 @@ import SelectSpotsAtPressModal from './editing/SelectSpotsAtPressModal';
 import SetInCurrentViewOverlay from './editing/SetInCurrentViewOverlay';
 import useMapEditor from './editing/useMapEditor';
 import VertexActionsOverlay from './editing/VertexActionsOverlay';
+import useMapFeatures from './features/useMapFeatures';
 import useMapFeaturesCalculated from './features/useMapFeaturesCalculated';
 import useMapPressEvents from './interactions/useMapPressEvents';
 import MacrostratOverlay from './macrostrat/MacrostratOverlay';
@@ -62,6 +63,7 @@ const MapContainer = forwardRef(({
   const {getExtentAndZoomCall, setBasemap} = useMap();
   const {convertFeatureGeometryToImagePixels} = useMapCoords();
   const mapRef = useRef(null);
+  const {getAllMappedSpots} = useMapFeatures();
   const {getSpotsInBoundingBox} = useMapFeaturesCalculated(mapRef);
   const [isShowVertexActionsModal, setIsShowVertexActionsModal] = useState(false);
   const [vertexActionValues, setVertexActionValues] = useState(null);
@@ -412,8 +414,12 @@ const MapContainer = forwardRef(({
     return [east - west, north - south];
   };
 
+  // #992, if the selected Spot is mapped on the current map, go straight to editing it instead of deselecting it
   const startEditingMode = () => {
-    startEditing(undefined, undefined, undefined, setMapModeToEdit);
+    const selectedMappedSpot = selectedSpot?.properties?.id
+      && getAllMappedSpots().find(spot => spot.properties.id === selectedSpot.properties.id);
+    const spotToEdit = selectedMappedSpot ? turf.cleanCoords(selectedMappedSpot) : undefined;
+    startEditing(spotToEdit, undefined, undefined, setMapModeToEdit);
   };
 
   const toggleUserLocation = (value) => {

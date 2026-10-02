@@ -41,6 +41,8 @@ const SampleListItem = ({
   /* Derived Variables */
 
   const isReadOnly = !canPickReadOnly && isSpotReadOnly(parentSpot);
+  // A rich sample is a Spot of its own, which can sit in a different dataset to its parent
+  const isSampleReadOnly = isReadOnly || (!!sample.properties?.isSample && isSpotReadOnly(sample));
   const sampleMetadata = getSampleMetadata(sample);
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 
@@ -90,7 +92,8 @@ const SampleListItem = ({
             </ListItem.Subtitle>
           )}
         </View>
-        {(isShowIGSN || sampleMetadata.Sample_IGSN) && (
+        {/* Viewing an existing IGSN is fine read-only; getting one would register and change the sample */}
+        {(sampleMetadata.Sample_IGSN || (isShowIGSN && !isSampleReadOnly)) && (
           <View>
             <IGSNLogo
               item={sampleMetadata}
