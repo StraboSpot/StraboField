@@ -65,7 +65,6 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, setDeleteProfil
 
   const onDeletePressed = async () => {
     const encodedLogin = Base64.encode(`${email}:${deleteProfileInputValue}`);
-    console.log(encodedLogin);
     const res = await deleteAccount(encodedLogin);
     console.log('ACCOUNT DELETED!', res);
     setDeleteProfileModalVisible(false);

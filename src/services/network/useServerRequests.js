@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
   deleteRequest,
   getRequest,
+  patchRequest,
   postFormDataRequest,
   postRequest,
   timeoutPromise,
@@ -38,14 +39,27 @@ const useServerRequests = () => {
 
   const getImageBaseUrl = () => isSelected ? baseUrl.replace('/db', '/pi/') : `${STRABO_APIS.STRABO}/pi/`;
 
-  const sendToSesar = async (data, path) => {
+  // SESAR error bodies come in several shapes: legacy {error} or {detail, code}, and the new {message, errors} where
+  // `errors` maps a field to a message or an array of messages. Collapse whichever is present into one string.
+  const getSesarErrorMessage = (json) => {
+    const fieldErrors = Object.values(json?.errors || {}).flat().filter(e => typeof e === 'string');
+    const message = json?.error || json?.message || json?.detail;
+    // `message` usually repeats one of the field errors, so drop duplicates before joining.
+    return [...new Set([message, ...fieldErrors].filter(Boolean))].join('\n') || undefined;
+  };
+
+  // Registers (POST /samples/) or updates (PATCH /samples/{igsn}/) a sample through the SESAR v2 JSON API and
+  // returns the sample SESAR sends back. Throws a user-facing message on any failure so registerSample shows it.
+  const sendToSesar = async (method, path, payload) => {
+    let response;
     try {
       // Read the access token from the store rather than the useSelector closure: registerSample may refresh and
       // dispatch a new token immediately before posting, and the closure captured at render time would still hold
       // the stale (expired) one until the next re-render.
       const accessToken = store.getState().user.sesar.sesarToken.access;
-      return await postRequest(`${SESAR_PATHS.SESAR_API}${path}`, data, bearerAuth(accessToken),
-        {'Content-Type': 'application/x-www-form-urlencoded'});
+      const request = method === 'PATCH' ? patchRequest : postRequest;
+      response = await request(`${SESAR_PATHS.SESAR_API}${path}`, JSON.stringify(payload), bearerAuth(accessToken),
+        {'Accept': 'application/json', 'Content-Type': 'application/json'});
     }
     catch (err) {
       // Re-throw a clean, user-facing message so the caller (registerSample) surfaces it on the error view.
@@ -55,6 +69,16 @@ const useServerRequests = () => {
         ? 'SESAR did not respond (network timeout). Please check your connection and try again.'
         : 'Unable to reach SESAR. Please check your Internet connection and try again.');
     }
+    const json = await response.json().catch(() => undefined);
+    console.log('SESAR Sample Response', response.status, json);
+    // Validation failures come back as 400 {message, errors: {field: [messages]}}.
+    if (!response.ok) {
+      throw Error(
+        getSesarErrorMessage(json) || `SESAR rejected the sample (status ${response.status}).`);
+    }
+    const sample = json?.data ?? json;
+    if (!sample?.igsn) throw Error('SESAR returned an unreadable response. Please try again.');
+    return sample;
   };
 
   /* Exported Functions */
@@ -156,23 +180,39 @@ const useServerRequests = () => {
     getRequest(`${baseUrl}/project/${projectId}`, basicAuth(encodedLogin));
 
   const getSesarToken = async (orcidToken) => {
+    // Exchanges the ORCID id token for a SESAR access/refresh pair tied to the StraboSpot connection. The token must
+    // go as form data: this endpoint ignores a JSON body and answers as if no token was sent ("The given ORCID JWT is
+    // either invalid..."). Content-Type is left unset so fetch adds the multipart boundary.
     const formData = new FormData();
-    formData.append('connection', 'strabospot');
-    formData.append('orcid_id_token', orcidToken);
+    formData.append('token', orcidToken);
     const response = await postRequest(`${SESAR_PATHS.SESAR_API}${SESAR_PATHS.GET_TOKEN}`, formData, null,
       {'Accept': 'application/json'});
     const json = await response.json();
-    if (json.error) {
-      console.error('SESAR Token Error', json.error);
-      throw Error(json.error);
+    // SESAR v2 wraps the token pair in `data` ({data: {access, refresh}}); fall back to a top-level pair.
+    const tokens = json.data ?? json;
+    // A new-shape {message, errors} body only counts as a failure when no token came back, since a success may also
+    // carry a `message`.
+    if (json.error || !response.ok || (json.message && !tokens?.access)) {
+      const errorMessage = getSesarErrorMessage(json) || `SESAR token request failed (status ${response.status}).`;
+      console.error('SESAR Token Error', errorMessage);
+      throw Error(errorMessage);
     }
-    return json;
+    return tokens;
   };
 
-  const getSesarUserCode = async (accessToken) => {
-    const response = await getRequest(`${SESAR_PATHS.SESAR_API}${SESAR_PATHS.GET_USER_CODE}`,
-      bearerAuth(accessToken), {responseType: 'text'});
-    return response.text();
+  // SESAR retired the XML credentials_service_v2.php (it now rewrites to /api/auth/user/, which has no codes); the
+  // v2 API lists the codes the user can register samples under as a JSON array of {sesar_code, team, ...}.
+  // Returns null when SESAR rejects the access token (401) so the caller can refresh and retry.
+  const getSesarUserCodes = async (accessToken) => {
+    const response = await getRequest(`${SESAR_PATHS.SESAR_API}${SESAR_PATHS.GET_USER_CODES}`,
+      bearerAuth(accessToken), {responseType: 'json'});
+    if (response.status === 401) return null;
+    const json = await response.json().catch(() => undefined);
+    const codes = json?.data ?? json;
+    if (!response.ok || !Array.isArray(codes)) {
+      throw Error(getSesarErrorMessage(json) || `Unable to load SESAR user codes (status ${response.status}).`);
+    }
+    return codes;
   };
 
   const getTileBaseUrl = () => isSelected ? endpoint.replace('/db', '/strabotiles') : tilehost;
@@ -182,19 +222,21 @@ const useServerRequests = () => {
     return response.json();
   };
 
-  const postToSesar = xmlData => sendToSesar(xmlData, SESAR_PATHS.UPLOAD);
+  const postToSesar = payload => sendToSesar('POST', SESAR_PATHS.SAMPLES, payload);
 
   const refreshSesarToken = async (refreshTokenValue) => {
-    const formData = new FormData();
-    formData.append('refresh', refreshTokenValue);
-    const response = await postRequest(`${SESAR_PATHS.SESAR_API}${SESAR_PATHS.REFRESH_TOKEN}`, formData, null,
-      {'Content-Type': 'application/x-www-form-urlencoded'});
+    const response = await postRequest(`${SESAR_PATHS.SESAR_API}${SESAR_PATHS.REFRESH_TOKEN}`,
+      JSON.stringify({refresh: refreshTokenValue}), null,
+      {'Accept': 'application/json', 'Content-Type': 'application/json'});
     const json = await response.json();
-    // SESAR returns 401 {detail, code} when the refresh token is invalid or expired. Map it to an `error` shape so
-    // the caller doesn't mistake the failure body for a valid {access, refresh} pair — destructuring that blindly
-    // wipes both stored tokens and locks the user out silently.
-    if (!response.ok) return {code: json.code, error: json.detail || 'SESAR refresh token is invalid or expired'};
-    return json;
+    // SESAR returns 401 ({message, errors}, or legacy {detail, code}) when the refresh token is invalid or expired. Map
+    // it to an `error` shape so the caller doesn't mistake the failure body for a valid {access, refresh} pair —
+    // destructuring that blindly wipes both stored tokens and locks the user out silently.
+    if (!response.ok) {
+      return {code: json.code, error: getSesarErrorMessage(json) || 'SESAR refresh token is invalid or expired'};
+    }
+    // SESAR v2 wraps the token pair in `data` ({data: {access, refresh}}); fall back to a top-level pair.
+    return json.data ?? json;
   };
 
   const registerUser = (newAccountInfo) => {
@@ -228,7 +270,8 @@ const useServerRequests = () => {
 
   const updateProject = project => postRequest(`${baseUrl}/project`, project, basicAuth());
 
-  const updateOnSesar = xmlData => sendToSesar(xmlData, SESAR_PATHS.UPDATE);
+  const updateOnSesar = (igsn, payload) =>
+    sendToSesar('PATCH', `${SESAR_PATHS.SAMPLES}${encodeURIComponent(igsn)}/`, payload);
 
   const uploadImage = (formdata, isProfileImage) => {
     return new Promise((resolve, reject) => {
@@ -291,7 +334,7 @@ const useServerRequests = () => {
     getProfileImageURL,
     getProject,
     getSesarToken,
-    getSesarUserCode,
+    getSesarUserCodes,
     getTileBaseUrl,
     getTilesFromHost,
     convertSpotToMacrostrat,

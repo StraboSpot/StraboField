@@ -18,7 +18,7 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
   /* Data Hooks */
 
   const {exportMicroProjectPDF} = useDevice();
-  const {height, width} = useWindowSize();
+  const {width} = useWindowSize();
 
   /* Local State */
 
@@ -73,6 +73,8 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
   return (
     <ModalWrapper
       fullscreen
+      // The PDF scrolls itself, and a list around it takes its drags on Android
+      isChildrenFilled
       isHideHeader
       isVisible={visible}
       showActionButton={false}
@@ -119,7 +121,7 @@ const MicroProjectPDFOverlay = ({doc, setVisible, visible}) => {
               await openUrl(uri);
             }}
             source={doc.file}
-            style={{width, height: height - 100}}
+            style={{flex: 1, width}}
           />
         )}
         <Loading isLoading={loading} style={{backgroundColor: 'transparent'}}/>

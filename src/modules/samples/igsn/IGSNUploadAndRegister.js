@@ -96,8 +96,8 @@ const IGSNUploadAndRegister = ({handleIGSNChecked, isIGSNChecked, openLoginPage,
           type: tokens.access ? 'success' : 'danger',
         });
         if (!selectedFeature.isOnMySesar) {
-          const sesarCodesRes = await getAndSaveSesarCode(tokens);
-          dispatch(setSesarUserCodes(sesarCodesRes.results.sesar_codes[0].sesar_code));
+          const sesarCodes = await getAndSaveSesarCode(tokens);
+          dispatch(setSesarUserCodes(sesarCodes));
         }
         dispatch(setLoadingStatus({view: 'home', bool: false}));
       }
