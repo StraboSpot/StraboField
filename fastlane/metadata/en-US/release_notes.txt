@@ -1,4 +1,29 @@
+MEASUREMENTS
+• Compass over template: a fresh compass reading now takes priority over an active template
+• Strike from dip direction: entering a dip direction fills in the strike instead of writing NaN
+
+PHOTOS
+• Photos picked together: several photos saved at once no longer collide and overwrite each other
+
+READ-ONLY DATASETS
+• Spots stay out of read-only datasets: Spots can no longer be moved, copied, or created into a read-only dataset
+• Locked samples and features: Add Data to Sample, Get IGSN, and Other Feature fields are disabled on read-only Spots
+
 SAMPLES & IGSN
+• SESAR sign-in when saving: saving a sample with an IGSN prompts you to sign in to SESAR when needed
 • Works with SESAR's new system: signing in, registering, and updating IGSNs now use SESAR's latest API
+
+FORMS & DATA
+• Same-day date ranges: an equal start and end date no longer fails validation
+• Correct sed choices: "masses" (diagenesis) and "Supratidal" (environment) now save as their own values
+• Mineral lookup: looking up a mineral keeps the data already entered, and a mineral with no name shows Unknown
+• Template deletions sync: deleting a template marks the project as changed
+
+SMALL TOUCHES
+• Map editing: Edit goes straight to the selected Spot when it is on the current map
+• Halted collaborations: an owner's project shows in the server list again once its collaboration is halted
+• Project screen on tablets: shows as a centered box instead of fullscreen
+• Profile photo: a camera or gallery error no longer breaks setting a profile photo
+• StraboField naming: permission prompts and support email now say StraboField
 
 Thanks for using StraboSpot!

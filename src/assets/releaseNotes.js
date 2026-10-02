@@ -25,6 +25,85 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 
 const RELEASE_NOTES = [
   {
+    version: '2.31.5',
+    groups: [
+      {
+        title: 'Measurements',
+        items: [
+          {
+            text: 'Compass over template: a fresh compass reading now takes priority over an active template',
+            commit: 'fc842b740',
+            play: 'Compass readings no longer overwritten by templates',
+          },
+          {
+            text: 'Strike from dip direction: entering a dip direction fills in the strike instead of writing NaN',
+            commit: '001df3483',
+          },
+        ],
+      },
+      {
+        title: 'Photos',
+        items: [
+          {
+            text: 'Photos picked together: several photos saved at once no longer collide and overwrite each other',
+            commit: '489ac7196',
+            play: 'Photos picked together no longer overwrite each other',
+          },
+        ],
+      },
+      {
+        title: 'Read-only datasets',
+        items: [
+          {
+            text: 'Spots stay out of read-only datasets: Spots can no longer be moved, copied, or created into a read-only dataset',
+            commit: 'f8a237a0f',
+          },
+          {
+            text: 'Locked samples and features: Add Data to Sample, Get IGSN, and Other Feature fields are disabled on read-only Spots',
+            commit: 'cdcc0817e',
+          },
+        ],
+      },
+      {
+        title: 'Samples & IGSN',
+        items: [
+          {
+            text: 'SESAR sign-in when saving: saving a sample with an IGSN prompts you to sign in to SESAR when needed',
+            commit: 'f9a5bcf27',
+          },
+        ],
+      },
+      {
+        title: 'Forms & data',
+        items: [
+          {text: 'Same-day date ranges: an equal start and end date no longer fails validation', commit: 'af49c8f88'},
+          {
+            text: 'Correct sed choices: "masses" (diagenesis) and "Supratidal" (environment) now save as their own values',
+            commit: 'a8e8657cc',
+          },
+          {
+            text: 'Mineral lookup: looking up a mineral keeps the data already entered, and a mineral with no name shows Unknown',
+            commit: '8d3b48a72',
+          },
+          {text: 'Template deletions sync: deleting a template marks the project as changed', commit: 'ba0dc7d04'},
+        ],
+      },
+      {
+        title: 'Small touches',
+        items: [
+          {text: 'Map editing: Edit goes straight to the selected Spot when it is on the current map', commit: '000aea5a6'},
+          {
+            text: 'Halted collaborations: an owner\'s project shows in the server list again once its collaboration is halted',
+            commit: '25ec904b4',
+          },
+          {text: 'Project screen on tablets: shows as a centered box instead of fullscreen', commit: '7a1c2626b'},
+          {text: 'Profile photo: a camera or gallery error no longer breaks setting a profile photo', commit: '595d86752'},
+          {text: 'StraboField naming: permission prompts and support email now say StraboField', commit: '048edfc6d'},
+        ],
+      },
+    ],
+  },
+  {
     version: '2.31.4',
     groups: [
       {
