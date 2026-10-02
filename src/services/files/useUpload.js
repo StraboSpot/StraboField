@@ -8,6 +8,7 @@ import useUploadImages from './useUploadImages';
 import {setSpotsUploadedTimestamp} from '../../modules/connections/connections.slice';
 import {addedStatusMessage} from '../../modules/home/home.slice';
 import {stripMapboxTokenFromProject} from '../../modules/maps/custom-maps/customMaps.helpers';
+import {isDatasetReadOnly} from '../../modules/project/projects.helpers';
 import {
   addedProjectFromServer,
   deletedSpotIdFromDataset,
@@ -52,7 +53,8 @@ const useUpload = () => {
 
   const uploadDataset = async (dataset) => {
     try {
-      if (!dataset.isReadOnly) {
+      // Another user's dataset is theirs to upload, even where the server would take it
+      if (!isDatasetReadOnly(dataset, store.getState().user.straboUserId)) {
         setUploadStatusMessage(`Uploading dataset ${dataset.name}...`);
         let datasetCopy = JSON.parse(JSON.stringify(dataset));
         delete datasetCopy.spotIds;

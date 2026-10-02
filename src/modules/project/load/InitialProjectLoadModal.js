@@ -188,10 +188,10 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
       doesRenderAsView
       fullscreen={SMALL_SCREEN}
       headerTitle={statusMessageModalTitle}
-      overlayStyleOverride={{
-        height: visibleInitialSection === 'none' ? 'auto' : '80%',
-        justifyContent: 'center',
-      }}
+      // The sections (project lists, new-project form) are flex: 1 and scroll internally, so they need a definite
+      // body height. In the default content-sized box they sit in a FlatList header and collapse to almost nothing.
+      isChildrenFilled={visibleInitialSection !== 'none'}
+      overlayStyleOverride={visibleInitialSection === 'none' ? {justifyContent: 'center'} : {maxHeight: '80%'}}
       showActionButton={false}
       showCancelButton={false}
     >

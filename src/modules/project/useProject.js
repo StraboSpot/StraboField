@@ -2,6 +2,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
+import {isDatasetReadOnly} from './projects.helpers';
 import {
   addedDataset,
   addedProjectDescription,
@@ -45,7 +46,8 @@ const useProject = () => {
 
   // Whether anything in the project is locked at all. Scanning the handful of datasets is far cheaper than
   // the Spot walks that ask about read only, so those check this first and skip the walk entirely
-  const isAnythingReadOnly = isReadOnlyProject || Object.values(datasets).some(dataset => dataset.isReadOnly);
+  const isAnythingReadOnly = isReadOnlyProject
+    || Object.values(datasets).some(dataset => isDatasetReadOnly(dataset, user.straboUserId));
 
   /* Internal Functions */
 
@@ -226,9 +228,7 @@ const useProject = () => {
 
   const isReadOnlyDataset = (datasetId) => {
     if (isReadOnlyProject) return true;
-    const dataset = datasets[datasetId];
-    if (dataset?.isReadOnly !== undefined) return dataset.isReadOnly;
-    return false;
+    return isDatasetReadOnly(datasets[datasetId], user.straboUserId);
   };
 
   // Only the Spot's own dataset. Whether anything else locks it - the Spot holding the map it sits on, or

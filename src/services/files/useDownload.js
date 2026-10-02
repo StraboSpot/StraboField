@@ -19,6 +19,7 @@ import {CUSTOM_MAP_SOURCES} from '../../modules/maps/custom-maps/customMaps.cons
 import {normalizeCustomMapId, stripMapboxToken} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {MAP_PROVIDERS} from '../../modules/maps/maps.constants';
 import {addedCustomMapsFromBackup} from '../../modules/maps/maps.slice';
+import {getDatasetOwnerId, isDatasetReadOnly} from '../../modules/project/projects.helpers';
 import {
   addedDatasets,
   addedProjectFromServer,
@@ -47,6 +48,8 @@ let prevActiveDatasetsIds = [], prevTargetDatasetId;
 // Read off the downloaded project rather than the one the caller passed - the web auto login starts a
 // download from a bare {id}, so only the server response reliably says whether the project is read only
 let isDownloadedProjectReadOnly = false;
+// Read off the downloaded project too, for the datasets saved before the server sent each one's own owner
+let downloadedProjectOwnerId;
 
 // Every caller shares the accumulators above, so a second download would reset the arrays the first is still
 // filling and save a mixed set. Module scope too, since the project list, QAQC and auto-login all start downloads.
@@ -83,6 +86,7 @@ const useDownload = () => {
     prevActiveDatasetsIds = [];
     prevTargetDatasetId = undefined;
     isDownloadedProjectReadOnly = false;
+    downloadedProjectOwnerId = undefined;
   };
 
   /* Internal Functions */
@@ -166,9 +170,11 @@ const useDownload = () => {
     dispatch(addedStatusMessage('Downloading Linked Sample Data...'));
     for (const spot of linkedSpots) {
       const strabosamplesId = getSampleMetadata(spot).strabosamples_id;
+      // StraboSamples knows a sample under its owner, who is the owner of the dataset holding it
+      const dataset = Object.values(datasetsObjToSave).find(d => d.spotIds?.includes(spot.properties.id));
       try {
-        const strabosample = getStraboSampleFromResponse(
-          await getStraboSample(strabosamplesId, undefined, encodedLoginScoped));
+        const strabosample = getStraboSampleFromResponse(await getStraboSample(strabosamplesId,
+          getDatasetOwnerId(dataset, downloadedProjectOwnerId), encodedLoginScoped));
         if (isEmpty(strabosample?.id)) throw Error('No sample returned');
         STRABOSAMPLES_LINKED_DATA_KEYS.forEach((key) => {
           if (isEmpty(strabosample[key])) delete spot.properties[key];
@@ -191,6 +197,7 @@ const useDownload = () => {
       dispatch(addedStatusMessage('Downloading Project Properties...'));
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
       isDownloadedProjectReadOnly = !!projectResponse.isReadOnly;
+      downloadedProjectOwnerId = projectResponse.owner_straboUserId;
       if (!isEmpty(project)) {
         if (project.id === selectedProject.id) {
           if (!isEmpty(activeDatasetsIds)) prevActiveDatasetsIds = activeDatasetsIds;
@@ -327,9 +334,10 @@ const useDownload = () => {
     });
   };
 
-  // A read only project makes every dataset in it read only too, which is the rule useProject's
-  // isReadOnlyDataset applies. Only a writable dataset may be the target, since the target takes new Spots
-  const isWritableDataset = dataset => !isDownloadedProjectReadOnly && !dataset.isReadOnly;
+  // A read only project makes every dataset in it read only too, as does another user owning it, which are the rules
+  // useProject's isReadOnlyDataset applies. Only a writable dataset may be the target, since the target takes new Spots
+  const isWritableDataset = dataset => !isDownloadedProjectReadOnly
+    && !isDatasetReadOnly(dataset, store.getState().user.straboUserId);
 
   // Sets the first writable dataset as both the active and target dataset
   const setFirstWritableActiveAndTarget = (datasets) => {

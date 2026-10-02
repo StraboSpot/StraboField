@@ -52,7 +52,9 @@ const SampleListItem = ({
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
   // A linked sample's page on the StraboSamples website, which can only be opened online
   const isLinked = !isEmpty(sampleMetadata.strabosamples_id);
-  const sampleUrl = getStraboSampleUrl(sampleMetadata.strabosamples_id);
+  // The server knows the link by the Spot holding the sample: its own Spot, or the parent it is kept on
+  const holdingSpotId = sample.properties?.isSample ? sample.properties.id : parentSpot?.properties?.id;
+  const sampleUrl = getStraboSampleUrl(sampleMetadata.strabosamples_id, holdingSpotId);
 
   /* Local State */
 
@@ -60,9 +62,7 @@ const SampleListItem = ({
 
   /* Event Handlers */
 
-  // The server knows the link by the Spot holding the sample: its own Spot, or the parent it is kept on
-  const handleLinkIconPressed = () => openStraboSampleWebPage(sampleMetadata.strabosamples_id,
-    sample.properties?.isSample ? sample.properties.id : parentSpot.properties.id);
+  const handleLinkIconPressed = () => openStraboSampleWebPage(sampleMetadata.strabosamples_id, holdingSpotId);
 
   const handleIGSNButtonPressed = () => {
     if (sampleMetadata.Sample_IGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));

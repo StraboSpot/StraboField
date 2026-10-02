@@ -28,7 +28,7 @@ const LinkedSampleCard = ({spot}) => {
 
   const sample = getSampleMetadata(spot);
   const strabosamplesId = sample.strabosamples_id;
-  const sampleUrl = getStraboSampleUrl(strabosamplesId);
+  const sampleUrl = getStraboSampleUrl(strabosamplesId, spot.properties.id);
   const linkedTabs = SAMPLE_DETAIL_TABS.filter(tab => tab.dataKey && !isEmpty(spot.properties[tab.dataKey]));
 
   /* Local State */

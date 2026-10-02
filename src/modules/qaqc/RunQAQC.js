@@ -9,12 +9,14 @@ import useDownload from '../../services/files/useDownload';
 import useUpload from '../../services/files/useUpload';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import {isDatasetReadOnly} from '../project/projects.helpers';
 
 const RunQAQC = ({dataset}) => {
   /* Data Hooks */
 
   const encodedLogin = useSelector(state => state.user.encoded_login);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
+  const straboUserId = useSelector(state => state.user.straboUserId);
   const {datasets, project} = useSelector(state => state.project);
 
   const {initializeDownload} = useDownload();
@@ -31,10 +33,10 @@ const RunQAQC = ({dataset}) => {
 
   /* View */
 
-  const isDatasetReadOnly = datasets[dataset.id]?.isReadOnly;
+  const isDatasetLocked = isDatasetReadOnly(datasets[dataset.id], straboUserId);
   const isProjectReadOnly = project?.isReadOnly;
 
-  if (!isTestingMode || isProjectReadOnly || isDatasetReadOnly) return null;
+  if (!isTestingMode || isProjectReadOnly || isDatasetLocked) return null;
 
   return (
     <View style={{paddingBottom: 10}}>

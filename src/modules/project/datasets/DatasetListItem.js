@@ -10,6 +10,7 @@ import {truncateText} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import {WARNING_COLOR} from '../../../shared/styles.constants';
 import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
+import {isDatasetReadOnly} from '../projects.helpers';
 import useProject from '../useProject';
 
 const DatasetListItem = ({dataset, setDatasetToView}) => {
@@ -17,6 +18,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const {targetDatasetId} = useSelector(state => state.project);
+  const straboUserId = useSelector(state => state.user.straboUserId);
 
   const [imagesNeededCount] = useDatasetNeededImagesCount(dataset);
   const {toggleActiveDataset, toggleTargetDataset} = useProject();
@@ -26,7 +28,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const checked = targetDatasetId && targetDatasetId === dataset.id;
   const imagesCount = dataset?.images?.imageIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
-  const isReadOnly = dataset.isReadOnly;
+  const isReadOnly = isDatasetReadOnly(dataset, straboUserId);
   const spotsCount = dataset.spotIds?.length || 0;
 
   /* Event Handlers */
