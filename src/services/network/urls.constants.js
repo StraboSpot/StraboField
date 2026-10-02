@@ -7,7 +7,7 @@ const rockdSpotConversion = 'https://dev.macrostrat.org/api/v3/dev/convert/field
 const rockdLogin = 'https://dev.rockd.org/login';
 const rockdCheckIn = 'https://dev.rockd.org/api/v2/protected/checkin';
 const rockdRedirectUri = 'strabofield://macrostrat/login';
-const sesarAPI = __DEV__ ? 'https://app-sandbox.geosamples.org/webservices' : 'https://app.geosamples.org/webservices';
+const sesarAPI = __DEV__ ? 'https://api-sandbox.geosamples.org/api' : 'https://api.geosamples.org/api';
 const straboSpotAPI = 'https://strabospot.org';
 const tilehost = 'https://tiles.strabospot.org';
 
@@ -54,12 +54,12 @@ export const MICRO_PATHS = {
 };
 
 export const SESAR_PATHS = {
-  GET_TOKEN: '/get_token.php',
-  REFRESH_TOKEN: '/refresh_token.php',
-  GET_USER_CODE: '/credentials_service_v2.php',
+  // `strabospot` is the connection id SESAR stamps on the tokens it issues for this app.
+  GET_TOKEN: '/auth/token/strabospot/',
+  REFRESH_TOKEN: '/auth/token/refresh/',
+  GET_USER_CODES: '/sesar-codes/by-permission/?permission=create_sample',
+  SAMPLES: '/samples/',
   SESAR_API: sesarAPI,
-  UPLOAD: '/upload.php',
-  UPDATE: '/update.php',
 };
 
 export const ORCID_PATHS = {

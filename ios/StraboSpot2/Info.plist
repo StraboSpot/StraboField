@@ -60,7 +60,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>$(PRODUCT_NAME) uses the camera to photograph rock outcrops, geological features, and field samples that are geotagged and attached to your field spot data.</string>
 	<key>NSFileProviderDomainUsageDescription</key>
-	<string>$(PRODUCT_NAME) to access device&apos;s accelerometer</string>
+	<string>$(PRODUCT_NAME) to access device's accelerometer</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>$(PRODUCT_NAME) would like to access your location for map usage</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
