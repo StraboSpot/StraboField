@@ -93,8 +93,13 @@ const projectSlice = createSlice({
     addedProject(state, action) {
       state.project = normalizeProject(action.payload);
     },
+    // The selected tag is a copy the tag pages save from, so it is swapped for the server's merged copy too, or
+    // the next save writes it back over the merge
     addedProjectFromServer(state, action) {
       state.project = normalizeProject(action.payload);
+      if (!isEmpty(state.selectedTag)) {
+        state.selectedTag = state.project.tags?.find(tag => tag.id === state.selectedTag.id) || {};
+      }
     },
     addedProjectDescription(state, action) {
       state.project = action.payload;
