@@ -77,29 +77,32 @@ const NotebookFooter = ({
       {(!isEmpty(selectedSample) && !isRichSample) ? (
         // A sample kept on its parent Spot has no notebook menu of its own to link it from, so it is linked here
         <View style={[footerStyle.footerIconContainer, footerStyle.sampleButtonsContainer]}>
-          <OutlineButton
-            containerStyle={footerStyle.sampleButtonContainer}
-            icon={{
-              color: PRIMARY_ACCENT_COLOR,
-              name: 'add',
-              size: 20,
-            }}
-            iconContainerStyle={{paddingRight: 0}}
-            onPress={convertToRichSample}
-            title={'Add Data'}
-          />
+          {/* Adding data and linking both rewrite the sample, so a read-only Spot offers neither */}
           {!isReadOnly && (
-            <OutlineButton
-              containerStyle={footerStyle.sampleButtonContainer}
-              icon={{
-                color: PRIMARY_ACCENT_COLOR,
-                name: isLinked ? 'unlink' : 'link',
-                size: 20,
-                type: 'ionicon',
-              }}
-              onPress={linkOrUnlinkSample}
-              title={isLinked ? 'Unlink Sample' : 'Link Sample'}
-            />
+            <>
+              <OutlineButton
+                containerStyle={footerStyle.sampleButtonContainer}
+                icon={{
+                  color: PRIMARY_ACCENT_COLOR,
+                  name: 'add',
+                  size: 20,
+                }}
+                iconContainerStyle={{paddingRight: 0}}
+                onPress={convertToRichSample}
+                title={'Add Data'}
+              />
+              <OutlineButton
+                containerStyle={footerStyle.sampleButtonContainer}
+                icon={{
+                  color: PRIMARY_ACCENT_COLOR,
+                  name: isLinked ? 'unlink' : 'link',
+                  size: 20,
+                  type: 'ionicon',
+                }}
+                onPress={linkOrUnlinkSample}
+                title={isLinked ? 'Unlink Sample' : 'Link Sample'}
+              />
+            </>
           )}
         </View>
       ) : (

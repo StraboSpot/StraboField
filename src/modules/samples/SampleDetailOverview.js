@@ -37,6 +37,8 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
   const sampleValues = spot.properties?.samples?.[0];
   const sampleIGSN = sampleValues?.Sample_IGSN;
   const isReadOnly = isSpotReadOnly(spot);
+  // Viewing an existing IGSN is fine read-only; getting one would register and change the sample
+  const isGetIGSNHidden = !sampleIGSN && isReadOnly;
 
   let sampleDetail = JSON.parse(JSON.stringify(sampleValues ?? {}));
   delete sampleDetail.id;
@@ -109,12 +111,14 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
           onPress={onViewDetailPressed}
           title={'Details'}
         />
-        <SampleActionButton
-          accessibilityHint={sampleIGSN ? 'Shows the sample\'s IGSN record' : 'Registers the sample for an IGSN'}
-          iconName={sampleIGSN ? 'barcode-outline' : 'add-circle-outline'}
-          onPress={onViewIGSNPressed}
-          title={sampleIGSN ? 'IGSN Data' : 'Get IGSN'}
-        />
+        {!isGetIGSNHidden && (
+          <SampleActionButton
+            accessibilityHint={sampleIGSN ? 'Shows the sample\'s IGSN record' : 'Registers the sample for an IGSN'}
+            iconName={sampleIGSN ? 'barcode-outline' : 'add-circle-outline'}
+            onPress={onViewIGSNPressed}
+            title={sampleIGSN ? 'IGSN Data' : 'Get IGSN'}
+          />
+        )}
         {!isReadOnly && (
           <SampleActionButton
             accessibilityHint={isLinked ? 'Removes the link to StraboSamples'

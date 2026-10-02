@@ -190,6 +190,18 @@ export const handleResponse = async (response, auth) => {
   return isJson ? json : Promise.reject(describeUnreadableBody(response, text));
 };
 
+// Like postRequest with custom headers: the body is sent as given and the raw response is returned.
+export const patchRequest = async (url, body, auth, customHeaders = {}, timeout = DEFAULT_TIMEOUT) => {
+  try {
+    console.log('PATCH', url, body, auth, customHeaders, timeout);
+    return await timeoutPromise(fetch(url, {method: 'PATCH', headers: buildHeaders(auth, customHeaders), body}), timeout);
+  }
+  catch (err) {
+    console.error(`Error PATCH: ${url}`, err);
+    throw err;
+  }
+};
+
 export const postFormDataRequest = async (url, formData, auth) => {
   try {
     const response = await timeoutPromise(fetch(url, {
