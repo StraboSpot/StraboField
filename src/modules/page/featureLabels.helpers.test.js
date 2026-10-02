@@ -1,24 +1,11 @@
 import {getDefaultLabel, getFeatureTitle, resolveLabelOnSave} from './featureLabels.helpers';
 import {PAGE_KEYS} from './pageKeys.constants';
-import alert from '../../shared/ui/alert';
-
-jest.mock('../../shared/ui/alert');
 
 // The real dictionary lookups are the forms' business, not this router's: stub them so a case can be read as
-// 'this page asks for these fields', and so a survey gaining a choice cannot break these tests
-const getLabel = key => (key === undefined || key === null ? '' : 'L(' + key + ')');
+// 'this page asks for these fields', and so a survey gaining a choice cannot break these tests. An empty value
+// reads as 'Unknown', as it does in useForm, so a title that forgets to check for one shows up here.
+const getLabel = key => (key === undefined || key === null || key === '' ? 'Unknown' : 'L(' + key + ')');
 const getLabels = keys => (Array.isArray(keys) ? keys : [keys]).map(getLabel).join(', ');
-
-// Answers the label prompt the way a user would, and reports whether it was actually asked
-const answerPrompt = (choice) => {
-  alert.mockImplementation((title, description, options) => {
-    const option = options.find(o => (choice === 'Update' ? o.style !== 'cancel' : o.style === 'cancel'));
-    option.onPress();
-  });
-  return () => alert.mock.calls.length > 0;
-};
-
-beforeEach(() => jest.clearAllMocks());
 
 describe('getDefaultLabel', () => {
   // The orientation numbers are deliberately left out: they are added at render time so they keep following
@@ -59,9 +46,67 @@ describe('getDefaultLabel', () => {
     expect(getDefaultLabel(PAGE_KEYS.TEPHRA, {layer_type: 'ash'}, getLabel, getLabels)).toBeUndefined();
   });
 
-  it('gives the pages titled by position alone nothing to fill a label in with', () => {
-    [PAGE_KEYS.STRUCTURES, PAGE_KEYS.DIAGENESIS, PAGE_KEYS.FOSSILS, PAGE_KEYS.INTERPRETATIONS].forEach(
-      pageKey => expect(getDefaultLabel(pageKey, {id: 1}, getLabel, getLabels)).toBeUndefined());
+  // The row number is left to the list, which keeps it right when a row is deleted
+  it('names an interpretation by the types it has data on, without a number', () => {
+    expect(getDefaultLabel(PAGE_KEYS.INTERPRETATIONS, {energy: 'x'}, getLabel, getLabels)).toBe('Process Interpretation');
+    const interpretation = {geometry: 'x', clastic: 'x', notes: 'a note'};
+    expect(getDefaultLabel(PAGE_KEYS.INTERPRETATIONS, interpretation, getLabel, getLabels))
+      .toBe('Environment, Surfaces Interpretation');
+    expect(getDefaultLabel(PAGE_KEYS.INTERPRETATIONS, {notes: 'a note'}, getLabel, getLabels)).toBeUndefined();
+  });
+
+  // Tab order, whatever order the tabs were filled in
+  it('names a structure by the tabs it has data on', () => {
+    expect(getDefaultLabel(PAGE_KEYS.STRUCTURES, {paleosol_horizons: ['a']}, getLabel, getLabels)).toBe('Pedogenic');
+    const structure = {lag_type: 'x', bedding_plane_features: ['x']};
+    expect(getDefaultLabel(PAGE_KEYS.STRUCTURES, structure, getLabel, getLabels)).toBe('Bedding Plane, Physical');
+  });
+
+  // Every tab shows the same Notes field, so it cannot say which tab was filled in
+  it('does not count a note as data on any tab', () => {
+    expect(getDefaultLabel(PAGE_KEYS.STRUCTURES, {notes: 'a note'}, getLabel, getLabels)).toBeUndefined();
+  });
+
+  // Any field under a heading counts, not only its first, and the headings keep form order whatever order the
+  // fields were filled in
+  it('names a diagenesis by the headings of its sections with data', () => {
+    const diagenesis = {other_diagenetic_features: ['stylolites'], cement_composition: ['calcite'], vein_width: 2};
+    expect(getDefaultLabel(PAGE_KEYS.DIAGENESIS, diagenesis, getLabel, getLabels))
+      .toBe('Cement, Veins, Other Diagenetic Features');
+    expect(getDefaultLabel(PAGE_KEYS.DIAGENESIS, {notes: 'a note'}, getLabel, getLabels)).toBeUndefined();
+  });
+
+  it('names a fully filled in diagenesis by every heading', () => {
+    const diagenesis = {cement_composition: ['calcite'], vein_type: 'x', fracture_type: 'x',
+      nodules_concretions_size: 'x', replacement_type: 'x', recrystallization_type: 'x',
+      other_diagenetic_features: ['x'], fabric_selective: ['x'], carbonate_desicc_and_diss: ['x']};
+    expect(getDefaultLabel(PAGE_KEYS.DIAGENESIS, diagenesis, getLabel, getLabels)).toBe('Cement, Veins, Fractures, '
+      + 'Nodules/Concretions, Replacement, Recrystallization, Other Diagenetic Features, Porosity Type, '
+      + 'Carbonate Desiccation and Dissolution');
+  });
+
+  // Only the first field of each part: a second Body field and Descriptive are filled in too, and left out
+  it('names a fossil by its first Body field, then its first Trace field', () => {
+    const fossil = {invertebrate: ['mollusca'], mollusca: ['bivalve'], diversity: 'low', descriptive: ['burrowed']};
+    expect(getDefaultLabel(PAGE_KEYS.FOSSILS, fossil, getLabel, getLabels)).toBe('L(mollusca) (L(low) Diversity)');
+  });
+
+  it('names a fossil by Descriptive when it has no Diversity, reading \'other\' as what was typed', () => {
+    const fossil = {vertebrate: ['other'], other_vertebrate: 'fish scale', descriptive: ['track', 'trail']};
+    expect(getDefaultLabel(PAGE_KEYS.FOSSILS, fossil, getLabel, getLabels)).toBe('Fish Scale (L(track), L(trail))');
+  });
+
+  it('names a fossil by whichever part it has', () => {
+    expect(getDefaultLabel(PAGE_KEYS.FOSSILS, {chordate: 'fish'}, getLabel, getLabels)).toBe('L(fish)');
+    expect(getDefaultLabel(PAGE_KEYS.FOSSILS, {diversity: 'high'}, getLabel, getLabels)).toBe('L(high) Diversity');
+    expect(getDefaultLabel(PAGE_KEYS.FOSSILS, {notes: 'a note'}, getLabel, getLabels)).toBeUndefined();
+  });
+
+  // The list numbers a bed with no package geometry, so there is no label to store for one
+  it('names a bed by its package geometry, and one without any not at all', () => {
+    expect(getDefaultLabel(PAGE_KEYS.BEDDING, {package_geometry: 'tabular'}, getLabel, getLabels))
+      .toBe('L(tabular)');
+    expect(getDefaultLabel(PAGE_KEYS.BEDDING, {notes: 'a note'}, getLabel, getLabels)).toBeUndefined();
   });
 
   it('names a sample by the name the user gave it', () => {
@@ -83,69 +128,73 @@ describe('resolveLabelOnSave', () => {
     {pageKey: PAGE_KEYS.THREE_D_STRUCTURES, previousFeature: previousFeature, values: values,
       getLabel: getLabel, getLabels: getLabels});
 
-  it('labels a feature being created', async () => {
-    const wasAsked = answerPrompt('Keep');
+  it('labels a feature being created', () => {
     const values = {id: 1, type: 'fault', feature_type: 'thrust'};
-    expect(await resolve(undefined, values)).toEqual({...values, label: 'Fault - L(THRUST)'});
-    expect(wasAsked()).toBe(false);
+    expect(resolve(undefined, values)).toEqual({...values, label: 'Fault - L(THRUST)'});
   });
 
-  it('keeps a label the user typed as it is being created', async () => {
+  it('keeps a label the user typed as it is being created', () => {
     const values = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Big fault'};
-    expect(await resolve(undefined, values)).toEqual(values);
+    expect(resolve(undefined, values)).toEqual(values);
   });
 
-  it('fills in a label for a feature saved before there were labels', async () => {
-    const wasAsked = answerPrompt('Keep');
+  it('fills in a label for a feature saved before there were labels', () => {
     const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust'};
-    expect(await resolve(previousFeature, {...previousFeature})).toEqual(
-      {...previousFeature, label: 'Fault - L(THRUST)'});
-    expect(wasAsked()).toBe(false);
+    expect(resolve(previousFeature, {...previousFeature})).toEqual({...previousFeature, label: 'Fault - L(THRUST)'});
   });
 
   // The field's hint promises a default when none is given, so clearing it asks for that default back
-  it('gives the default back when the user clears the field', async () => {
+  it('gives the default back when the user clears the field', () => {
     const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Big fault'};
-    expect(await resolve(previousFeature, {...previousFeature, label: ''})).toEqual(
+    expect(resolve(previousFeature, {...previousFeature, label: ''})).toEqual(
       {...previousFeature, label: 'Fault - L(THRUST)'});
   });
 
-  it('asks before moving a label that was filled in, and keeps it when told to', async () => {
+  it('moves a label that was filled in along with the data', () => {
     const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Fault - L(THRUST)'};
     const values = {...previousFeature, feature_type: 'normal'};
-    const wasAsked = answerPrompt('Keep');
-    expect(await resolve(previousFeature, values)).toEqual(values);
-    expect(wasAsked()).toBe(true);
-  });
-
-  it('moves a label that was filled in when told to update it', async () => {
-    const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Fault - L(THRUST)'};
-    const values = {...previousFeature, feature_type: 'normal'};
-    answerPrompt('Update');
-    expect(await resolve(previousFeature, values)).toEqual({...values, label: 'Fault - L(NORMAL)'});
+    expect(resolve(previousFeature, values)).toEqual({...values, label: 'Fault - L(NORMAL)'});
   });
 
   // Whether a label was filled in is recomputed from the feature as the form opened it, not remembered, so a
   // label that does not match what the feature read as back then was typed by hand
-  it('never asks about a label the user typed, and leaves it alone', async () => {
+  it('leaves a label the user typed alone when the data changes', () => {
     const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Big fault by the creek'};
     const values = {...previousFeature, feature_type: 'normal'};
-    const wasAsked = answerPrompt('Update');
-    expect(await resolve(previousFeature, values)).toEqual(values);
-    expect(wasAsked()).toBe(false);
+    expect(resolve(previousFeature, values)).toEqual(values);
   });
 
-  it('does not ask when an edit leaves the label where it already was', async () => {
+  it('keeps a label typed into this save, even over a data change', () => {
     const previousFeature = {id: 1, type: 'fault', feature_type: 'thrust', label: 'Fault - L(THRUST)'};
-    const values = {...previousFeature, notes: 'added a note'};
-    const wasAsked = answerPrompt('Update');
-    expect(await resolve(previousFeature, values)).toEqual(values);
-    expect(wasAsked()).toBe(false);
+    const values = {...previousFeature, feature_type: 'normal', label: 'Big fault'};
+    expect(resolve(previousFeature, values)).toEqual(values);
   });
 
-  it('hands back the values untouched on a page with no label to give', async () => {
+  describe('on a page whose default can run out', () => {
+    const resolveFossil = (previousFeature, values) => resolveLabelOnSave(
+      {pageKey: PAGE_KEYS.FOSSILS, previousFeature: previousFeature, values: values, getLabel: getLabel,
+        getLabels: getLabels});
+    const previousFossil = {id: 1, chordate: 'fish', label: 'L(fish)'};
+
+    // So the list falls back to titling the fossil by its position
+    it('clears a label that was filled in once its data is gone', () => {
+      expect(resolveFossil(previousFossil, {id: 1, label: 'L(fish)'}).label).toBeUndefined();
+    });
+
+    it('leaves a label the user typed', () => {
+      const values = {id: 1, label: 'Fish bed'};
+      expect(resolveFossil({...previousFossil, label: 'Fish bed'}, values)).toEqual(values);
+    });
+
+    it('leaves a fossil with nothing to label it by unlabeled', () => {
+      const values = {id: 1, notes: 'a note'};
+      expect(resolveFossil({id: 1}, values)).toBe(values);
+    });
+  });
+
+  it('hands back the values untouched on a page with no label to give', () => {
     const values = {id: 1, text: 'a note'};
-    const resolved = await resolveLabelOnSave({pageKey: PAGE_KEYS.NOTES, previousFeature: {id: 1}, values: values,
+    const resolved = resolveLabelOnSave({pageKey: PAGE_KEYS.NOTES, previousFeature: {id: 1}, values: values,
       getLabel: getLabel, getLabels: getLabels});
     expect(resolved).toBe(values);
   });
@@ -165,6 +214,6 @@ describe('getFeatureTitle', () => {
   });
 
   it('gives nothing for a page with neither', () => {
-    expect(getFeatureTitle(PAGE_KEYS.FOSSILS, {id: 1}, getLabel, getLabels)).toBeUndefined();
+    expect(getFeatureTitle(PAGE_KEYS.NOTES, {id: 1}, getLabel, getLabels)).toBeUndefined();
   });
 });

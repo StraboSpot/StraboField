@@ -322,7 +322,7 @@
       "label": "Orientation (if elongate, azimuth 0-360)",
       "required": "false",
       "constraint": ". >= 0 and . <= 360",
-      "constraint_message": "Azimuth value must be between 0 to 360 degrees"
+      "constraint_message": "Value must be a whole number between 0 and 360."
     },
     {
       "type": "select_one oh76z01",

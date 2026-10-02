@@ -7913,7 +7913,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"base64-js@npm:^1.0.2, base64-js@npm:^1.3.1, base64-js@npm:^1.5.1":
+"base64-js@npm:^1.3.1, base64-js@npm:^1.5.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
   checksum: 10c0/f23823513b63173a001030fae4f2dabe283b99a9d324ade3ad3d148e218134676f1ee8568c877cd79ec1c53158dcf2d2ba527a97c606618928ba99dd930102bf
@@ -8108,16 +8108,6 @@ __metadata:
   version: 1.1.2
   resolution: "buffer-from@npm:1.1.2"
   checksum: 10c0/124fff9d66d691a86d3b062eff4663fe437a9d9ee4b47b1b9e97f5a5d14f6d5399345db80f796827be7c95e70a8e765dd404b7c3ff3b3324f98e9b0c8826cc34
-  languageName: node
-  linkType: hard
-
-"buffer@npm:5.0.x":
-  version: 5.0.8
-  resolution: "buffer@npm:5.0.8"
-  dependencies:
-    base64-js: "npm:^1.0.2"
-    ieee754: "npm:^1.1.4"
-  checksum: 10c0/cf711a9cffb24da0a90c0ed7f1c6b95a98dd54169fc99096ae6eee6ccd6f313cd34e3f59e0fe5e612f1671e619d9bf8d8f8f9d9f9f0c1bdffe3a2e76686607cb
   languageName: node
   linkType: hard
 
@@ -8608,13 +8598,6 @@ __metadata:
   version: 9.5.0
   resolution: "commander@npm:9.5.0"
   checksum: 10c0/5f7784fbda2aaec39e89eb46f06a999e00224b3763dc65976e05929ec486e174fe9aac2655f03ba6a5e83875bd173be5283dc19309b7c65954701c02025b3c1d
-  languageName: node
-  linkType: hard
-
-"component-emitter@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "component-emitter@npm:2.0.0"
-  checksum: 10c0/65dfaf787ea49eb48f0ffec766bda7ec67e8dbeb3b406f08724dcae842e0aa274731fcccb9280b77d2b41693061731a9080b60d276020246a146544cd9900b83
   languageName: node
   linkType: hard
 
@@ -10065,13 +10048,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"events@npm:1.1.x":
-  version: 1.1.1
-  resolution: "events@npm:1.1.1"
-  checksum: 10c0/29ba5a4c7d03dd2f4a2d3d9d4dfd8332225256f666cd69f490975d2eff8d7c73f1fb4872877b2c1f3b485e8fb42462153d65e5a21ea994eb928c3bec9e0c826e
-  languageName: node
-  linkType: hard
-
 "events@npm:^3.2.0":
   version: 3.3.0
   resolution: "events@npm:3.3.0"
@@ -11278,7 +11254,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ieee754@npm:^1.1.13, ieee754@npm:^1.1.4":
+"ieee754@npm:^1.1.13":
   version: 1.2.1
   resolution: "ieee754@npm:1.2.1"
   checksum: 10c0/b0782ef5e0935b9f12883a2e2aa37baa75da6e66ce6515c168697b42160807d9330de9a32ec1ed73149aea02e0d822e572bca6f1e22bdcbd2149e13b050b17bb
@@ -15127,20 +15103,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-xml2js@npm:1.0.3":
-  version: 1.0.3
-  resolution: "react-native-xml2js@npm:1.0.3"
-  dependencies:
-    buffer: "npm:5.0.x"
-    events: "npm:1.1.x"
-    sax: "npm:0.6.x"
-    stream: "npm:0.0.x"
-    timers: "npm:0.1.x"
-    xmlbuilder: "npm:8.2.x"
-  checksum: 10c0/26555fa5f7b4cb9d6f8996c86f50f1c8b21a020bac245dfd344f9f0473a6ac348f2cb7a8abeb65fac45bd2a49f7e97aed1500b234ff3cbdfae42664997fa6c6b
-  languageName: node
-  linkType: hard
-
 "react-native-zip-archive@npm:8.0.1":
   version: 8.0.1
   resolution: "react-native-zip-archive@npm:8.0.1"
@@ -15806,13 +15768,6 @@ __metadata:
   version: 2.1.2
   resolution: "safer-buffer@npm:2.1.2"
   checksum: 10c0/7e3c8b2e88a1841c9671094bbaeebd94448111dd90a81a1f606f3f67708a6ec57763b3b47f06da09fc6054193e0e6709e77325415dc8422b04497a8070fa02d4
-  languageName: node
-  linkType: hard
-
-"sax@npm:0.6.x":
-  version: 0.6.1
-  resolution: "sax@npm:0.6.1"
-  checksum: 10c0/48bffa29341d7c10aacc12924738b5308ddfeebd27324f69074bb5a14be4f64e710916ce7aefca916b5a756ab6e0e304678de9cec56943b06f663cec4a06cdc9
   languageName: node
   linkType: hard
 
@@ -16571,7 +16526,6 @@ __metadata:
     react-native-vector-icons: "npm:10.3.0"
     react-native-web: "npm:0.21.2"
     react-native-worklets: "npm:0.8.3"
-    react-native-xml2js: "npm:1.0.3"
     react-native-zip-archive: "npm:8.0.1"
     react-redux: "npm:9.3.0"
     react-test-renderer: "npm:19.2.3"
@@ -16587,15 +16541,6 @@ __metadata:
     webpack-dev-server: "npm:^5.2.4"
   languageName: unknown
   linkType: soft
-
-"stream@npm:0.0.x":
-  version: 0.0.3
-  resolution: "stream@npm:0.0.3"
-  dependencies:
-    component-emitter: "npm:^2.0.0"
-  checksum: 10c0/5d262408583f3d5fed8077b33ad670320d85c6b7c0fb3ab73a9a632fbad0ee36f3c66e6feb5264cb39dbee3a619174fa886b5f69f98217666d0844f6a2f6510b
-  languageName: node
-  linkType: hard
 
 "strict-uri-encode@npm:^2.0.0":
   version: 2.0.0
@@ -16991,13 +16936,6 @@ __metadata:
   version: 1.1.0
   resolution: "thunky@npm:1.1.0"
   checksum: 10c0/369764f39de1ce1de2ba2fa922db4a3f92e9c7f33bcc9a713241bc1f4a5238b484c17e0d36d1d533c625efb00e9e82c3e45f80b47586945557b45abb890156d2
-  languageName: node
-  linkType: hard
-
-"timers@npm:0.1.x":
-  version: 0.1.1
-  resolution: "timers@npm:0.1.1"
-  checksum: 10c0/cf50fe43d593188c7cb5d7533c403473799f950e8ecabf06944896468f5f343aefcdb363c7c2ad94724e9bf7fef9885c1e8e9275417497a3b22a0edaa8d0979f
   languageName: node
   linkType: hard
 
@@ -18021,13 +17959,6 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 10c0/25eb33aff17edcb90721ed6b0eb250976328533ad3cd1a28a274bd263682e7296a6591ff1436d6cbc50fa67463158b062f9d1122013b361cec99a05f84680e06
-  languageName: node
-  linkType: hard
-
-"xmlbuilder@npm:8.2.x":
-  version: 8.2.2
-  resolution: "xmlbuilder@npm:8.2.2"
-  checksum: 10c0/5806a607e8c02fe6055a6b0c013e99489d74945019a8d4fdadcb9e92ffb0342987ed9f04fa46579762ad825044417e5ff019081c9d7ec058384e65b502aa7fb2
   languageName: node
   linkType: hard
 

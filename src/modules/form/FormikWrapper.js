@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import {Formik} from 'formik';
 
@@ -16,8 +16,16 @@ import useForm from './useForm';
 // rather than only when the form is saved, and the caller can keep Save from being pressed while any error
 // remains. Leave it off for a form with no validation, or one whose validate is really a change handler, which
 // must not run a second time for every keystroke. setInvalidFields names the fields in error, for a page that
-// has to point at one the form is not showing.
-const FormikWrapper = ({children, formName, setInvalidFields, setIsFormInvalid, validate, ...props}) => {
+// has to point at one the form is not showing. setIsFormDirty reports whether the values differ from those the
+// form opened with, so the caller can keep Save from being pressed until there is a change to save.
+
+// Formik's dirty flag, passed up as it changes, since reading it off the form ref does not re-render the caller
+const DirtyStatus = ({dirty, setIsFormDirty}) => {
+  useEffect(() => setIsFormDirty(dirty), [dirty]);
+  return null;
+};
+
+const FormikWrapper = ({children, formName, setInvalidFields, setIsFormDirty, setIsFormInvalid, validate, ...props}) => {
   /* Data Hooks */
 
   const {validateForm} = useForm();
@@ -40,6 +48,7 @@ const FormikWrapper = ({children, formName, setInvalidFields, setIsFormInvalid, 
     >
       {formProps => (
         <>
+          {setIsFormDirty && <DirtyStatus dirty={formProps.dirty} setIsFormDirty={setIsFormDirty}/>}
           {setIsFormInvalid && (
             <LiveValidation
               formProps={formProps}

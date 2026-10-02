@@ -1,4 +1,64 @@
-STABILITY
-• Fewer crashes: fixed iOS crashes that could occur when switching between modal screens
+FORMS & VALIDATION
+• Live form validation: errors show as you type and Save stays disabled until they're fixed
+• Find the problem field: the tab holding an unanswered field is marked so you know where to look
+• Auto dip direction: entering a strike fills in the matching dip direction wherever you type one
+• Negative numbers on iOS: type negative values, with a keyboard matched to the field
+
+COMPASS
+• Automatic declination: magnetic declination is recorded and kept up to date in your project data
+• Declination without GPS: falls back through your project location and nearby Spots to stay corrected, with clearer warnings when it can't
+
+MEASUREMENTS
+• Bulk strike/dip: calculate missing strikes and dip directions for every record that holds a plane
+• Steadier validation: planar+linear and 3D-structure measurements are checked and hinted more reliably
+• Compass over template: a fresh compass reading now takes priority over an active template
+• Strike from dip direction: entering a dip direction fills in the strike instead of writing NaN
+
+TAGS
+• Memos on tags: add, remove, count, and list a tag's memos from its detail page
+• Cleaner tag counts: a tag's counts show as icon chips instead of a legend
+• Sample tagging: only samples that have their own Spot can be tagged
+
+MEMOS
+• Memo authorship: memos record who wrote them and when
+• Associated samples: link samples to a memo, including legacy samples, from the Memo modal
+• Memos in Overview: a Spot's memos now show in its notebook Overview
+
+NOTEBOOK & PAGES
+• Feature labels: every feature list shows a label, filled in on save
+• Full Spots list: see the full Spots list when no Spot is selected
+• Collapsible More Pages: the More Pages sections collapse like the main menu's
+
+LISTS & DATASETS
+• Remembered sort: each list keeps its sort order and reverse sort, applied before the first paint
+• Active dataset names: lists name the active datasets at the top, with a shortcut to open Datasets
+• Map filter for Spots: filter Spots by whether they're on the geographic map or not mapped
+
+READ-ONLY DATASETS
+• Read-only everywhere: read-only status now carries through image basemaps, strat sections, and forms
+• Spots stay out of read-only datasets: Spots can no longer be moved, copied, or created into a read-only dataset
+• Locked samples and features: Add Data to Sample, Get IGSN, and Other Feature fields are disabled on read-only Spots
+
+STRAT SECTIONS
+• Image overlays: set up, save, and draw image overlays under a strat section in the right order
+• Open with intervals: opening a section activates the datasets holding its intervals
+
+SAMPLES & IGSN
+• Steadier SESAR: improved login and token handling for IGSN registration
+• Safer saves: Save is disabled when SESAR registration can't go through
+• Correct sample location: a sample from an image-basemap Spot gets a real-world location
+• SESAR sign-in when saving: saving a sample with an IGSN prompts you to sign in to SESAR when needed
+• Works with SESAR's new system: signing in, registering, and updating IGSNs now use SESAR's latest API
+
+SHORTCUTS
+• Straight to the Notebook: each shortcut opens its new Spot in the Notebook
+• No empty Spots: canceling a photo or sketch no longer leaves an empty Spot behind
+
+MAPS
+• Accurate Spot placement: a Spot lands on the map it was set in, sized to the view
+• Remembered map view: the map view is saved once the camera settles
+• Single name label: a Spot with multiple measurements draws its name label once
+
+Full notes: https://github.com/StraboSpot/StraboField/releases/tag/v2.32.0
 
 Thanks for using StraboSpot!

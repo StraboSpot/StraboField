@@ -1,5 +1,6 @@
 import {GLYPHS_URL} from './glyphs/glyphs.constants';
 import {STRABO_APIS} from '../../services/network/urls.constants';
+import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import config from '../../utils/config';
 
 export const LATITUDE = 39.828175;      // Geographic center of US;
@@ -25,6 +26,9 @@ export const SPOTS_EXTENT_ZOOM_DELAY = 500;
 export const PRESS_BOX_PADDING = 10;
 export const PRESS_BOX_PADDING_PRECISE = 1;
 
+// Marks a button that saves a map to the device for offline use
+export const DOWNLOAD_ICON = {color: PRIMARY_ACCENT_COLOR, name: 'cloud-download-outline', type: 'ionicon'};
+
 export const MAPBOX_TOKEN = config.get('mapbox_access_token');
 
 export const MAP_MODES = {
@@ -42,6 +46,12 @@ export const MAP_MODES = {
   INTERVAL_DRAG: 'intervalDrag',
 };
 
+// The one place every map that is not a map of somewhere is shown at in a list, as [zoom, x, y] - the Dakota
+// hogback southwest of Denver. The default basemaps ship a bundled tile of it (see MapThumbnail), and a Mapbox
+// style, being a way of drawing the whole world rather than a map of one area, is drawn at the same tile. Telling
+// those apart is a question of how each draws a place, so the list shows them all the same one.
+export const THUMBNAIL_TILE = [12, 851, 1556];
+
 export const DEFAULT_MAPS = [
   {
     title: 'Mapbox Topo',
@@ -56,7 +66,7 @@ export const DEFAULT_MAPS = [
     id: 'osm',
     source: 'osm',
   }, {
-    title: 'Geology from macrostrat',
+    title: 'Geology from Macrostrat',
     id: 'macrostrat',
     source: 'macrostrat',
   }, {
@@ -68,6 +78,7 @@ export const DEFAULT_MAPS = [
 export const MAP_PROVIDERS = {
   mapbox_classic: {
     attributions: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.',
+    credits: ['Mapbox', 'OpenStreetMap'],
     imageType: 'png',
     mime: 'image/png',
     tilePath: '/{z}/{x}/{y}.png',
@@ -75,6 +86,7 @@ export const MAP_PROVIDERS = {
   },
   mapbox_styles: {
     attributions: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.',
+    credits: ['Mapbox', 'OpenStreetMap'],
     mime: 'image/png',
     tilePath: '/tiles/256/{z}/{x}/{y}',
     url: ['https://api.mapbox.com/styles/v1/'],
@@ -82,6 +94,7 @@ export const MAP_PROVIDERS = {
   },
   osm: {
     attributions: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.',
+    credits: ['OpenStreetMap'],
     imageType: 'png',
     mime: 'image/png',
     tilePath: '{z}/{x}/{y}.png',
@@ -94,6 +107,7 @@ export const MAP_PROVIDERS = {
   },
   macrostrat: {
     attributions: '© <a href="https://macrostrat.org/#about">macrostrat</a>',
+    credits: ['Macrostrat'],
     imageType: 'png',
     mime: 'image/png',
     tilePath: '/{z}/{x}/{y}.png',
@@ -101,6 +115,7 @@ export const MAP_PROVIDERS = {
   },
   strabospot_mapbox: {
     attributions: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.',
+    credits: ['Mapbox', 'OpenStreetMap'],
     imageType: 'png',
     mime: 'image/png',
     tilePath: '/{z}/{x}/{y}.png',
@@ -109,6 +124,9 @@ export const MAP_PROVIDERS = {
   },
   strabospot_mymaps: {
     attributions: '<a href="https://www.strabospot.org">StraboSpot Contributed</a>',
+    // The maps here are contributed by StraboSpot's users, who keep whatever rights they hold in them. StraboSpot
+    // serves the tiles and claims no copyright of its own, so it is named as a source rather than a rights holder.
+    contributedVia: 'StraboSpot',
     imageType: 'png',
     mime: 'image/png',
     tilePath: '{z}/{x}/{y}.png',
@@ -117,6 +135,7 @@ export const MAP_PROVIDERS = {
   },
   strabospot_usgs_hillshade: {
     attributions: '© <a href="https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer">The USGS 3D Elevation Program (3DEP) Bare Earth DEM Dynamic Service</a>',
+    credits: ['USGS 3DEP'],
     imageType: 'png',
     mime: 'image/png',
     tilePath: '/{z}/{x}/{y}.png',

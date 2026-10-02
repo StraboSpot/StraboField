@@ -42,9 +42,9 @@ const getText = (node, text = []) => {
   return text;
 };
 
-// Open a feature's detail view, optionally moving to another tab and typing there, and report what the tab bar
-// says and whether Save is being held
-const openDetail = async ({page, spot, selectedAttribute, tabIndex}) => {
+// Open a feature's detail view, optionally moving to another tab and typing there, or typing on the tab it opens
+// on, and report what the tab bar says and whether Save is being held
+const openDetail = async ({isEdited, page, spot, selectedAttribute, tabIndex}) => {
   const settle = async () => ReactTestRenderer.act(async () => {});
   let renderer;
   await ReactTestRenderer.act(() => {
@@ -63,6 +63,8 @@ const openDetail = async ({page, spot, selectedAttribute, tabIndex}) => {
     const tabs = renderer.root.findAll(n => n.props?.testID === 'RNE__ButtonGroupItem' && n.props?.onPress);
     await ReactTestRenderer.act(() => tabs[tabIndex].props.onPress());
     await settle();
+  }
+  if (tabIndex || isEdited) {
     // Typing on the tab revalidates, which is where the fields of the tab left behind used to drop out
     const inputs = renderer.root.findAll(n => n.props?.onChangeText);
     await ReactTestRenderer.act(() => inputs[0].props.onChangeText('typed on this tab'));
@@ -89,7 +91,8 @@ describe('lithology tabs', () => {
     },
   });
 
-  const openLithology = lithology => openDetail({
+  const openLithology = (lithology, isEdited) => openDetail({
+    isEdited: isEdited,
     page: <BasicSedPage isReadOnly={false} page={{key: 'lithologies', label: 'Lithologies'}}/>,
     selectedAttribute: lithology,
     spot: getIntervalSpot(lithology),
@@ -111,12 +114,20 @@ describe('lithology tabs', () => {
     expect(markedTabs).not.toContain('Texture *');
   });
 
+  // Edited, since Save is also held until there is a change to save
   it('marks no tab once every field the interval asks for is answered', async () => {
     const {isSaveHeld, markedTabs} = await openLithology(
-      {id: 'lith-1', primary_lithology: 'siliciclastic', siliciclastic_type: 'sandstone', sand_grain_size: 'coarse'});
+      {id: 'lith-1', primary_lithology: 'siliciclastic', siliciclastic_type: 'sandstone', sand_grain_size: 'coarse'},
+      true);
     expect(markedTabs).toContain('Texture');
     expect(markedTabs).not.toContain('*');
     expect(isSaveHeld).toBe(false);
+  });
+
+  it('holds Save on a complete lithology until something is changed', async () => {
+    const {isSaveHeld} = await openLithology(
+      {id: 'lith-1', primary_lithology: 'siliciclastic', siliciclastic_type: 'sandstone', sand_grain_size: 'coarse'});
+    expect(isSaveHeld).toBe(true);
   });
 });
 

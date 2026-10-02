@@ -116,7 +116,6 @@ const SignUp = ({navigation}) => {
   /* Logic Helpers */
 
   const signUp = async () => {
-    console.log('ConnectedValue', userData.password.value);
     setIsLoading(true);
     try {
       const newUser = await registerUser(userData);

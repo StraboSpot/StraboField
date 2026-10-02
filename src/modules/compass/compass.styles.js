@@ -37,6 +37,27 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     textAlign: 'center',
   },
+  declinationMessageContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 25,
+  },
+  declinationMessageText: {
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontSize: themes.PRIMARY_TEXT_SIZE,
+    textAlign: 'center',
+  },
+  declinationWarningBanner: {
+    backgroundColor: themes.WARNING_COLOR,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+  },
+  declinationWarningText: {
+    color: themes.WHITE,
+    fontSize: themes.PRIMARY_TEXT_SIZE - 2,
+    textAlign: 'center',
+  },
   matrixDataButtonContainer: {
     alignItems: 'center',
     flexDirection: 'row',

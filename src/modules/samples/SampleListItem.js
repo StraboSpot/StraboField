@@ -10,6 +10,7 @@ import {getSampleMetadata, getSampleTitle} from './samples.helpers';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
+import {SAMPLES_COLOR} from '../../shared/styles.constants';
 import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import CheckboxList from '../../shared/ui/CheckboxList';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
@@ -22,6 +23,7 @@ const SampleListItem = ({
                           canPickReadOnly,
                           isCheckedList,
                           isItemChecked,
+                          isOutlined,
                           isShowAvatar,
                           isShowIGSN,
                           isShowSubtitle,
@@ -41,6 +43,8 @@ const SampleListItem = ({
   /* Derived Variables */
 
   const isReadOnly = !canPickReadOnly && isSpotReadOnly(parentSpot);
+  // A rich sample is a Spot of its own, which can sit in a different dataset to its parent
+  const isSampleReadOnly = isReadOnly || (!!sample.properties?.isSample && isSpotReadOnly(sample));
   const sampleMetadata = getSampleMetadata(sample);
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 
@@ -68,7 +72,7 @@ const SampleListItem = ({
   return (
     <>
     <ListItem
-      containerStyle={commonStyles.listItem}
+      containerStyle={[commonStyles.listItem, isOutlined && {borderColor: SAMPLES_COLOR, borderWidth: 2.5}]}
       key={'SampleListItem' + sampleMetadata.id}
       onPress={() => isCheckedList ? handleCheckBoxPressed() : onPress(sample)}
     >
@@ -90,7 +94,8 @@ const SampleListItem = ({
             </ListItem.Subtitle>
           )}
         </View>
-        {(isShowIGSN || sampleMetadata.Sample_IGSN) && (
+        {/* Viewing an existing IGSN is fine read-only; getting one would register and change the sample */}
+        {(sampleMetadata.Sample_IGSN || (isShowIGSN && !isSampleReadOnly)) && (
           <View>
             <IGSNLogo
               item={sampleMetadata}

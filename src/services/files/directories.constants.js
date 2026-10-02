@@ -13,6 +13,10 @@ const microDir = appDir + '/Micro/';
 const microZipsDir = appDir + '/Micro/Zips/';
 const tilesDir = documentDir + '/StraboSpotTiles';
 const tileCacheDir = tilesDir + '/TileCache/';
+// One tile per custom map, standing in for it in the map layers list. A sibling of the tile cache rather than
+// something inside it: readDirectoryForMapFiles reads every entry of that one as a downloaded map, so a loose
+// file there would be listed as one.
+const tileThumbnailsDir = tilesDir + '/TileThumbnails/';
 const glyphsDir = appDir + '/Glyphs/';   // Bundled map-label glyphs, installed at startup for offline text
 const tileTempDir = tilesDir + '/TileTemp/';
 const tileZipsDir = tilesDir + '/TileZips/';
@@ -47,6 +51,7 @@ export const APP_DIRECTORIES = {
   TILE_CACHE: tileCacheDir,
   TILES_DIRECTORY: tilesDir,
   TILE_TEMP: tileTempDir,
+  TILE_THUMBNAILS: tileThumbnailsDir,
   TILE_ZIP: tileZipsDir,
 
   // iOS-only

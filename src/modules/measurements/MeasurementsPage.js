@@ -32,7 +32,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  const {createNewMeasurement, deleteMeasurements, toggleMeasurementHiddenOnMap} = useMeasurements();
+  const {createNewMeasurement, deleteMeasurements} = useMeasurements();
 
   /* Local State */
 
@@ -270,7 +270,6 @@ const MeasurementsPage = ({isReadOnly, page}) => {
               isSelectMode={multiSelectMode === sectionType}
               item={item}
               onPress={() => onMeasurementPressed(item, section.title)}
-              onToggleHiddenOnMap={!isReadOnly && toggleMeasurementHiddenOnMap}
               selectedIds={getIdsOfSelected()}
             />
           );

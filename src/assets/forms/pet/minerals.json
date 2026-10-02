@@ -132,20 +132,25 @@
       "type": "decimal",
       "name": "average_grain_size_mm",
       "label": "Average Grain Size (mm)",
-      "required": "false"
+      "required": "false",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "maximum_grain_size_mm",
       "label": "Maximum Grain Size (mm)",
-      "required": "false"
+      "required": "false",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be greater than 0."
     },
     {
       "type": "decimal",
       "name": "modal",
       "label": "Modal %",
       "required": "false",
-      "constraint": ". <= 100 and . > 0"
+      "constraint": ". <= 100 and . > 0",
+      "constraint_message": "Value must be greater than 0 and no more than 100."
     },
     {
       "type": "text",

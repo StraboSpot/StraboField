@@ -18,6 +18,7 @@ import CustomMapDetails from '../maps/custom-maps/CustomMapDetails';
 import ManageCustomMaps from '../maps/custom-maps/ManageCustomMaps';
 import ImageBasemapsList from '../maps/ImageBasemapsList';
 import ManageOfflineMapsMenu from '../maps/offline-maps/ManageOfflineMaps';
+import OfflineMapDetails from '../maps/offline-maps/OfflineMapDetails';
 import StratSectionsList from '../maps/strat-section/StratSectionsList';
 import MicroProjectsList from '../micro/MicroProjectsList';
 import AddingNewSpots from '../preferences/AddingNewSpots';
@@ -47,6 +48,13 @@ import Tags from '../tags/Tags';
 import Templates from '../templates/Templates';
 import UserConventions from '../user/UserConventions';
 import UserProfile from '../user/UserProfile';
+
+// Pages that render their own header, or none at all
+const PAGES_WITH_OWN_HEADER = [
+  MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES,
+  MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS,
+  MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS,
+];
 
 const MainMenuPanel = forwardRef(({
                                     closeMainMenuPanel,
@@ -90,10 +98,7 @@ const MainMenuPanel = forwardRef(({
   const renderMainMenuContent = () => {
     return (
       <>
-        {!isSidePanelVisible
-          && (!mainMenuPageVisible
-            || (mainMenuPageVisible && mainMenuPageVisible !== MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS
-              && mainMenuPageVisible !== MAIN_MENU_ITEMS.CUSTOMIZE_AND_PRESET.TEMPLATES))
+        {!isSidePanelVisible && !PAGES_WITH_OWN_HEADER.includes(mainMenuPageVisible)
           && <MainMenuPanelHeader onOverflowMenuPress={isTagsPage && (() => setIsTagsOverflowMenuVisible(true))}/>
         }
         {renderMainMenuList()}
@@ -167,14 +172,19 @@ const MainMenuPanel = forwardRef(({
 
       // Maps
       case MAIN_MENU_ITEMS.MAPS.CUSTOM:
-        return <ManageCustomMaps zoomToCustomMap={mapComponentRef?.current?.zoomToCustomMap}/>;
+        return (
+          <ManageCustomMaps
+            zoomToCustomMap={mapComponentRef?.current?.zoomToCustomMap}
+            zoomToOfflineMapTiles={mapComponentRef?.current?.zoomToOfflineMapTiles}
+          />
+        );
       case MAIN_MENU_ITEMS.MAPS.IMAGE_BASEMAPS :
         return <ImageBasemapsList closeManMenuPanel={closeMainMenuPanel} openDatasetsPage={openDatasetsPage}/>;
       case MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS:
         return (
           <ManageOfflineMapsMenu
             closeMainMenuPanel={closeMainMenuPanel}
-            zoomToCenterOfflineTile={mapComponentRef?.current?.zoomToCenterOfflineTile}
+            zoomToOfflineMapTiles={mapComponentRef?.current?.zoomToOfflineMapTiles}
           />
         );
 
@@ -223,9 +233,16 @@ const MainMenuPanel = forwardRef(({
       case SIDE_PANEL_VIEWS.IMPORT_PROJECT:
         return <ImportProjectFromZip/>;
       case SIDE_PANEL_VIEWS.MANAGE_CUSTOM_MAP:
-        return <CustomMapDetails/>;
+        return (
+          <CustomMapDetails
+            closeMainMenuPanel={closeMainMenuPanel}
+            zoomToCustomMap={mapComponentRef?.current?.zoomToCustomMap}
+          />
+        );
       case SIDE_PANEL_VIEWS.NEW_PROJECT:
         return <NewProject closeNotebookPanel={closeNotebookPanel}/>;
+      case SIDE_PANEL_VIEWS.OFFLINE_MAP_DETAILS:
+        return <OfflineMapDetails/>;
       case SIDE_PANEL_VIEWS.OPEN_PROJECT:
         return <OpenProject closeMainMenuPanel={closeMainMenuPanel} closeNotebookPanel={closeNotebookPanel}/>;
       case SIDE_PANEL_VIEWS.TAG_ADD_REMOVE_FEATURES:

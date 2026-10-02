@@ -82,7 +82,7 @@ const AddFabricModal = () => {
   const saveFabric = async () => {
     try {
       const {values} = await submitAndShowErrors(formRef.current);
-      const editedFabricData = await resolveLabelOnSave(
+      const editedFabricData = resolveLabelOnSave(
         {pageKey: PAGE_KEYS.FABRICS, values: values, getLabel: getLabel, getLabels: getLabels});
       console.log('Saving fabric data to Spot ...');
       let editedFabricsData = spot.properties.fabrics ? JSON.parse(JSON.stringify(spot.properties.fabrics)) : [];

@@ -1,13 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {AppState, Platform, View} from 'react-native';
+import {ActivityIndicator, AppState, Platform, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
 import {setCompassMeasurements} from './compass.slice';
+import compassStyles from './compass.styles';
 import CompassDebug from './CompassDebug';
 import CompassFace from './CompassFace';
 import useCompassSound from './useCompassSound';
-import useCompassCore from '../../services/device/useCompassCore';
+import useCompassCore, {DECLINATION_SOURCE} from '../../services/device/useCompassCore';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
@@ -26,6 +27,7 @@ const Compass = ({
   const compassMeasurements = useSelector(state => state.compass.measurements);
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const modalVisible = useSelector(state => state.home.modalVisible);
+  const {isSample} = useSelector(state => state.spot.selectedSpot.properties);
 
   const {
     compassData,
@@ -42,6 +44,8 @@ const Compass = ({
   /* Local State */
 
   const hasShownCalibrationAlert = useRef(false);
+  const [declinationSource, setDeclinationSource] = useState(null);
+  const [isResolvingDeclination, setIsResolvingDeclination] = useState(true);
   const [showCompassRawDataView, setShowCompassRawDataView] = useState(false);
 
   /* Side Effects */
@@ -50,29 +54,27 @@ const Compass = ({
     console.log('UE Compass []');
     let isMounted = true;
 
-    const declinationReady = fetchDeclination().catch((err) => {
-      console.error('Magnetic Declination not available', err);
-      alert('Magnetic Declination Unavailable',
-        'Could not determine magnetic declination from your location. Enable Location Services, or — on a '
-        + 'device without GPS such as a Wi-Fi-only iPad — enter it manually under Project Description > '
-        + 'Magnetic Declination and the app will apply it to compass measurements.');
-      throw err; // rethrow so the Android branch can tell success from failure and not start with declination 0
-    });
-
     const startSensors = () => {
-      if (!isMounted) return; // component unmounted before declination resolved
       subscribeToSensors();
       subscribeToCalibrationStatus(handleCalibrationStatus);
     };
 
-    // Android converts magnetic -> true north in JS by adding this declination. Starting the stream
-    // before the fetch resolves would record magnetic values, and starting it after the fetch FAILS
-    // (declination stuck at 0) would silently record magnetic mislabeled as true. So only start once
-    // declination is known; on failure the user got the alert above and the compass stays unstarted.
-    // iOS gets true north straight from CoreMotion's reference frame and doesn't use this value, so it
-    // subscribes immediately.
-    if (Platform.OS === 'android') declinationReady.then(startSensors).catch(() => {});
-    else startSensors();
+    // Resolve the declination first (GPS -> project -> centroid -> none), then start the sensors. Starting
+    // before it resolves would let Android record magnetic values mislabeled as true north, and a null source
+    // means we have no way to reach true north for this measurement, so the compass stays disabled instead.
+    fetchDeclination()
+      .then(({source}) => {
+        if (!isMounted) return; // component unmounted before declination resolved
+        setDeclinationSource(source);
+        setIsResolvingDeclination(false);
+        if (source !== null) startSensors();
+      })
+      .catch((err) => {
+        console.error('Error resolving magnetic declination', err);
+        if (!isMounted) return;
+        setDeclinationSource(null);
+        setIsResolvingDeclination(false);
+      });
 
     const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
     return () => {
@@ -155,16 +157,46 @@ const Compass = ({
 
   /* View */
 
-  return (
-    <View style={{flex: 1}}>
-      <CompassFace
-        compassData={compassData}
-        compassMeasurementTypes={compassMeasurementTypes}
-        grabMeasurements={grabMeasurements}
-      />
-      {showCompassRawDataView && <CompassDebug compassData={compassData} matrixRotation={matrixRawData?.current}/>}
-    </View>
-  );
+  const renderCompassBody = () => {
+    if (isResolvingDeclination) {
+      return (
+        <View style={compassStyles.declinationMessageContainer}>
+          <ActivityIndicator size='large'/>
+          <Text style={compassStyles.declinationMessageText}>Determining magnetic declination…</Text>
+        </View>
+      );
+    }
+    if (declinationSource === null) {
+      return (
+        <View style={compassStyles.declinationMessageContainer}>
+          <Text style={compassStyles.declinationMessageText}>
+            Compass unavailable. Magnetic declination cannot be determined here. Turn on Location Services, add a
+            location to this Spot, or enter a Magnetic Declination in Project Description, then reopen the compass.
+          </Text>
+        </View>
+      );
+    }
+    return (
+      <>
+        {declinationSource === DECLINATION_SOURCE.CENTROID && (
+          <View style={compassStyles.declinationWarningBanner}>
+            <Text style={compassStyles.declinationWarningText}>
+              GPS unavailable — using the location where this {isSample ? 'Sample' : 'Spot'} was created.
+              Declination may be less accurate.
+            </Text>
+          </View>
+        )}
+        <CompassFace
+          compassData={compassData}
+          compassMeasurementTypes={compassMeasurementTypes}
+          grabMeasurements={grabMeasurements}
+        />
+        {showCompassRawDataView && <CompassDebug compassData={compassData} matrixRotation={matrixRawData?.current}/>}
+      </>
+    );
+  };
+
+  return <View style={{flex: 1}}>{renderCompassBody()}</View>;
 };
 
 export default Compass;

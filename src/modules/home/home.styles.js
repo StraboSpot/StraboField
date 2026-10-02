@@ -175,22 +175,6 @@ const homeStyles = StyleSheet.create({
     right: 10,
     top: 10,
   },
-  offlineMapLabelContainer: {
-    alignItems: 'center',
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 60,
-    zIndex: -1,
-  },
-  offlineMapViewLabel: {
-    color: 'yellow',
-    fontSize: 20,
-    fontWeight: 'bold',
-    padding: 10,
-    textShadowColor: 'black',
-    textShadowRadius: 10,
-  },
   shortcutButtons: {
     position: 'absolute',
     right: 10,

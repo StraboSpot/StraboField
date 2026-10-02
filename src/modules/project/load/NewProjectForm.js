@@ -17,7 +17,8 @@ import useProject from '../useProject';
 const initialValues = {
   start_date: new Date().toISOString(),
   gps_datum: 'WGS84 (Default)',
-  magnetic_declination: 0,
+  // No magnetic_declination default: a new project starts with the field empty so it can be seeded from the
+  // first GPS/centroid reading (or entered manually), rather than baking in a literal 0 that reads as a real value.
 };
 
 const NewProjectForm = ({openMainMenuPanel}) => {

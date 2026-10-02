@@ -21,8 +21,14 @@
  * Writes the files fastlane reads for store uploads:
  *   - App Store (deliver): fastlane/metadata/en-US/release_notes.txt        (grouped, <= 4000 chars)
  *   - Play (supply):       fastlane/metadata/android/en-US/changelogs/<versionCode>.txt (<= 500 chars)
- * When the aggregated notes exceed a store's cap, they are trimmed to fit and a
+ * When the App Store notes exceed the cap, they are trimmed to fit and a
  * "Full notes: <GitHub release>" link is appended so users can read the rest.
+ *
+ * Play's cap only fits a handful of lines, so Play is prioritized rather than truncated: items with a
+ * short `play` blurb are the highlights, listed feature releases (x.y.0) first, then patches newest
+ * first; whatever doesn't fit or has no blurb folds into a closing "Plus more fixes" line. A range with
+ * no `play` items falls back to one compact line per group. Items tagged `platforms` (e.g. ['ios'],
+ * ['web']) are left out of the other platform's store notes.
  *
  * Also writes WHAT_TO_TEST.md at the repo root — a tester-facing rendering of the same curated
  * notes, refreshed on every run for paste into TestFlight / Play testing notes. It is gitignored
@@ -98,6 +104,20 @@ async function fetchAppStoreVersion() {
   }
 }
 
+// Keep only the items that apply to a store's platform (untagged items apply everywhere), dropping
+// groups left empty.
+function forPlatform(entries, platform) {
+  return entries.map(entry => ({
+    ...entry,
+    groups: entry.groups
+      .map(g => ({...g, items: g.items.filter(i => !i.platforms || i.platforms.includes(platform))}))
+      .filter(g => g.items.length),
+  }));
+}
+
+// A feature release (x.y.0) outranks the patches that follow it.
+const isFeatureRelease = version => /^\d+\.\d+\.0$/.test(version);
+
 // Merge the groups of several release entries into one deduplicated, ordered list. Entries are
 // passed newest-first, so the newest release's group titles lead and, within a title, its items
 // come first.
@@ -137,32 +157,42 @@ function appStoreText(groups, notesUrl) {
   return kept.join('\n\n') + tail;
 }
 
-// Play: one compact line per group (title + item labels), packed to fit the 500-char cap. On
-// overflow, append a "Full notes" link instead of the footer so users can read the rest.
-function playText(groups, version, notesUrl) {
-  const header = `StraboField ${version}\n\n`;
-  if (!groups.length) return `${header}• Stability and reliability improvements`;
+// Play: the `play` highlights in priority order (feature releases first, then patches newest first),
+// packed to the 500-char cap. Anything skipped folds into a closing "Plus more fixes" line.
+function playText(entries, version, storeVersion) {
+  const aggregated = entries.length > 1 && storeVersion;
+  const header = aggregated ? `New since ${storeVersion}:\n` : `StraboField ${version}\n\n`;
+  const ranked = [...entries.filter(e => isFeatureRelease(e.version)), ...entries.filter(e => !isFeatureRelease(e.version))];
+  const items = ranked.flatMap(e => e.groups.flatMap(g => g.items));
+  const highlights = items.filter(i => i.play).map(i => `• ${i.play}`);
+  if (!highlights.length) return playGroupText(mergeGroups(entries), header);
 
-  const lines = groups.map(g => `• ${g.title}: ${g.items.map(i => label(i.text)).join('; ')}`);
-  const link = `Full notes: ${notesUrl}`;
-  const fits = arr => header.length + arr.join('\n').length <= PLAY_LIMIT;
-
+  const more = '• Plus more fixes and improvements';
+  const fits = arr => (header + arr.join('\n')).length <= PLAY_LIMIT;
   const kept = [];
-  let overflow = false;
-  for (const line of lines) {
-    if (fits([...kept, line])) kept.push(line);
-    else {
-      overflow = true;
-      break;
-    }
+  for (const line of highlights) {
+    if (fits([...kept, line, more])) kept.push(line);
   }
-  if (overflow) {
-    while (kept.length && !fits([...kept, '', link])) kept.pop();
-    return `${header}${[...kept, '', link].join('\n')}`;
-  }
-  let out = header + kept.join('\n');
+  const lines = kept.length < items.length ? [...kept, more] : kept;
+  let out = header + lines.join('\n');
   if (out.length + 2 + FOOTER.length <= PLAY_LIMIT) out += `\n\n${FOOTER}`;
   return out;
+}
+
+// Play fallback when no item has a `play` blurb: one compact line per group (title + item labels),
+// keeping as many leading groups as fit.
+function playGroupText(groups, header) {
+  if (!groups.length) return `${header}• Stability and reliability improvements`;
+  const lines = groups.map(g => `• ${g.title}: ${g.items.map(i => label(i.text)).join('; ')}`);
+  const more = '• Plus more fixes and improvements';
+  const fits = arr => (header + arr.join('\n')).length <= PLAY_LIMIT;
+  const kept = [];
+  for (const line of lines) {
+    if (fits([...kept, line, more])) kept.push(line);
+    else break;
+  }
+  const out = header + (kept.length < lines.length ? [...kept, more] : kept).join('\n');
+  return out.length + 2 + FOOTER.length <= PLAY_LIMIT ? `${out}\n\n${FOOTER}` : out;
 }
 
 // WHAT_TO_TEST.md: a tester-facing rendering of the same curated highlights — a heading per group,
@@ -222,12 +252,11 @@ async function main() {
   if (!entries.length) entries = RELEASE_NOTES.filter(r => r.version === target); // store already at/ahead of target
   entries.sort((a, b) => compareVersions(b.version, a.version));
 
-  const groups = mergeGroups(entries);
   const notesUrl = releaseUrl(COMMIT_BASE_URL, target);
 
-  const appStore = appStoreText(groups, notesUrl);
-  const play = playText(groups, target, notesUrl);
-  const whatToTest = whatToTestText(groups, target, versionCode);
+  const appStore = appStoreText(mergeGroups(forPlatform(entries, 'ios')), notesUrl);
+  const play = playText(forPlatform(entries, 'android'), target, storeVersion);
+  const whatToTest = whatToTestText(mergeGroups(entries), target, versionCode);
 
   const appFile = path.join(ROOT, 'fastlane/metadata/en-US/release_notes.txt');
   const playFile = path.join(ROOT, `fastlane/metadata/android/en-US/changelogs/${versionCode || 'draft'}.txt`);

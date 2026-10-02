@@ -32,7 +32,8 @@ const ProjectDescription = () => {
   const projectDescription = {
     ...project.description,
     gps_datum: project.description?.gps_datum || 'WGS84 (Default)',
-    magnetic_declination: project.description?.magnetic_declination || 0,
+    // No `|| 0` default: 0 is a valid declination (the agonic line), and a field the user cleared must stay
+    // empty rather than snap back to 0. The value is spread straight through from the saved description.
   };
 
   /* Side Effects */

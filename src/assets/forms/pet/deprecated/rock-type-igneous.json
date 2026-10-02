@@ -42,7 +42,9 @@
       "name": "color_index_pluton",
       "label": "Color Index",
       "required": "false",
-      "relevant": "selected(${igneous_rock_class}, 'plutonic')"
+      "relevant": "selected(${igneous_rock_class}, 'plutonic')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_one nx1fj58",
@@ -86,7 +88,9 @@
       "name": "pluton_characteristic_size_of",
       "label": "Characteristic size of crystals, mm",
       "required": "false",
-      "relevant": "selected(${igneous_rock_class}, 'plutonic')"
+      "relevant": "selected(${igneous_rock_class}, 'plutonic')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be a whole number greater than 0."
     },
     {
       "type": "select_multiple pt2tr54",
@@ -172,7 +176,9 @@
       "name": "color_index_volc",
       "label": "Color Index",
       "required": "false",
-      "relevant": "selected(${igneous_rock_class}, 'volcanic')"
+      "relevant": "selected(${igneous_rock_class}, 'volcanic')",
+      "constraint": ". >= 0 and . <= 100",
+      "constraint_message": "Value must be between 0 and 100."
     },
     {
       "type": "select_one nx1fj58",
@@ -186,7 +192,9 @@
       "name": "vol_characteristic_size_of_cry",
       "label": "Characteristic size of crystals, mm",
       "required": "false",
-      "relevant": "selected(${igneous_rock_class}, 'volcanic')"
+      "relevant": "selected(${igneous_rock_class}, 'volcanic')",
+      "constraint": ". > 0",
+      "constraint_message": "Value must be a whole number greater than 0."
     },
     {
       "type": "select_multiple kc4rs46",

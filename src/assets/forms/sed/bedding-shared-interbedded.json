@@ -17,6 +17,7 @@
       "label": "Lithology 1: Interbed Relative Proportion (%)",
       "required": false,
       "constraint": ". > 0 and . <= 50",
+      "constraint_message": "Value must be greater than 0 and no more than 50.",
       "relevant": "",
       "read_only": "",
       "calculation": "",
