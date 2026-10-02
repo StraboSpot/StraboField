@@ -25,6 +25,10 @@ export const SAMPLE_LOCATION_KEY = 'location';
 // Coordinates are compared to no more decimal places than StraboSamples gives them, and never more than this many
 export const SAMPLE_LOCATION_MAX_DECIMALS = 5;
 
+// StraboSamples needs the sample owner's user id, which a profile saved before the server sent it doesn't have
+export const MISSING_STRABO_USER_ID_MESSAGE = 'Your user profile is missing your StraboSpot user id. Go to Profile,'
+  + ' tap Download User Profile, then try again.';
+
 export const STRABOSAMPLES_FIELD_MAP = {
   name: ['sample_id_name', 'label'],
   igsn: 'Sample_IGSN',

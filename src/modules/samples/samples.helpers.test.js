@@ -197,6 +197,12 @@ describe('getStraboSampleFromResponse', () => {
   it('keeps what sits inside a wrapped sample', () => {
     expect(getStraboSampleFromResponse({sample: {id: 'a', subsystem_links: links}}).subsystem_links).toBe(links);
   });
+
+  it('keeps data beside a wrapped sample that the sample leaves empty', () => {
+    const microData = {thin_sections: [{id: 1}]};
+    expect(getStraboSampleFromResponse({sample: {id: 'a', micro_data: null}, micro_data: microData}).micro_data)
+      .toBe(microData);
+  });
 });
 
 describe('isLinkedToFieldSpot', () => {

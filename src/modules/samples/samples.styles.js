@@ -103,6 +103,10 @@ const sampleStyles = StyleSheet.create({
   linkedCardStatusContainer: {
     alignItems: 'center',
   },
+  linkedCardStatusUploaded: {
+    color: PRIMARY_ACCENT_COLOR,
+    fontStyle: 'normal',
+  },
   linkedCardTitle: {
     color: PRIMARY_TEXT_COLOR,
     fontSize: SMALL_TEXT_SIZE,

@@ -104,9 +104,12 @@ export const getSamplesLinkedTo = (spots, strabosamplesId, fieldSampleId) => Obj
 
 // The sample in a /samplesdb/sample response. The sample's own fields may come wrapped in a `sample` object, with
 // what the doc lists beside them (subsystem_links, field_data and the rest) either inside it or next to it, so both
-// levels are read and the sample's own fields win where the two share a key.
-export const getStraboSampleFromResponse = response => response?.sample ? {...response, ...response.sample}
-  : response;
+// levels are read. The sample's own fields win where both have a value, so an empty one inside it can't hide one beside
+// it.
+export const getStraboSampleFromResponse = response => response?.sample ? {
+  ...response,
+  ...Object.fromEntries(Object.entries(response.sample).filter(([, value]) => !isEmpty(value))),
+} : response;
 
 // A Field link's reference_id is the id of the Spot holding the sample, not the sample's own id: a rich sample's own
 // Spot, whose id is the sample's, or the parent Spot of a sample kept on it (which the link marks rich: false). It is
