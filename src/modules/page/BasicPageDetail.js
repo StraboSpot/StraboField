@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
+import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {RED} from '../../shared/styles.constants';
 import {FormFlatList} from '../../shared/ui';
@@ -18,6 +19,7 @@ import {Form, useForm} from '../form';
 import {overlayStyles} from '../home/overlays';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {isTokenExpired} from '../samples/igsn/igsn.helpers';
 import IGSNModal from '../samples/igsn/IGSNModal';
 import useSamples from '../samples/useSamples';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
@@ -26,6 +28,12 @@ import {useSpots} from '../spots';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {useTags} from '../tags';
 import {messages} from './ui/Messages';
+
+// Formik's dirty flag only exists inside the form, and Save is drawn outside it, so pass it up as it changes
+const FormDirtyReporter = ({dirty, setIsFormDirty}) => {
+  useEffect(() => setIsFormDirty(dirty), [dirty]);
+  return null;
+};
 
 const BasicPageDetail = ({
                            PageTabsComponent,
@@ -41,6 +49,7 @@ const BasicPageDetail = ({
 
   const dispatch = useDispatch();
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
+  const {encoded_login, sesar} = useSelector(state => state.user);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {showErrors, validateForm} = useForm();
@@ -49,15 +58,18 @@ const BasicPageDetail = ({
   const {deleteSedFeature, onSedFormChange, saveSedBedFeature, saveSedFeature} = useSed();
   const {checkSampleName} = useSpots();
   const {deleteFeatureTags} = useTags();
+  const {getOrcidToken} = useServerRequests();
   const toast = useToast();
 
   /* Local State */
 
   const formRef = useRef(null);
+  const isDiscardedRef = useRef(false);
 
   const [initialValues, setInitialValues] = useState(selectedFeature);
   const [igsnFormValues, setIgsnFormValues] = useState(null);
   const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
+  const [isFormDirty, setIsFormDirty] = useState(false);
   const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
   const [isSaveDisabled, setIsSaveDisabled] = useState(false);
@@ -75,6 +87,13 @@ const BasicPageDetail = ({
     else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
   }
   const isTemplate = saveTemplate;
+  // An unchanged sample has nothing to save, and saving one with an IGSN would only send the same data to SESAR again
+  const isSampleUnchanged = pageKey === PAGE_KEYS.SAMPLES && !isTemplate && !isFormDirty;
+  // Saving a sample already on SESAR updates it there, which needs a SESAR session: one was never made, was dropped
+  // after a failed refresh, or can no longer be refreshed. The sign-in otherwise lives in the IGSN modal, which only
+  // Save opens, so Save becomes the sign-in. An access token that has merely expired is refreshed on save instead.
+  const isSesarSignInNeeded = !!selectedFeature.isOnMySesar && !!selectedFeature.Sample_IGSN && isInternetReachable
+    && (!sesar?.sesarToken?.access || isTokenExpired(sesar.sesarToken.refresh));
   const title = groupKey === 'pet' && pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS
   && !selectedFeature.rock_type && selectedFeature.igneous_rock_class
     ? toTitleCase(selectedFeature.igneous_rock_class.replace('_', ' ') + ' Rock')
@@ -115,17 +134,44 @@ const BasicPageDetail = ({
   /* Logic Helpers */
 
   const cancelForm = async () => {
+    // A sample on SESAR can only be saved through Save, which updates SESAR too (see saveForm). Ask here, while the
+    // page is still open, so the edits can be kept and saved properly; leaving would only be able to drop them.
+    if (hasUnsavedChanges() && isOnSesar(formRef.current.values)) {
+      alert('Unsaved Changes',
+        'This sample has an IGSN, so changes must be saved with Save, which also updates SESAR. Discard your changes?',
+        [{
+          text: 'Keep Editing',
+          style: 'cancel',
+        }, {
+          text: 'Discard',
+          style: 'destructive',
+          onPress: () => {
+            // Marks the edits as dealt with, so leaving does not go on to ask about them
+            isDiscardedRef.current = true;
+            closeDetailView();
+          },
+        }],
+        {cancelable: false},
+      );
+      return;
+    }
     closeDetailView();
   };
 
+  // Runs as the page unmounts, from the closure of its first render, so it reads the form rather than props/state
   const confirmLeavePage = () => {
-    const description = isIGSNChecked
-      ? 'Would you like to save your data before continuing? \n\n This sample was not registered to SESAR. Please re-save sample to register to SESAR.'
-      : 'Would you like to save your data before continuing?';
-    if (!isTemplate && formRef.current && formRef.current.dirty) {
+    if (hasUnsavedChanges()) {
       const formCurrent = formRef.current;
+      // Saving a sample on SESAR opens the IGSN modal to update it there, and that modal is part of this page, which
+      // is going away. Saving here would change the sample locally only, leaving SESAR out of step.
+      if (isOnSesar(formCurrent.values)) {
+        alert('Changes Not Saved',
+          'This sample has an IGSN, so changes can only be saved with Save, which also updates SESAR. Your changes '
+          + 'were not saved.');
+        return;
+      }
       alert('Unsaved Changes',
-        description,
+        'Would you like to save your data before continuing?',
         [{
           text: 'No',
           style: 'cancel',
@@ -194,6 +240,11 @@ const BasicPageDetail = ({
     }
   };
 
+  const hasUnsavedChanges = () => !isTemplate && !isDiscardedRef.current && !!formRef.current?.dirty;
+
+  // Saved through the IGSN modal so SESAR is updated too, as in saveForm
+  const isOnSesar = values => !!values?.Sample_IGSN && !!values?.isOnMySesar;
+
   const saveButtonOnPress = () => {
     isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
   };
@@ -257,6 +308,15 @@ const BasicPageDetail = ({
     saveTemplate(formValues);
   };
 
+  // The ORCID redirect comes back to the IGSN modal mounted below, which stores the SESAR tokens; Save then returns.
+  const signIntoSesar = async () => {
+    if (!encoded_login) {
+      alert('Sign in to StraboSpot', 'Please sign in to your StraboSpot account before connecting to MySESAR.');
+      return;
+    }
+    await getOrcidToken();
+  };
+
   const updateIGSNAndShowModal = async (formCurrent) => {
     const values = {...formCurrent.values};
     await saveFeature(formCurrent);
@@ -281,6 +341,7 @@ const BasicPageDetail = ({
         >
           {formProps => (
             <>
+              <FormDirtyReporter dirty={formProps.dirty} setIsFormDirty={setIsFormDirty}/>
               <Form {...{
                 ...formProps,
                 formName: formName,
@@ -331,10 +392,16 @@ const BasicPageDetail = ({
                     </Text>
                   </View>
                 )}
+                {isSesarSignInNeeded && (
+                  <Text style={{color: RED, fontSize: 16, fontWeight: '500', padding: 10, textAlign: 'center'}}>
+                    This sample has an IGSN, so changes are also saved to SESAR. Please sign in to SESAR to save.
+                  </Text>
+                )}
                 <SaveAndCancelButtons
                   cancel={cancelForm}
-                  getIsDisabled={isSaveDisabled}
-                  save={saveButtonOnPress}
+                  getIsDisabled={!isSesarSignInNeeded && (isSaveDisabled || isSampleUnchanged)}
+                  save={isSesarSignInNeeded ? signIntoSesar : saveButtonOnPress}
+                  title={isSesarSignInNeeded ? 'Sign in to SESAR' : undefined}
                 />
               </>
             )}
