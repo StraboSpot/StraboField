@@ -45,7 +45,8 @@ const useServerRequests = () => {
   const getSesarErrorMessage = (json) => {
     const fieldErrors = Object.values(json?.errors || {}).flat().filter(e => typeof e === 'string');
     const message = json?.error || json?.message || json?.detail;
-    return [message, ...fieldErrors].filter(Boolean).join('\n') || undefined;
+    // `message` usually repeats one of the field errors, so drop duplicates before joining.
+    return [...new Set([message, ...fieldErrors].filter(Boolean))].join('\n') || undefined;
   };
 
   // Registers (POST /samples/) or updates (PATCH /samples/{igsn}/) a sample through the SESAR v2 JSON API and
@@ -72,7 +73,10 @@ const useServerRequests = () => {
     const json = await response.json().catch(() => undefined);
     console.log('SESAR Sample Response', response.status, json);
     // Validation failures come back as 400 {message, errors: {field: [messages]}}.
-    if (!response.ok) throw Error(getSesarErrorMessage(json) || `SESAR rejected the sample (status ${response.status}).`);
+    if (!response.ok) {
+      throw Error(
+        getSesarErrorMessage(json) || `SESAR rejected the sample (status ${response.status}).`);
+    }
     const sample = json?.data ?? json;
     if (!sample?.igsn) throw Error('SESAR returned an unreadable response. Please try again.');
     return sample;
@@ -178,9 +182,13 @@ const useServerRequests = () => {
     getRequest(`${baseUrl}/project/${projectId}`, basicAuth(encodedLogin));
 
   const getSesarToken = async (orcidToken) => {
-    // Exchanges the ORCID id token for a SESAR access/refresh pair tied to the StraboSpot connection.
-    const response = await postRequest(`${SESAR_PATHS.SESAR_API}${SESAR_PATHS.GET_TOKEN}`,
-      JSON.stringify({token: orcidToken}), null, {'Accept': 'application/json', 'Content-Type': 'application/json'});
+    // Exchanges the ORCID id token for a SESAR access/refresh pair tied to the StraboSpot connection. The token must
+    // go as form data: this endpoint ignores a JSON body and answers as if no token was sent ("The given ORCID JWT is
+    // either invalid..."). Content-Type is left unset so fetch adds the multipart boundary.
+    const formData = new FormData();
+    formData.append('token', orcidToken);
+    const response = await postRequest(`${SESAR_PATHS.SESAR_API}${SESAR_PATHS.GET_TOKEN}`, formData, null,
+      {'Accept': 'application/json'});
     const json = await response.json();
     // SESAR v2 wraps the token pair in `data` ({data: {access, refresh}}); fall back to a top-level pair.
     const tokens = json.data ?? json;
