@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 
 import {useToast} from 'react-native-toast-notifications';
+import {useSelector} from 'react-redux';
 
 import useSamples from './useSamples';
 import {isEmpty} from '../../shared/helpers';
@@ -12,6 +13,7 @@ import alert from '../../shared/ui/alert';
 const useLinkSampleAction = (sampleChangesRef) => {
   /* Data Hooks */
 
+  const {isConnected, isInternetReachable} = useSelector(state => state.connections.isOnline);
   const toast = useToast();
   const {getSelectedSample, unlinkSample} = useSamples();
 
@@ -24,6 +26,8 @@ const useLinkSampleAction = (sampleChangesRef) => {
   /* Derived Variables */
 
   const isLinked = !isEmpty(getSelectedSample()?.strabosamples_id);
+  // Linking picks from StraboSamples, so it needs a connection. Unlinking is made on the device.
+  const isLinkOrUnlinkDisabled = !isLinked && !(isConnected && isInternetReachable);
 
   /* Side Effects */
 
@@ -69,6 +73,7 @@ const useLinkSampleAction = (sampleChangesRef) => {
     closeLinkSampleModal: () => setIsLinkSampleModalVisible(false),
     isLinkSampleModalVisible: isLinkSampleModalVisible,
     isLinked: isLinked,
+    isLinkOrUnlinkDisabled: isLinkOrUnlinkDisabled,
     linkOrUnlinkSample: linkOrUnlinkSample,
   };
 };

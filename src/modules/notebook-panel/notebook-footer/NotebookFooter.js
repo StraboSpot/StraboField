@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -14,6 +14,7 @@ import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import {NOTEBOOK_PAGES} from '../../page/page.constants';
 import usePage from '../../page/usePage';
 import LinkSampleModal from '../../samples/LinkSampleModal';
+import sampleStyles from '../../samples/samples.styles';
 import useLinkSampleAction from '../../samples/useLinkSampleAction';
 import useSamples from '../../samples/useSamples';
 
@@ -33,7 +34,13 @@ const NotebookFooter = ({
 
   const {getAllRelevantPages} = usePage();
   const {createRichSample} = useSamples();
-  const {closeLinkSampleModal, isLinkSampleModalVisible, isLinked, linkOrUnlinkSample} = useLinkSampleAction(
+  const {
+    closeLinkSampleModal,
+    isLinkOrUnlinkDisabled,
+    isLinkSampleModalVisible,
+    isLinked,
+    linkOrUnlinkSample,
+  } = useLinkSampleAction(
     sampleChangesRef);
 
   /* Local State */
@@ -76,35 +83,43 @@ const NotebookFooter = ({
     <View style={footerStyle.footerContainer}>
       {(!isEmpty(selectedSample) && !isRichSample) ? (
         // A sample kept on its parent Spot has no notebook menu of its own to link it from, so it is linked here
-        <View style={[footerStyle.footerIconContainer, footerStyle.sampleButtonsContainer]}>
-          {/* Adding data and linking both rewrite the sample, so a read-only Spot offers neither */}
-          {!isReadOnly && (
-            <>
-              <OutlineButton
-                containerStyle={footerStyle.sampleButtonContainer}
-                icon={{
-                  color: PRIMARY_ACCENT_COLOR,
-                  name: 'add',
-                  size: 20,
-                }}
-                iconContainerStyle={{paddingRight: 0}}
-                onPress={convertToRichSample}
-                title={'Add Data'}
-              />
-              <OutlineButton
-                containerStyle={footerStyle.sampleButtonContainer}
-                icon={{
-                  color: PRIMARY_ACCENT_COLOR,
-                  name: isLinked ? 'unlink' : 'link',
-                  size: 20,
-                  type: 'ionicon',
-                }}
-                onPress={linkOrUnlinkSample}
-                title={isLinked ? 'Unlink Sample' : 'Link Sample'}
-              />
-            </>
+        <>
+          <View style={[footerStyle.footerIconContainer, footerStyle.sampleButtonsContainer]}>
+            {/* Adding data and linking both rewrite the sample, so a read-only Spot offers neither */}
+            {!isReadOnly && (
+              <>
+                <OutlineButton
+                  containerStyle={footerStyle.sampleButtonContainer}
+                  icon={{
+                    color: PRIMARY_ACCENT_COLOR,
+                    name: 'add',
+                    size: 20,
+                  }}
+                  iconContainerStyle={{paddingRight: 0}}
+                  onPress={convertToRichSample}
+                  title={'Add Data'}
+                />
+                <OutlineButton
+                  containerStyle={footerStyle.sampleButtonContainer}
+                  disabled={isLinkOrUnlinkDisabled}
+                  icon={{
+                    color: PRIMARY_ACCENT_COLOR,
+                    name: isLinked ? 'unlink' : 'link',
+                    size: 20,
+                    type: 'ionicon',
+                  }}
+                  onPress={linkOrUnlinkSample}
+                  title={isLinked ? 'Unlink Sample' : 'Link Sample'}
+                />
+              </>
+            )}
+          </View>
+          {!isReadOnly && isLinkOrUnlinkDisabled && (
+            <Text style={[sampleStyles.offlineNote, {paddingBottom: 8, paddingTop: 0}]}>
+              Linking a sample needs an internet connection
+            </Text>
           )}
-        </View>
+        </>
       ) : (
         <>
           <View

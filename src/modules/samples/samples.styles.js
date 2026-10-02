@@ -28,6 +28,9 @@ const sampleStyles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 10,
   },
+  actionButtonDisabled: {
+    borderColor: MEDIUMGREY,
+  },
   actionButtonPressed: {
     backgroundColor: PRIMARY_ACCENT_COLOR_FADED_20,
   },
@@ -35,6 +38,9 @@ const sampleStyles = StyleSheet.create({
     color: PRIMARY_ACCENT_COLOR,
     fontSize: SMALL_TEXT_SIZE,
     fontWeight: TEXT_WEIGHT_500,
+  },
+  actionButtonTextDisabled: {
+    color: MEDIUMGREY,
   },
   actionButtonsContainer: {
     flexDirection: 'row',
@@ -144,6 +150,13 @@ const sampleStyles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  offlineNote: {
+    color: DARKGREY,
+    fontSize: SMALL_TEXT_SIZE,
+    fontStyle: 'italic',
+    paddingTop: 6,
+    textAlign: 'center',
   },
 });
 

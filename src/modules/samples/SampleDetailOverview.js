@@ -25,7 +25,13 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel, getSurvey} = useForm();
-  const {closeLinkSampleModal, isLinkSampleModalVisible, isLinked, linkOrUnlinkSample} = useLinkSampleAction();
+  const {
+    closeLinkSampleModal,
+    isLinkOrUnlinkDisabled,
+    isLinkSampleModalVisible,
+    isLinked,
+    linkOrUnlinkSample,
+  } = useLinkSampleAction();
   const {isSpotReadOnly} = useSpots();
 
   /* Local State */
@@ -123,12 +129,16 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
           <SampleActionButton
             accessibilityHint={isLinked ? 'Removes the link to StraboSamples'
               : 'Links this sample to a sample in StraboSamples'}
+            disabled={isLinkOrUnlinkDisabled}
             iconName={isLinked ? 'unlink-outline' : 'link-outline'}
             onPress={isLinked ? onUnlinkPressed : linkOrUnlinkSample}
             title={isLinked ? 'Unlink' : 'Link Sample'}
           />
         )}
       </View>
+      {!isReadOnly && isLinkOrUnlinkDisabled && (
+        <Text style={sampleStyles.offlineNote}>Linking a sample needs an internet connection</Text>
+      )}
       <IGSNModal
         isVisible={isIGSNModalVisible}
         onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
