@@ -140,7 +140,10 @@ const useForm = () => {
         else if (fieldModel.type === 'decimal') {
           values[key] = isNaN(parseFloat(values[key])) ? undefined : parseFloat(values[key]);
         }
-        if (key === 'end_date' && Date.parse(values.start_date) > Date.parse(values.end_date)) {
+        // Compared by calendar day, not raw timestamp: the fields are picked and shown as dates (MM/DD/YYYY) but
+        // stored with the time-of-day they were set, so an equal start and end day would otherwise fail on the clock.
+        if (key === 'end_date' && !isEmpty(values.start_date)
+          && moment(values.start_date).isAfter(moment(values.end_date), 'day')) {
           errors[key] = fieldModel.constraint_message;
         }
         if (fieldModel.constraint) {
