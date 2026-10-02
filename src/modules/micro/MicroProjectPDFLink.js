@@ -6,11 +6,12 @@ import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 
-// Opens a StraboMicro project's PDF. It is downloaded when the sample is linked, and again here if that didn't happen.
+// Opens a StraboMicro project's PDF. It is downloaded when the sample is linked, and again here if that didn't happen
+// or the project has changed on the server since.
 const MicroProjectPDFLink = ({projectId}) => {
   /* Data Hooks */
 
-  const {downloadMicroProjectIfMissing} = useMicro();
+  const {downloadMicroProjectIfMissingOrOutdated} = useMicro();
 
   /* Local State */
 
@@ -23,7 +24,7 @@ const MicroProjectPDFLink = ({projectId}) => {
   const onPress = async () => {
     try {
       setIsLoading(true);
-      setDoc(await downloadMicroProjectIfMissing(projectId));
+      setDoc(await downloadMicroProjectIfMissingOrOutdated(projectId));
       setIsVisible(true);
     }
     catch (err) {
