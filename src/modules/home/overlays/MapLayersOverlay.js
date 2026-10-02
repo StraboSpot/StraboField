@@ -204,15 +204,18 @@ const MapLayersOverlay = ({onTouchOutside, visible, zoomToCustomMap}) => {
             {isOffline && <ListItem.Subtitle style={subtitleStyle}>({customMap.count} tiles)</ListItem.Subtitle>}
             {isPreviewed && <ListItem.Subtitle style={subtitleStyle}>Previewing offline map</ListItem.Subtitle>}
           </ListItem.Content>
-          {/* Status rather than a control: an overlay left on is drawn on the map whether its options are open
+          {/* Says the map is drawn over the basemap, since an overlay left on is drawn whether its options are open
            or not, and the row no longer keeps the switch that used to say so by being on. In the row and not
-           under the name, where it would cost a third line under a title already allowed two. */}
+           under the name, where it would cost a third line under a title already allowed two. It opens the
+           options, where the switch is: without a press of its own, a tap on it fell through to the row and
+           made the map the basemap, switching the overlay off while leaving the map on screen. */}
           {isOverlayOn && (
             <Icon
-              accessibilityLabel={'This map is drawn over the basemap'}
+              accessibilityLabel={'This map is drawn over the basemap. Show its options'}
               color={themes.PRIMARY_ACCENT_COLOR}
               containerStyle={overlayStatusStyle}
               name={'layers'}
+              onPress={() => onToggleOptionsShown(settingsMap)}
               size={20}
               type={'ionicon'}
             />
