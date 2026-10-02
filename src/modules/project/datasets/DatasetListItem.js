@@ -71,7 +71,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         <Icon
           color={checked ? themes.PRIMARY_ACCENT_COLOR : isActive || isReadOnly ? themes.MEDIUMGREY
             : themes.SECONDARY_BACKGROUND_COLOR}
-          disabled={!isActive}
+          disabled={!isActive || isReadOnly}
           disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
           name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
           onPress={() => makeDatasetCurrent(dataset.id)}
