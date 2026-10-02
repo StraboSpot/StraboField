@@ -259,6 +259,27 @@ describe('addedProjectFromServer', () => {
     expect(project.reports[0].modified_timestamp).toBe(1756000000000);
     expect(project.reports[0]).not.toHaveProperty('updated_timestamp');
   });
+
+  // The selected tag is a copy, and the tag pages save from it. Left as it was, it would write the tag back over
+  // whatever the server merged into it.
+  it('replaces the selected tag with the server\'s copy of it', () => {
+    const state = {project: {tags: [{id: 't1', spots: [spotId]}]}, selectedTag: {id: 't1', spots: [spotId]}};
+    const incoming = {id: 1, tags: [{id: 't1', spots: [spotId, otherSpotId]}]};
+    const {selectedTag} = projectReducer(state, addedProjectFromServer(incoming));
+    expect(selectedTag).toEqual({id: 't1', spots: [spotId, otherSpotId]});
+  });
+
+  it('clears the selected tag when the server no longer has it', () => {
+    const state = {project: {tags: [{id: 't1'}]}, selectedTag: {id: 't1'}};
+    const {selectedTag} = projectReducer(state, addedProjectFromServer({id: 1, tags: [{id: 't2'}]}));
+    expect(selectedTag).toEqual({});
+  });
+
+  it('leaves no tag selected when none was', () => {
+    const state = {project: {}, selectedTag: {}};
+    const {selectedTag} = projectReducer(state, addedProjectFromServer({id: 1, tags: [{id: 't1'}]}));
+    expect(selectedTag).toEqual({});
+  });
 });
 
 // The store's persist migration hands whatever is on the device to this, and a throw there makes redux-persist
