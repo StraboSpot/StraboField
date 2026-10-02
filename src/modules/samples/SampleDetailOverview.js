@@ -10,6 +10,7 @@ import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import {useForm} from '../form';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
+import useProject from '../project/useProject';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
 const SampleDetailOverview = () => {
@@ -19,6 +20,7 @@ const SampleDetailOverview = () => {
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel, getSurvey} = useForm();
+  const {isSpotInReadOnlyDataset} = useProject();
 
   /* Local State */
 
@@ -28,6 +30,8 @@ const SampleDetailOverview = () => {
 
   const sampleValues = spot.properties?.samples?.[0];
   const sampleIGSN = sampleValues?.Sample_IGSN;
+  // Viewing an existing IGSN is fine read-only; getting one would register and change the sample
+  const isGetIGSNHidden = !sampleIGSN && isSpotInReadOnlyDataset(spot.properties?.id);
 
   let sampleDetail = JSON.parse(JSON.stringify(sampleValues ?? {}));
   delete sampleDetail.id;
@@ -91,11 +95,13 @@ const SampleDetailOverview = () => {
             View More Detail
           </Text>
         </Pressable>
-        <Pressable onPress={onViewIGSNPressed}>
-          <Text style={[commonStyles.listItemTitle, {color: PRIMARY_ACCENT_COLOR, paddingTop: 5}]}>
-            {sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}
-          </Text>
-        </Pressable>
+        {!isGetIGSNHidden && (
+          <Pressable onPress={onViewIGSNPressed}>
+            <Text style={[commonStyles.listItemTitle, {color: PRIMARY_ACCENT_COLOR, paddingTop: 5}]}>
+              {sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}
+            </Text>
+          </Pressable>
+        )}
       </View>
       <IGSNModal
         isVisible={isIGSNModalVisible}
