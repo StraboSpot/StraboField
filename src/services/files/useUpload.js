@@ -5,6 +5,7 @@ import KeepAwake from 'react-native-keep-awake';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useUploadImages from './useUploadImages';
+import {setSpotsUploadedTimestamp} from '../../modules/connections/connections.slice';
 import {addedStatusMessage} from '../../modules/home/home.slice';
 import {stripMapboxTokenFromProject} from '../../modules/maps/custom-maps/customMaps.helpers';
 import {
@@ -94,6 +95,7 @@ const useUpload = () => {
         console.log(dataset.name + ': Uploading Spots...', spotCollection);
         setUploadStatusMessage(`Uploading ${dataset.name} spots...`);
         await updateDatasetSpots(dataset.id, spotCollection);
+        dispatch(setSpotsUploadedTimestamp(Date.now()));
         setUploadStatusMessage(`Finished uploading ${dataset.name} spots.`);
       }
     }

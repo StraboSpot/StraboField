@@ -13,6 +13,7 @@ import {
 import {MACROSTRAT_PATHS, MICRO_PATHS, ORCID_PATHS, SAMPLES_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
 import {userAgent} from './userAgent.constants';
 import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
+import {MISSING_STRABO_USER_ID_MESSAGE} from '../../modules/samples/samples.constants';
 import alert from '../../shared/ui/alert';
 import {store} from '../../store/ConfigureStore';
 
@@ -186,10 +187,14 @@ const useServerRequests = () => {
   const getProject = (projectId, encodedLogin) =>
     getRequest(`${baseUrl}/project/${projectId}`, basicAuth(encodedLogin));
 
-  // Without the owner's userpkey, a sample shared by a collaborator is a 404
-  const getStraboSample = (id, ownerId) => getRequest(
-    `${getSamplesBaseUrl()}${SAMPLES_PATHS.SAMPLE}${encodeURIComponent(id)}?owner=${encodeURIComponent(ownerId)}`,
-    basicAuth());
+  // Without the owner's userpkey, a sample shared by a collaborator is a 404. With no owner given, it's the user's own,
+  // read from the store since a profile just loaded by a sign-in isn't in this render yet.
+  const getStraboSample = async (id, ownerId, encodedLogin) => {
+    const owner = ownerId || store.getState().user.straboUserId;
+    if (!owner) throw Error(MISSING_STRABO_USER_ID_MESSAGE);
+    return getRequest(`${getSamplesBaseUrl()}${SAMPLES_PATHS.SAMPLE}${encodeURIComponent(id)}?owner=${encodeURIComponent(owner)}`,
+      basicAuth(encodedLogin));
+  };
 
   const getSesarToken = async (orcidToken) => {
     // Exchanges the ORCID id token for a SESAR access/refresh pair tied to the StraboSpot connection. The token must
