@@ -1,0 +1,6 @@
+StraboField 2.31.4
+
+• IGSN works with SESAR's new system
+• Plus more fixes and improvements
+
+Thanks for using StraboSpot!

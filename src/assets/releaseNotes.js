@@ -25,6 +25,28 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 
 const RELEASE_NOTES = [
   {
+    version: '2.31.4',
+    groups: [
+      {
+        title: 'Samples & IGSN',
+        items: [
+          {
+            text: 'Works with SESAR\'s new system: signing in, registering, and updating IGSNs now use SESAR\'s latest API',
+            commit: 'b4b82e407',
+            play: 'IGSN works with SESAR\'s new system',
+          },
+        ],
+      },
+      {
+        title: 'Small touches',
+        items: [
+          {text: 'StraboMicro project PDFs scroll properly', commit: '3356b2664', platforms: ['android']},
+          {text: 'Links in PDFs can be tapped', commit: '05a433566', platforms: ['android']},
+        ],
+      },
+    ],
+  },
+  {
     version: '2.31.3',
     groups: [
       {
