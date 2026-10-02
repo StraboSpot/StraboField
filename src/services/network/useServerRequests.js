@@ -186,8 +186,10 @@ const useServerRequests = () => {
   const getProject = (projectId, encodedLogin) =>
     getRequest(`${baseUrl}/project/${projectId}`, basicAuth(encodedLogin));
 
-  const getStraboSample = id =>
-    getRequest(`${getSamplesBaseUrl()}${SAMPLES_PATHS.SAMPLE}${encodeURIComponent(id)}`, basicAuth());
+  // Without the owner's userpkey, a sample shared by a collaborator is a 404
+  const getStraboSample = (id, ownerId) => getRequest(
+    `${getSamplesBaseUrl()}${SAMPLES_PATHS.SAMPLE}${encodeURIComponent(id)}?owner=${encodeURIComponent(ownerId)}`,
+    basicAuth());
 
   const getSesarToken = async (orcidToken) => {
     // Exchanges the ORCID id token for a SESAR access/refresh pair tied to the StraboSpot connection. The token must

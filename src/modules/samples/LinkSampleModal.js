@@ -81,7 +81,7 @@ const LinkSampleModal = ({closeModal, isVisible}) => {
     try {
       setErrorMessage('');
       setIsLoading(true);
-      const strabosample = getStraboSampleFromResponse(await getStraboSample(getStraboSamplesId(item)));
+      const strabosample = getStraboSampleFromResponse(await getStraboSample(getStraboSamplesId(item), item.userpkey));
       // Only ever link the id the user picked, so a response for anything else is an error rather than a link
       if (isEmpty(strabosample?.id) || getStraboSamplesId(strabosample) !== getStraboSamplesId(item)) {
         throw new Error('StraboSamples returned a different sample than the one picked.');

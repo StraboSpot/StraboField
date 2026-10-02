@@ -24,9 +24,10 @@ const useStraboSampleWebPage = () => {
     : undefined;
 
   // Whether the server has the link yet, which it only does once the Spot holding the sample has been uploaded. The
-  // server knows the link by that Spot: a rich sample's own, or the parent of a sample kept on it.
+  // server knows the link by that Spot: a rich sample's own, or the parent of a sample kept on it. Only the user's own
+  // samples can be linked, so the user is the owner.
   const getIsLinkUploaded = async (strabosamplesId, spotId) => {
-    const strabosample = getStraboSampleFromResponse(await getStraboSample(strabosamplesId)) ?? {};
+    const strabosample = getStraboSampleFromResponse(await getStraboSample(strabosamplesId, straboUserId)) ?? {};
     return isLinkedToFieldSpot(strabosample, spotId);
   };
 
