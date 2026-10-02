@@ -1,10 +1,7 @@
-StraboField 2.32.0
+New since 2.31.3:
+• Compass readings no longer overwritten by templates
+• Photos picked together no longer overwrite each other
+• IGSN works with SESAR's new system
+• Plus more fixes and improvements
 
-• Stability: Crash fix; Fewer crashes
-• Forms & validation: Live form validation; Find the problem field; Auto dip direction; Negative numbers on iOS
-• Compass: Automatic declination; Compass over template
-• Measurements: Hide from map; Bulk strike/dip; Steadier validation
-• Tags: Memos on tags; Cleaner tag counts; Sample tagging
-• Memos: Memo authorship; Associated samples; Memos in Overview
-
-Full notes: https://github.com/StraboSpot/StraboField/releases/tag/v2.32.0
+Thanks for using StraboSpot!
