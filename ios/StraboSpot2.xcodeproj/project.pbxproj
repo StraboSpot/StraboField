@@ -18,6 +18,7 @@
 		D6E5C2BF2ABE281C005F243A /* Compass.m in Sources */ = {isa = PBXBuildFile; fileRef = D6E5C2BD2ABE281C005F243A /* Compass.m */; };
 		D6E5C2C22ABE2CA2005F243A /* compass_button_click.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D6E5C2C12ABE2CA1005F243A /* compass_button_click.mp3 */; };
 		D6EAF5652BCD8C2400AF6566 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = D6EAF5642BCD8C2400AF6566 /* PrivacyInfo.xcprivacy */; };
+		D6F1A0012EB0000100A1B2C3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F1A0022EB0000100A1B2C3 /* SceneDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		D6E5C2C02ABE282A005F243A /* StraboSpot2-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "StraboSpot2-Bridging-Header.h"; sourceTree = "<group>"; };
 		D6E5C2C12ABE2CA1005F243A /* compass_button_click.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = compass_button_click.mp3; path = ../src/assets/sounds/compass_button_click.mp3; sourceTree = "<group>"; };
 		D6EAF5642BCD8C2400AF6566 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		D6F1A0022EB0000100A1B2C3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -81,6 +83,7 @@
 			isa = PBXGroup;
 			children = (
 				D6C43B472DBC40DE0086A202 /* AppDelegate.swift */,
+				D6F1A0022EB0000100A1B2C3 /* SceneDelegate.swift */,
 				D6E5C2C12ABE2CA1005F243A /* compass_button_click.mp3 */,
 				D6E5C2C02ABE282A005F243A /* StraboSpot2-Bridging-Header.h */,
 				D6E5C2BD2ABE281C005F243A /* Compass.m */,
@@ -350,6 +353,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D6C43B482DBC40DE0086A202 /* AppDelegate.swift in Sources */,
+				D6F1A0012EB0000100A1B2C3 /* SceneDelegate.swift in Sources */,
 				D6E5C2BB2ABE277D005F243A /* Compass.swift in Sources */,
 				D6E5C2BE2ABE281C005F243A /* Dummy.swift in Sources */,
 				D6E5C2BF2ABE281C005F243A /* Compass.m in Sources */,
