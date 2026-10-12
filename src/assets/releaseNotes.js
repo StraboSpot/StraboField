@@ -25,6 +25,68 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 
 const RELEASE_NOTES = [
   {
+    version: '2.31.6',
+    groups: [
+      {
+        title: 'Measurements',
+        items: [
+          {
+            text: 'Steady compass for lineations: trend and plunge are always taken along the top of the screen, which now stays in portrait while the compass is open, instead of sometimes reading 90° or 180° off depending on how the device was held. The live strike/dip and trend/plunge are shown under the compass',
+            commit: '543c2cc2f',
+            play: 'Lineation trend no longer reads 90° or 180° off',
+          },
+        ],
+      },
+      {
+        title: 'Notebook & navigation',
+        items: [
+          {
+            text: 'Zoom to Spot: zooming to a Spot opened from the Spot Navigator no longer crashes or reopens the navigator',
+            commit: 'ea10e66e8',
+            play: 'Zoom to Spot from the Spot Navigator no longer crashes',
+          },
+          {
+            text: 'Notebook tab on phones: the Notebook tab no longer goes blank after opening a project',
+            commit: 'b258ceffd',
+            play: 'Notebook tab no longer blank after opening a project',
+          },
+          {
+            text: 'Notebook from the image viewer: the Notebook button opens the Notebook instead of a second map',
+            commit: '8dcad73d2',
+          },
+        ],
+      },
+      {
+        title: 'Photos & backups',
+        items: [
+          {
+            text: 'Photo resize errors: a photo that fails to resize shows an error instead of closing the app',
+            commit: '85f39627e',
+            platforms: ['ios'],
+          },
+          {
+            text: 'Re-importing backups: images already on the device are copied correctly when a backup is imported again',
+            commit: 'd7db85335',
+            platforms: ['ios'],
+          },
+        ],
+      },
+      {
+        title: 'Maps & sign-in',
+        items: [
+          {
+            text: 'Downloaded custom maps: a custom map without an id no longer stops a downloaded project\'s custom maps from loading',
+            commit: 'e2316ee24',
+          },
+          {
+            text: 'Forgot password: when the reset link can\'t be opened, the sign-in screen tells you where to reset it',
+            commit: '5cb339d3c',
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '2.31.5',
     groups: [
       {

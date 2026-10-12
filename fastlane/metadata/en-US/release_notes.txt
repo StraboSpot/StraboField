@@ -1,29 +1,17 @@
 MEASUREMENTS
-• Compass over template: a fresh compass reading now takes priority over an active template
-• Strike from dip direction: entering a dip direction fills in the strike instead of writing NaN
+• Steady compass for lineations: trend and plunge are always taken along the top of the screen, which now stays in portrait while the compass is open, instead of sometimes reading 90° or 180° off depending on how the device was held. The live strike/dip and trend/plunge are shown under the compass
 
-PHOTOS
-• Photos picked together: several photos saved at once no longer collide and overwrite each other
+NOTEBOOK & NAVIGATION
+• Zoom to Spot: zooming to a Spot opened from the Spot Navigator no longer crashes or reopens the navigator
+• Notebook tab on phones: the Notebook tab no longer goes blank after opening a project
+• Notebook from the image viewer: the Notebook button opens the Notebook instead of a second map
 
-READ-ONLY DATASETS
-• Spots stay out of read-only datasets: Spots can no longer be moved, copied, or created into a read-only dataset
-• Locked samples and features: Add Data to Sample, Get IGSN, and Other Feature fields are disabled on read-only Spots
+PHOTOS & BACKUPS
+• Photo resize errors: a photo that fails to resize shows an error instead of closing the app
+• Re-importing backups: images already on the device are copied correctly when a backup is imported again
 
-SAMPLES & IGSN
-• SESAR sign-in when saving: saving a sample with an IGSN prompts you to sign in to SESAR when needed
-• Works with SESAR's new system: signing in, registering, and updating IGSNs now use SESAR's latest API
-
-FORMS & DATA
-• Same-day date ranges: an equal start and end date no longer fails validation
-• Correct sed choices: "masses" (diagenesis) and "Supratidal" (environment) now save as their own values
-• Mineral lookup: looking up a mineral keeps the data already entered, and a mineral with no name shows Unknown
-• Template deletions sync: deleting a template marks the project as changed
-
-SMALL TOUCHES
-• Map editing: Edit goes straight to the selected Spot when it is on the current map
-• Halted collaborations: an owner's project shows in the server list again once its collaboration is halted
-• Project screen on tablets: shows as a centered box instead of fullscreen
-• Profile photo: a camera or gallery error no longer breaks setting a profile photo
-• StraboField naming: permission prompts and support email now say StraboField
+MAPS & SIGN-IN
+• Downloaded custom maps: a custom map without an id no longer stops a downloaded project's custom maps from loading
+• Forgot password: when the reset link can't be opened, the sign-in screen tells you where to reset it
 
 Thanks for using StraboSpot!

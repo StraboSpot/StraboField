@@ -1,0 +1,8 @@
+StraboField 2.31.6
+
+• Lineation trend no longer reads 90° or 180° off
+• Zoom to Spot from the Spot Navigator no longer crashes
+• Notebook tab no longer blank after opening a project
+• Plus more fixes and improvements
+
+Thanks for using StraboSpot!
