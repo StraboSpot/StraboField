@@ -5,11 +5,14 @@ const useDeviceOrientation = () => {
 
   const lockToPortrait = () => {};
 
+  const lockToPortraitWhileOpen = async () => () => {};
+
   const unlockOrientation = () => {};
 
   return {
     lockOrientation,
     lockToPortrait,
+    lockToPortraitWhileOpen,
     unlockOrientation,
   };
 };
