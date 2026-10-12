@@ -21,18 +21,17 @@ const useDeviceOrientation = () => {
       {...toastOptions, type: 'lock'});
   };
 
-  // Freezes the UI to whatever orientation it is in right now (the specific one, so which landscape is
-  // preserved too). Used when the compass opens so moving/tilting the tablet to sight a measurement can't
-  // flip the screen. Falls back to aspect ratio if the current orientation isn't lockable (e.g. face up).
-  const lockToCurrentOrientation = async () => {
-    const current = await RNOrientationDirector.getInterfaceOrientation();
-    const target = RNOrientationDirector.isLockableOrientation(current)
-      ? current
-      : (width > height ? Orientation.landscape : Orientation.portrait);
-    RNOrientationDirector.lockTo(target);
-    toast.show(
-      `Screen orientation LOCKED to ${RNOrientationDirector.convertOrientationToHumanReadableString(target)}`,
-      {...toastOptions, type: 'lock'});
+  // Holds the UI in portrait while the compass is open, on every device, so the edge the compass measures a
+  // lineation along (the device's top edge) is always the edge at the top of the screen, and the screen can't
+  // rotate while sighting a reading. Quiet, since it happens on every compass open. Returns a function that puts
+  // back whatever was there before: unlocked, or the lock that was already set (the small-screen portrait lock,
+  // or the user's own lock from the map, possibly landscape). There's no getter for the locked orientation, but
+  // while locked the interface orientation is the locked one, so that's read before overriding it.
+  const lockToPortraitWhileOpen = async () => {
+    const previousLock = RNOrientationDirector.isLocked() ? await RNOrientationDirector.getInterfaceOrientation()
+      : null;
+    RNOrientationDirector.lockTo(Orientation.portrait);
+    return () => (previousLock ? RNOrientationDirector.lockTo(previousLock) : RNOrientationDirector.unlock());
   };
 
   const lockToPortrait = () => {
@@ -47,8 +46,8 @@ const useDeviceOrientation = () => {
 
   return {
     lockOrientation,
-    lockToCurrentOrientation,
     lockToPortrait,
+    lockToPortraitWhileOpen,
     unlockOrientation,
   };
 };
