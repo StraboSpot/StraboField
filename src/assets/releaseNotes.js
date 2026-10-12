@@ -25,6 +25,21 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 
 const RELEASE_NOTES = [
   {
+    version: '2.31.7',
+    groups: [
+      {
+        title: 'Photos',
+        items: [
+          {
+            text: 'Taking photos on iPad: taking photos, especially several in a row, no longer crashes the app',
+            commit: 'f3808f8b9',
+            platforms: ['ios'],
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '2.31.6',
     groups: [
       {

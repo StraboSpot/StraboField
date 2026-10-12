@@ -1,3 +1,6 @@
+PHOTOS
+• Taking photos on iPad: taking photos, especially several in a row, no longer crashes the app
+
 MEASUREMENTS
 • Steady compass for lineations: trend and plunge are always taken along the top of the screen, which now stays in portrait while the compass is open, instead of sometimes reading 90° or 180° off depending on how the device was held. The live strike/dip and trend/plunge are shown under the compass
 
