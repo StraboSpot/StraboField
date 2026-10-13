@@ -219,6 +219,9 @@ const Compass = ({
           grabMeasurements={grabMeasurements}
         />
         {renderLiveReading()}
+        {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR) && (
+          <Text style={compassStyles.lineationHintText}>Align long side with lineation</Text>
+        )}
         {showCompassRawDataView && <CompassDebug compassData={compassData} matrixRotation={matrixRawData?.current}/>}
       </>
     );
