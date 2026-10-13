@@ -172,12 +172,12 @@ const Compass = ({
       <>
         {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR) && (
           <Text style={compassStyles.liveReadingText}>
-            Strike {formatValue(compassData.strike)}   Dip {formatValue(compassData.dip)}
+            Strike {formatValue(compassData.strike)} Dip {formatValue(compassData.dip)}
           </Text>
         )}
         {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR) && (
           <Text style={compassStyles.liveReadingText}>
-            Trend {formatValue(compassData.trend)}   Plunge {formatValue(compassData.plunge)}
+            Trend {formatValue(compassData.trend)} Plunge {formatValue(compassData.plunge)}
           </Text>
         )}
       </>
@@ -219,11 +219,6 @@ const Compass = ({
           grabMeasurements={grabMeasurements}
         />
         {renderLiveReading()}
-        {/* The screen is locked to portrait and trend is taken along the device's top edge, so a user holding the
-        device sideways (as landscape support used to allow) needs telling which way to point it. */}
-        {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR) && (
-          <Text style={compassStyles.lineationHintText}>Point the top of the screen along the lineation</Text>
-        )}
         {showCompassRawDataView && <CompassDebug compassData={compassData} matrixRotation={matrixRawData?.current}/>}
       </>
     );

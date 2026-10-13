@@ -4,7 +4,7 @@ import {NativeEventEmitter, Platform} from 'react-native';
 import geomagnetism from 'geomagnetism';
 import {useSelector} from 'react-redux';
 
-import {cartesianToSpherical, getStrikeAndDip, getTrendAndPlunge, mod} from './compassMath.helpers';
+import {cartesianToSpherical, getStrikeAndDip, getTrendAndPlunge, mod, pointingAxisRow} from './compassMath.helpers';
 import CompassModule from './CompassModule';
 import useMapCoords from '../../modules/maps/view/useMapCoords';
 import useMapLocation from '../../modules/maps/view/useMapLocation';
@@ -69,7 +69,7 @@ const useCompassCore = () => {
     let {magneticHeading, trueHeading} = matrixRotationData;
     if (applyDeclination) trueHeading = mod(magneticHeading + appliedDeclination, 360);
     const {strike, dip} = getStrikeAndDipFromMatrix(matrix, appliedDeclination);
-    const {plunge, trend} = getTrendAndPlungeFromMatrix(matrix, appliedDeclination);
+    const {plunge, trend} = getTrendAndPlungeFromMatrix(matrix, appliedDeclination, matrixRotationData.screenRotation);
 
     const dipDirection = mod(strike + 90, 360);
     setCompassData({
@@ -110,15 +110,18 @@ const useCompassCore = () => {
     return {strike, dip};
   };
 
-  // Uses the Y axis (m2x row) — the device's top edge, which the user points along the lineation. Always the top
-  // edge, whatever the hold: Compass.js locks the screen to portrait while the compass is open, so that's also
-  // the edge at the top of the screen on every device. Following the hold instead (from 2.31.2) picked the
-  // edge from gravity when the compass opened, which was random with the device flat and a short edge when held
-  // sideways, so lineations came out 90 or 180 degrees off (#1005).
-  const getTrendAndPlungeFromMatrix = (matrix, declination) => {
-    const {m21, m22, m23} = matrix;
-    const ENU_TP = Platform.OS === 'ios' ? cartesianToSpherical(-m22, m21, m23)
-      : cartesianToSpherical(m21, m22, m23);
+  // Uses the edge at the top of the screen, which the user points along the lineation. Compass.js locks the
+  // screen to portrait while the compass is open, so on iOS that's always the device's top edge (Y, the m2x row).
+  // Android's matrix is in the device's natural frame, and some Android tablets are naturally landscape, so a
+  // portrait screen there is rotated from that frame: the native module reports the screen's rotation and
+  // pointingAxisRow picks the matching device edge (0 = top edge, as on iOS). Read on every sample rather than
+  // latched, so it settles as soon as the portrait lock has rotated the screen. Following the hold from gravity
+  // instead (2.31.2-2.31.5) was random with the device flat and a short edge when held sideways, so lineations
+  // came out 90 or 180 degrees off (#1005).
+  const getTrendAndPlungeFromMatrix = (matrix, declination, screenRotation) => {
+    const {a, b, c} = pointingAxisRow(matrix, Platform.OS === 'ios' ? 0 : screenRotation);
+    const ENU_TP = Platform.OS === 'ios' ? cartesianToSpherical(-b, a, c)
+      : cartesianToSpherical(a, b, c);
     let {plunge, trend} = getTrendAndPlunge(ENU_TP);
     trend = mod(trend + declination, 360); // declination resolved by caller (0 when already true north)
     return {plunge, trend};

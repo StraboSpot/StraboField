@@ -186,6 +186,21 @@ const RELEASE_NOTES = [
     ],
   },
   {
+    version: '2.31.8',
+    groups: [
+      {
+        title: 'Measurements',
+        items: [
+          {
+            text: 'Adjusted Android tablets whose natural top is in landscape',
+            commit: '9e737be',
+            platforms: ['android'],
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '2.31.7',
     groups: [
       {
@@ -329,13 +344,19 @@ const RELEASE_NOTES = [
       {
         title: 'Small touches',
         items: [
-          {text: 'Map editing: Edit goes straight to the selected Spot when it is on the current map', commit: '000aea5a6'},
+          {
+            text: 'Map editing: Edit goes straight to the selected Spot when it is on the current map',
+            commit: '000aea5a6',
+          },
           {
             text: 'Halted collaborations: an owner\'s project shows in the server list again once its collaboration is halted',
             commit: '25ec904b4',
           },
           {text: 'Project screen on tablets: shows as a centered box instead of fullscreen', commit: '7a1c2626b'},
-          {text: 'Profile photo: a camera or gallery error no longer breaks setting a profile photo', commit: '595d86752'},
+          {
+            text: 'Profile photo: a camera or gallery error no longer breaks setting a profile photo',
+            commit: '595d86752',
+          },
           {text: 'StraboField naming: permission prompts and support email now say StraboField', commit: '048edfc6d'},
         ],
       },
