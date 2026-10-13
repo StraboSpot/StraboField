@@ -19,18 +19,20 @@ const UtmFieldInputs = ({formRef, geomFormRef, isReadOnly}) => {
 
   const fillWithCurrentLocation = async () => {
     const currentLocation = await getCurrentLocation();
+    // A fix can take up to 30 seconds, long enough to have left the page and taken its forms with it
+    const geomForm = geomFormRef.current;
+    const form = formRef?.current;
+    if (!geomForm) return;
     if (currentLocation.latitude && currentLocation.longitude) {
       const {easting, northing, zone} = convertLatLngToUtm([currentLocation.longitude, currentLocation.latitude]);
-      geomFormRef.current.setFieldValue('utm_zone', zone);
-      geomFormRef.current.setFieldValue('easting', easting);
-      geomFormRef.current.setFieldValue('northing', northing);
+      geomForm.setFieldValue('utm_zone', zone);
+      geomForm.setFieldValue('easting', easting);
+      geomForm.setFieldValue('northing', northing);
     }
-    if (formRef) {
-      if (currentLocation.altitude) formRef.current.setFieldValue('altitude', currentLocation.altitude);
-      if (currentLocation.accuracy) formRef.current.setFieldValue('gps_accuracy', currentLocation.accuracy);
-      if (currentLocation.altitudeAccuracy) {
-        formRef.current.setFieldValue('altitude_accuracy', currentLocation.altitudeAccuracy);
-      }
+    if (form) {
+      if (currentLocation.altitude) form.setFieldValue('altitude', currentLocation.altitude);
+      if (currentLocation.accuracy) form.setFieldValue('gps_accuracy', currentLocation.accuracy);
+      if (currentLocation.altitudeAccuracy) form.setFieldValue('altitude_accuracy', currentLocation.altitudeAccuracy);
     }
   };
 
