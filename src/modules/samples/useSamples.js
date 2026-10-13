@@ -3,6 +3,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch} from 'react-redux';
 
 import {isEmpty} from '../../shared/helpers';
+import {hasValidCoords} from '../maps/maps.helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {addedNewSpotIdToDataset, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -33,7 +34,7 @@ const useSamples = () => {
       if (!geoCoords) return undefined;
       return turf.point(geoCoords).geometry;
     }
-    if (isEmpty(parentSpot.geometry)) return undefined;
+    if (!hasValidCoords(parentSpot)) return undefined;
     return parentSpot.geometry.type === 'Point' || parentSpot.geometry.type === 'LineString' ? parentSpot.geometry
       : turf.centroid(parentSpot).geometry;
   };

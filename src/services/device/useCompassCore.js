@@ -6,6 +6,7 @@ import {useSelector} from 'react-redux';
 
 import {cartesianToSpherical, getStrikeAndDip, getTrendAndPlunge, mod, pointingAxisRow} from './compassMath.helpers';
 import CompassModule from './CompassModule';
+import {hasValidCoords} from '../../modules/maps/maps.helpers';
 import useMapCoords from '../../modules/maps/view/useMapCoords';
 import useMapLocation from '../../modules/maps/view/useMapLocation';
 import {updatedProject} from '../../modules/project/projects.slice';
@@ -192,7 +193,7 @@ const useCompassCore = () => {
   // lng/lat). Returns undefined when neither the Spot nor any parent has a geographic location.
   const getSpotGeoCoords = () => {
     if (isEmpty(selectedSpot)) return undefined;
-    if (isOnGeoMap(selectedSpot)) return isEmpty(selectedSpot.geometry) ? undefined : getCentroidOfSelectedSpot();
+    if (isOnGeoMap(selectedSpot)) return hasValidCoords(selectedSpot) ? getCentroidOfSelectedSpot() : undefined;
     return getRootSpotGeoCoords(selectedSpot.properties.image_basemap, selectedSpot.properties.strat_section_id);
   };
 

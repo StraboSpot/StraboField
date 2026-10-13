@@ -29,6 +29,7 @@ import {
 import {deepCopyWithNewIds, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
+import {hasValidCoords} from '../maps/maps.helpers';
 import {
   clearedSpotsInMapExtentIds,
   clearedStratSection,
@@ -601,7 +602,7 @@ const useSpots = () => {
         return [rootSpot.properties.lng, rootSpot.properties.lat];
       }
       if (isOnGeoMap(rootSpot)) {
-        if (!rootSpot.geometry) return undefined;
+        if (!hasValidCoords(rootSpot)) return undefined;
         return rootSpot.geometry.type === 'Point' ? rootSpot.geometry.coordinates
           : turf.centroid(rootSpot).geometry.coordinates;
       }
