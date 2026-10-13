@@ -45,7 +45,7 @@ const NotebookHeader = ({
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const navigation = useNavigation();
-  const {getCurrentLocation} = useMapLocation();
+  const {getCurrentLocation, showLocationError} = useMapLocation();
   const {
     checkSpotName,
     getReadOnlyReason,
@@ -194,7 +194,14 @@ const NotebookHeader = ({
   // on a pixel map go - a copy inherits them with no geometry to match, see copySpot - and the open map goes with
   // them, which handleSpotSelected does and setSelectedSpot does not.
   const setToCurrentLocation = async () => {
-    const currentLocation = await getCurrentLocation();
+    let currentLocation;
+    try {
+      currentLocation = await getCurrentLocation();
+    }
+    catch (err) {
+      showLocationError(err);
+      return;
+    }
     let editedSpot = JSON.parse(JSON.stringify(spot));
     editedSpot.geometry = turf.point([currentLocation.longitude, currentLocation.latitude]).geometry;
     delete editedSpot.properties.image_basemap;

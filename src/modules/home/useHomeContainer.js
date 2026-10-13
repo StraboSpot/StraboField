@@ -1,8 +1,8 @@
-import {useToast} from 'react-native-toast-notifications';
 import {useDispatch} from 'react-redux';
 
 import {setLoadingStatus} from './home.slice';
 import {isEmpty} from '../../shared/helpers';
+import useMapLocation from '../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
@@ -12,8 +12,8 @@ const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
 
   const dispatch = useDispatch();
 
+  const {showLocationError} = useMapLocation();
   const {handleSpotSelected} = useSpots();
-  const toast = useToast();
 
   /* Exported Functions */
 
@@ -37,7 +37,7 @@ const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
     catch (err) {
       // console.error('Geolocation Error:', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      toast.show(`${err.toString()}`);
+      showLocationError(err);
     }
   };
 

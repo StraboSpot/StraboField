@@ -31,7 +31,7 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const {launchCameraFromNotebook} = useImages();
-  const {setPointAtCurrentLocation} = useMapLocation();
+  const {setPointAtCurrentLocation, showLocationError} = useMapLocation();
   const {discardSpot} = useSpots();
   const {isTargetDatasetMissing, shortcutSwitchPositions} = useShortcutSwitches();
   const toast = useToast();
@@ -68,7 +68,7 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   const capturePhotoAtCurrentLocation = async () => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     const spotNumberBeforeCreate = preferences.starting_number_for_spot;
-    const point = await setPointAtCurrentLocation();
+    const point = await getPointAtCurrentLocation();
     if (point) {
       const newImages = await launchCameraFromNotebook();
       const imagesSavedLength = newImages.length;
@@ -85,6 +85,16 @@ const ShortcutButtons = ({openNotebookPanel}) => {
       else discardSpot(point, spotNumberBeforeCreate);
     }
     dispatch(setLoadingStatus({view: 'home', bool: false}));
+  };
+
+  // Undefined when the location can't be found, so the shortcut stops and its spinner still comes down
+  const getPointAtCurrentLocation = async () => {
+    try {
+      return await setPointAtCurrentLocation();
+    }
+    catch (err) {
+      showLocationError(err);
+    }
   };
 
   // Sketch reports its save through here, so the Spot made for it is earned and no longer pending. Sketch says
@@ -107,7 +117,7 @@ const ShortcutButtons = ({openNotebookPanel}) => {
       }
       case 'sketch': {
         const spotNumberBeforeCreate = preferences.starting_number_for_spot;
-        const point = await setPointAtCurrentLocation();
+        const point = await getPointAtCurrentLocation();
         if (point) {
           pendingSketchSpotRef.current = {spot: point, spotNumber: spotNumberBeforeCreate};
           setIsSketchModalVisible(true);

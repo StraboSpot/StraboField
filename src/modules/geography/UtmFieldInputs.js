@@ -13,7 +13,7 @@ import useMapLocation from '../maps/view/useMapLocation';
 const UtmFieldInputs = ({formRef, geomFormRef, isReadOnly}) => {
   /* Data Hooks */
 
-  const {getCurrentLocation} = useMapLocation();
+  const {getCurrentLocation, showLocationError} = useMapLocation();
 
   /* Local State */
 
@@ -26,6 +26,10 @@ const UtmFieldInputs = ({formRef, geomFormRef, isReadOnly}) => {
     setIsGettingLocation(true);
     try {
       currentLocation = await getCurrentLocation();
+    }
+    catch (err) {
+      showLocationError(err);
+      return;
     }
     finally {
       setIsGettingLocation(false);
