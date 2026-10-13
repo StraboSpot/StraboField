@@ -304,16 +304,8 @@ const useServerRequests = () => {
   const verifyImagesExistence = imageIdsArray => postRequest(`${baseUrl}/verifyImages/`, imageIdsArray, basicAuth());
 
   const zipURLStatus = async (zipId) => {
-    try {
-      const response = await timeoutPromise(fetch(`${getTileBaseUrl()}/asyncstatus/${zipId}`));
-      const json = await response.json();
-      if (json.error) throw Error(json.error);
-      return json;
-    }
-    catch (err) {
-      console.error('Error in zipURLStatus', err);
-      throw new Error(err);
-    }
+    const response = await timeoutPromise(fetch(`${getTileBaseUrl()}/asyncstatus/${zipId}`));
+    return response.json();
   };
 
   return {
