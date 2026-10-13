@@ -1,8 +1,8 @@
-import {useToast} from 'react-native-toast-notifications';
 import {useDispatch} from 'react-redux';
 
 import {setLoadingStatus} from './home.slice';
 import {isEmpty} from '../../shared/helpers';
+import useMapLocation from '../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
@@ -12,8 +12,8 @@ const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
 
   const dispatch = useDispatch();
 
+  const {showLocationError} = useMapLocation();
   const {handleSpotSelected} = useSpots();
-  const toast = useToast();
 
   /* Exported Functions */
 
@@ -28,16 +28,20 @@ const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
     if (!isEmpty(attributes)) dispatch(setSelectedAttributes(attributes));
   };
 
+  // Returns whether it got there, so the geolocate button can turn back off if not
   const zoomToCurrentLocation = async () => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     try {
       await mapComponentRef.current?.zoomToCurrentLocation();
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
+      return true;
     }
     catch (err) {
       // console.error('Geolocation Error:', err);
+      showLocationError(err);
+      return false;
+    }
+    finally {
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      toast.show(`${err.toString()}`);
     }
   };
 

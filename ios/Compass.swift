@@ -16,10 +16,16 @@ import UIKit
     // project's magnetic declination (manually entered) to convert to true — the same path Android uses.
     var trueNorthAvailable = false
     var trueNorthDetermined = false
-    var currentScreenRotation = 0 // 0/90/180/270 — how the device is currently held (see screenRotation)
 
     override static func requiresMainQueueSetup() -> Bool {
         true
+    }
+
+    // Run startCompass/stopCompass on main, the same queue the CoreMotion handlers use, so the sample
+    // arrays and flags are only ever touched from one thread. Without this RN calls them on a background
+    // queue and stopCompass clears the arrays while the handlers are appending (#1006).
+  @objc override var methodQueue: DispatchQueue {
+        DispatchQueue.main
     }
 
     override func supportedEvents() -> [String]! {
@@ -61,9 +67,6 @@ import UIKit
             }
             self.trueNorthAvailable = true
             self.trueNorthDetermined = true
-            // Track the current hold from gravity so trend/plunge follows the edge that's up as the
-            // tablet is held (portrait or either landscape), rather than a fixed portrait edge.
-            self.currentScreenRotation = Compass.screenRotation(fromGravity: data.gravity)
             self.trueMatrixArray.append(data.attitude.rotationMatrix)
             if self.trueMatrixArray.count > 5 {
                 self.trueMatrixArray.removeFirst()
@@ -76,9 +79,6 @@ import UIKit
             guard let data = data else {
                 return
             }
-            // Also tracked here so the hold is known in the no-true-north fallback, where the true frame
-            // above never delivers data.
-            self.currentScreenRotation = Compass.screenRotation(fromGravity: data.gravity)
             self.magneticMatrixArray.append(data.attitude.rotationMatrix)
             if self.magneticMatrixArray.count > 5 {
                 self.magneticMatrixArray.removeFirst()
@@ -94,19 +94,7 @@ import UIKit
         magneticMatrixArray.removeAll()
         trueNorthAvailable = false
         trueNorthDetermined = false
-        sendEvent(withName: "compassCalibrationStatus", body: ["needsCalibration": false])
-    }
-
-    // Screen-up in the device plane is opposite gravity's in-plane projection; snap it to the nearest of
-    // the four interface orientations. Codes match the JS layer's pointingAxisRow:
-    //   0 = portrait (+Y up), 90 = -X up, 180 = -Y up (upside down), 270 = +X up.
-    // Derived from gravity (not UIInterfaceOrientation) so it's correct even when the UI is orientation
-    // locked, and it doesn't depend on the confusable landscapeLeft/landscapeRight enum handedness.
-    private static func screenRotation(fromGravity g: CMAcceleration) -> Int {
-        if abs(g.y) >= abs(g.x) {
-            return g.y <= 0 ? 0 : 180
-        }
-        return g.x < 0 ? 270 : 90
+        if hasListeners {sendEvent(withName: "compassCalibrationStatus", body: ["needsCalibration": false])}
     }
 
     private func emitHeadingIfReady() {
@@ -134,7 +122,6 @@ import UIKit
                     "reference": "true",
                     "trueHeading": trueHeading.rounded(toPlaces: 1),
                     "magneticHeading": magneticHeading.rounded(toPlaces: 1),
-                    "screenRotation": currentScreenRotation,
                     "matrix": matrixBody(avgTrue),
                 ])
         }
@@ -147,7 +134,6 @@ import UIKit
                     "reference": "magnetic",
                     "trueHeading": -1,
                     "magneticHeading": magneticHeading.rounded(toPlaces: 1),
-                    "screenRotation": currentScreenRotation,
                     "matrix": matrixBody(avgMag),
                 ])
         }

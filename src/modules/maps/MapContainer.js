@@ -516,7 +516,7 @@ const MapContainer = forwardRef(({
   // Zoom map to the extent of given Spots
   const zoomToSpots = (spot) => {
     if (Platform.OS !== 'web' && !cameraRef.current) return;
-    zoomToSpotsNow(spot, mapRef.current, cameraRef.current);
+    zoomToSpotsNow(spot, mapRef.current, cameraRef.current).catch(console.error);
   };
 
   // Zoom map to the extent of the mapped Spots

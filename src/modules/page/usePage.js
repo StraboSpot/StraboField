@@ -3,6 +3,7 @@ import {useSelector} from 'react-redux';
 import {NOTEBOOK_PAGES, PAGES_HIDDEN_IN_SAMPLE, PAGES_SECTIONS, PET_PAGES, SED_PAGES} from './page.constants';
 import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty} from '../../shared/helpers';
+import useForm from '../form/useForm';
 import {getReportsAtSpot, getReportsToList} from '../reports/reports.helpers';
 import {hasSedRockData} from '../sed/sed.helpers';
 import useTags from '../tags/useTags';
@@ -16,6 +17,7 @@ const usePage = () => {
   const {owner_straboUserId} = useSelector(state => state.project.project) || {};
   const {straboUserId} = useSelector(state => state.user);
 
+  const {getSurvey} = useForm();
   const {getTagsAtSpot} = useTags();
 
   /* Derived Variables */
@@ -121,6 +123,12 @@ const usePage = () => {
   };
 
   /* Logic Helpers */
+
+  // Sedimentary Rocks and Lithologies list the same objects, but the Sedimentary Rocks form covers only the
+  // Lithology tab, so a lithology filled in only on its Composition, Texture or Stratification tab has nothing of
+  // its own to show there. The label is left out since one is filled in on every save.
+  const hasSedRockData = lithology => getSurvey(['sed', PAGE_KEYS.LITHOLOGIES])
+    .some(field => field.name && field.name !== 'label' && !isEmpty(lithology[field.name]));
 
   // PAGES_SECTIONS is the same for every Spot, so the Spot-specific rules live here: Interval belongs
   // to the interval itself, while Strat Section is offered only to a Spot not already in one.

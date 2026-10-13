@@ -66,6 +66,13 @@ const HomeViewSmallScreen = forwardRef(({
     Platform.OS !== 'web' && lockToPortrait();
   }, []);
 
+  // The navigator hides only while the Notebook shows, so leaving it open would bring it back, in place of the
+  // map, the moment the Notebook closes.
+  const openSpotInNotebookAndCloseNavigator = (spot, notebookPage, attributes) => {
+    setIsShowingSpotNavigator(false);
+    openSpotInNotebook(spot, notebookPage, attributes);
+  };
+
   const toggleSpotNavigator = () => {
     dispatch(canceledIntervalDrag());
     closeNotebookPanel();
@@ -111,7 +118,7 @@ const HomeViewSmallScreen = forwardRef(({
           closeSpotsNavigator={toggleSpotNavigator}
           openMainMenuPanel={openMainMenuPanel}
           openNotebookPanel={openNotebookPanel}
-          openSpotInNotebook={openSpotInNotebook}
+          openSpotInNotebook={openSpotInNotebookAndCloseNavigator}
         />
       ) : (
         <Tab.Navigator
@@ -207,9 +214,9 @@ const HomeViewSmallScreen = forwardRef(({
             {() =>
               <NotebookPanel
                 closeNotebookPanel={closeNotebookPanel}
-                createDefaultGeom={mapComponentRef?.current?.createDefaultGeom}
+                createDefaultGeom={() => mapComponentRef.current?.createDefaultGeom()}
                 openMainMenuPanel={openMainMenuPanel}
-                zoomToSpots={mapComponentRef?.current?.zoomToSpots}
+                zoomToSpots={spots => mapComponentRef.current?.zoomToSpots(spots)}
               />
             }
           </Tab.Screen>

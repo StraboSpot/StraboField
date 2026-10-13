@@ -48,6 +48,15 @@ const RELEASE_NOTES = [
             text: 'Negative numbers on iOS: type negative values, with a keyboard matched to the field',
             commit: '37f4bd19b',
           },
+          {
+            text: 'Sensible limits: number fields reject impossible values, like negative thicknesses, percentages over 100, or azimuths past 360',
+            commit: '5a11493cb',
+          },
+          {
+            text: 'Number pad on iOS: fields that can\'t be negative open the number pad instead of the full keyboard',
+            commit: '5a11493cb',
+            platforms: ['ios'],
+          },
         ],
       },
       {
@@ -60,6 +69,33 @@ const RELEASE_NOTES = [
           {
             text: 'Declination without GPS: falls back through your project location and nearby Spots to stay corrected, with clearer warnings when it can\'t',
             commit: 'cbf505d88',
+          },
+          {text: 'Lineation hint: "Align long side with lineation" shows for linear measurements', commit: '58372162d'},
+        ],
+      },
+      {
+        title: 'Location',
+        items: [
+          {
+            text: 'Location button spinner: the Geography location button shows a spinner while it waits for a fix',
+            commit: '2d6bb68fa',
+          },
+          {
+            text: 'Location checked first: shortcuts and geolocate check that location is on and allowed before they start, and tell you if it isn\'t',
+            commit: '15a7596b7',
+          },
+          {
+            text: 'Clear location errors: a failed location lookup says why, and shortcuts no longer leave the spinner running',
+            commit: 'fc8402033',
+          },
+          {
+            text: 'Location Services off: a separate message tells you to turn Location Services back on in Settings',
+            commit: '0d228862c',
+            platforms: ['ios'],
+          },
+          {
+            text: 'Coordinate checks: Geography coordinates must be numbers, so a typo can no longer leave a Spot without a location',
+            commit: '166f2feee',
           },
         ],
       },
@@ -85,6 +121,10 @@ const RELEASE_NOTES = [
           },
           {text: 'Cleaner tag counts: a tag\'s counts show as icon chips instead of a legend', commit: '336086e36'},
           {text: 'Sample tagging: only samples that have their own Spot can be tagged', commit: '74bd5d3af'},
+          {
+            text: 'Synced tags stay current: saving a tag after an auto-sync no longer overwrites edits made on another device',
+            commit: 'e87e61904',
+          },
         ],
       },
       {
@@ -104,6 +144,10 @@ const RELEASE_NOTES = [
           {text: 'Feature labels: every feature list shows a label, filled in on save', commit: '0f264290d'},
           {text: 'Full Spots list: see the full Spots list when no Spot is selected', commit: '290258006'},
           {text: 'Collapsible More Pages: the More Pages sections collapse like the main menu\'s', commit: '63286a2b7'},
+          {
+            text: 'Tidier Overview: Sedimentary Rocks is hidden from the Overview when no lithology has rock data',
+            commit: '1e47168a7',
+          },
         ],
       },
       {
@@ -143,6 +187,10 @@ const RELEASE_NOTES = [
             text: 'Open with intervals: opening a section activates the datasets holding its intervals',
             commit: '6252cf94b',
           },
+          {
+            text: 'Hidden datasets: opening a strat section or image basemap whose Spot is in a dataset that\'s off turns that dataset on',
+            commit: 'fe892bf49',
+          },
         ],
       },
       {
@@ -175,12 +223,140 @@ const RELEASE_NOTES = [
           },
           {text: 'Remembered map view: the map view is saved once the camera settles', commit: 'ae29924cc'},
           {text: 'Single name label: a Spot with multiple measurements draws its name label once', commit: '28772ecd6'},
+          {
+            text: 'Reliable offline map saves: a dropped connection, or the phone going to sleep, no longer breaks saving a map',
+            commit: 'e8db6fc14',
+          },
+          {
+            text: 'Zoom to Spot: a Spot without a usable location shows a message instead of an error',
+            commit: '1ddf6c498',
+          },
+        ],
+      },
+      {
+        title: 'Stability',
+        items: [
+          {
+            text: 'Recover instead of closing: if something unexpected goes wrong, the app offers Try Again instead of closing, and your data stays safe',
+            commit: 'bc5e33008',
+          },
+          {text: 'Compass: opening the compass with no Spot selected no longer crashes the app', commit: '8f1a66b31'},
+          {text: 'Renaming images: renaming an image from the Image Gallery no longer crashes the app', commit: '13b5fedd3'},
+          {
+            text: 'Project import: tapping Unzip and Save before a large zip finished copying no longer crashes the app',
+            commit: 'ac0d53859',
+          },
+          {
+            text: 'Geography page: leaving the page while it waits for a location no longer causes errors',
+            commit: 'c93e971b0',
+          },
+          {
+            text: 'iPad orientation: opening a window while the screen is locked upside down no longer crashes the app',
+            commit: '166f2feee',
+            platforms: ['ios'],
+          },
         ],
       },
       {
         title: 'Small touches',
         items: [
           {text: 'Copied Spots: a copied Spot gets its own feature ids', commit: '4bc897794'},
+          {
+            text: 'Imported sed rocks: a StraboSpot 1 sedimentary rock missing an id no longer takes another lithology\'s id',
+            commit: '0e65eaa07',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    version: '2.31.8',
+    groups: [
+      {
+        title: 'Measurements',
+        items: [
+          {
+            text: 'Adjusted Android tablets whose natural top is in landscape',
+            commit: '9e737be',
+            platforms: ['android'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    version: '2.31.7',
+    groups: [
+      {
+        title: 'Photos',
+        items: [
+          {
+            text: 'Taking photos on iPad: taking photos, especially several in a row, no longer crashes the app',
+            commit: 'f3808f8b9',
+            platforms: ['ios'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    version: '2.31.6',
+    groups: [
+      {
+        title: 'Measurements',
+        items: [
+          {
+            text: 'Steady compass for lineations: trend and plunge are always taken along the top of the screen, which now stays in portrait while the compass is open, instead of sometimes reading 90° or 180° off depending on how the device was held. The live strike/dip and trend/plunge are shown under the compass',
+            commit: '543c2cc2f',
+            play: 'Lineation trend no longer reads 90° or 180° off',
+          },
+        ],
+      },
+      {
+        title: 'Notebook & navigation',
+        items: [
+          {
+            text: 'Zoom to Spot: zooming to a Spot opened from the Spot Navigator no longer crashes or reopens the navigator',
+            commit: 'ea10e66e8',
+            play: 'Zoom to Spot from the Spot Navigator no longer crashes',
+          },
+          {
+            text: 'Notebook tab on phones: the Notebook tab no longer goes blank after opening a project',
+            commit: 'b258ceffd',
+            play: 'Notebook tab no longer blank after opening a project',
+          },
+          {
+            text: 'Notebook from the image viewer: the Notebook button opens the Notebook instead of a second map',
+            commit: '8dcad73d2',
+          },
+        ],
+      },
+      {
+        title: 'Photos & backups',
+        items: [
+          {
+            text: 'Photo resize errors: a photo that fails to resize shows an error instead of closing the app',
+            commit: '85f39627e',
+            platforms: ['ios'],
+          },
+          {
+            text: 'Re-importing backups: images already on the device are copied correctly when a backup is imported again',
+            commit: 'd7db85335',
+            platforms: ['ios'],
+          },
+        ],
+      },
+      {
+        title: 'Maps & sign-in',
+        items: [
+          {
+            text: 'Downloaded custom maps: a custom map without an id no longer stops a downloaded project\'s custom maps from loading',
+            commit: 'e2316ee24',
+          },
+          {
+            text: 'Forgot password: when the reset link can\'t be opened, the sign-in screen tells you where to reset it',
+            commit: '5cb339d3c',
+          },
         ],
       },
     ],
@@ -252,13 +428,19 @@ const RELEASE_NOTES = [
       {
         title: 'Small touches',
         items: [
-          {text: 'Map editing: Edit goes straight to the selected Spot when it is on the current map', commit: '000aea5a6'},
+          {
+            text: 'Map editing: Edit goes straight to the selected Spot when it is on the current map',
+            commit: '000aea5a6',
+          },
           {
             text: 'Halted collaborations: an owner\'s project shows in the server list again once its collaboration is halted',
             commit: '25ec904b4',
           },
           {text: 'Project screen on tablets: shows as a centered box instead of fullscreen', commit: '7a1c2626b'},
-          {text: 'Profile photo: a camera or gallery error no longer breaks setting a profile photo', commit: '595d86752'},
+          {
+            text: 'Profile photo: a camera or gallery error no longer breaks setting a profile photo',
+            commit: '595d86752',
+          },
           {text: 'StraboField naming: permission prompts and support email now say StraboField', commit: '048edfc6d'},
         ],
       },

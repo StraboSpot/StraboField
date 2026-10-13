@@ -6,6 +6,7 @@ import {useSelector} from 'react-redux';
 
 import {cartesianToSpherical, getStrikeAndDip, getTrendAndPlunge, mod, pointingAxisRow} from './compassMath.helpers';
 import CompassModule from './CompassModule';
+import {hasValidCoords} from '../../modules/maps/maps.helpers';
 import useMapCoords from '../../modules/maps/view/useMapCoords';
 import useMapLocation from '../../modules/maps/view/useMapLocation';
 import {updatedProject} from '../../modules/project/projects.slice';
@@ -36,7 +37,6 @@ const useCompassCore = () => {
   const magneticDeclination = useRef(0);
   const matrixRawData = useRef(null);
   const rotationMatrixSubscription = useRef(null);
-  const sessionScreenRotation = useRef(null); // hold orientation (0/90/180/270) captured when the compass opened
 
   const [compassData, setCompassData] = useState({
     dip: null,
@@ -67,18 +67,10 @@ const useCompassCore = () => {
 
     const matrix = Platform.OS === 'ios' ? matrixRotationData.matrix : matrixRotationData;
     matrixRawData.current = matrix;
-    // Which hold to use for trend/plunge (0/90/180/270). Only trend/plunge needs it — strike/dip and the
-    // camera axis are the screen normal, unchanged by rotating the tablet in its own plane. Captured once
-    // when the compass opens and held for the session, matching the locked screen, so tilting the tablet
-    // to sight a reading can't flip which edge is treated as "up".
-    if (sessionScreenRotation.current == null && matrixRotationData.screenRotation != null) {
-      sessionScreenRotation.current = matrixRotationData.screenRotation;
-    }
-    const screenRotation = sessionScreenRotation.current ?? 0;
     let {magneticHeading, trueHeading} = matrixRotationData;
     if (applyDeclination) trueHeading = mod(magneticHeading + appliedDeclination, 360);
     const {strike, dip} = getStrikeAndDipFromMatrix(matrix, appliedDeclination);
-    const {plunge, trend} = getTrendAndPlungeFromMatrix(matrix, appliedDeclination, screenRotation);
+    const {plunge, trend} = getTrendAndPlungeFromMatrix(matrix, appliedDeclination, matrixRotationData.screenRotation);
 
     const dipDirection = mod(strike + 90, 360);
     setCompassData({
@@ -119,12 +111,16 @@ const useCompassCore = () => {
     return {strike, dip};
   };
 
-  // Uses the in-plane device axis that is "up" for the current hold (see pointingAxisRow) — the edge the
-  // user points at the feature. In portrait that's the device's top edge (+Y, the original behavior); in
-  // landscape it's whichever long/short edge is up as held, so the reading follows the tablet's orientation
-  // instead of forcing portrait. The platform massage (iOS reference frame vs Android ENU) is unchanged.
-  const getTrendAndPlungeFromMatrix = (matrix, declination, screenRotation = 0) => {
-    const {a, b, c} = pointingAxisRow(matrix, screenRotation);
+  // Uses the edge at the top of the screen, which the user points along the lineation. Compass.js locks the
+  // screen to portrait while the compass is open, so on iOS that's always the device's top edge (Y, the m2x row).
+  // Android's matrix is in the device's natural frame, and some Android tablets are naturally landscape, so a
+  // portrait screen there is rotated from that frame: the native module reports the screen's rotation and
+  // pointingAxisRow picks the matching device edge (0 = top edge, as on iOS). Read on every sample rather than
+  // latched, so it settles as soon as the portrait lock has rotated the screen. Following the hold from gravity
+  // instead (2.31.2-2.31.5) was random with the device flat and a short edge when held sideways, so lineations
+  // came out 90 or 180 degrees off (#1005).
+  const getTrendAndPlungeFromMatrix = (matrix, declination, screenRotation) => {
+    const {a, b, c} = pointingAxisRow(matrix, Platform.OS === 'ios' ? 0 : screenRotation);
     const ENU_TP = Platform.OS === 'ios' ? cartesianToSpherical(-b, a, c)
       : cartesianToSpherical(a, b, c);
     let {plunge, trend} = getTrendAndPlunge(ENU_TP);
@@ -197,7 +193,7 @@ const useCompassCore = () => {
   // lng/lat). Returns undefined when neither the Spot nor any parent has a geographic location.
   const getSpotGeoCoords = () => {
     if (isEmpty(selectedSpot)) return undefined;
-    if (isOnGeoMap(selectedSpot)) return isEmpty(selectedSpot.geometry) ? undefined : getCentroidOfSelectedSpot();
+    if (isOnGeoMap(selectedSpot)) return hasValidCoords(selectedSpot) ? getCentroidOfSelectedSpot() : undefined;
     return getRootSpotGeoCoords(selectedSpot.properties.image_basemap, selectedSpot.properties.strat_section_id);
   };
 
@@ -273,7 +269,6 @@ const useCompassCore = () => {
 
   const subscribeToSensors = () => {
     try {
-      sessionScreenRotation.current = null; // re-latch the hold for this fresh compass session
       const CompassEvents = new NativeEventEmitter(CompassModule);
       rotationMatrixSubscription.current = CompassEvents.addListener('rotationMatrix', handleMatrixRotationData);
       Platform.OS === 'ios' ? CompassModule.startCompass() : CompassModule.startSensors();
@@ -297,7 +292,6 @@ const useCompassCore = () => {
   const unsubscribeFromSensors = () => {
     try {
       rotationMatrixSubscription.current?.remove();
-      sessionScreenRotation.current = null;
       Platform.OS === 'ios' ? CompassModule.stopCompass() : CompassModule.stopSensors();
       console.log('%cEnded Compass observation and rotationMatrix listener.', 'color: red');
     }

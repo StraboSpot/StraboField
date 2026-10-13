@@ -14,6 +14,7 @@ import {MACROSTRAT_PATHS, MICRO_PATHS, ORCID_PATHS, SAMPLES_PATHS, SESAR_PATHS, 
 import {userAgent} from './userAgent.constants';
 import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
 import {MISSING_STRABO_USER_ID_MESSAGE} from '../../modules/samples/samples.constants';
+import {toError} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {store} from '../../store/ConfigureStore';
 
@@ -327,7 +328,7 @@ const useServerRequests = () => {
     }
     catch (err) {
       console.error('Error in zipURLStatus', err);
-      throw new Error(err);
+      throw toError(err);
     }
   };
 

@@ -311,6 +311,10 @@ const useDownload = () => {
 
   const loadCustomMaps = (maps) => {
     maps.map(async (map) => {
+      if (!map.id) {
+        console.warn('Skipping custom map with no id', map);
+        return;
+      }
       const mapId = normalizeCustomMapId(map.id, map.source);
       let providerInfo = MAP_PROVIDERS[map.source];
       if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {

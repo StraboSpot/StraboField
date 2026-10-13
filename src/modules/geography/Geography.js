@@ -178,6 +178,13 @@ const Geography = ({isReadOnly, page}) => {
     const validateGeometry = (values) => {
       const {easting, latitude, longitude, northing} = getParsedGeomValues(values);
       let errors = {};
+      // A hardware keyboard can type anything into these fields. Check the whole text: parseFloat reads '75W' as 75
+      // and 'abc' as NaN, which passes every range check below and saves a Spot with no usable location.
+      ['easting', 'latitude', 'longitude', 'northing', 'x_pixels', 'y_pixels'].forEach((key) => {
+        if (isEmpty(values[key])) return;
+        const text = String(values[key]).trim();
+        if (text === '' || !Number.isFinite(Number(text))) errors[key] = 'Must be a number';
+      });
       if (values.latitude && (latitude < -90 || latitude > 90)) {
         errors.latitude = 'Latitude must be between -90 and 90';
       }

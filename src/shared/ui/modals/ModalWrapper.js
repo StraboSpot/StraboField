@@ -18,6 +18,10 @@ import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
 // Body fills a fullscreen/small-screen modal; shrinks-to-content (and scrolls past the cap) in a
 // max-height-capped centered modal.
+// Every orientation the app allows (Info.plist). iOS crashes presenting a modal that shares no orientation with the
+// app, and the app can be locked to any of them - the compass restores whatever lock was there before, which on an
+// iPad can be upside-down portrait, and 'portrait' alone does not include that.
+const SUPPORTED_ORIENTATIONS = ['portrait', 'portrait-upside-down', 'landscape'];
 const FILL_FLEX = {flex: 1};
 const CONTENT_SIZED_FLEX = {flexShrink: 1};
 
@@ -257,7 +261,7 @@ const ModalWrapper = ({
         onDismiss={handleDismiss}
         onRequestClose={handleRequestClose}
         statusBarTranslucent
-        supportedOrientations={['portrait', 'landscape']}
+        supportedOrientations={SUPPORTED_ORIENTATIONS}
         visible={isVisible}
       >
         <GestureHandlerRootView style={{flex: 1}}>
@@ -291,7 +295,7 @@ const ModalWrapper = ({
       animationType={'fade'}
       onDismiss={handleDismiss}
       onRequestClose={handleRequestClose}
-      supportedOrientations={['portrait', 'landscape']}
+      supportedOrientations={SUPPORTED_ORIENTATIONS}
       transparent
       visible={isVisible}
     >

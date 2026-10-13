@@ -4,6 +4,7 @@ import {Platform} from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import usePermissions from '../../../services/device/usePermissions';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import DismissibleWarningModal from '../../../shared/ui/modals/DismissibleWarningModal';
 import useImages from '../../images/useImages';
@@ -32,7 +33,8 @@ const ShortcutButtons = ({openNotebookPanel}) => {
 
 
   const {launchCameraFromNotebook} = useImages();
-  const {setPointAtCurrentLocation} = useMapLocation();
+  const {isLocationAvailable, setPointAtCurrentLocation, showLocationError} = useMapLocation();
+  const {hasCameraPermission} = usePermissions();
   const {discardSpot} = useSpots();
   const {isTargetDatasetMissing, shortcutSwitchPositions} = useShortcutSwitches();
   const toast = useToast();
@@ -69,7 +71,7 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   const capturePhotoAtCurrentLocation = async () => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     const spotNumberBeforeCreate = preferences.starting_number_for_spot;
-    const point = await setPointAtCurrentLocation();
+    const point = await getPointAtCurrentLocation();
     if (point) {
       const newImages = await launchCameraFromNotebook();
       const imagesSavedLength = newImages.length;
@@ -88,6 +90,16 @@ const ShortcutButtons = ({openNotebookPanel}) => {
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };
 
+  // Undefined when the location can't be found, so the shortcut stops and its spinner still comes down
+  const getPointAtCurrentLocation = async () => {
+    try {
+      return await setPointAtCurrentLocation();
+    }
+    catch (err) {
+      showLocationError(err);
+    }
+  };
+
   // Sketch reports its save through here, so the Spot made for it is earned and no longer pending. Sketch says
   // 'Sketch Saved!' itself, so there is no toast here - two for the one save read as a glitch.
   const saveImagesToSpot = (newImages) => {
@@ -101,23 +113,26 @@ const ShortcutButtons = ({openNotebookPanel}) => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     dispatch(clearedSelectedSpots());
     switch (key) {
+      // Ask for what the photo needs before the orientation warning, not after the user has read it
       case 'photo': {
+        if (!await isLocationAvailable() || !await hasCameraPermission()) break;
         if (isCameraOrientationWarningHidden) await capturePhotoAtCurrentLocation();
         else setIsOrientationWarningVisible(true);
         break;
       }
       case 'sketch': {
         const spotNumberBeforeCreate = preferences.starting_number_for_spot;
-        const point = await setPointAtCurrentLocation();
+        const point = await getPointAtCurrentLocation();
         if (point) {
           pendingSketchSpotRef.current = {spot: point, spotNumber: spotNumberBeforeCreate};
           setIsSketchModalVisible(true);
         }
         break;
       }
+      // The modals find the location only on save, where a failure would go unseen behind them, so check first
       default:
         if (modalVisible === key) dispatch(setModalVisible({modal: null}));
-        else dispatch(setModalVisible({modal: key}));
+        else if (await isLocationAvailable()) dispatch(setModalVisible({modal: key}));
     }
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };

@@ -17,6 +17,7 @@ import Routes from './src/routes/Routes';
 import MacrostratAuthRedirectHandler from './src/services/data-intergration/macrostrat/MacrostratAuthRedirectHandler';
 import {RELEASE_NAME} from './src/shared/app.constants';
 import {SMALL_SCREEN} from './src/shared/styles.constants';
+import AppErrorFallback from './src/shared/ui/AppErrorFallback';
 import ToastWrapper from './src/shared/ui/ToastWrapper';
 import uiStyles from './src/shared/ui/ui.styles';
 import {persistor, store} from './src/store/ConfigureStore';
@@ -82,6 +83,7 @@ const linking = Platform.OS !== 'web' && {
 
 // persistor.purge(); // Use this to clear persistStore completely
 
+const renderErrorFallback = props => <AppErrorFallback {...props}/>;
 
 // Runs after rehydration, before anything renders. An offline map preview is persisted while the basemap behind
 // it is rebuilt live at launch, so one left open at quit would come back labelling a map that is not previewed.
@@ -102,21 +104,27 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={uiStyles.container}>
-        <Provider store={store}>
-          <ToastWrapper>
-            <PersistGate loading={null} onBeforeLift={onBeforeLift} persistor={persistor}>
-              {/*<Sentry.TouchEventBoundary>*/}
-              {!SMALL_SCREEN && <StatusBar hidden/>}
-              <ConnectionStatus/>
-              <ProfileSyncListener/>
-              <MacrostratAuthRedirectHandler/>
-              <NavigationContainer linking={linking}>
-                <Routes/>
-              </NavigationContainer>
-              {/*</Sentry.TouchEventBoundary>*/}
-            </PersistGate>
-          </ToastWrapper>
-        </Provider>
+        {/* Catches what nothing else did - a render error, or a fatal error thrown from a timer or event handler -
+            and shows AppErrorFallback in place of the app. Without it, iOS kills the app before the error reaches
+            Sentry (it shows up only as a Hermes crash, e.g. STRABOSPOT-2-6GK). Outside the Provider so a broken
+            store is caught too. */}
+        <Sentry.GlobalErrorBoundary fallback={renderErrorFallback}>
+          <Provider store={store}>
+            <ToastWrapper>
+              <PersistGate loading={null} onBeforeLift={onBeforeLift} persistor={persistor}>
+                {/*<Sentry.TouchEventBoundary>*/}
+                {!SMALL_SCREEN && <StatusBar hidden/>}
+                <ConnectionStatus/>
+                <ProfileSyncListener/>
+                <MacrostratAuthRedirectHandler/>
+                <NavigationContainer linking={linking}>
+                  <Routes/>
+                </NavigationContainer>
+                {/*</Sentry.TouchEventBoundary>*/}
+              </PersistGate>
+            </ToastWrapper>
+          </Provider>
+        </Sentry.GlobalErrorBoundary>
       </SafeAreaView>
     </SafeAreaProvider>
   );

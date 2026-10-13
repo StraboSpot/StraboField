@@ -185,8 +185,8 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         if (!isEditModeUnavailable) mapComponentRef.current?.startEditingMode();
         break;
       case 'toggleUserLocation':
-        if (value) zoomToCurrentLocation().catch(console.error);
         mapComponentRef.current?.toggleUserLocation(value);
+        if (value) return zoomToCurrentLocation();
         break;
       case 'closeImageBasemap':
         const spotWithThisImageBasemap = getRootSpot(currentImageBasemap?.id);

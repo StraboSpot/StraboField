@@ -1,13 +1,15 @@
 package com.strabospot2;
 
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.util.Log;
+import android.view.Display;
 import android.view.Surface;
-import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -142,30 +144,29 @@ public class Compass extends ReactContextBaseJavaModule implements SensorEventLi
         wm.putDouble("m32", averagedMatrix[5]);
         wm.putDouble("m33", averagedMatrix[8]);
 
-        // How the device is currently held, so JS can pick the "up" edge for trend/plunge. The matrix
-        // stays in the device's natural frame; the display rotation is defined relative to that frame,
-        // so the JS pointingAxisRow mapping (which mirrors remapCoordinateSystem) resolves it correctly
-        // even on tablets whose natural orientation is landscape.
+        // Which device edge is at the top of the screen, so JS measures trend/plunge along it. The compass holds
+        // the screen in portrait, but the matrix stays in the device's natural frame, and on tablets whose
+        // natural orientation is landscape a portrait screen is rotated 90 or 270 from it; the JS
+        // pointingAxisRow mapping (which mirrors remapCoordinateSystem) picks the matching edge.
         wm.putInt("screenRotation", getScreenRotation());
 
         sendEvent("rotationMatrix", wm);
     }
 
-    // 0 / 90 / 180 / 270 — the display's rotation from the device's natural orientation.
+    // 0 / 90 / 180 / 270 — the rotation of the app's screen from the device's natural orientation. Read from the
+    // Activity's own display rather than the application context's default display, so it's the app's window that
+    // counts (they agree in normal full-screen use, but not necessarily in split-screen or on an external display).
     private int getScreenRotation() {
-        try {
-            WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            if (windowManager == null || windowManager.getDefaultDisplay() == null) return 0;
-            switch (windowManager.getDefaultDisplay().getRotation()) {
-                case Surface.ROTATION_90: return 90;
-                case Surface.ROTATION_180: return 180;
-                case Surface.ROTATION_270: return 270;
-                default: return 0;
-            }
-        }
-        catch (Exception e) {
-            Log.e("Compass", "Could not read display rotation, defaulting to portrait.", e);
-            return 0;
+        Activity activity = getReactApplicationContext().getCurrentActivity();
+        Display display = activity == null ? null
+            : Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? activity.getDisplay()
+            : activity.getWindowManager().getDefaultDisplay();
+        int rotation = display == null ? Surface.ROTATION_0 : display.getRotation();
+        switch (rotation) {
+            case Surface.ROTATION_90: return 90;
+            case Surface.ROTATION_180: return 180;
+            case Surface.ROTATION_270: return 270;
+            default: return 0;
         }
     }
 
