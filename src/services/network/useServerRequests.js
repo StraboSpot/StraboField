@@ -14,6 +14,7 @@ import {
 import {MACROSTRAT_PATHS, MICRO_PATHS, ORCID_PATHS, SESAR_PATHS, STRABO_APIS} from './urls.constants';
 import {userAgent} from './userAgent.constants';
 import {updatedProjectTransferProgress} from '../../modules/connections/connections.slice';
+import {toError} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {store} from '../../store/ConfigureStore';
 
@@ -304,8 +305,16 @@ const useServerRequests = () => {
   const verifyImagesExistence = imageIdsArray => postRequest(`${baseUrl}/verifyImages/`, imageIdsArray, basicAuth());
 
   const zipURLStatus = async (zipId) => {
-    const response = await timeoutPromise(fetch(`${getTileBaseUrl()}/asyncstatus/${zipId}`));
-    return response.json();
+    try {
+      const response = await timeoutPromise(fetch(`${getTileBaseUrl()}/asyncstatus/${zipId}`));
+      const json = await response.json();
+      if (json.error) throw Error(json.error);
+      return json;
+    }
+    catch (err) {
+      console.error('Error in zipURLStatus', err);
+      throw toError(err);
+    }
   };
 
   return {
