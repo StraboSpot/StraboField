@@ -79,7 +79,10 @@ const Compass = ({
     // declination is known; on failure the user got the alert above and the compass stays unstarted.
     // iOS gets true north straight from CoreMotion's reference frame and doesn't use this value, so it
     // subscribes immediately.
-    if (Platform.OS === 'android') declinationReady.then(startSensors).catch(() => {});
+    if (Platform.OS === 'android') {
+      declinationReady.then(startSensors).catch(() => {
+      });
+    }
     else startSensors();
 
     const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
@@ -171,12 +174,12 @@ const Compass = ({
       <>
         {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR) && (
           <Text style={compassStyles.liveReadingText}>
-            Strike {formatValue(compassData.strike)}   Dip {formatValue(compassData.dip)}
+            Strike {formatValue(compassData.strike)} Dip {formatValue(compassData.dip)}
           </Text>
         )}
         {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR) && (
           <Text style={compassStyles.liveReadingText}>
-            Trend {formatValue(compassData.trend)}   Plunge {formatValue(compassData.plunge)}
+            Trend {formatValue(compassData.trend)} Plunge {formatValue(compassData.plunge)}
           </Text>
         )}
       </>
@@ -192,10 +195,7 @@ const Compass = ({
       />
       {renderLiveReading()}
       {/* The screen is locked to portrait and trend is taken along the device's top edge, so a user holding the
-      device sideways (as landscape support used to allow) needs telling which way to point it. */}
-      {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR) && (
-        <Text style={compassStyles.lineationHintText}>Point the top of the screen along the lineation</Text>
-      )}
+       device sideways (as landscape support used to allow) needs telling which way to point it. */}
       {showCompassRawDataView && <CompassDebug compassData={compassData} matrixRotation={matrixRawData?.current}/>}
     </View>
   );
