@@ -1,3 +1,4 @@
+import * as turf from '@turf/turf';
 import proj4 from 'proj4';
 
 import {GEO_LAT_LNG_PROJECTION, MAP_MODES, PIXEL_PROJECTION} from './maps.constants';
@@ -90,6 +91,19 @@ export const getClosestSpotDistanceAndIndex = (distancesFromSpot) => {
 export const getUtmDisplayString = ([lng, lat]) => {
   const {easting, northing, zone} = convertLatLngToUtm([lng, lat]);
   return `UTM ${zone}  ${Math.round(easting)} mE  ${Math.round(northing)} mN`;
+};
+
+// Whether every coordinate of the feature is a number, so turf can measure it. Older versions saved whatever was
+// typed into the Geography coordinates (e.g. 'abc' as NaN), and turf throws on those.
+export const hasValidCoords = (feature) => {
+  if (isEmpty(feature?.geometry)) return false;
+  try {
+    const coords = turf.coordAll(feature);
+    return coords.length > 0 && coords.every(coord => coord.length >= 2 && coord.every(Number.isFinite));
+  }
+  catch {
+    return false; // A geometry too malformed for turf to walk, e.g. coordinates: null
+  }
 };
 
 export const isDrawMode = mode => Object.values(MAP_MODES.DRAW).includes(mode);
