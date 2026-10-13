@@ -51,15 +51,9 @@ const HomeContainer = ({navigation, route}) => {
   }, []);
 
   useEffect(() => {
-    console.log('UE HomeContainer', '[navigation, route.params]', route.params);
-    const unsubscribe = navigation.addListener('focus', () => {
-      route?.params?.pageKey === 'overview' && openNotebookPanel(route.params.pageKey);
-    });
-    return () => {
-      // console.log('Navigation Unsubscribed');
-      return unsubscribe;
-    };
-  }, [navigation, route.params]);
+    console.log('UE HomeContainer', '[route.params]', route.params);
+    if (route?.params?.pageKey === 'overview') openNotebookPanel(route.params.pageKey);
+  }, [route.params]);
 
   useEffect(() => {
     // console.log('UE HomeContainer [user]', email);

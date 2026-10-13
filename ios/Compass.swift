@@ -21,6 +21,13 @@ import UIKit
         true
     }
 
+    // Run startCompass/stopCompass on main, the same queue the CoreMotion handlers use, so the sample
+    // arrays and flags are only ever touched from one thread. Without this RN calls them on a background
+    // queue and stopCompass clears the arrays while the handlers are appending (#1006).
+  @objc override var methodQueue: DispatchQueue {
+        DispatchQueue.main
+    }
+
     override func supportedEvents() -> [String]! {
         return ["rotationMatrix", "compassCalibrationStatus"]
     }
@@ -87,7 +94,7 @@ import UIKit
         magneticMatrixArray.removeAll()
         trueNorthAvailable = false
         trueNorthDetermined = false
-        sendEvent(withName: "compassCalibrationStatus", body: ["needsCalibration": false])
+        if hasListeners {sendEvent(withName: "compassCalibrationStatus", body: ["needsCalibration": false])}
     }
 
     private func emitHeadingIfReady() {
