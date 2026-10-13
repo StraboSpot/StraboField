@@ -48,6 +48,15 @@ const RELEASE_NOTES = [
             text: 'Negative numbers on iOS: type negative values, with a keyboard matched to the field',
             commit: '37f4bd19b',
           },
+          {
+            text: 'Sensible limits: number fields reject impossible values, like negative thicknesses, percentages over 100, or azimuths past 360',
+            commit: '5a11493cb',
+          },
+          {
+            text: 'Number pad on iOS: fields that can\'t be negative open the number pad instead of the full keyboard',
+            commit: '5a11493cb',
+            platforms: ['ios'],
+          },
         ],
       },
       {
@@ -60,6 +69,33 @@ const RELEASE_NOTES = [
           {
             text: 'Declination without GPS: falls back through your project location and nearby Spots to stay corrected, with clearer warnings when it can\'t',
             commit: 'cbf505d88',
+          },
+          {text: 'Lineation hint: "Align long side with lineation" shows for linear measurements', commit: '58372162d'},
+        ],
+      },
+      {
+        title: 'Location',
+        items: [
+          {
+            text: 'Location button spinner: the Geography location button shows a spinner while it waits for a fix',
+            commit: '2d6bb68fa',
+          },
+          {
+            text: 'Location checked first: shortcuts and geolocate check that location is on and allowed before they start, and tell you if it isn\'t',
+            commit: '15a7596b7',
+          },
+          {
+            text: 'Clear location errors: a failed location lookup says why, and shortcuts no longer leave the spinner running',
+            commit: 'fc8402033',
+          },
+          {
+            text: 'Location Services off: a separate message tells you to turn Location Services back on in Settings',
+            commit: '0d228862c',
+            platforms: ['ios'],
+          },
+          {
+            text: 'Coordinate checks: Geography coordinates must be numbers, so a typo can no longer leave a Spot without a location',
+            commit: '166f2feee',
           },
         ],
       },
@@ -85,6 +121,10 @@ const RELEASE_NOTES = [
           },
           {text: 'Cleaner tag counts: a tag\'s counts show as icon chips instead of a legend', commit: '336086e36'},
           {text: 'Sample tagging: only samples that have their own Spot can be tagged', commit: '74bd5d3af'},
+          {
+            text: 'Synced tags stay current: saving a tag after an auto-sync no longer overwrites edits made on another device',
+            commit: 'e87e61904',
+          },
         ],
       },
       {
@@ -104,6 +144,10 @@ const RELEASE_NOTES = [
           {text: 'Feature labels: every feature list shows a label, filled in on save', commit: '0f264290d'},
           {text: 'Full Spots list: see the full Spots list when no Spot is selected', commit: '290258006'},
           {text: 'Collapsible More Pages: the More Pages sections collapse like the main menu\'s', commit: '63286a2b7'},
+          {
+            text: 'Tidier Overview: Sedimentary Rocks is hidden from the Overview when no lithology has rock data',
+            commit: '1e47168a7',
+          },
         ],
       },
       {
@@ -143,6 +187,10 @@ const RELEASE_NOTES = [
             text: 'Open with intervals: opening a section activates the datasets holding its intervals',
             commit: '6252cf94b',
           },
+          {
+            text: 'Hidden datasets: opening a strat section or image basemap whose Spot is in a dataset that\'s off turns that dataset on',
+            commit: 'fe892bf49',
+          },
         ],
       },
       {
@@ -175,12 +223,48 @@ const RELEASE_NOTES = [
           },
           {text: 'Remembered map view: the map view is saved once the camera settles', commit: 'ae29924cc'},
           {text: 'Single name label: a Spot with multiple measurements draws its name label once', commit: '28772ecd6'},
+          {
+            text: 'Reliable offline map saves: a dropped connection, or the phone going to sleep, no longer breaks saving a map',
+            commit: 'e8db6fc14',
+          },
+          {
+            text: 'Zoom to Spot: a Spot without a usable location shows a message instead of an error',
+            commit: '1ddf6c498',
+          },
+        ],
+      },
+      {
+        title: 'Stability',
+        items: [
+          {
+            text: 'Recover instead of closing: if something unexpected goes wrong, the app offers Try Again instead of closing, and your data stays safe',
+            commit: 'bc5e33008',
+          },
+          {text: 'Compass: opening the compass with no Spot selected no longer crashes the app', commit: '8f1a66b31'},
+          {text: 'Renaming images: renaming an image from the Image Gallery no longer crashes the app', commit: '13b5fedd3'},
+          {
+            text: 'Project import: tapping Unzip and Save before a large zip finished copying no longer crashes the app',
+            commit: 'ac0d53859',
+          },
+          {
+            text: 'Geography page: leaving the page while it waits for a location no longer causes errors',
+            commit: 'c93e971b0',
+          },
+          {
+            text: 'iPad orientation: opening a window while the screen is locked upside down no longer crashes the app',
+            commit: '166f2feee',
+            platforms: ['ios'],
+          },
         ],
       },
       {
         title: 'Small touches',
         items: [
           {text: 'Copied Spots: a copied Spot gets its own feature ids', commit: '4bc897794'},
+          {
+            text: 'Imported sed rocks: a StraboSpot 1 sedimentary rock missing an id no longer takes another lithology\'s id',
+            commit: '0e65eaa07',
+          },
         ],
       },
     ],
