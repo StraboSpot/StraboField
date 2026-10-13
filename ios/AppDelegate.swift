@@ -2,8 +2,6 @@ import UIKit
 import OrientationDirector
 
 @main class AppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
-
     var reactNativeDelegate: ReactNativeDelegate?
     var reactNativeFactory: RCTReactNativeFactory?
 
@@ -17,25 +15,13 @@ import OrientationDirector
         reactNativeDelegate = delegate
         reactNativeFactory = factory
 
-        window = UIWindow(frame: UIScreen.main.bounds)
-
-        factory.startReactNative(
-            withModuleName: "StraboSpot2",
-            in: window,
-            launchOptions: launchOptions
-        )
+        // The window and React Native root are created in SceneDelegate
 
         return true
     }
 
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         return SharedOrientationDirectorImpl.shared.supportedInterfaceOrientations
-    }
-
-    func application(_ app: UIApplication,
-    open url: URL,
-    options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        return RCTLinkingManager.application(app, open: url, options: options)
     }
 }
 

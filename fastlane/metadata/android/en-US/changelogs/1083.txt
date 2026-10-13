@@ -1,0 +1,7 @@
+New since 2.31.3:
+• Compass readings no longer overwritten by templates
+• Photos picked together no longer overwrite each other
+• IGSN works with SESAR's new system
+• Plus more fixes and improvements
+
+Thanks for using StraboSpot!

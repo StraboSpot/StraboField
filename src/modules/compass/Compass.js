@@ -3,6 +3,7 @@ import {ActivityIndicator, AppState, Platform, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import {COMPASS_TOGGLE_BUTTONS} from './compass.constants';
 import {setCompassMeasurements} from './compass.slice';
 import compassStyles from './compass.styles';
 import CompassDebug from './CompassDebug';
@@ -12,6 +13,7 @@ import useCompassCore, {DECLINATION_SOURCE} from '../../services/device/useCompa
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setModalVisible} from '../home/home.slice';
+import useDeviceOrientation from '../home/useDeviceOrientation';
 import useMeasurements from '../measurements/useMeasurements';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
@@ -39,6 +41,7 @@ const Compass = ({
     unsubscribeFromSensors,
   } = useCompassCore();
   const {playCompassSound} = useCompassSound();
+  const {lockToPortraitWhileOpen} = useDeviceOrientation();
   const {createNewMeasurement} = useMeasurements();
 
   /* Local State */
@@ -53,6 +56,10 @@ const Compass = ({
   useEffect(() => {
     console.log('UE Compass []');
     let isMounted = true;
+
+    // Portrait for the whole compass session (every mode, every device): trend/plunge is measured along the
+    // device's top edge, so that has to be the edge at the top of the screen and must not rotate away from it.
+    const restoreOrientation = lockToPortraitWhileOpen();
 
     const startSensors = () => {
       subscribeToSensors();
@@ -79,6 +86,7 @@ const Compass = ({
     const appStateSubscription = AppState.addEventListener('change', handleAppStateChange);
     return () => {
       isMounted = false;
+      restoreOrientation.then(restore => restore());
       unsubscribeFromSensors();
       unsubscribeFromCalibrationStatus();
       appStateSubscription.remove();
@@ -157,6 +165,25 @@ const Compass = ({
 
   /* View */
 
+  // The live numbers behind the needle, so the user can read exactly what Tap to Measure will record.
+  const renderLiveReading = () => {
+    const formatValue = value => (value === null || value === undefined ? '—' : `${value}°`);
+    return (
+      <>
+        {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR) && (
+          <Text style={compassStyles.liveReadingText}>
+            Strike {formatValue(compassData.strike)}   Dip {formatValue(compassData.dip)}
+          </Text>
+        )}
+        {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR) && (
+          <Text style={compassStyles.liveReadingText}>
+            Trend {formatValue(compassData.trend)}   Plunge {formatValue(compassData.plunge)}
+          </Text>
+        )}
+      </>
+    );
+  };
+
   const renderCompassBody = () => {
     if (isResolvingDeclination) {
       return (
@@ -191,6 +218,12 @@ const Compass = ({
           compassMeasurementTypes={compassMeasurementTypes}
           grabMeasurements={grabMeasurements}
         />
+        {renderLiveReading()}
+        {/* The screen is locked to portrait and trend is taken along the device's top edge, so a user holding the
+        device sideways (as landscape support used to allow) needs telling which way to point it. */}
+        {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR) && (
+          <Text style={compassStyles.lineationHintText}>Point the top of the screen along the lineation</Text>
+        )}
         {showCompassRawDataView && <CompassDebug compassData={compassData} matrixRotation={matrixRawData?.current}/>}
       </>
     );

@@ -57,7 +57,8 @@ const ImageSlider = ({route, navigation}) => {
   const getSpotFromId = () => {
     console.log('getSpotFromId getCurrentIndex', imageIndex);
     const spot = spots[imagesObj[imageIndex].spotId];
-    navigation.navigate('HomeScreen', {pageKey: PAGE_KEYS.OVERVIEW});
+    // navigate would push a second Home (and map) here instead of returning to the existing one so use popTo.
+    navigation.popTo('HomeScreen', {pageKey: PAGE_KEYS.OVERVIEW});
     dispatch(setSelectedSpot(spot));
   };
 

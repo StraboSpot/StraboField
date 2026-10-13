@@ -30,7 +30,6 @@ import Form from '../form/Form';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {setModalValues, setModalVisible} from '../home/home.slice';
-import useDeviceOrientation from '../home/useDeviceOrientation';
 import useMapLocation from '../maps/view/useMapLocation';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -56,7 +55,6 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
 
-  const {lockToCurrentOrientation, unlockOrientation} = useDeviceOrientation();
   const {getChoices, getLabel, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
@@ -99,19 +97,8 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
     console.log('UE AddMeasurementModal []');
     return () => {
       dispatch(setModalValues({}));
-      if (!SMALL_SCREEN && Platform.OS !== 'web') unlockOrientation();
     };
   }, []);
-
-  // The compass reads correctly in any hold now (trend/plunge follows the edge that's up as held, strike/dip
-  // never depended on orientation), so instead of forcing portrait we lock to whatever orientation the user
-  // opened it in — the screen then stays put while they move/tilt the tablet to take the reading. Manual
-  // entry needs no lock. Phones (SMALL_SCREEN) stay portrait app-wide.
-  useEffect(() => {
-    if (SMALL_SCREEN || Platform.OS === 'web') return;
-    if (isManualMeasurement) unlockOrientation();
-    else lockToCurrentOrientation();
-  }, [isManualMeasurement]);
 
   useLayoutEffect(() => {
     console.log('UE AddMeasurementModal [compassMeasurementTypes, templates]', compassMeasurementTypes, templates);
