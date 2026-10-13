@@ -28,16 +28,20 @@ const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
     if (!isEmpty(attributes)) dispatch(setSelectedAttributes(attributes));
   };
 
+  // Returns whether it got there, so the geolocate button can turn back off if not
   const zoomToCurrentLocation = async () => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     try {
       await mapComponentRef.current?.zoomToCurrentLocation();
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
+      return true;
     }
     catch (err) {
       // console.error('Geolocation Error:', err);
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
       showLocationError(err);
+      return false;
+    }
+    finally {
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
     }
   };
 

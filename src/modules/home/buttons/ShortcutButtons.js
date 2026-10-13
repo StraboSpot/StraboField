@@ -4,6 +4,7 @@ import {Platform} from 'react-native';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
+import usePermissions from '../../../services/device/usePermissions';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import DismissibleWarningModal from '../../../shared/ui/modals/DismissibleWarningModal';
 import useImages from '../../images/useImages';
@@ -31,7 +32,8 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const {launchCameraFromNotebook} = useImages();
-  const {setPointAtCurrentLocation, showLocationError} = useMapLocation();
+  const {isLocationAvailable, setPointAtCurrentLocation, showLocationError} = useMapLocation();
+  const {hasCameraPermission} = usePermissions();
   const {discardSpot} = useSpots();
   const {isTargetDatasetMissing, shortcutSwitchPositions} = useShortcutSwitches();
   const toast = useToast();
@@ -110,7 +112,9 @@ const ShortcutButtons = ({openNotebookPanel}) => {
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     dispatch(clearedSelectedSpots());
     switch (key) {
+      // Ask for what the photo needs before the orientation warning, not after the user has read it
       case 'photo': {
+        if (!await isLocationAvailable() || !await hasCameraPermission()) break;
         if (isCameraOrientationWarningHidden) await capturePhotoAtCurrentLocation();
         else setIsOrientationWarningVisible(true);
         break;
@@ -124,9 +128,10 @@ const ShortcutButtons = ({openNotebookPanel}) => {
         }
         break;
       }
+      // The modals find the location only on save, where a failure would go unseen behind them, so check first
       default:
         if (modalVisible === key) dispatch(setModalVisible({modal: null}));
-        else dispatch(setModalVisible({modal: key}));
+        else if (await isLocationAvailable()) dispatch(setModalVisible({modal: key}));
     }
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };

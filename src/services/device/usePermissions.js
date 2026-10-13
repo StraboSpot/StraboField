@@ -63,10 +63,18 @@ const usePermissions = () => {
 
   const hasStoragePermission = () => requestPermissionForFeature('storage');
 
+  // Checks without asking, so it answers at once
+  const isLocationPermissionGranted = async () => {
+    const permission = Platform.OS === 'ios' ? PERMISSION_CONFIG.location.ios : PERMISSION_CONFIG.location.android;
+    const status = await check(permission);
+    return status === RESULTS.GRANTED || status === RESULTS.LIMITED;
+  };
+
   return {
     hasCameraPermission,
     hasLocationPermission,
     hasStoragePermission,
+    isLocationPermissionGranted,
   };
 };
 

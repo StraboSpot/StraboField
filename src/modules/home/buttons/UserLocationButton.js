@@ -5,6 +5,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useSelector} from 'react-redux';
 
 import IconButton from '../../../shared/ui/buttons/IconButton';
+import useMapLocation, {isLocationRequestPending} from '../../maps/view/useMapLocation';
 
 const UserLocationButton = ({clickHandler}) => {
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
@@ -12,11 +13,15 @@ const UserLocationButton = ({clickHandler}) => {
   const stratSection = useSelector(state => state.map.stratSection);
 
   const appState = useRef(AppState.currentState);
+  const {isLocationAvailable} = useMapLocation();
   const toast = useToast();
 
   const [userLocationButtonOn, setUserLocationButtonOn] = useState(false);
   const wasLocationButtonOn = useRef(false);
   const timeoutRef = useRef(null);
+  // clickHandler is new on every render, so the timer reads it through a ref, or each redraw would restart it
+  const clickHandlerRef = useRef(clickHandler);
+  clickHandlerRef.current = clickHandler;
 
   const clearLocationTimer = useCallback(() => {
     if (timeoutRef.current) {
@@ -44,7 +49,7 @@ const UserLocationButton = ({clickHandler}) => {
       timeoutRef.current = setTimeout(() => {
         console.log('Timer expired, turning off location');
         setUserLocationButtonOn(false);
-        clickHandler('toggleUserLocation', false);
+        clickHandlerRef.current('toggleUserLocation', false);
         toast.show('Geolocation turned off automatically to conserve battery.');
       }, currentTimeout);
     }
@@ -62,7 +67,7 @@ const UserLocationButton = ({clickHandler}) => {
         timeoutRef.current = null;
       }
     };
-  }, [userLocationButtonOn, currentTimeout, clickHandler, toast]);
+  }, [userLocationButtonOn, currentTimeout, toast]);
 
   // Handle AppState changes
   useEffect(() => {
@@ -78,7 +83,7 @@ const UserLocationButton = ({clickHandler}) => {
 
       appState.current = nextAppState;
       console.log('AppState', appState.current);
-      if (appState.current.match(/inactive|background/)) {
+      if (appState.current.match(/inactive|background/) && !isLocationRequestPending()) {
         console.log('App is inactive!');
         wasLocationButtonOn.current = userLocationButtonOn;
         clearLocationTimer();
@@ -91,13 +96,22 @@ const UserLocationButton = ({clickHandler}) => {
     };
   }, [userLocationButtonOn, clearLocationTimer, toast]);
 
+  // Turns on only once the location is available, and back off if the zoom to it fails
+  const handleLocationButtonPressed = async () => {
+    const isTurningOn = !userLocationButtonOn;
+    if (isTurningOn && !await isLocationAvailable()) return;
+    setUserLocationButtonOn(isTurningOn);
+    const isZoomed = await clickHandler('toggleUserLocation', isTurningOn);
+    if (isTurningOn && !isZoomed) {
+      setUserLocationButtonOn(false);
+      clickHandler('toggleUserLocation', false);
+    }
+  };
+
   if (!currentImageBasemap && !stratSection) {
     return (
       <IconButton
-        onPress={() => {
-          setUserLocationButtonOn(!userLocationButtonOn);
-          clickHandler('toggleUserLocation', !userLocationButtonOn);
-        }}
+        onPress={handleLocationButtonPressed}
         source={userLocationButtonOn
           ? require('../../../assets/icons/MyLocationButton_pressed.png')
           : require('../../../assets/icons/MyLocationButton.png')}
