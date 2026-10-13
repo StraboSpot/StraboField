@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
@@ -15,10 +15,21 @@ const UtmFieldInputs = ({formRef, geomFormRef, isReadOnly}) => {
 
   const {getCurrentLocation} = useMapLocation();
 
+  /* Local State */
+
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+
   /* Logic Helpers */
 
   const fillWithCurrentLocation = async () => {
-    const currentLocation = await getCurrentLocation();
+    let currentLocation;
+    setIsGettingLocation(true);
+    try {
+      currentLocation = await getCurrentLocation();
+    }
+    finally {
+      setIsGettingLocation(false);
+    }
     // A fix can take up to 30 seconds, long enough to have left the page and taken its forms with it
     const geomForm = geomFormRef.current;
     const form = formRef?.current;
@@ -77,6 +88,7 @@ const UtmFieldInputs = ({formRef, geomFormRef, isReadOnly}) => {
                   size: 30,
                   color: commonStyles.iconColor.color,
                 }}
+                isLoading={isGettingLocation}
                 onPress={fillWithCurrentLocation}
               />
             )}
