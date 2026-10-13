@@ -20,6 +20,8 @@ const PERMISSION_CONFIG = {
     ios: PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
     blocked: ['Location Permission Denied',
       'To use your location, allow location access in Settings -> Apps -> StraboField -> Location.'],
+    servicesOff: ['Location Services Off',
+      'To use your location, turn on Location Services in Settings -> Privacy & Security -> Location Services.'],
     unavailable: ['Location Unavailable', 'Location services are not available on this device.'],
   },
   storage: {
@@ -50,7 +52,13 @@ const usePermissions = () => {
     let status = await check(permission);
     if (status === RESULTS.DENIED) status = await request(permission);
     if (status === RESULTS.GRANTED || status === RESULTS.LIMITED) return true;
-    if (showBlockedAlert && status === RESULTS.BLOCKED) alert(...config.blocked);
+    // iOS reports Location Services turned off device-wide as denied for every app, even with the app's own
+    // permission on, so tell the user which switch is actually off. Android checks the permission on its own and
+    // offers to turn location on from the geolocation call.
+    const isServicesOff = Platform.OS === 'ios' && status === RESULTS.BLOCKED && config.servicesOff
+      && !await DeviceInfo.isLocationEnabled();
+    if (showBlockedAlert && isServicesOff) alert(...config.servicesOff);
+    else if (showBlockedAlert && status === RESULTS.BLOCKED) alert(...config.blocked);
     else if (showBlockedAlert && status === RESULTS.UNAVAILABLE) alert(...config.unavailable);
     return false;
   };
