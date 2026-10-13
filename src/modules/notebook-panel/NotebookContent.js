@@ -42,7 +42,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const {getAllRelevantPages, getPopulatedPagesKeys} = usePage();
   const {
     getRootSpot,
-    getSpotWithThisImageBasemap,
+    getSpotWithThisImage,
     handleSpotSelected,
     isSpotReadOnly,
   } = useSpots();
@@ -63,7 +63,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const isReadOnly = isSpotReadOnly(spot);
   const isSample = !isEmpty(selectedSample) || spot.properties?.isSample;
   const spotWithThisImageBasemap = spot.properties?.image_basemap
-    && getSpotWithThisImageBasemap(spot.properties.image_basemap);
+    && getSpotWithThisImage(spot.properties.image_basemap);
   const isSampleOrSampleChild = isSample || spotWithThisImageBasemap?.properties?.isSample;
   const pageVisible = pagesStack.slice(-1)[0];
 

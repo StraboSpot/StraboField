@@ -42,7 +42,7 @@ const ImageCard = ({
   const {downloadImageAndSave} = useDevice();
   const {deleteImageFromSpot, getImageBasemap, setAnnotation} = useImages();
   const {getImageThumbnailURIs} = useImageThumbnails();
-  const {getAllSpotsOnImageBasemap, getSpotWithThisImageBasemap} = useSpots();
+  const {getAllSpotsOnImageBasemap, getSpotWithThisImage} = useSpots();
 
   /* Local State */
 
@@ -76,7 +76,7 @@ const ImageCard = ({
       }
       else {
         // The Spot holding the image, not the selected Spot: the image gallery renames with none selected
-        const spotWithThisImage = getSpotWithThisImageBasemap(image.id);
+        const spotWithThisImage = getSpotWithThisImage(image.id);
         dispatch(editedSpotImage(updatedImage));
         if (spotWithThisImage) dispatch(updatedModifiedTimestampsBySpotsIds([spotWithThisImage.properties.id]));
       }

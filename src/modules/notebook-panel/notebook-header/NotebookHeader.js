@@ -52,7 +52,7 @@ const NotebookHeader = ({
     getRootSpotGeoCoords,
     getSampleSpotIconSource,
     getSpotGeometryIconSource,
-    getSpotWithThisImageBasemap,
+    getSpotWithThisImage,
     getSpotWithThisSample,
     handleSpotSelected,
     isCurrentMapReadOnly,
@@ -71,7 +71,7 @@ const NotebookHeader = ({
   // Spot underneath, and nothing the user reads should give that away
   const spotLabel = spot.properties?.isSample || isLegacySample ? 'Sample' : 'Spot';
   const spotWithThisImageBasemap = spot.properties?.image_basemap
-    && getSpotWithThisImageBasemap(spot.properties.image_basemap);
+    && getSpotWithThisImage(spot.properties.image_basemap);
   const parentSpot = spot.properties?.isSample ? getSpotWithThisSample(spot.properties.id)
     : !isEmpty(spotWithThisImageBasemap) ? spotWithThisImageBasemap
       : null;

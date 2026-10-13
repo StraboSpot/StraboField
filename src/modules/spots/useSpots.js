@@ -102,7 +102,7 @@ const useSpots = () => {
     if (newSpot && preferences.prepend_spot_name_nested_spot
       && (isOnImageBasemap(newSpot) || isOnStratSection(newSpot))) {
       if (isOnImageBasemap(newSpot)) {
-        const parentSpot = getSpotWithThisImageBasemap(newSpot.properties.image_basemap);
+        const parentSpot = getSpotWithThisImage(newSpot.properties.image_basemap);
         newSpotName = parentSpot.properties.name + namePrefix;
       }
       else {
@@ -115,7 +115,7 @@ const useSpots = () => {
     if (newSpot && preferences.restart_num_each_nested_spot
       && (isOnImageBasemap(newSpot) || isOnStratSection(newSpot))) {
       if (isOnImageBasemap(newSpot)) {
-        const parentSpot = getSpotWithThisImageBasemap(newSpot.properties.image_basemap);
+        const parentSpot = getSpotWithThisImage(newSpot.properties.image_basemap);
         const imageBasemaps = getImageBasemapsInSpot(parentSpot);
         const nestedImageBasemapSpots = imageBasemaps.flatMap(i => getAllSpotsOnImageBasemap(i.id));
         spotNumber = nestedImageBasemapSpots.length + 1;
@@ -175,12 +175,12 @@ const useSpots = () => {
     return Object.values(foundSpots);
   };
 
-  // The Spot holding a given image basemap or strat section, generalizing getSpotWithThisImageBasemap and
+  // The Spot holding a given image basemap or strat section, generalizing getSpotWithThisImage and
   // getSpotWithThisStratSection. Takes both ids because the map asked about is sometimes the one on screen
   // and sometimes the one a given Spot sits on, which are not always the same. The geo map has no Spot
   // holding it, hence no id and no result.
   const getSpotWithThisMap = (imageBasemapId, stratSectionId) => {
-    if (imageBasemapId) return getSpotWithThisImageBasemap(imageBasemapId);
+    if (imageBasemapId) return getSpotWithThisImage(imageBasemapId);
     return stratSectionId ? getSpotWithThisStratSection(stratSectionId) : undefined;
   };
 
@@ -645,9 +645,10 @@ const useSpots = () => {
     return Object.values(getActiveSpotsObj()).filter(spot => spot?.properties?.sed?.strat_section);
   };
 
-  const getSpotWithThisImageBasemap = (imageBasemapId) => {
+  // Any image, basemap or not
+  const getSpotWithThisImage = (imageId) => {
     return Object.values(getActiveSpotsObj()).find((spot) => {
-      const spotFound = spot.properties?.images?.find(image => image.id?.toString() === imageBasemapId?.toString());
+      const spotFound = spot.properties?.images?.find(image => image.id?.toString() === imageId?.toString());
       return spotFound ? spot : undefined;
     });
   };
@@ -763,7 +764,7 @@ const useSpots = () => {
     getSpotsWithKey,
     getSpotsWithSamples,
     getSpotsWithStratSection,
-    getSpotWithThisImageBasemap,
+    getSpotWithThisImage,
     getSpotWithThisSample,
     getSpotWithThisStratSection,
     getVisibleSpots,
