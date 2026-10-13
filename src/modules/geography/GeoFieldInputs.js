@@ -17,14 +17,16 @@ const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
 
   const fillWithCurrentLocation = async () => {
     const currentLocation = await getCurrentLocation();
-    if (currentLocation.latitude) geomFormRef.current.setFieldValue('latitude', currentLocation.latitude);
-    if (currentLocation.longitude) geomFormRef.current.setFieldValue('longitude', currentLocation.longitude);
-    if (formRef) {
-      if (currentLocation.altitude) formRef.current.setFieldValue('altitude', currentLocation.altitude);
-      if (currentLocation.accuracy) formRef.current.setFieldValue('gps_accuracy', currentLocation.accuracy);
-      if (currentLocation.altitudeAccuracy) {
-        formRef.current.setFieldValue('altitude_accuracy', currentLocation.altitudeAccuracy);
-      }
+    // A fix can take up to 30 seconds, long enough to have left the page and taken its forms with it
+    const geomForm = geomFormRef.current;
+    const form = formRef?.current;
+    if (!geomForm) return;
+    if (currentLocation.latitude) geomForm.setFieldValue('latitude', currentLocation.latitude);
+    if (currentLocation.longitude) geomForm.setFieldValue('longitude', currentLocation.longitude);
+    if (form) {
+      if (currentLocation.altitude) form.setFieldValue('altitude', currentLocation.altitude);
+      if (currentLocation.accuracy) form.setFieldValue('gps_accuracy', currentLocation.accuracy);
+      if (currentLocation.altitudeAccuracy) form.setFieldValue('altitude_accuracy', currentLocation.altitudeAccuracy);
     }
   };
 
