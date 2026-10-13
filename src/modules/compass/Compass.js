@@ -29,7 +29,7 @@ const Compass = ({
   const compassMeasurements = useSelector(state => state.compass.measurements);
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const modalVisible = useSelector(state => state.home.modalVisible);
-  const {isSample} = useSelector(state => state.spot.selectedSpot.properties);
+  const isSample = useSelector(state => state.spot.selectedSpot.properties?.isSample);
 
   const {
     compassData,
