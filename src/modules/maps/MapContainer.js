@@ -79,6 +79,7 @@ const MapContainer = forwardRef(({
     editSpot,
     endDraw,
     extendLineFromEndpoint,
+    getEditSession,
     getSpotToEdit,
     handleSelectedVertexLongPress,
     isEditingSpot,
@@ -114,6 +115,7 @@ const MapContainer = forwardRef(({
   } = useMapPressEvents({
     clearSelectedSpots,
     editSpot,
+    getEditSession,
     getSpotToEdit,
     isEditingSpot,
     mapMode,

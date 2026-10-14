@@ -60,6 +60,7 @@ const useMapEditor = ({
     deleteSelectedVertex,
     editFeatureVertex,
     extendLineFromEndpoint,
+    getEditSession,
     getVertexIndexInSpotToEdit,
     moveVertex,
     setSelectedSpotToEdit,
@@ -117,26 +118,31 @@ const useMapEditor = ({
     dispatch(clearedSelectedSpots());
   };
 
-  const editSpot = async (e) => {
-    // Select/Unselect new vertex to edit
+  // Handles a press in edit mode. What happens depends on what is under the press.
+  //
+  // When no Spot is being edited:
+  //   - A Spot -> start editing it. A line or polygon shows its vertices so they can be pressed.
+  //   - No Spot (empty map) -> ignore the press.
+  //
+  // When a Spot is being edited:
+  //   - One of its vertices -> select that vertex so it can be dragged.
+  //   - A different Spot -> switch to editing that one.
+  //   - No Spot (empty map) -> stop editing the Spot (edit mode stays on).
+  // Where the edited Spot overlaps another, the edited Spot wins, so a nearby point Spot can't take a press
+  // meant for a vertex.
+  // handleMapPress only calls this for a press on a vertex or on empty map; it switches Spots itself.
+  //
+  // editSession is what getEditSession() returned when the press began. Save and Cancel change that value, so
+  // if it no longer matches once a map query returns, the edit this press belongs to is over and the press is
+  // dropped. The caller reads it, not this function, because the caller runs map queries of its own first and
+  // a Save during those has to count too.
+  const editSpot = async (e, editSession) => {
     const [screenPointX, screenPointY] = Platform.OS === 'web' ? [e.point.x, e.point.y]
       : Platform.OS === 'android' ? [e.properties.screenPointX / PixelRatio.get(), e.properties.screenPointY / PixelRatio.get()]
         : [e.properties.screenPointX, e.properties.screenPointY];
     console.log('Select/Unselect vertex (and thus feature with the vertex) to edit');
     console.log('Selecting feature to edit...');
 
-    // Pick what to edit from where the user pressed:
-    //
-    // No Spot is being edited yet:
-    //   - Nothing under the press -> do nothing.
-    //   - A Spot under the press -> make it the edited Spot (all others become not-selected; a line or
-    //     polygon has its vertices exploded onto the draw layer).
-    //
-    // A Spot is already being edited (prefer that Spot when it's under the press, so a nearby point Spot
-    // can't steal a vertex tap):
-    //   - Nothing under the press -> deselect the edited Spot.
-    //   - A different Spot under the press (and no vertex of the edited Spot) -> switch to editing it.
-    //   - A vertex of the edited Spot under the press -> make it the selected vertex to edit.
     let spotAtPress;
     if (!isEmpty(spotEditing)) {
       const spotsAtPress = await getSpotsAtPress(screenPointX, screenPointY);
@@ -144,6 +150,7 @@ const useMapEditor = ({
       spotAtPress = isEditingSpotAtPress ? spotEditing : await getSpotAtPress(screenPointX, screenPointY);
     }
     else spotAtPress = await getSpotAtPress(screenPointX, screenPointY);
+    if (editSession !== getEditSession()) return;
     const spotFound = !isEmpty(spotAtPress) && spotAtPress?.geometry ? turf.cleanCoords(spotAtPress) : undefined;
     // #114, while editing, click on a different spot to edit, should immediately identify it as the selected spot and hence update the notebook panel.
     if (!isEmpty(spotFound)) dispatch(setSelectedSpot(spotFound));
@@ -169,6 +176,7 @@ const useMapEditor = ({
           vertexSelected = closestVertexDetails[0];
           isVertexIdentifiedAtSpotPress = true;
         }
+        if (editSession !== getEditSession()) return;
         if (isEmpty(vertexSelected)) {
           if (spotEditing.properties.id === spotFound.properties.id) clearSelectedFeatureToEdit();
           else {
@@ -197,7 +205,12 @@ const useMapEditor = ({
     }
   };
 
-  const getSpotToEdit = async (e, screenPointX, screenPointY, spotToEdit) => {
+  // A long press in edit mode on the Spot being edited changes its vertices: on a line it opens the vertex
+  // actions modal; on a polygon it deletes the vertex under the press, or adds one there if there is none.
+  //
+  // editSession is what getEditSession() returned when the press began, read by the caller before its own map
+  // queries. If Save or Cancel has changed it once a query returns, the edit is over and the press is dropped.
+  const getSpotToEdit = async (e, screenPointX, screenPointY, spotToEdit, editSession) => {
     const vertexSelected = isEmpty(spotEditing) ? {} : await getDrawFeatureAtPress(screenPointX, screenPointY);
     // Treat the press as on the edited Spot when its body OR a vertex of it is under the press (the vertex
     // check covers corner presses where the fill isn't under the point), so a nearby point Spot can't block it.
@@ -207,6 +220,7 @@ const useMapEditor = ({
         || (!isEmpty(vertexSelected) && String(vertexSelected.properties.id) === String(spotEditing.properties.id));
       if (isEditingSpotAtPress) spotToEdit = spotEditing;
     }
+    if (editSession !== getEditSession()) return;
     if (isEmpty(spotToEdit)) console.log('Already in editing mode and no Spot found where pressed. No action taken.');
     else if (!isEmpty(spotEditing)) {
       let spotEditingCopy = JSON.parse(JSON.stringify(spotEditing));
@@ -323,6 +337,7 @@ const useMapEditor = ({
     editSpot,
     endDraw,
     extendLineFromEndpoint,
+    getEditSession,
     getSpotToEdit,
     handleSelectedVertexLongPress,
     isEditingSpot: !isEmpty(spotEditing),

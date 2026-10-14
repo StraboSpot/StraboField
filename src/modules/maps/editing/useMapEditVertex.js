@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {Platform} from 'react-native';
 
 import * as turf from '@turf/turf';
@@ -45,6 +45,11 @@ const useMapEditVertex = ({
   const {isSpotInReadOnlyDataset} = useProject();
 
   /* Local State */
+
+  // Bumped each time an edit ends. A press awaits map queries before it acts, so Save or Cancel can land in
+  // between, and acting anyway leaves the press's vertex markers stranded on the map. A press reads it with
+  // getEditSession when it begins and drops its result if it has changed after an await.
+  const editSessionRef = useRef(0);
 
   const [allowMapViewMove, setAllowMapViewMove] = useState(true); // VIEW mode (initial) allows map movement
   const [editFeatureVertex, setEditFeatureVertex] = useState([]);
@@ -291,9 +296,11 @@ const useMapEditVertex = ({
     console.log('Set vertex to edit:', vertexToEditWithGeoCoords);
     setEditFeatureVertex([vertexToEditWithGeoCoords]);
     setAllowMapViewMove(false);
+    const editSession = getEditSession();
     const vertexGeoCoords = vertexToEditWithGeoCoords.geometry.coordinates;
     let vertexScreenCoords = Platform.OS === 'web' ? mapRef.current.project(vertexGeoCoords)
       : await mapRef.current.getPointInView(vertexGeoCoords);
+    if (editSession !== getEditSession()) return;
     if (Platform.OS === 'web') vertexScreenCoords = [vertexScreenCoords.x, vertexScreenCoords.y];
     // getPointInView seems to include pixel ratio adjustment for Android
     // now after updating @rnmapbox/maps from v10.1.39 to v10.2.10
@@ -371,6 +378,7 @@ const useMapEditVertex = ({
 
   const clearEditing = () => {
     console.log('Clearing editing data...');
+    editSessionRef.current += 1;
     clearVertexes();
     setSpotEditing({});
     setSpotsEdited([]);
@@ -433,6 +441,8 @@ const useMapEditVertex = ({
         : editVertex]);
     }
   };
+
+  const getEditSession = () => editSessionRef.current;
 
   const splitLine = async (e, spotEditingCopy, spotToEdit, vertexSelected) => {
     console.log('Splitting Line...', e, spotEditingCopy, spotToEdit, vertexSelected);
@@ -541,6 +551,7 @@ const useMapEditVertex = ({
     deleteSelectedVertex,
     editFeatureVertex,
     extendLineFromEndpoint,
+    getEditSession,
     getVertexIndexInSpotToEdit,
     moveVertex,
     setSelectedSpotToEdit,

@@ -20,6 +20,7 @@ import useMapMeasure from '../useMapMeasure';
 const useMapPressEvents = ({
                              clearSelectedSpots,
                              editSpot,
+                             getEditSession,
                              getSpotToEdit,
                              isEditingSpot,
                              mapMode,
@@ -100,8 +101,9 @@ const useMapPressEvents = ({
       else console.log('No Spots to edit. No action taken.');
     }
     else if (mapMode === MAP_MODES.EDIT) {
+      const editSession = getEditSession();
       const spotToEdit = await getSpotAtPress(screenPointX, screenPointY);
-      await getSpotToEdit(e, screenPointX, screenPointY, spotToEdit);
+      await getSpotToEdit(e, screenPointX, screenPointY, spotToEdit, editSession);
     }
     else console.log('No Spots to edit. No action taken.');
   };
@@ -180,12 +182,15 @@ const useMapPressEvents = ({
       // Edit a Spot
       else if (mapMode === MAP_MODES.EDIT) {
         const [screenPointX, screenPointY] = getScreenPoint(e);
+        // Checked again after the map queries below; if Save or Cancel changed it meanwhile, drop the press
+        const editSession = getEditSession();
         // A vertex in the press box is a vertex gesture - let editSpot handle it.
         const vertexAtPress = isEditingSpot ? await getDrawFeatureAtPress(screenPointX, screenPointY) : {};
-        if (!isEmpty(vertexAtPress)) await editSpot(e);
+        if (!isEmpty(vertexAtPress)) await editSpot(e, editSession);
         else {
           // No vertex: switch Spots. Look at Spots under the press other than the one being edited.
           const spotsAtPress = await getSpotsAtPress(screenPointX, screenPointY);
+          if (editSession !== getEditSession()) return;
           const editingSpotId = store.getState().spot.selectedSpot?.properties?.id;
           const otherSpots = isEditingSpot ? spotsAtPress.filter(spot => spot.properties.id !== editingSpotId)
             : spotsAtPress;
@@ -195,7 +200,7 @@ const useMapPressEvents = ({
             setIsShowSpotsAtPressModal(true);
           }
           else if (otherSpots.length === 1) setSpotToEditFromPicker(otherSpots[0]);
-          else if (spotsAtPress.length === 0) await editSpot(e);  // empty press - editSpot deselects
+          else if (spotsAtPress.length === 0) await editSpot(e, editSession);  // empty press - editSpot deselects
           // Only the edited Spot under the press, no vertex - do nothing (don't grab the nearest vertex).
           else console.log('Only the edited Spot at press and no vertex in box. No action taken.');
         }
