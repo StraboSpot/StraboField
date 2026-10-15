@@ -4,7 +4,7 @@ import {Text} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
-import {filterTagsByTagType, getFeatureLabel, tagSpotExists} from './tags.helpers';
+import {filterTagsByTagType, getFeatureLabel, getTagTitle, tagSpotExists} from './tags.helpers';
 import {deepFindFeatureById, isEmpty} from '../../shared/helpers';
 import useForm from '../form/useForm';
 import MeasurementLabel from '../measurements/MeasurementLabel';
@@ -280,7 +280,7 @@ const useTags = () => {
       updatedTags = tags.filter(tag => !tagIdsToSave.has(tag.id));
       updatedTags = tagToSave.map(tag => ({...tag, modified_timestamp: timestamp})).concat(updatedTags);
     }
-    updatedTags = updatedTags.sort((tagA, tagB) => tagA.name.localeCompare(tagB.name));
+    updatedTags = updatedTags.sort((tagA, tagB) => getTagTitle(tagA).localeCompare(getTagTitle(tagB)));
     dispatch(updatedProject({field: 'tags', value: updatedTags}));
   };
 

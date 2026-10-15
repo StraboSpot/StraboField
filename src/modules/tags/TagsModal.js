@@ -6,6 +6,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import TagDetailModal from './detail/TagDetailModal';
+import {getTagTitle} from './tags.helpers';
 import TagsListItem from './TagsListItem';
 import useTags from './useTags';
 import commonStyles from '../../shared/common.styles';
@@ -171,7 +172,8 @@ const TagsModal = ({
               text={!isEmpty(tags) && isEmpty(getRelevantTags()) ? 'There are no tags with this type.' : ''}
             />
           }
-          data={getRelevantTags().sort((tagA, tagB) => tagA.name.localeCompare(tagB.name))}  // alphabetize by name
+          data={getRelevantTags().sort(
+            (tagA, tagB) => getTagTitle(tagA).localeCompare(getTagTitle(tagB)))}  // alphabetize by name
           keyExtractor={item => item.id.toString()}
           renderItem={({item}) => renderTagItem(item)}
           // When the Save button shows, the list must flex so it scrolls internally and the button stays pinned.
