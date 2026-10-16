@@ -98,7 +98,9 @@ const App = () => {
           <ToastWrapper>
             <PersistGate loading={null} onBeforeLift={installGlyphs} persistor={persistor}>
               {/*<Sentry.TouchEventBoundary>*/}
-              {!SMALL_SCREEN && <StatusBar hidden/>}
+              {/* iOS sets the status bar natively (RootViewController in AppDelegate.swift); <StatusBar> there is a
+                  red-box error since the appearance is view-controller-based. */}
+              {Platform.OS !== 'ios' && !SMALL_SCREEN && <StatusBar hidden/>}
               <ConnectionStatus/>
               <ProfileSyncListener/>
               <MacrostratAuthRedirectHandler/>

@@ -97,6 +97,9 @@ const HomeViewSmallScreen = forwardRef(({
         }
         centerContainerStyle={{justifyContent: 'center'}}
         edges={'top'}
+        // Skips Header's own <StatusBar> (it doesn't hide the bar): iOS sets the status bar natively, and RN's
+        // StatusBar module red-boxes there now that the appearance is view-controller-based.
+        hideStatusBar={Platform.OS === 'ios'}
         leftComponent={isShowingSpotNavigator && !isNotebookPanelVisible ? (
           <Icon
             color={themes.PRIMARY_TEXT_COLOR}

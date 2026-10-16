@@ -1,7 +1,6 @@
 import {Platform, StyleSheet} from 'react-native';
 
 import {
-  BLACK,
   DARKGREY,
   GOLD,
   LIST_BORDER_COLOR,
@@ -28,7 +27,7 @@ const styles = StyleSheet.create({
     zIndex: 50,
   },
   container: {
-    backgroundColor: Platform.OS === 'ios' ? BLACK : WHITE,
+    backgroundColor: WHITE,
     flex: 1,
     overflow: 'hidden',
   },
