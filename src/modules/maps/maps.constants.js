@@ -20,6 +20,13 @@ export const DEFAULT_GEOM_VIEW_SHARE = 0.25;
 // the extent of Spots — fitBounds is dropped if issued mid-relayout on iOS. See issue #892.
 export const SPOTS_EXTENT_ZOOM_DELAY = 500;
 
+// Getting the current location watches the GPS instead of taking the first fix, which is often a cached or
+// cell/Wi-Fi fix kilometers off while the GPS warms up. See issue #1012.
+export const LOCATION_ACCURACY_TARGET = 20;   // m - take the first fix at least this accurate
+export const LOCATION_MAX_FIX_AGE = 5000;     // ms - ignore fixes older than this when the request starts
+export const LOCATION_SETTLE_TIME = 15000;    // ms - after this, take the most accurate fix so far
+export const LOCATION_TIMEOUT = 30000;        // ms - give up if there is no fix at all by then
+
 // Half-width (DIP) of the press box for finding Spots/vertices under the finger; _PRECISE requires
 // a press directly on the feature (e.g. Macrostrat).
 export const PRESS_BOX_PADDING = 10;
