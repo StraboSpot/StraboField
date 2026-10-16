@@ -1,11 +1,16 @@
 import {createSlice} from '@reduxjs/toolkit';
 
+import {getNewUUID} from '../../shared/helpers';
+
 const initialConnectionsState = {
   databaseEndpoint: {
     endpoint: '',
     isSelected: false,
     isVerified: false,
   },
+  // Identifies this install to the server (the X-Strabo-Device header). Persisted and never reset, so it outlives
+  // signing out; the one minted here only sticks on an install's first launch, since rehydration replaces it after.
+  deviceId: getNewUUID(),
   isAutoSaving: false,
   isForceOffline: false,
   isLocalSaveNeeded: false,
