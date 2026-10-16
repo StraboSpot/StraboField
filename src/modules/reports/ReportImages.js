@@ -87,6 +87,7 @@ const ReportImages = ({setUpdatedImages, updatedImages}) => {
         images={updatedImages}
         isThumbnailOnly
         onOpenImage={handleOpenImage}
+        saveUpdatedImage={saveUpdatedImage}
       />
 
       {/* Modals */}

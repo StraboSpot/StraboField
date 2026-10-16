@@ -10,7 +10,6 @@ import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import {SwitchWrapper} from '../../shared/ui';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {useSpots} from '../spots';
 import {editedSpotImage} from '../spots/spots.slice';
@@ -32,7 +31,6 @@ const ImageCard = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const spot = useSelector(state => state.spot.selectedSpot);
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
 
@@ -68,9 +66,8 @@ const ImageCard = ({
   const handleEndEditing = () => {
     if (!isEmpty(title) && title !== image.title) {
       const updatedImage = {...image, title};
-      if (modalVisible === MODAL_KEYS.NOTEBOOK.SAMPLES || modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
-        saveUpdatedImage(updatedImage);
-      }
+      // Images owned by something other than a Spot (Sample, Memo) are saved through their owner
+      if (saveUpdatedImage) saveUpdatedImage(updatedImage);
       else {
         dispatch(editedSpotImage(updatedImage));
         dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
