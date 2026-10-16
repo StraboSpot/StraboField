@@ -3,8 +3,8 @@
   "version": "2.31.8",
   "private": true,
   "scripts": {
-    "android": "npx react-native run-android",
-    "android-release": "npx react-native run-android --mode=release",
+    "android": "npx react-native run-android --active-arch-only",
+    "android-release": "npx react-native run-android --mode=release --active-arch-only",
     "ios-release": "npx react-native run-ios --mode=Release",
     "ios-sim": "npx react-native run-ios --simulator=\"iPad Pro (11-inch) (4th generation)\"",
     "ios": "npx react-native run-ios",
