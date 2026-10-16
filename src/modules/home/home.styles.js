@@ -199,6 +199,48 @@ const homeStyles = StyleSheet.create({
     right: 10,
     top: 10,
   },
+  // White ring to stand out against the map; presses pass through to the button it overlaps
+  notebookButtonBadge: {
+    backgroundColor: themes.PRIMARY_ACCENT_COLOR,
+    borderColor: themes.WHITE,
+    borderRadius: 8,
+    borderWidth: 2,
+    height: 16,
+    pointerEvents: 'none',
+    position: 'absolute',
+    right: -2,
+    top: -2,
+    width: 16,
+  },
+  notebookButtonHighlight: {
+    borderRadius: 16,
+    bottom: -6,
+    left: -6,
+    position: 'absolute',
+    right: -6,
+    top: -6,
+  },
+  // Absolute, in the label's padding, so the label stays centered whether or not it shows
+  notebookTabBadge: {
+    backgroundColor: themes.PRIMARY_ACCENT_COLOR,
+    borderRadius: 4,
+    height: 8,
+    position: 'absolute',
+    right: 0,
+    top: 4,
+    width: 8,
+  },
+  // Padded so the flash reads as a pill
+  notebookTabLabel: {
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  // Matches the Map tab's label (tabBarLabelStyle plus the tab bar's default margin)
+  notebookTabLabelText: {
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontSize: themes.PRIMARY_HEADER_TEXT_SIZE,
+    margin: 4,
+  },
   shortcutButtons: {
     position: 'absolute',
     right: 10,

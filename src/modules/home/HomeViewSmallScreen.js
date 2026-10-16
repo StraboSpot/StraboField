@@ -1,5 +1,5 @@
 import React, {forwardRef, useEffect, useState} from 'react';
-import {Platform, View} from 'react-native';
+import {Animated, Platform, Text, View} from 'react-native';
 
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {Button, Header, Icon} from '@rn-vui/base';
@@ -11,6 +11,7 @@ import ShortcutButtons from './buttons/ShortcutButtons';
 import {NAVIGATION_OPTIONS} from './home.constants';
 import {setModalVisible} from './home.slice';
 import homeStyles from './home.styles';
+import useNotebookUpdateIndicator from './useNotebookUpdateIndicator';
 import * as themes from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
@@ -61,6 +62,7 @@ const HomeViewSmallScreen = forwardRef(({
   const {height, width} = useWindowSize();
   const {isCurrentMapReadOnly} = useSpots();
   const {lockToPortrait} = useDeviceOrientation();
+  const {clearUnseenSpot, hasUnseenSpot, notebookUpdateHighlightColor} = useNotebookUpdateIndicator(mapMode);
 
   useEffect(() => {
     Platform.OS !== 'web' && lockToPortrait();
@@ -79,6 +81,16 @@ const HomeViewSmallScreen = forwardRef(({
     setIsShowingSpotNavigator(s => !s);
   };
 
+  // The tab bar only styles string labels, so this one carries its own label style
+  const renderNotebookTabLabel = ({focused}) => (
+    <Animated.View
+      style={[homeStyles.notebookTabLabel, !focused && {backgroundColor: notebookUpdateHighlightColor}]}
+    >
+      <Text style={homeStyles.notebookTabLabelText}>Notebook</Text>
+      {hasUnseenSpot && !focused && <View style={homeStyles.notebookTabBadge}/>}
+    </Animated.View>
+  );
+
   return (
     <>
       <Header
@@ -96,7 +108,7 @@ const HomeViewSmallScreen = forwardRef(({
             iconRight
             onPress={toggleSpotNavigator}
             size={'sm'}
-            title={isShowingSpotNavigator ? 'Spot Navigator' : selectedSpot?.properties?.name || 'Spot Navigator'}
+            title={isShowingSpotNavigator ? 'Spot Navigator' : selectedSpot?.properties?.name || 'No Spot Selected'}
             titleStyle={{color: themes.PRIMARY_TEXT_COLOR, fontSize: themes.PRIMARY_HEADER_TEXT_SIZE}}
             type={'clear'}
           />
@@ -210,7 +222,15 @@ const HomeViewSmallScreen = forwardRef(({
               </>
             }
           </Tab.Screen>
-          <Tab.Screen name={'Notebook'} options={NAVIGATION_OPTIONS}>
+          <Tab.Screen
+            listeners={{
+              // On blur too: a Spot selected from inside the Notebook was seen there
+              blur: clearUnseenSpot,
+              focus: clearUnseenSpot,
+            }}
+            name={'Notebook'}
+            options={{...NAVIGATION_OPTIONS, tabBarLabel: renderNotebookTabLabel}}
+          >
             {() =>
               <NotebookPanel
                 closeNotebookPanel={closeNotebookPanel}

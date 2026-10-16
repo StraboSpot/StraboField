@@ -67,7 +67,11 @@ const RightSideButtons = ({
       )}
 
       <Animated.View style={[homeStyles.notebookButton, animateRightSide]}>
-        <NotebookButton closeNotebookPanel={closeNotebookPanel} openNotebookPanel={openNotebookPanel}/>
+        <NotebookButton
+          closeNotebookPanel={closeNotebookPanel}
+          mapMode={mapMode}
+          openNotebookPanel={openNotebookPanel}
+        />
       </Animated.View>
 
       {!currentImageBasemap && !stratSection && (
