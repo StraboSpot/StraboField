@@ -198,8 +198,10 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
             </ListItem>
             {labelTypeOn && (
               <ButtonGroup
+                buttonStyle={{paddingVertical: 4}}
                 buttons={['Dip/Plunge\nor Name', 'Dip/Plunge\nOnly', 'Spot Name\nOnly']}
-                containerStyle={styles.measurementDetailSwitches}
+                // Two-line labels outgrow the fixed 40pt height at larger Dynamic Type sizes, so let it grow
+                containerStyle={[styles.measurementDetailSwitches, {height: 'auto', minHeight: 40}]}
                 onPress={i => dispatch(setLabelTypeOn(i === 0 ? 'dipOrName' : i === 1 ? 'dip' : 'name'))}
                 selectedButtonStyle={{backgroundColor: themes.PRIMARY_ACCENT_COLOR}}
                 selectedIndex={labelTypeOn === 'dipOrName' ? 0 : labelTypeOn === 'dip' ? 1 : 2}

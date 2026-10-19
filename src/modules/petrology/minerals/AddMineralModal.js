@@ -130,7 +130,7 @@ const AddMineralModal = () => {
           <ButtonGroup
             buttonStyle={{padding: 5}}
             buttons={['Look up by Rock Class', 'Look up in Glossary']}
-            containerStyle={{height: 50, borderRadius: 10}}
+            containerStyle={{borderRadius: 10, height: 'auto', minHeight: 50}}
             onPress={onViewTypePress}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
             selectedIndex={selectedTypeIndex}
