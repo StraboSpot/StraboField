@@ -1,0 +1,26 @@
+name: Close Stale Issues
+
+on:
+  schedule:
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  close-stale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: Close issues still missing info after 45 days
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {closeStale} = require('./.github/scripts/issue-info-check.js');
+            await closeStale({github, context, core});
