@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, TextInput, View} from 'react-native';
+import {Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {Button, Image} from '@rn-vui/base';
@@ -12,6 +12,7 @@ import {getLatLngText, isEmpty, toFixedInteger, toTitleCase} from '../../../shar
 import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
+import TextInput from '../../../shared/ui/TextInput';
 import {LABEL_DICTIONARY} from '../../form/form.constants';
 import {openedMessageModal} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';

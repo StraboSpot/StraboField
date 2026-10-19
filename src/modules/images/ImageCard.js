@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Platform, Text, TouchableOpacity, View} from 'react-native';
 
 import {Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -13,6 +13,7 @@ import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SwitchWrapper from '../../shared/ui/SwitchWrapper';
+import TextInput from '../../shared/ui/TextInput';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImage} from '../spots/spots.slice';

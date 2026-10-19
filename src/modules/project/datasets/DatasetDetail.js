@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Platform, Text, TextInput, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
@@ -15,6 +15,7 @@ import LittleSpacer from '../../../shared/ui/LittleSpacer';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
+import TextInput from '../../../shared/ui/TextInput';
 import formStyles from '../../form/form.styles';
 import FormFlatList from '../../form/FormFlatList';
 import FormikWrapper from '../../form/FormikWrapper';

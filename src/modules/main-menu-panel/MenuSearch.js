@@ -8,6 +8,7 @@ import {
   PRIMARY_TEXT_SIZE,
   SECONDARY_BACKGROUND_COLOR,
 } from '../../shared/styles.constants';
+import TextInput from '../../shared/ui/TextInput';
 
 const MenuSearch = ({searchState, setSearchState}) => {
   /* Event Handlers */
@@ -18,6 +19,7 @@ const MenuSearch = ({searchState, setSearchState}) => {
 
   return (
     <SearchBar
+      InputComponent={TextInput}
       autoCorrect={false}
       cancelIcon
       clearIcon

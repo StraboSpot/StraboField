@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Platform, Text, TextInput, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {ButtonGroup, ListItem} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -10,6 +10,7 @@ import commonStyles from '../../shared/common.styles';
 import * as themes from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import SectionDivider from '../../shared/ui/SectionDivider';
+import TextInput from '../../shared/ui/TextInput';
 import formStyles from '../form/form.styles';
 import PageHeader from '../page/PageHeader';
 

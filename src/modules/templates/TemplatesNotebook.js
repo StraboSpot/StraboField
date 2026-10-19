@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, ScrollView, Text, TextInput, View} from 'react-native';
+import {FlatList, ScrollView, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -24,6 +24,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SwitchWrapper from '../../shared/ui/SwitchWrapper';
+import TextInput from '../../shared/ui/TextInput';
 import formStyles from '../form/form.styles';
 import MeasurementDetail from '../measurements/MeasurementDetail';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';

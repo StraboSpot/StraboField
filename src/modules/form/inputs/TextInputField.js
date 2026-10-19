@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
-import {Text, TextInput} from 'react-native';
+import {Text} from 'react-native';
 
 import {useField, useFormikContext} from 'formik';
 
 import FieldLabel from './FieldLabel';
 import * as themes from '../../../shared/styles.constants';
+import TextInput from '../../../shared/ui/TextInput';
 import formStyles from '../form.styles';
 
 const TextInputField = ({

@@ -1,5 +1,6 @@
 import {Platform, StyleSheet} from 'react-native';
 
+import * as themes from '../styles.constants';
 import {
   BLACK,
   DARKGREY,
@@ -83,6 +84,19 @@ const styles = StyleSheet.create({
   itemSeparator: {
     borderColor: PRIMARY_BACKGROUND_COLOR,
     borderTopWidth: 1,
+  },
+  keyboardDoneBar: {
+    alignItems: 'flex-end',
+    backgroundColor: themes.LIGHTGREY,
+    borderTopColor: themes.MEDIUMGREY,
+    borderTopWidth: 0.5,
+    paddingHorizontal: 25,
+    paddingVertical: 10,
+  },
+  keyboardDoneText: {
+    color: themes.PRIMARY_ACCENT_COLOR,
+    fontSize: themes.PRIMARY_TEXT_SIZE,
+    fontWeight: themes.TEXT_WEIGHT_700,
   },
   littleSpacer: {
     padding: 5,
