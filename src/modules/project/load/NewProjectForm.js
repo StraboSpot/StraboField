@@ -4,7 +4,7 @@ import {FlatList, View} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {SECONDARY_BACKGROUND_COLOR} from '../../../shared/styles.constants';
-import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
+import ActionButton from '../../../shared/ui/buttons/ActionButton';
 import Form from '../../form/Form';
 import FormikWrapper from '../../form/FormikWrapper';
 import useForm from '../../form/useForm';
@@ -78,7 +78,7 @@ const NewProjectForm = ({openMainMenuPanel}) => {
       {/* Pass the rendered element, not the function: a function prop is a new component type each
        render, which remounts Formik and wipes entered values (e.g. on a map tap that re-renders). */}
       <FlatList ListHeaderComponent={renderFormFields()}/>
-      <OutlineButton
+      <ActionButton
         disabled={isFormInvalid}
         onPress={saveForm}
         title={'Save New Project'}
