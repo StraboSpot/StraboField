@@ -151,6 +151,8 @@ const spotSlice = createSlice({
       const {field, value, spotId = state.selectedSpot?.properties?.id} = action.payload;
       if (spotId) {
         const spotToEdit = state.spots[spotId];
+        // A Spot can be selected before it is saved, e.g. the new half of a line split during map editing
+        if (!spotToEdit) return;
         if (isEmpty(value)) delete spotToEdit.properties[field];
         else spotToEdit.properties[field] = value;
         spotToEdit.properties.modified_timestamp = Date.now();
