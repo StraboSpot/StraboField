@@ -5,7 +5,7 @@ import {useDispatch} from 'react-redux';
 
 import ReportsList from './ReportsList';
 import AddButton from '../../shared/ui/buttons/AddButton';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ReportsMenu = ({}) => {
@@ -19,7 +19,7 @@ const ReportsMenu = ({}) => {
 
   const addReport = () => {
     dispatch(setModalValues({}));
-    dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
+    dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
   };
 
   /* View */

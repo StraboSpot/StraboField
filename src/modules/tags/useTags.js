@@ -26,8 +26,8 @@ const useTags = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const reports = useSelector(state => state.project.project?.reports) || [];
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
@@ -136,7 +136,7 @@ const useTags = () => {
 
   const addTag = () => {
     dispatch(setSelectedTag({}));
-    if (modalVisible === MODAL_KEYS.NOTEBOOK.TAGS) dispatch(addedTagToSelectedSpot(true));
+    if (activeModal === MODAL_KEYS.NOTEBOOK.TAGS) dispatch(addedTagToSelectedSpot(true));
     else dispatch(addedTagToSelectedSpot(false));
   };
 

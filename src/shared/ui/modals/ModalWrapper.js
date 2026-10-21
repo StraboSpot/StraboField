@@ -63,7 +63,7 @@ const ModalWrapper = ({
 
   const footerShortcutModal = useSelector((state) => {
     if (isEmpty(state.spot.selectedSpot) || !isEmpty(state.spot.selectedAttributes)) return null;
-    return SHORTCUT_MODALS.find(m => m.key === state.home.modalVisible && m.notebook_modal_key) ?? null;
+    return SHORTCUT_MODALS.find(m => m.key === state.home.activeModal && m.notebook_modal_key) ?? null;
   });
 
   const {height: windowHeight} = useWindowDimensions();
@@ -111,7 +111,7 @@ const ModalWrapper = ({
     if (canDismiss) (onBackdropPress || closeModal || onCancelPress)?.();
   };
 
-  // Fast path for the iOS two-phase modal switch (see setModalVisible): when this modal finishes dismissing, show any
+  // Fast path for the iOS two-phase modal switch (see setActiveModal): when this modal finishes dismissing, show any
   // modal queued behind it. Fires on iOS only, and no-ops when nothing is queued; the ModalsContainer timer is the
   // guaranteed fallback for modals that unmount without delivering onDismiss.
   const handleDismiss = () => {

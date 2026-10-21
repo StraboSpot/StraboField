@@ -15,7 +15,7 @@ import {
 } from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
@@ -48,7 +48,7 @@ const PageHeader = ({
       alert('No Features!', 'No features have been selected.');
       dispatch(setMultipleFeaturesTaggingEnabled(false));
     }
-    else dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.FEATURE_TAGS}));
+    else dispatch(setActiveModal({modal: MODAL_KEYS.OTHER.FEATURE_TAGS}));
   };
 
   const toggleFeaturesTagButton = () => {

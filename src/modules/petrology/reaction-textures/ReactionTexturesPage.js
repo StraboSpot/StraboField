@@ -11,7 +11,7 @@ import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import useForm from '../../form/useForm';
-import {setModalVisible} from '../../home/home.slice';
+import {setActiveModal} from '../../home/home.slice';
 import BasicListItem from '../../page/BasicListItem';
 import BasicPageDetail from '../../page/BasicPageDetail';
 import {getFeatureTitle} from '../../page/featureLabels.helpers';
@@ -51,12 +51,12 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
 
   /* Logic Helpers */
 
-  const addReaction = () => dispatch(setModalVisible({modal: page.key}));
+  const addReaction = () => dispatch(setActiveModal({modal: page.key}));
 
   const editReaction = (reaction) => {
     setIsDetailView(true);
     setSelectedReaction(reaction);
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   const getExistingMineralsText = () => {

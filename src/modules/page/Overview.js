@@ -13,7 +13,7 @@ import {SMALL_SCREEN, SMALL_TEXT_SIZE, TEXT_WEIGHT_500} from '../../shared/style
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import uiStyles from '../../shared/ui/ui.styles';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import ImageModal from '../images/ImageModal';
 import ImagePropertiesModal from '../images/ImagePropertiesModal';
 import useImages from '../images/useImages';
@@ -110,8 +110,8 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
 
   const openPage = (page) => {
     dispatch(setNotebookPageVisible(page.key));
-    if (page.modal) dispatch(setModalVisible({modal: page.modal}));
-    else dispatch(setModalVisible({modal: null}));
+    if (page.modal) dispatch(setActiveModal({modal: page.modal}));
+    else dispatch(setActiveModal({modal: null}));
   };
 
   const openRockdLink = () => {

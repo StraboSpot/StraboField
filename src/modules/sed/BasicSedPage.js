@@ -9,7 +9,7 @@ import {getNewUUID, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import useForm from '../form/useForm';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
@@ -59,7 +59,7 @@ const BasicSedPage = ({isReadOnly, page}) => {
   const addAttribute = () => {
     setIsDetailView(true);
     setSelectedAttribute({id: getNewUUID()});
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   const editAttribute = (attribute, i) => {
@@ -72,7 +72,7 @@ const BasicSedPage = ({isReadOnly, page}) => {
     }
     setIsDetailView(true);
     setSelectedAttribute(attribute);
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   /* Render Functions */

@@ -29,7 +29,7 @@ import compassStyles from '../compass/compass.styles';
 import Form from '../form/Form';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -48,9 +48,9 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
@@ -83,7 +83,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
   const isSelectedAttitude = !isEmpty(selectedAttributes) && selectedAttributes?.length > 0;
 
   // The shortcut makes its own Spot at the current location, where the Notebook is editing the Spot it is open on
-  const isShortcutMeasurement = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT;
+  const isShortcutMeasurement = activeModal === MODAL_KEYS.SHORTCUTS.MEASUREMENT;
 
   // Web has no Compass input and no toggle to leave Manual, so Manual is always on there whatever the preference
   // says. Everywhere else follow the shared user preference, so this toggle and the one in User Conventions stay in
@@ -157,7 +157,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
       setAssocChoicesViewKey(null);
     }
     else if (isShowTemplates) setIsShowTemplates(false);
-    else dispatch(setModalVisible({modal: null}));
+    else dispatch(setActiveModal({modal: null}));
   };
 
   const onMeasurementTypePress = (i) => {
@@ -302,7 +302,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
       }
       // The shortcut always steps aside; from the Notebook the modal only does so on a small screen, where it
       // covers the page it just saved to. Both before the toast, which a modal on top would paint over.
-      if (isShortcutMeasurement || SMALL_SCREEN) dispatch(setModalVisible({modal: null}));
+      if (isShortcutMeasurement || SMALL_SCREEN) dispatch(setActiveModal({modal: null}));
       // After the zoom, which raises a full-screen spinner the toast would otherwise sit behind for most of its
       // life - the reason only shortcut saves looked too fast
       if (isShortcutMeasurement) await zoomToCurrentLocation();

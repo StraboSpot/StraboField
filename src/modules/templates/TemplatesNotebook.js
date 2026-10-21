@@ -45,7 +45,7 @@ const TemplatesNotebook = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const modalVisible = useSelector(state => state.home.modalVisible);
+  const activeModal = useSelector(state => state.home.activeModal);
   const templates = useSelector(state => state.project.project?.templates);
 
   const {saveTemplateValues} = useTemplates();
@@ -66,14 +66,14 @@ const TemplatesNotebook = ({
   /* Derived Variables */
 
   let templateKey = page.key || undefined;
-  if (isEmpty(page) && modalVisible) {
-    page = MODALS.find(p => p.key === modalVisible);
-    templateKey = modalVisible === MODAL_KEYS.NOTEBOOK.MEASUREMENTS
-    || modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? MEASUREMENT_TEMPLATE_KEY
-      : modalVisible === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS
-      || modalVisible === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_SEDIMENTARY ? rockKey
+  if (isEmpty(page) && activeModal) {
+    page = MODALS.find(p => p.key === activeModal);
+    templateKey = activeModal === MODAL_KEYS.NOTEBOOK.MEASUREMENTS
+    || activeModal === MODAL_KEYS.SHORTCUTS.MEASUREMENT ? MEASUREMENT_TEMPLATE_KEY
+      : activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS
+      || activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_SEDIMENTARY ? rockKey
         : page.notebook_modal_key ? page.notebook_modal_key
-          : modalVisible;
+          : activeModal;
   }
 
   /* Side Effects */
@@ -114,7 +114,7 @@ const TemplatesNotebook = ({
     setIsShowNameInput(true);
     setName('');
     if (templateKey === MEASUREMENT_TEMPLATE_KEY) setSelectedTemplate({values: {type: templateType}});
-    else if (modalVisible === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS) {
+    else if (activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS) {
       setSelectedTemplate({values: {igneous_rock_class: templateType}});
     }
     else setSelectedTemplate({values: {}});
@@ -309,7 +309,7 @@ const TemplatesNotebook = ({
       activeTemplates = getLinearTemplates(activeTemplatesForKey);
       label = 'Linear';
     }
-    else if (modalVisible === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS) label = toTitleCase(type);
+    else if (activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS) label = toTitleCase(type);
 
     const title = templateKey === MEASUREMENT_TEMPLATE_KEY ? 'Select ' + label + ' Template'
       : 'Select ' + label + ' Template(s)';
@@ -354,7 +354,7 @@ const TemplatesNotebook = ({
   };
 
   const renderTemplatesList = () => {
-    let label = modalVisible === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS ? toTitleCase(templateKey) + ' Rock'
+    let label = activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS ? toTitleCase(templateKey) + ' Rock'
       : page.label_singular || toTitleCase(page.label).slice(0, -1) || 'Unknown';
 
     let relevantTemplates = templatesForKey;

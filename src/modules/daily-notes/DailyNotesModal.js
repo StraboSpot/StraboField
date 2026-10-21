@@ -11,7 +11,7 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import FormikWrapper from '../form/FormikWrapper';
 import DateInputField from '../form/inputs/DateInputField';
 import TextInputField from '../form/inputs/TextInputField';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import {updatedProject} from '../project/projects.slice';
 
 const DailyNotesModal = () => {
@@ -33,7 +33,7 @@ const DailyNotesModal = () => {
 
   const close = () => {
     dispatch(setModalValues({}));
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   const deleteNote = (values) => {
@@ -44,7 +44,7 @@ const DailyNotesModal = () => {
     else projectDescriptionUpdated = {...projectDescription, daily_setup: dailyNotesFiltered};
     dispatch(updatedProject({field: 'description', value: projectDescriptionUpdated}));
     dispatch(setModalValues({}));
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   const deleteNoteConfirm = () => {
@@ -65,7 +65,7 @@ const DailyNotesModal = () => {
     const projectDescriptionUpdated = {...projectDescription, daily_setup: dailyNotesUpdated};
     dispatch(updatedProject({field: 'description', value: projectDescriptionUpdated}));
     dispatch(setModalValues({}));
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   /* Render Functions */

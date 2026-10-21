@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
@@ -42,7 +42,7 @@ const EarthquakesPage = ({isReadOnly, page}) => {
   /* Logic Helpers */
 
   const addAttribute = () => {
-    dispatch(setModalVisible({modal: page.key}));
+    dispatch(setActiveModal({modal: page.key}));
   };
 
   const editAttribute = (attribute, i) => {
@@ -57,7 +57,7 @@ const EarthquakesPage = ({isReadOnly, page}) => {
     setSelectedAttribute(attribute);
     // In Redux too, so an edit from elsewhere can hand the open detail view back its updated record
     dispatch(setSelectedAttributes([attribute]));
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   /* Render Functions */

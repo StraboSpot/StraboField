@@ -12,7 +12,7 @@ import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import useForm from '../form/useForm';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
@@ -72,7 +72,7 @@ const TephraPage = ({isReadOnly, page}) => {
     setSelectedAttribute(initialValues);
     setSelectedTypeIndex(0);
     setIsDetailView(true);
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   const editAttribute = (attribute, i) => {
@@ -86,7 +86,7 @@ const TephraPage = ({isReadOnly, page}) => {
     setSelectedTypeIndex(0);
     setIsDetailView(true);
     setSelectedAttribute(attribute);
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   const updateOrder = () => {

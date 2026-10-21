@@ -36,7 +36,7 @@ const ImageCard = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const modalVisible = useSelector(state => state.home.modalVisible);
+  const activeModal = useSelector(state => state.home.activeModal);
   const spot = useSelector(state => state.spot.selectedSpot);
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
 
@@ -72,7 +72,7 @@ const ImageCard = ({
   const handleEndEditing = () => {
     if (!isEmpty(title) && title !== image.title) {
       const updatedImage = {...image, title};
-      if (modalVisible === MODAL_KEYS.NOTEBOOK.SAMPLES || modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
+      if (activeModal === MODAL_KEYS.NOTEBOOK.SAMPLES || activeModal === MODAL_KEYS.SHORTCUTS.SAMPLE) {
         saveUpdatedImage(updatedImage);
       }
       else {

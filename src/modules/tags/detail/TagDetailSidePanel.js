@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import TagDetail from './TagDetail';
 import TagDetailModal from './TagDetailModal';
 import {isEmpty} from '../../../shared/helpers';
-import {setModalValues, setModalVisible} from '../../home/home.slice';
+import {setActiveModal, setModalValues} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
@@ -41,11 +41,11 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
     dispatch(setSelectedAttributes([feature]));
   };
 
-  // The memo modal is rendered at the app level off modalVisible, so it opens over the panel as it does from the
+  // The memo modal is rendered at the app level off activeModal, so it opens over the panel as it does from the
   // Memos list
   const openReport = (report) => {
     dispatch(setModalValues(report));
-    dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
+    dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
   };
 
   /* View */

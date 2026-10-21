@@ -10,7 +10,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import BasicPageDetail from '../page/BasicPageDetail';
 import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
@@ -47,7 +47,7 @@ const FabricsPage = ({isReadOnly, page}) => {
 
   const addFabric = (type) => {
     dispatch(setModalValues({type: type}));
-    dispatch(setModalVisible({modal: page.key}));
+    dispatch(setActiveModal({modal: page.key}));
   };
 
   const editFabric = (fabric) => {
@@ -55,7 +55,7 @@ const FabricsPage = ({isReadOnly, page}) => {
     setSelectedFabric(fabric);
     // In Redux too, so an edit from elsewhere can hand the open detail view back its updated record
     dispatch(setSelectedAttributes([fabric]));
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   /* Render Functions */

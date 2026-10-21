@@ -36,8 +36,8 @@ const RightSideButtons = ({
 
   /* Data Hooks */
 
+  const activeModal = useSelector(state => state.home.activeModal);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {isCurrentMapReadOnly} = useSpots();
@@ -56,7 +56,7 @@ const RightSideButtons = ({
         <Animated.View style={[homeStyles.addIntervalButton, animateRightSide]}>
           <IconButton
             onPress={() => handleHomeAction(HOME_ACTIONS.ADD_INTERVAL)}
-            source={modalVisible === MODAL_KEYS.OTHER.ADD_INTERVAL
+            source={activeModal === MODAL_KEYS.OTHER.ADD_INTERVAL
               ? require('../../../assets/icons/AddIntervalButton_pressed.png')
               : require('../../../assets/icons/AddIntervalButton.png')}
           />

@@ -11,7 +11,7 @@ import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import FormikWrapper from '../../form/FormikWrapper';
 import SelectInputField from '../../form/inputs/SelectInputField';
 import useForm from '../../form/useForm';
-import {setModalVisible} from '../../home/home.slice';
+import {setActiveModal} from '../../home/home.slice';
 import BasicListItem from '../../page/BasicListItem';
 import BasicPageDetail from '../../page/BasicPageDetail';
 import {getFeatureTitle} from '../../page/featureLabels.helpers';
@@ -58,7 +58,7 @@ const MineralsPage = ({isReadOnly, page}) => {
   /* Logic Helpers */
 
   const addMineral = () => {
-    dispatch(setModalVisible({modal: page.key}));
+    dispatch(setActiveModal({modal: page.key}));
   };
 
   const copyMineralData = (spotId) => {
@@ -84,7 +84,7 @@ const MineralsPage = ({isReadOnly, page}) => {
     setSelectedMineral(mineral);
     // In Redux too, so an edit from elsewhere can hand the open detail view back its updated record
     dispatch(setSelectedAttributes([mineral]));
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   const getSpotsWithMinerals = () => {

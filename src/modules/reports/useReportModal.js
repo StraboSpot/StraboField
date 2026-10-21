@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {getNewUUID, getTimestampFromId, isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import useForm from '../form/useForm';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
@@ -108,7 +108,7 @@ const useReportModal = ({openSpotInNotebook}) => {
     else go();
   };
 
-  const closeModal = () => dispatch(setModalVisible({modal: null}));
+  const closeModal = () => dispatch(setActiveModal({modal: null}));
 
   // The memo asks about the record just tapped, so it calls it what the user sees rather than Spot for both
   const getSpotLabel = spot => spot.properties?.isSample ? 'Sample' : 'Spot';

@@ -8,7 +8,7 @@ import FeatureTagsAtSpotList from './FeatureTagsAtSpotList';
 import TagsAtSpotList from './TagsAtSpotList';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {addedTagToSelectedSpot} from '../project/projects.slice';
@@ -54,7 +54,7 @@ const TagsNotebook = ({isReadOnly, isSample, openMainMenuPanel, page}) => {
                 <SectionDividerWithRightButton
                   buttonTitle={'Assign/Remove'}
                   dividerText={firstDividerText}
-                  onPress={() => dispatch(setModalVisible({modal: pageVisible}))}
+                  onPress={() => dispatch(setActiveModal({modal: pageVisible}))}
                 />
               )}
             <TagsAtSpotList openMainMenuPanel={openMainMenuPanel} page={page}/>

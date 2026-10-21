@@ -17,7 +17,7 @@ import Form from '../../form/Form';
 import FormikWrapper from '../../form/FormikWrapper';
 import MainButtons from '../../form/MainButtons';
 import useForm from '../../form/useForm';
-import {setModalValues, setModalVisible} from '../../home/home.slice';
+import {setActiveModal, setModalValues} from '../../home/home.slice';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {getActiveTemplateList, getIsTemplateInUse} from '../../templates/templates.helpers';
 import TemplatesNotebook from '../../templates/TemplatesNotebook';
@@ -72,7 +72,7 @@ const AddMineralModal = () => {
     if (choicesViewKey) setChoicesViewKey(null);
     else if (isShowTemplates) setIsShowTemplates(false);
     else if (!isEmpty(selectedTypeIndex)) setSelectedTypeIndex(null);
-    else dispatch(setModalVisible({modal: null}));
+    else dispatch(setActiveModal({modal: null}));
   };
 
   const onIgOrMetSelected = (choiceName) => {

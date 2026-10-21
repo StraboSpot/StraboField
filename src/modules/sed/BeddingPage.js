@@ -13,7 +13,7 @@ import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRig
 import Form from '../form/Form';
 import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import BasicListItem from '../page/BasicListItem';
 import BasicPageDetail from '../page/BasicPageDetail';
@@ -78,7 +78,7 @@ const BeddingPage = ({isReadOnly, page}) => {
               savedValuesRef.current = {...beddingSharedRef.current.values};
               setIsDetailView(true);
               setSelectedAttribute({id: getNewUUID()});
-              dispatch(setModalVisible({modal: null}));
+              dispatch(setActiveModal({modal: null}));
             },
           },
         ],
@@ -88,7 +88,7 @@ const BeddingPage = ({isReadOnly, page}) => {
     else {
       setIsDetailView(true);
       setSelectedAttribute({id: getNewUUID()});
-      dispatch(setModalVisible({modal: null}));
+      dispatch(setActiveModal({modal: null}));
     }
   };
 
@@ -116,7 +116,7 @@ const BeddingPage = ({isReadOnly, page}) => {
     }
     setIsDetailView(true);
     setSelectedAttribute(attribute);
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   const saveBeddingShared = async (formCurrent) => {

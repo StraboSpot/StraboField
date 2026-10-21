@@ -13,7 +13,7 @@ import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
@@ -73,7 +73,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     console.log('UE NotebookContent [pageVisible, spot]', pageVisible, spot);
     if (isMultipleFeaturesTaggingEnabled) dispatch(setMultipleFeaturesTaggingEnabled(false));
     if (isNotebookPanelVisible && spot.properties?.isSample && isEmpty(spot.properties.samples)) {
-      dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.SAMPLES}));
+      dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.SAMPLES}));
     }
     const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
       || getAllRelevantPages().some(p => p.key === pageVisible)
@@ -90,13 +90,13 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const openPage = (key) => {
     dispatch(setNotebookPageVisible(key));
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
-    if (SMALL_SCREEN || isReadOnly) dispatch(setModalVisible({modal: null}));
+    if (SMALL_SCREEN || isReadOnly) dispatch(setActiveModal({modal: null}));
     else if (page.modal_component) {
       const populatedPagesKeys = getPopulatedPagesKeys(spot);
-      if (populatedPagesKeys.includes(page.key)) dispatch(setModalVisible({modal: null}));
-      else dispatch(setModalVisible({modal: page.key}));
+      if (populatedPagesKeys.includes(page.key)) dispatch(setActiveModal({modal: null}));
+      else dispatch(setActiveModal({modal: page.key}));
     }
-    else dispatch(setModalVisible({modal: null}));
+    else dispatch(setActiveModal({modal: null}));
   };
 
   const openDatasetsPage = () => {

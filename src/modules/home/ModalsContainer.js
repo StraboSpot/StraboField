@@ -26,10 +26,10 @@ const ModalsContainer = forwardRef(({
                                       zoomToCurrentLocation,
                                     }, mapComponentRef) => {
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const isHomeLoading = useSelector(state => state.home.loading.home);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const pendingModal = useSelector(state => state.home.pendingModal);
 
   // Drive the second phase of an iOS modal switch: once a modal is queued (and the outgoing one is dismissing), wait
@@ -55,7 +55,7 @@ const ModalsContainer = forwardRef(({
       <ReauthModal/>
       {/*------------------------*/}
       <LoadingSpinner isLoading={isHomeLoading}/>
-      {modalVisible && (
+      {activeModal && (
         <ActiveModal
           closeNotebookPanel={closeNotebookPanel}
           openNotebookPanel={openNotebookPanel}

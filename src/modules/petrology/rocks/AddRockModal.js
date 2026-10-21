@@ -21,7 +21,7 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import Form from '../../form/Form';
 import FormikWrapper from '../../form/FormikWrapper';
 import useForm from '../../form/useForm';
-import {setModalValues, setModalVisible} from '../../home/home.slice';
+import {setActiveModal, setModalValues} from '../../home/home.slice';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import useSed from '../../sed/useSed';
 import {getActiveTemplateList, getIsTemplateInUse} from '../../templates/templates.helpers';
@@ -97,7 +97,7 @@ const AddRockModal = ({modalKey}) => {
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
     else if (isShowTemplates) setIsShowTemplates(false);
-    else dispatch(setModalVisible({modal: null}));
+    else dispatch(setActiveModal({modal: null}));
   };
 
   const onIgneousRockTypePress = (i) => {

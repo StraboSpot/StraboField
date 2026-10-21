@@ -27,7 +27,7 @@ const ManualMeasurement = ({
                            }) => {
   /* Data Hooks */
 
-  const modalVisible = useSelector(state => state.home.modalVisible);
+  const activeModal = useSelector(state => state.home.activeModal);
 
   /* Local State */
 
@@ -105,8 +105,8 @@ const ManualMeasurement = ({
               <FlatListItemSeparator/>
             </>
           )}
-          {setAttributeMeasurements && modalVisible !== MODAL_KEYS.SHORTCUTS.MEASUREMENT
-            && modalVisible !== MODAL_KEYS.NOTEBOOK.MEASUREMENTS && (
+          {setAttributeMeasurements && activeModal !== MODAL_KEYS.SHORTCUTS.MEASUREMENT
+            && activeModal !== MODAL_KEYS.NOTEBOOK.MEASUREMENTS && (
               <>
                 <View style={compassStyles.sliderContainer}>
                   <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>

@@ -4,7 +4,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {HOME_ACTIONS} from './home.constants';
-import {setIsOfflineMapsModalVisible, setLoadingStatus, setModalVisible} from './home.slice';
+import {setActiveModal, setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
 import useAutoSave from '../../services/files/useAutoSave';
 import {isEmpty} from '../../shared/helpers';
@@ -198,7 +198,7 @@ const useHome = ({
         else toast.show('No Target Dataset! \n A target dataset needs to be set before drawing Spots.');
         break;
       case HOME_ACTIONS.ADD_INTERVAL:
-        dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
+        dispatch(setActiveModal({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
         break;
       case HOME_ACTIONS.CANCEL_EDITS:
         await endMapEditing(MAP_EDIT_CHOICES.CANCEL);

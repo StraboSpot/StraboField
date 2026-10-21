@@ -9,7 +9,7 @@ import commonStyles from '../../shared/common.styles';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const DailyNotes = () => {
@@ -22,12 +22,12 @@ const DailyNotes = () => {
 
   const addDailyNote = () => {
     dispatch(setModalValues({}));
-    dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.DAILY_NOTES}));
+    dispatch(setActiveModal({modal: MODAL_KEYS.OTHER.DAILY_NOTES}));
   };
 
   const editDailyNote = (item) => {
     dispatch(setModalValues(item));
-    dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.DAILY_NOTES}));
+    dispatch(setActiveModal({modal: MODAL_KEYS.OTHER.DAILY_NOTES}));
   };
 
   /* Render Functions */

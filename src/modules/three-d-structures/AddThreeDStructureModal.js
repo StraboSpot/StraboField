@@ -16,7 +16,7 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import Form from '../form/Form';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -64,7 +64,7 @@ const AddThreeDStructureModal = () => {
 
   /* Logic Helpers */
 
-  const closeModal = () => dispatch(setModalVisible({modal: null}));
+  const closeModal = () => dispatch(setActiveModal({modal: null}));
 
   const on3DStructureTypePress = (i) => {
     if (i !== selectedTypeIndex) {

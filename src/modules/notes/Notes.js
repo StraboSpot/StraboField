@@ -10,7 +10,7 @@ import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import uiStyles from '../../shared/ui/ui.styles';
-import {setLoadingStatus, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setLoadingStatus} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
@@ -48,8 +48,8 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
   const page = PRIMARY_PAGES.find(p => p.key === PAGE_KEYS.NOTES);
   // The Shortcut Notes modal is the only caller that supplies a save ref: it renders the sticky Save button in
   // its footer and expects the note field to fill the body. It is also the only Notes that makes a new Spot, so
-  // this - not modalVisible - is what tells the two apart. The Notebook's own Notes page can be open at the same
-  // time as the shortcut modal, and keying off modalVisible had it creating Spots and skipping its own prompt.
+  // this - not activeModal - is what tells the two apart. The Notebook's own Notes page can be open at the same
+  // time as the shortcut modal, and keying off activeModal had it creating Spots and skipping its own prompt.
   const isShortcutNote = !!registerSave;
 
   /* Side Effects */
@@ -142,7 +142,7 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
       const createdSpot = await saveForm(currentForm);
       if (createdSpot) {
         openSpotInNotebook(createdSpot, PAGE_KEYS.NOTES);
-        dispatch(setModalVisible({modal: null}));
+        dispatch(setActiveModal({modal: null}));
         await zoomToCurrentLocation();
         if (Platform.OS !== 'web') toast.show('Notes Saved', {type: 'success'});
       }

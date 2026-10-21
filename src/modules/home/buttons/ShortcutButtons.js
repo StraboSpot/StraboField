@@ -15,7 +15,7 @@ import SketchModal from '../../sketch/SketchModal';
 import {clearedSelectedSpots, editedSpotImages} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 import {DISMISSIBLE_WARNING_MESSAGES, DISMISSIBLE_WARNINGS} from '../home.constants';
-import {setLoadingStatus, setModalVisible} from '../home.slice';
+import {setActiveModal, setLoadingStatus} from '../home.slice';
 import useShortcutSwitches from '../useShortcutSwitches';
 
 const ShortcutButtons = ({confirmEndMapEditing, isMapEditing, openNotebookPanel}) => {
@@ -24,9 +24,9 @@ const ShortcutButtons = ({confirmEndMapEditing, isMapEditing, openNotebookPanel}
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const isCameraOrientationWarningHidden = useSelector(
     state => state.home.hiddenWarnings[DISMISSIBLE_WARNINGS.CAMERA_ORIENTATION]);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
@@ -117,8 +117,8 @@ const ShortcutButtons = ({confirmEndMapEditing, isMapEditing, openNotebookPanel}
         break;
       }
       default:
-        if (modalVisible === key) dispatch(setModalVisible({modal: null}));
-        else dispatch(setModalVisible({modal: key}));
+        if (activeModal === key) dispatch(setActiveModal({modal: null}));
+        else dispatch(setActiveModal({modal: key}));
     }
     dispatch(setLoadingStatus({view: 'home', bool: false}));
   };
@@ -136,7 +136,7 @@ const ShortcutButtons = ({confirmEndMapEditing, isMapEditing, openNotebookPanel}
             <IconButton
               key={sm.key}
               onPress={() => toggleShortcutModal(sm.key)}
-              source={modalVisible === sm.key ? sm.icon_pressed_src : sm.icon_src}
+              source={activeModal === sm.key ? sm.icon_pressed_src : sm.icon_src}
             />
           )];
         }

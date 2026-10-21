@@ -25,7 +25,7 @@ import Form from '../form/Form';
 import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import PageHeader from '../page/PageHeader';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
@@ -194,7 +194,7 @@ const MeasurementDetail = ({
     const types = selectedAttitude.type === MEASUREMENT_KEYS.LINEAR ? [COMPASS_TOGGLE_BUTTONS.PLANAR]
       : [COMPASS_TOGGLE_BUTTONS.LINEAR];
     dispatch(setCompassMeasurementTypes(types));
-    dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.MEASUREMENTS}));
+    dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.MEASUREMENTS}));
   };
 
   const cancelFormAndGo = () => {

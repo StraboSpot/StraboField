@@ -16,7 +16,7 @@ import FormikWrapper from '../../form/FormikWrapper';
 import SelectInputField from '../../form/inputs/SelectInputField';
 import TextInputField from '../../form/inputs/TextInputField';
 import useForm from '../../form/useForm';
-import {setModalValues, setModalVisible} from '../../home/home.slice';
+import {setActiveModal, setModalValues} from '../../home/home.slice';
 import {updatedProject} from '../../project/projects.slice';
 import {setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
@@ -91,7 +91,7 @@ const AddIntervalModal = () => {
 
   const close = () => {
     dispatch(setModalValues({}));
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   // Copy Sed Interval Lithology
@@ -187,7 +187,7 @@ const AddIntervalModal = () => {
         // else: 'top' for non-core or 'bottom' for core = natural end-of-stack placement, no repositioning needed
         dispatch(setSelectedSpot(newSpot));
         dispatch(setModalValues({}));
-        dispatch(setModalVisible({modal: null}));
+        dispatch(setActiveModal({modal: null}));
         if (preferences.starting_number_for_spot) {
           const updatedPreferences = {
             ...preferences,

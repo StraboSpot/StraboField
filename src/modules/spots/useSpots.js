@@ -28,7 +28,7 @@ import {
 } from './spots.slice';
 import {deepCopyWithNewIds, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import {
   clearedSpotsInMapExtentIds,
   clearedStratSection,
@@ -55,9 +55,9 @@ const useSpots = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const recentViews = useSelector(state => state.spot.recentViews);
   const reports = useSelector(state => state.project.project?.reports);
@@ -345,7 +345,7 @@ const useSpots = () => {
       if (!(preferences.restart_num_each_nested_spot && (isOnImageBasemap(newSpot) || isOnStratSection(newSpot)))) {
         updatedPreferences = {...preferences, starting_number_for_spot: spotNumber + 1};
       }
-      if (modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
+      if (activeModal === MODAL_KEYS.SHORTCUTS.SAMPLE) {
         updatedPreferences = {
           ...(updatedPreferences || preferences),
           starting_sample_number: (Number(preferences.starting_sample_number) || 1) + 1,
@@ -405,7 +405,7 @@ const useSpots = () => {
     }
 
     spotsToDelete.forEach(spot => removeSpotAndReferences(spot.properties.id));
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
 
     if (undoSnapshot) {
       toast.show(`Deleted ${spotToDelete.properties.isSample ? 'Sample' : 'Spot'} "${spotToDelete.properties.name}"`, {

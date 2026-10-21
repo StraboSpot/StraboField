@@ -12,7 +12,7 @@ import useCompassSound from './useCompassSound';
 import useCompassCore, {DECLINATION_SOURCE} from '../../services/device/useCompassCore';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import useMeasurements from '../measurements/useMeasurements';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
@@ -26,9 +26,9 @@ const Compass = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const compassMeasurements = useSelector(state => state.compass.measurements);
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const isSample = useSelector(state => state.spot.selectedSpot.properties?.isSample);
 
   const {
@@ -96,7 +96,7 @@ const Compass = ({
   // Create a new measurement on grabbing new compass measurements from shortcut modal
   useEffect(() => {
     console.log('UE Compass [compassMeasurements]', compassMeasurements);
-    if (!isEmpty(compassMeasurements) && modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT) {
+    if (!isEmpty(compassMeasurements) && activeModal === MODAL_KEYS.SHORTCUTS.MEASUREMENT) {
       console.log('New compass measurement recorded in Measurements.', compassMeasurements);
       createNewMeasurement();
       dispatch(setCompassMeasurements({}));
@@ -107,7 +107,7 @@ const Compass = ({
 
   const handleAppStateChange = (state) => {
     if (state === 'background' || state === 'inactive') {
-      dispatch(setModalVisible({modal: null}));
+      dispatch(setActiveModal({modal: null}));
       setShowCompassRawDataView(false);
       unsubscribeFromSensors();
     }

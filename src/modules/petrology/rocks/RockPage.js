@@ -21,7 +21,7 @@ import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWith
 import FormikWrapper from '../../form/FormikWrapper';
 import SelectInputField from '../../form/inputs/SelectInputField';
 import useForm from '../../form/useForm';
-import {setModalValues, setModalVisible} from '../../home/home.slice';
+import {setActiveModal, setModalValues} from '../../home/home.slice';
 import BasicListItem from '../../page/BasicListItem';
 import BasicPageDetail from '../../page/BasicPageDetail';
 import PageHeader from '../../page/PageHeader';
@@ -78,7 +78,7 @@ const RockPage = ({isReadOnly, page}) => {
     let newRock = pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? {id: getNewUUID(), igneous_rock_class: sectionKey}
       : {id: getNewUUID()};
     dispatch(setModalValues(newRock));
-    dispatch(setModalVisible({modal: page.key}));
+    dispatch(setActiveModal({modal: page.key}));
   };
 
   const copyPetData = (spotId) => {
@@ -149,7 +149,7 @@ const RockPage = ({isReadOnly, page}) => {
     }
     setIsDetailView(true);
     setSelectedRock(rock);
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   const getSpotsWithRockType = () => {

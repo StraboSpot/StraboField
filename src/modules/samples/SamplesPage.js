@@ -8,7 +8,7 @@ import {SAMPLE_DETAIL_TABS} from './samples.constants';
 import {getMicroProjectId} from './samples.helpers';
 import SamplesList from './SamplesList';
 import {isEmpty} from '../../shared/helpers';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import MicroProjectPDFLink from '../micro/MicroProjectPDFLink';
 import {setNotebookPageVisible, setRequestedSampleDetailTab} from '../notebook-panel/notebook.slice';
 import BasicPageDetail from '../page/BasicPageDetail';
@@ -85,7 +85,7 @@ const SamplesPage = ({
     else {
       setSelectedSample(sampleToEdit);
       dispatch(setSelectedAttributes([sampleToEdit]));
-      dispatch(setModalVisible({modal: null}));
+      dispatch(setActiveModal({modal: null}));
     }
   };
 
@@ -119,14 +119,14 @@ const SamplesPage = ({
   const renderSamplesMain = () => (
     <View style={{flex: 1}}>
       <PageHeader
-        onPressAdd={() => dispatch(setModalVisible({modal: page.key}))}
+        onPressAdd={() => dispatch(setActiveModal({modal: page.key}))}
         pageTitle={page.label}
         showAddButton={!isReadOnly}
       />
       <SamplesList
         isShowIGSN
         onPress={editSample}
-        onPressEmpty={!isReadOnly && (() => dispatch(setModalVisible({modal: page.key})))}
+        onPressEmpty={!isReadOnly && (() => dispatch(setActiveModal({modal: page.key})))}
       />
     </View>
   );

@@ -16,7 +16,7 @@ const getStore = (spot, selectedAttribute) => {
   // Built once: a new object per getState call would hand every selector a new value and never settle
   const state = {
     connections: {isOnline: {isInternetReachable: true}, databaseEndpoint: {endpoint: undefined, isSelected: false}},
-    home: {modalValues: {}, modalVisible: null},
+    home: {modalValues: {}, activeModal: null},
     map: {stratSection: undefined, currentBasemap: undefined},
     project: {project: {}, datasets: {}},
     spot: {selectedSpot: spot, selectedAttributes: [selectedAttribute]},

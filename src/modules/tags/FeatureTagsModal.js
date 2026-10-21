@@ -8,11 +8,11 @@ import {MODAL_KEYS} from '../page/pageKeys.constants';
 const FeatureTagsModal = () => {
   /* Data Hooks */
 
-  const modalVisible = useSelector(state => state.home.modalVisible);
+  const activeModal = useSelector(state => state.home.activeModal);
 
   /* Derived Variables */
 
-  const isFeatureLevelTaggingOn = modalVisible === MODAL_KEYS.OTHER.FEATURE_TAGS;
+  const isFeatureLevelTaggingOn = activeModal === MODAL_KEYS.OTHER.FEATURE_TAGS;
 
   /* View */
 

@@ -82,7 +82,7 @@ const homeConfig = {
     'loading',
     'messageModal',
     'modalValues',
-    'modalVisible',
+    'activeModal',
     'offlineMapToSaveId',
     'statusMessageModalTitle',
     'statusMessages',

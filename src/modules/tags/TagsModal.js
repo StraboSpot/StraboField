@@ -18,7 +18,7 @@ import Loading from '../../shared/ui/Loading';
 import modalStyles from '../../shared/ui/modals/modal.styles';
 import FormikWrapper from '../form/FormikWrapper';
 import SelectInputField from '../form/inputs/SelectInputField';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
@@ -35,8 +35,8 @@ const TagsModal = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const selectedFeature = useSelector(state => state.spot.selectedAttributes?.[0]);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
@@ -61,19 +61,19 @@ const TagsModal = ({
 
   const pageVisible = pagesStack.slice(-1)[0];
   const pageKey = pageVisible === PAGE_KEYS.GEOLOGIC_UNITS
-  || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
-  || modalVisible === MODAL_KEYS.NOTEBOOK.SAMPLES || modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE
+  || activeModal === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
+  || activeModal === MODAL_KEYS.NOTEBOOK.SAMPLES || activeModal === MODAL_KEYS.SHORTCUTS.SAMPLE
     ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
   const label = page.label;
   // Tagging from a shortcut makes its own Spot at the current location, where every other caller tags Spots
   // that already exist
-  const isShortcutTagging = modalVisible === MODAL_KEYS.SHORTCUTS.TAG
-    || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS;
+  const isShortcutTagging = activeModal === MODAL_KEYS.SHORTCUTS.TAG
+    || activeModal === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS;
   const isSaveButtonVisible = !isEmpty(tags)
-    && modalVisible !== MODAL_KEYS.NOTEBOOK.TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
-    && modalVisible !== MODAL_KEYS.OTHER.FEATURE_TAGS && modalVisible !== MODAL_KEYS.NOTEBOOK.REPORTS
-    && modalVisible !== MODAL_KEYS.NOTEBOOK.SAMPLES && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE;
+    && activeModal !== MODAL_KEYS.NOTEBOOK.TAGS && activeModal !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
+    && activeModal !== MODAL_KEYS.OTHER.FEATURE_TAGS && activeModal !== MODAL_KEYS.NOTEBOOK.REPORTS
+    && activeModal !== MODAL_KEYS.NOTEBOOK.SAMPLES && activeModal !== MODAL_KEYS.SHORTCUTS.SAMPLE;
 
   /* Logic Helpers */
 
@@ -121,7 +121,7 @@ const TagsModal = ({
         openSpotInNotebook(spot, pageKey);
       }
       else addSpotsToTags(checkedTagsTemp, selectedSpotsForTagging);
-      dispatch(setModalVisible({modal: null}));
+      dispatch(setActiveModal({modal: null}));
       // After the zoom, which raises a full-screen spinner the toast would otherwise sit behind for most of its
       // life - the reason only shortcut saves looked too fast
       if (isShortcutTagging) await zoomToCurrentLocation();
@@ -196,9 +196,9 @@ const TagsModal = ({
           ? tag.features && tag.features[selectedSpot.properties.id] && selectedFeature
           && tag.features[selectedSpot.properties.id].includes(selectedFeature.id)
           : isAlreadyChecked
-        : (modalVisible && modalVisible !== MODAL_KEYS.SHORTCUTS.TAG
-          && modalVisible !== MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
-          && modalVisible !== MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS)
+        : (activeModal && activeModal !== MODAL_KEYS.SHORTCUTS.TAG
+          && activeModal !== MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
+          && activeModal !== MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS)
           ? tag && tag.spots && tag.spots.includes(selectedSpot.properties.id)
           : checkedTagsTemp.map(checkedTag => checkedTag.id).includes(tag.id);
 
@@ -208,9 +208,9 @@ const TagsModal = ({
           ? !isMultipleFeaturesTaggingEnabled
             ? addRemoveTag(tag, selectedSpot, isFeatureLevelTagging)
             : addRemoveTag(tag, selectedSpot, isFeatureLevelTagging, isAlreadyChecked)
-          : (modalVisible !== MODAL_KEYS.SHORTCUTS.TAG
-            && modalVisible !== MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
-            && modalVisible !== MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS) ? addRemoveTag(tag, selectedSpot)
+          : (activeModal !== MODAL_KEYS.SHORTCUTS.TAG
+            && activeModal !== MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
+            && activeModal !== MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS) ? addRemoveTag(tag, selectedSpot)
             : checkTags(tag);
     };
 
