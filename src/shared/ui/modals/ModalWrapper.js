@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import ModalWrapperHeader from './ModalWrapperHeader';
 import overlayStyles from './overlay.styles';
-import {applyPendingModal} from '../../../modules/home/home.slice';
+import {applyPendingModal, setActiveModal} from '../../../modules/home/home.slice';
 import {SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
 import {isEmpty} from '../../helpers';
@@ -81,6 +81,10 @@ const ModalWrapper = ({
   // only hides the UI while it keeps running — so leaving mid-action invites duplicate or racing operations.
   const canDismiss = !isLoading;
   const isCloseButtonShown = canDismiss && (showCloseButton || showCancelButton !== false);
+  // What Close and Android back do. A modal shown through ActiveModal passes no handler of its own and closes by
+  // clearing the active modal, unless it shows no Close button and so is meant to stay open until answered.
+  const close = closeModal || onCancelPress
+    || (isCloseButtonShown ? () => dispatch(setActiveModal({modal: null})) : undefined);
 
   // Clear whichever obstruction is taller: the keyboard when one is open, otherwise the navigation bar. Android
   // 15+ forces edge-to-edge, so a fullscreen modal draws behind the navigation bar and its footer buttons become
@@ -108,7 +112,7 @@ const ModalWrapper = ({
   // Android's back button and back gesture both land here; without it the modal ignores them entirely. Callers
   // must clear `isLoading` on every path (a `finally`), or the modal has no exit at all while it is set.
   const handleRequestClose = () => {
-    if (canDismiss) (onBackdropPress || closeModal || onCancelPress)?.();
+    if (canDismiss) (onBackdropPress || close)?.();
   };
 
   // Fast path for the iOS two-phase modal switch (see setActiveModal): when this modal finishes dismissing, show any
@@ -179,7 +183,7 @@ const ModalWrapper = ({
     <>
       <ModalWrapperHeader
         buttonTitleRight={buttonTitleRight}
-        closeModal={closeModal || onCancelPress}
+        closeModal={close}
         headerImage={headerImage}
         headerTitle={headerTitle}
         imageStyle={imageStyle}
@@ -226,7 +230,7 @@ const ModalWrapper = ({
         <View style={[overlayStyles.overlayContainerFullScreen, viewOverlayStyles.fullscreenOverlay]}>
           <ModalWrapperHeader
             buttonTitleRight={buttonTitleRight}
-            closeModal={closeModal || onCancelPress}
+            closeModal={close}
             headerImage={headerImage}
             headerTitle={headerTitle}
             imageStyle={imageStyle}
