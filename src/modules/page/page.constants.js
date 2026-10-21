@@ -1,7 +1,6 @@
 import BasicOverviewList from './BasicOverviewList';
 import Overview from './Overview';
 import {MODAL_KEYS, PAGE_KEYS} from './pageKeys.constants';
-import DailyNotesModal from '../daily-notes/DailyNotesModal';
 import DataOverview from '../external-data/DataOverview';
 import ExternalData from '../external-data/ExternalData';
 import AddFabricModal from '../fabrics/AddFabricModal';
@@ -492,10 +491,6 @@ const OTHER_MODALS = [
     key: MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS,
     label: 'Add Tags To Spots',
     modal_component: AddTagsToSpotsShortcutModal,
-  }, {
-    key: MODAL_KEYS.OTHER.DAILY_NOTES,
-    label: 'Daily Notes',
-    modal_component: DailyNotesModal,
   }, {
     key: MODAL_KEYS.OTHER.FEATURE_TAGS,
     label: 'Add Feature Tags',

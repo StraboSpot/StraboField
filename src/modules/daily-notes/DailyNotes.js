@@ -1,34 +1,25 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import moment from 'moment';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
+import DailyNotesModal from './DailyNotesModal';
 import commonStyles from '../../shared/common.styles';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
-import {setActiveModal, setModalValues} from '../home/home.slice';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const DailyNotes = () => {
   /* Data Hooks */
 
-  const dispatch = useDispatch();
   const dailyNotes = useSelector(state => state.project.project?.description?.daily_setup) || [];
 
-  /* Logic Helpers */
+  /* Local State */
 
-  const addDailyNote = () => {
-    dispatch(setModalValues({}));
-    dispatch(setActiveModal({modal: MODAL_KEYS.OTHER.DAILY_NOTES}));
-  };
-
-  const editDailyNote = (item) => {
-    dispatch(setModalValues(item));
-    dispatch(setActiveModal({modal: MODAL_KEYS.OTHER.DAILY_NOTES}));
-  };
+  // null while the modal is closed
+  const [dailyNoteToEdit, setDailyNoteToEdit] = useState(null);
 
   /* Render Functions */
 
@@ -37,7 +28,7 @@ const DailyNotes = () => {
     return (
       <ListItem
         containerStyle={commonStyles.listItem}
-        onPress={() => editDailyNote(item)}
+        onPress={() => setDailyNoteToEdit(item)}
       >
         <ListItem.Content style={{overflow: 'hidden'}}>
           <ListItem.Title style={commonStyles.listItemTitle}>{title}</ListItem.Title>
@@ -53,7 +44,7 @@ const DailyNotes = () => {
     <View style={{flex: 1, flexDirection: 'column'}}>
       <SectionDividerWithRightButton
         dividerText={'Daily Notes'}
-        onPress={addDailyNote}
+        onPress={() => setDailyNoteToEdit({})}
       />
       <FlatList
         ItemSeparatorComponent={FlatListItemSeparator}
@@ -62,6 +53,12 @@ const DailyNotes = () => {
         keyExtractor={item => item.date}
         renderItem={({item}) => renderDailyNotesListItem(item)}
       />
+      {dailyNoteToEdit && (
+        <DailyNotesModal
+          closeModal={() => setDailyNoteToEdit(null)}
+          dailyNote={dailyNoteToEdit}
+        />
+      )}
     </View>
   );
 };
