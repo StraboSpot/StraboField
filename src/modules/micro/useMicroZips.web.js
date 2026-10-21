@@ -2,6 +2,7 @@ import {useState} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import {getDeviceIdHeader} from '../../services/network/serverRequests.helpers';
 import {MICRO_PATHS, STRABO_APIS} from '../../services/network/urls.constants';
 import {addedStatusMessage, removedLastStatusMessage} from '../home/home.slice';
 
@@ -38,7 +39,9 @@ const useMicroZips = () => {
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Downloading...'));
 
-      const response = await fetch(zipUrl, {headers: {'Authorization': 'Basic ' + user.encoded_login}});
+      const response = await fetch(zipUrl, {
+        headers: {'Authorization': 'Basic ' + user.encoded_login, ...getDeviceIdHeader(zipUrl)},
+      });
       if (!response.ok) throw new Error('Download failed');
 
       const blob = await response.blob();

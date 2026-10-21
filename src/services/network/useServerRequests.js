@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {
   deleteRequest,
+  getDeviceIdHeader,
   getRequest,
   handleResponse,
   patchRequest,
@@ -145,7 +146,7 @@ const useServerRequests = () => {
   // };
 
   const getMyMapsBbox = async (mapUrl) => {
-    const response = await fetch(mapUrl);
+    const response = await fetch(mapUrl, {headers: getDeviceIdHeader(mapUrl)});
     return handleResponse(response);
   };
 
@@ -255,7 +256,7 @@ const useServerRequests = () => {
 
   const testCustomMapUrl = async (mapURL) => {
     try {
-      const response = await fetch(mapURL);
+      const response = await fetch(mapURL, {headers: getDeviceIdHeader(mapURL)});
       return response.ok;
     }
     catch (err) {
@@ -288,9 +289,11 @@ const useServerRequests = () => {
         console.error('Error Uploading Image', err);
         reject(false);
       });
-      xhr.open('POST', `${baseUrl}${isProfileImage ? '/profileImage' : '/image'}`);
+      const url = `${baseUrl}${isProfileImage ? '/profileImage' : '/image'}`;
+      xhr.open('POST', url);
       xhr.setRequestHeader('Content-Type', 'multipart/form-data');
       xhr.setRequestHeader('Authorization', `Basic ${encoded_login}`);
+      Object.entries(getDeviceIdHeader(url)).forEach(([name, value]) => xhr.setRequestHeader(name, value));
       //xhr.setRequestHeader('User-Agent', userAgent);
 
       //User-Agent is a forbidden header in the browser Fetch API — the browser sets it automatically and does not allow JavaScript to override it.

@@ -2,6 +2,7 @@ import {Platform} from 'react-native';
 
 import * as Sentry from '@sentry/react-native';
 
+import {STRABO_APIS} from './urls.constants';
 import {userAgent} from './userAgent.constants';
 import {setIsSessionExpiredModalVisible} from '../../modules/home/home.slice';
 import {isEmpty} from '../../shared/helpers';
@@ -26,8 +27,9 @@ const buildAuthHeader = (auth) => {
 
 // User-Agent is a forbidden header in the browser Fetch API - the browser sets it and blocks any override - so
 // only send it off the web.
-const buildHeaders = (auth, customHeaders = {}) => ({
+const buildHeaders = (url, auth, customHeaders = {}) => ({
   ...(Platform.OS !== 'web' && {'User-Agent': userAgent}),
+  ...getDeviceIdHeader(url),
   ...buildAuthHeader(auth),
   ...customHeaders,
 });
@@ -102,6 +104,14 @@ const handleError = async (response, auth) => {
 const isMarkupBody = (response, text) => response.headers.get('content-type')?.includes('html')
   || text.trimStart().startsWith('<');
 
+// strabospot.org, or the custom server while it is switched on. Third parties (SESAR, Macrostrat) and the tile
+// server are left out.
+const isStraboApiUrl = (url) => {
+  const {endpoint, isSelected} = store.getState().connections.databaseEndpoint;
+  const origins = [STRABO_APIS.STRABO, isSelected && endpoint.match(/^https?:\/\/[^/]+/)?.[0]];
+  return origins.some(origin => origin && url.startsWith(`${origin}/`));
+};
+
 // Read the body once and parse it without throwing. A response body can only be read once, so the text comes back
 // alongside the result for callers that need to inspect what arrived instead of JSON.
 // A PHP warning printed ahead of the body leaves the data intact with markup glued to its front, and the request
@@ -148,7 +158,7 @@ const readPrefixedJson = (response, text) => {
 
 export const deleteRequest = async (url, auth) => {
   try {
-    const response = await timeoutPromise(fetch(url, {method: 'DELETE', headers: buildHeaders(auth)}));
+    const response = await timeoutPromise(fetch(url, {method: 'DELETE', headers: buildHeaders(url, auth)}));
     return handleResponse(response, auth);
   }
   catch (err) {
@@ -169,7 +179,7 @@ export const deleteRequest = async (url, auth) => {
 // buildHeaders, which would spread it into the request and send `responsetype: blob` as a header, tripping CORS.
 export const getRequest = async (url, auth, options = {}) => {
   try {
-    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(auth)}));
+    const response = await timeoutPromise(fetch(url, {method: 'GET', headers: buildHeaders(url, auth)}));
     return isEmpty(options) ? handleResponse(response, auth) : response;
   }
   catch (err) {
@@ -177,6 +187,11 @@ export const getRequest = async (url, auth, options = {}) => {
     throw err;
   }
 };
+
+// Identifies the install, not the user, so the server can tell apart two devices uploading on one account. Not sent
+// from the web yet: the server's CORS preflight doesn't allow the header, so the browser would block the request.
+export const getDeviceIdHeader = url => Platform.OS !== 'web' && isStraboApiUrl(url)
+  ? {'X-Strabo-Device': store.getState().connections.deviceId} : {};
 
 export const handleResponse = async (response, auth) => {
   if (!response.ok) return handleError(response, auth);
@@ -194,7 +209,8 @@ export const handleResponse = async (response, auth) => {
 export const patchRequest = async (url, body, auth, customHeaders = {}, timeout = DEFAULT_TIMEOUT) => {
   try {
     console.log('PATCH', url, body, auth, customHeaders, timeout);
-    return await timeoutPromise(fetch(url, {method: 'PATCH', headers: buildHeaders(auth, customHeaders), body}), timeout);
+    return await timeoutPromise(fetch(url, {method: 'PATCH', headers: buildHeaders(url, auth, customHeaders), body}),
+      timeout);
   }
   catch (err) {
     console.error(`Error PATCH: ${url}`, err);
@@ -206,7 +222,7 @@ export const postFormDataRequest = async (url, formData, auth) => {
   try {
     const response = await timeoutPromise(fetch(url, {
       method: 'POST',
-      headers: buildHeaders(auth),
+      headers: buildHeaders(url, auth),
       body: formData,
     }));
     return handleResponse(response, auth);
@@ -222,7 +238,7 @@ export const postRequest = async (url, body, auth, customHeaders = {}, timeout =
     console.log('POST', url, body, auth, customHeaders, timeout);
     const response = await timeoutPromise(fetch(url, {
       method: 'POST',
-      headers: buildHeaders(auth, isEmpty(customHeaders) ? {'Content-Type': 'application/json'} : customHeaders),
+      headers: buildHeaders(url, auth, isEmpty(customHeaders) ? {'Content-Type': 'application/json'} : customHeaders),
       body: isEmpty(customHeaders) ? JSON.stringify(body) : body,
     }), timeout);
     return isEmpty(customHeaders) ? handleResponse(response, auth) : response;

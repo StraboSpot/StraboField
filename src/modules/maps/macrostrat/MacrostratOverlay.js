@@ -77,7 +77,7 @@ const MacrostratOverlay = ({
   const renderContent = () => {
     const {age, name, rocktype, map_ref} = dataObject;
     const commaSeparatedString = rocktype?.join(', ');
-    const macrostratUrl = `https://www.macrostrat.org/map/loc/${location.coords[0]?.toFixed(
+    const macrostratUrl = `https://macrostrat.org/map/loc/${location.coords[0]?.toFixed(
       2)}/${location.coords[1]?.toFixed(2)}#z=${location.zoom.toFixed(1)}`;
 
     return (

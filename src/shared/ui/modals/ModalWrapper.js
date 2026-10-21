@@ -12,7 +12,7 @@ import {applyPendingModal} from '../../../modules/home/home.slice';
 import {SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
 import {isEmpty} from '../../helpers';
-import {MODAL_WIDTH, SMALL_SCREEN} from '../../styles.constants';
+import {MODAL_WIDTH, SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../styles.constants';
 import AvatarWrapper from '../avatars/AvatarWrapper';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
@@ -265,7 +265,14 @@ const ModalWrapper = ({
         visible={isVisible}
       >
         <GestureHandlerRootView style={{flex: 1}}>
-          <View style={[overlayStyles.overlayContainerFullScreen, {paddingBottom: fullscreenPaddingBottom}]}>
+          {/* A fullscreen iOS Modal ignores the safe area, and the fixed 50pt offset is shorter than the
+              Dynamic Island inset, so clear whichever is taller. */}
+          <View
+            style={[overlayStyles.overlayContainerFullScreen, {
+              paddingBottom: fullscreenPaddingBottom,
+              paddingTop: Math.max(insets.top, SMALL_SCREEN_STATUS_BAR_OFFSET),
+            }]}
+          >
             {renderModalContent()}
           </View>
         </GestureHandlerRootView>
