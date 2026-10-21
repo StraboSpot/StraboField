@@ -8,12 +8,12 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
-import {getLatLngText, isEmpty, toFixedInteger, toTitleCase} from '../../../shared/helpers';
+import {getLatLngText, isEmpty, toFixedInteger} from '../../../shared/helpers';
 import {MEDIUM_TEXT_SIZE, PRIMARY_TEXT_COLOR, SMALL_SCREEN} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import TextInput from '../../../shared/ui/TextInput';
-import {LABEL_DICTIONARY} from '../../form/form.constants';
+import useForm from '../../form/useForm';
 import {openedMessageModal} from '../../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
@@ -22,9 +22,10 @@ import useMapLocation from '../../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import projectStyles from '../../project/project.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
+import {isLineSpot, isPolygonSpot} from '../../spots/spots.helpers';
 import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
-import {TRACE_SUB_TYPE_FIELDS} from '../notebook.constants';
+import {getTraceSurfaceFeatureText} from '../../trace-surface-feature/traceSurfaceFeature.helpers';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
@@ -46,6 +47,7 @@ const NotebookHeader = ({
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const navigation = useNavigation();
+  const {getLabel} = useForm();
   const {getCurrentLocation} = useMapLocation();
   const {
     checkSpotName,
@@ -134,43 +136,14 @@ const NotebookHeader = ({
         }
         else return getCoordText(lat, lng);
       }
-      else if ((spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')
-        && spot.properties.trace && spot.properties.trace.trace_feature && spot.properties.trace.trace_type) {
-        return getTraceText();
-      }
-      else if ((spot.geometry.type === 'Polygon' || spot.geometry.type === 'MultiPolygon'
-          || spot.geometry.type === 'GeometryCollection') && spot.properties.surface_feature
-        && spot.properties.surface_feature.surface_feature_type) {
-        return getSurfaceFeatureText();
-      }
+      // Lines and polygons are too many coordinates to show, so they are named by what was mapped instead
+      const traceSurfaceFeatureText = getTraceSurfaceFeatureText(spot, getLabel);
+      if (traceSurfaceFeatureText) return traceSurfaceFeatureText;
+      else if (isLineSpot(spot)) return 'Line';
+      else if (isPolygonSpot(spot)) return 'Polygon';
       return spot.geometry.type;
     }
     else return undefined;
-  };
-
-  const getSurfaceFeatureText = () => {
-    const surfaceFeatureDictionary = LABEL_DICTIONARY.general.surface_feature;
-    const key = spot.properties.surface_feature.surface_feature_type;
-    let surfaceFeatureText = surfaceFeatureDictionary[key] || key.replace(/_/g, ' ');
-    if (spot.properties.surface_feature.surface_feature_type === 'other'
-      && spot.properties.surface_feature.other_surface_feature_type) {
-      surfaceFeatureText = spot.properties.surface_feature.other_surface_feature_type;
-    }
-    return toTitleCase(surfaceFeatureText);
-  };
-
-  const getTraceText = () => {
-    const traceDictionary = LABEL_DICTIONARY.general.trace;
-    const key = spot.properties.trace.trace_type;
-    let traceText = traceDictionary[key] || key.replace(/_/g, ' ');
-    traceText = toTitleCase(traceText) + ' Trace';
-    const subType = TRACE_SUB_TYPE_FIELDS.find(subTypeField => spot.properties.trace[subTypeField]);
-    if (subType) {
-      const subTypeValue = spot.properties.trace[subType];
-      const subTypeLabel = traceDictionary[subTypeValue];
-      if (subTypeLabel) traceText = traceText + ' - ' + subTypeLabel.toUpperCase();
-    }
-    return traceText;
   };
 
   const goBackToParentSpot = () => {

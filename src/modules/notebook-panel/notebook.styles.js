@@ -56,21 +56,6 @@ const notebookStyles = StyleSheet.create({
     borderLeftWidth: SAMPLES_BORDER_WIDTH,
     borderRightWidth: SAMPLES_BORDER_WIDTH,
   },
-  traceSurfaceFeatureContainer: {
-    borderBottomColor: themes.MEDIUMGREY,
-    borderBottomWidth: 0.5,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  traceSurfaceFeatureToggleContainer: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    paddingLeft: 10,
-  },
-  traceSurfaceFeatureToggleText: {
-    fontSize: themes.MEDIUM_TEXT_SIZE,
-    paddingRight: 10,
-  },
 });
 
 export default notebookStyles;
