@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import ActionButtonsSmallScreen from './buttons/ActionButtonsSmallScreen';
 import MainMenuButton from './buttons/MainMenuButton';
 import ShortcutButtons from './buttons/ShortcutButtons';
-import {NAVIGATION_OPTIONS} from './home.constants';
+import {HOME_ACTIONS, NAVIGATION_OPTIONS} from './home.constants';
 import homeStyles from './home.styles';
 import * as themes from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
@@ -27,14 +27,14 @@ import VersionCheckLabel from '../version-check/VersionCheckLabel';
 const Tab = createMaterialTopTabNavigator();
 
 const HomeViewSmallScreen = forwardRef(({
-                                          clickHandler,
                                           closeMainMenuPanel,
                                           closeNotebookPanel,
                                           confirmEndMapEditing,
-                                          dialogClickHandler,
                                           dialogs,
                                           distance,
                                           endMeasurement,
+                                          handleHomeAction,
+                                          handleHomeActionFromMenu,
                                           hasDrawTools,
                                           isCreateToolsDisabled,
                                           isMapEditing,
@@ -158,14 +158,14 @@ const HomeViewSmallScreen = forwardRef(({
 
                 {currentImageBasemap && (
                   <IconButton
-                    onPress={() => clickHandler('closeImageBasemap')}
+                    onPress={() => handleHomeAction(HOME_ACTIONS.CLOSE_IMAGE_BASEMAP)}
                     source={require('../../assets/icons/Close.png')}
                     style={homeStyles.closeButtonSmallScreen}
                   />
                 )}
                 {stratSection && (
                   <IconButton
-                    onPress={() => clickHandler('closeStratSection')}
+                    onPress={() => handleHomeAction(HOME_ACTIONS.CLOSE_STRAT_SECTION)}
                     source={require('../../assets/icons/Close.png')}
                     style={homeStyles.closeButtonSmallScreen}
                   />
@@ -173,7 +173,7 @@ const HomeViewSmallScreen = forwardRef(({
 
                 {stratSection && !isCurrentMapReadOnly() && !isCreateToolsDisabled && (
                   <IconButton
-                    onPress={() => clickHandler('addInterval')}
+                    onPress={() => handleHomeAction(HOME_ACTIONS.ADD_INTERVAL)}
                     source={require('../../assets/icons/AddIntervalButton.png')}
                     style={homeStyles.addIntervalButton}
                   />
@@ -195,11 +195,11 @@ const HomeViewSmallScreen = forwardRef(({
                       : homeStyles.actionButtonsSmallScreenContainerLandscape]}
                 >
                   <ActionButtonsSmallScreen
-                    clickHandler={clickHandler}
-                    dialogClickHandler={dialogClickHandler}
                     dialogs={dialogs}
                     distance={distance}
                     endMeasurement={endMeasurement}
+                    handleHomeAction={handleHomeAction}
+                    handleHomeActionFromMenu={handleHomeActionFromMenu}
                     hasDrawTools={hasDrawTools}
                     mapMode={mapMode}
                     onCancel={onCancel}

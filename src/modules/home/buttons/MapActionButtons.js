@@ -11,7 +11,7 @@ import MapActionsOverlay from '../overlays/MapActionsOverlay';
 import MapLayersOverlay from '../overlays/MapLayersOverlay';
 import MapSymbolsOverlay from '../overlays/MapSymbolsOverlay';
 
-const MapActionButtons = ({dialogClickHandler, dialogs, toggleDialog, zoomToCustomMap}) => {
+const MapActionButtons = ({dialogs, handleHomeActionFromMenu, toggleDialog, zoomToCustomMap}) => {
   /* Data Hooks */
 
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
@@ -64,12 +64,11 @@ const MapActionButtons = ({dialogClickHandler, dialogs, toggleDialog, zoomToCust
 
       {/* Modals */}
       <MapActionsOverlay
-        onPress={name => dialogClickHandler('mapActionsMenuVisible', name)}
+        onPress={name => handleHomeActionFromMenu('mapActionsMenuVisible', name)}
         onTouchOutside={() => toggleDialog('mapActionsMenuVisible')}
         visible={dialogs.mapActionsMenuVisible}
       />
       <MapSymbolsOverlay
-        onPress={name => dialogClickHandler('mapSymbolsMenuVisible', name)}
         onTouchOutside={() => toggleDialog('mapSymbolsMenuVisible')}
         visible={dialogs.mapSymbolsMenuVisible}
       />

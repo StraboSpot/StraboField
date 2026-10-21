@@ -11,16 +11,17 @@ import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import useSpots from '../../spots/useSpots';
+import {HOME_ACTIONS} from '../home.constants';
 import homeStyles from '../home.styles';
 import DrawInfo from '../pop-ups/DrawInfo';
 
 const RightSideButtons = ({
                             animateRightSide,
-                            clickHandler,
                             closeNotebookPanel,
                             confirmEndMapEditing,
                             distance,
                             endMeasurement,
+                            handleHomeAction,
                             hasDrawTools,
                             isCreateToolsDisabled,
                             isMapEditing,
@@ -54,7 +55,7 @@ const RightSideButtons = ({
       {stratSection && !isCurrentMapReadOnly() && !isCreateToolsDisabled && (
         <Animated.View style={[homeStyles.addIntervalButton, animateRightSide]}>
           <IconButton
-            onPress={() => clickHandler('addInterval')}
+            onPress={() => handleHomeAction(HOME_ACTIONS.ADD_INTERVAL)}
             source={modalVisible === MODAL_KEYS.OTHER.ADD_INTERVAL
               ? require('../../../assets/icons/AddIntervalButton_pressed.png')
               : require('../../../assets/icons/AddIntervalButton.png')}
@@ -79,9 +80,9 @@ const RightSideButtons = ({
       <Animated.View style={[homeStyles.drawContainer, animateRightSide]}>
         <View style={{alignItems: 'flex-end'}}>
           <DrawInfo
-            clickHandler={clickHandler}
             distance={distance}
             endMeasurement={endMeasurement}
+            handleHomeAction={handleHomeAction}
             mapMode={mapMode}
             onCancel={onCancel}
             onEndDrawPressed={onEndDrawPressed}
@@ -89,7 +90,11 @@ const RightSideButtons = ({
           />
         </View>
         {hasDrawTools && (
-          <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode} openMainMenuPanel={openMainMenuPanel}/>
+          <DrawActionButtons
+            handleHomeAction={handleHomeAction}
+            mapMode={mapMode}
+            openMainMenuPanel={openMainMenuPanel}
+          />
         )}
       </Animated.View>
     </>

@@ -26,11 +26,11 @@ const Home = forwardRef(({
   console.log('Rendering Home...');
 
   const {
-    clickHandler,
-    dialogClickHandler,
     dialogs,
     distance,
     endMeasurement,
+    handleHomeAction,
+    handleHomeActionFromMenu,
     hasDrawTools,
     isCreateToolsDisabled,
     onCancel,
@@ -56,14 +56,14 @@ const Home = forwardRef(({
     return (
       <Animated.View style={[homeStyles.container, animateLeftSide]}>
         <HomeViewSmallScreen
-          clickHandler={clickHandler}
           closeMainMenuPanel={closeMainMenuPanel}
           closeNotebookPanel={closeNotebookPanel}
           confirmEndMapEditing={confirmEndMapEditing}
-          dialogClickHandler={dialogClickHandler}
           dialogs={dialogs}
           distance={distance}
           endMeasurement={endMeasurement}
+          handleHomeAction={handleHomeAction}
+          handleHomeActionFromMenu={handleHomeActionFromMenu}
           hasDrawTools={hasDrawTools}
           isCreateToolsDisabled={isCreateToolsDisabled}
           isMapEditing={isMapEditing}
@@ -88,14 +88,14 @@ const Home = forwardRef(({
         animateLeftSide={animateLeftSide}
         animateNotebookDrawer={animateNotebookDrawer}
         animateRightSide={animateRightSide}
-        clickHandler={clickHandler}
         closeMainMenuPanel={closeMainMenuPanel}
         closeNotebookPanel={closeNotebookPanel}
         confirmEndMapEditing={confirmEndMapEditing}
-        dialogClickHandler={dialogClickHandler}
         dialogs={dialogs}
         distance={distance}
         endMeasurement={endMeasurement}
+        handleHomeAction={handleHomeAction}
+        handleHomeActionFromMenu={handleHomeActionFromMenu}
         hasDrawTools={hasDrawTools}
         isCreateToolsDisabled={isCreateToolsDisabled}
         isMapEditing={isMapEditing}

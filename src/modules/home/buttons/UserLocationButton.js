@@ -5,8 +5,9 @@ import {useToast} from 'react-native-toast-notifications';
 import {useSelector} from 'react-redux';
 
 import IconButton from '../../../shared/ui/buttons/IconButton';
+import {HOME_ACTIONS} from '../home.constants';
 
-const UserLocationButton = ({clickHandler}) => {
+const UserLocationButton = ({handleHomeAction}) => {
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const currentTimeout = useSelector(state => state.home.geolocationTimeout);
   const stratSection = useSelector(state => state.map.stratSection);
@@ -24,9 +25,9 @@ const UserLocationButton = ({clickHandler}) => {
       timeoutRef.current = null;
     }
     setUserLocationButtonOn(false);
-    clickHandler('toggleUserLocation', false);
+    handleHomeAction(HOME_ACTIONS.TOGGLE_USER_LOCATION, false);
     // console.log('Location timer cleared');
-  }, [clickHandler]);
+  }, [handleHomeAction]);
 
   // Handle location timer when button state changes
   useEffect(() => {
@@ -44,7 +45,7 @@ const UserLocationButton = ({clickHandler}) => {
       timeoutRef.current = setTimeout(() => {
         console.log('Timer expired, turning off location');
         setUserLocationButtonOn(false);
-        clickHandler('toggleUserLocation', false);
+        handleHomeAction(HOME_ACTIONS.TOGGLE_USER_LOCATION, false);
         toast.show('Geolocation turned off automatically to conserve battery.');
       }, currentTimeout);
     }
@@ -62,7 +63,7 @@ const UserLocationButton = ({clickHandler}) => {
         timeoutRef.current = null;
       }
     };
-  }, [userLocationButtonOn, currentTimeout, clickHandler, toast]);
+  }, [userLocationButtonOn, currentTimeout, handleHomeAction, toast]);
 
   // Handle AppState changes
   useEffect(() => {
@@ -96,10 +97,9 @@ const UserLocationButton = ({clickHandler}) => {
       <IconButton
         onPress={() => {
           setUserLocationButtonOn(!userLocationButtonOn);
-          clickHandler('toggleUserLocation', !userLocationButtonOn);
+          handleHomeAction(HOME_ACTIONS.TOGGLE_USER_LOCATION, !userLocationButtonOn);
         }}
-        source={userLocationButtonOn
-          ? require('../../../assets/icons/MyLocationButton_pressed.png')
+        source={userLocationButtonOn ? require('../../../assets/icons/MyLocationButton_pressed.png')
           : require('../../../assets/icons/MyLocationButton.png')}
       />
     );

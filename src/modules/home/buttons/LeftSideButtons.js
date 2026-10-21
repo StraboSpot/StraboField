@@ -7,14 +7,15 @@ import MainMenuButton from './MainMenuButton';
 import MapActionButtons from './MapActionButtons';
 import UserLocationButton from './UserLocationButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
+import {HOME_ACTIONS} from '../home.constants';
 import homeStyles from '../home.styles';
 
 const LeftSideButtons = ({
                            animateLeftSide,
-                           clickHandler,
                            closeMainMenuPanel,
-                           dialogClickHandler,
                            dialogs,
+                           handleHomeAction,
+                           handleHomeActionFromMenu,
                            openMainMenuPanel,
                            toggleDialog,
                            zoomToCustomMap,
@@ -36,25 +37,25 @@ const LeftSideButtons = ({
 
       <Animated.View style={[homeStyles.mapActionsContainer, animateLeftSide]}>
         <MapActionButtons
-          dialogClickHandler={dialogClickHandler}
           dialogs={dialogs}
+          handleHomeActionFromMenu={handleHomeActionFromMenu}
           toggleDialog={toggleDialog}
           zoomToCustomMap={zoomToCustomMap}
         />
       </Animated.View>
 
       <Animated.View style={[homeStyles.bottomLeftIcons, animateLeftSide]}>
-        <UserLocationButton clickHandler={clickHandler}/>
+        <UserLocationButton handleHomeAction={handleHomeAction}/>
 
         {currentImageBasemap && (
           <IconButton
-            onPress={() => clickHandler('closeImageBasemap')}
+            onPress={() => handleHomeAction(HOME_ACTIONS.CLOSE_IMAGE_BASEMAP)}
             source={require('../../../assets/icons/Close.png')}
           />
         )}
         {stratSection && (
           <IconButton
-            onPress={() => clickHandler('closeStratSection')}
+            onPress={() => handleHomeAction(HOME_ACTIONS.CLOSE_STRAT_SECTION)}
             source={require('../../../assets/icons/Close.png')}
           />
         )}

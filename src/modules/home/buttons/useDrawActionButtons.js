@@ -3,8 +3,9 @@ import {useSelector} from 'react-redux';
 import {DRAW_ACTION_IMAGES} from './drawActionButtons.constants';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import {MAP_MODES} from '../../maps/maps.constants';
+import {HOME_ACTIONS} from '../home.constants';
 
-const useDrawActionButtons = ({clickHandler, mapMode}) => {
+const useDrawActionButtons = ({handleHomeAction, mapMode}) => {
   /* Data Hooks */
 
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
@@ -53,30 +54,30 @@ const useDrawActionButtons = ({clickHandler, mapMode}) => {
   };
 
   const handleIntervalDragPressed = () => {
-    if (mapMode === MAP_MODES.INTERVAL_DRAG) clickHandler('cancelIntervalDrag');
-    else clickHandler('startIntervalDrag');
+    if (mapMode === MAP_MODES.INTERVAL_DRAG) handleHomeAction(HOME_ACTIONS.CANCEL_INTERVAL_DRAG);
+    else handleHomeAction(HOME_ACTIONS.START_INTERVAL_DRAG);
   };
 
   const handleEditShapePressed = () => {
-    if (mapMode === MAP_MODES.EDIT) clickHandler('cancelEdits');
-    else clickHandler('startEditing');
+    if (mapMode === MAP_MODES.EDIT) handleHomeAction(HOME_ACTIONS.CANCEL_EDITS);
+    else handleHomeAction(HOME_ACTIONS.START_EDITING);
   };
 
   const handleLinePressed = () => {
-    if (drawGeometries.line === MAP_MODES.DRAW.LINE) clickHandler(MAP_MODES.DRAW.LINE);
-    else clickHandler(MAP_MODES.DRAW.FREEHANDLINE);
+    if (drawGeometries.line === MAP_MODES.DRAW.LINE) handleHomeAction(MAP_MODES.DRAW.LINE);
+    else handleHomeAction(MAP_MODES.DRAW.FREEHANDLINE);
   };
 
   const handlePointPressed = () => {
     if (currentImageBasemap || stratSection || drawGeometries.point === MAP_MODES.DRAW.POINT) {
-      clickHandler(MAP_MODES.DRAW.POINT);
+      handleHomeAction(MAP_MODES.DRAW.POINT);
     }
-    else clickHandler(MAP_MODES.DRAW.POINTLOCATION);
+    else handleHomeAction(MAP_MODES.DRAW.POINTLOCATION);
   };
 
   const handlePolygonPressed = () => {
-    if (drawGeometries.polygon === MAP_MODES.DRAW.POLYGON) clickHandler(MAP_MODES.DRAW.POLYGON);
-    else clickHandler(MAP_MODES.DRAW.FREEHANDPOLYGON);
+    if (drawGeometries.polygon === MAP_MODES.DRAW.POLYGON) handleHomeAction(MAP_MODES.DRAW.POLYGON);
+    else handleHomeAction(MAP_MODES.DRAW.FREEHANDPOLYGON);
   };
 
   return {

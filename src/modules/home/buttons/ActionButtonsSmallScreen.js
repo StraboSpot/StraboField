@@ -9,12 +9,12 @@ import homeStyles from '../home.styles';
 import DrawInfo from '../pop-ups/DrawInfo';
 
 const ActionButtonsSmallScreen = ({
-                                    clickHandler,
-                                    dialogClickHandler,
                                     dialogs,
                                     distance,
                                     onCancel,
                                     endMeasurement,
+                                    handleHomeAction,
+                                    handleHomeActionFromMenu,
                                     hasDrawTools,
                                     mapMode,
                                     onEndDrawPressed,
@@ -32,15 +32,15 @@ const ActionButtonsSmallScreen = ({
     <View style={homeStyles.actionButtonsSmallScreenStack}>
       <View style={homeStyles.mapReadoutsRow}>
         <View style={homeStyles.mapReadoutsSmallScreen}>
-          <UserLocationButton clickHandler={clickHandler}/>
+          <UserLocationButton handleHomeAction={handleHomeAction}/>
           <MapControlsContainer/>
         </View>
 
         <View style={homeStyles.drawInfoSmallScreen}>
           <DrawInfo
-            clickHandler={clickHandler}
             distance={distance}
             endMeasurement={endMeasurement}
+            handleHomeAction={handleHomeAction}
             mapMode={mapMode}
             onCancel={onCancel}
             onEndDrawPressed={onEndDrawPressed}
@@ -53,14 +53,18 @@ const ActionButtonsSmallScreen = ({
         <View style={homeStyles.mapActionsPill}>
           <View style={homeStyles.smallScreenMapActionButtons}>
             <MapActionButtons
-              dialogClickHandler={dialogClickHandler}
               dialogs={dialogs}
+              handleHomeActionFromMenu={handleHomeActionFromMenu}
               toggleDialog={toggleDialog}
               zoomToCustomMap={zoomToCustomMap}
             />
           </View>
           {hasDrawTools && (
-            <DrawActionButtons clickHandler={clickHandler} mapMode={mapMode} openMainMenuPanel={openMainMenuPanel}/>
+            <DrawActionButtons
+              handleHomeAction={handleHomeAction}
+              mapMode={mapMode}
+              openMainMenuPanel={openMainMenuPanel}
+            />
           )}
         </View>
       </View>

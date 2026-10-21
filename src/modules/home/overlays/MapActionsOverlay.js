@@ -10,7 +10,7 @@ import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import useSpots from '../../spots/useSpots';
-import {MAP_ACTIONS} from '../home.constants';
+import {HOME_ACTIONS, MAP_ACTIONS_MENU_ITEMS} from '../home.constants';
 
 const MapActionsOverlay = ({
                              onPress,
@@ -38,17 +38,18 @@ const MapActionsOverlay = ({
     const isIOS = Platform.OS === 'ios';
     const isWeb = Platform.OS === 'web';
     const hasValidConnection = isConnected && (isInternetReachable || currentBasemap?.source);
-    const isSaveMapVisible = item.key === 'saveMap' && !isWeb && hasValidConnection;
-    const isStereonetVisible = item.key === 'stereonet' && (isIOS || isWeb);
-    const isStratSectionVisible = item.key === 'stratSection' && stratSection;
-    const isSelectSpotsVisible = item.key === 'selectSpots' && isTestingMode;
-    const isMapMeasurementVisible = item.key === 'mapMeasurement' && !stratSection && !currentImageBasemap;
+    const isSaveMapVisible = item.key === HOME_ACTIONS.SAVE_MAP && !isWeb && hasValidConnection;
+    const isStereonetVisible = item.key === HOME_ACTIONS.STEREONET && (isIOS || isWeb);
+    const isStratSectionVisible = item.key === HOME_ACTIONS.STRAT_SECTION && stratSection;
+    const isSelectSpotsVisible = item.key === HOME_ACTIONS.SELECT_SPOTS && isTestingMode;
+    const isMapMeasurementVisible = item.key === HOME_ACTIONS.MAP_MEASUREMENT && !stratSection && !currentImageBasemap;
     // Tagging writes to the Spots it tags, so it goes away with the rest of the editing on a read only map
-    const isReadOnlyHiddenAction = isReadOnlyMap && item.key === 'addTag';
-    const isToggleScaleBarUnitsVisible = item.key === 'toggleScaleBarUnits' && !stratSection && !currentImageBasemap;
+    const isReadOnlyHiddenAction = isReadOnlyMap && item.key === HOME_ACTIONS.ADD_TAG;
+    const isToggleScaleBarUnitsVisible = item.key === HOME_ACTIONS.TOGGLE_SCALE_BAR_UNITS && !stratSection
+      && !currentImageBasemap;
 
-    const otherKeysToHide = new Set(
-      ['saveMap', 'stereonet', 'stratSection', 'selectSpots', 'mapMeasurement', 'toggleScaleBarUnits']);
+    const otherKeysToHide = new Set([HOME_ACTIONS.SAVE_MAP, HOME_ACTIONS.STEREONET, HOME_ACTIONS.STRAT_SECTION,
+      HOME_ACTIONS.SELECT_SPOTS, HOME_ACTIONS.MAP_MEASUREMENT, HOME_ACTIONS.TOGGLE_SCALE_BAR_UNITS]);
     const isDefaultVisible = !otherKeysToHide.has(item.key);
 
     return !isReadOnlyHiddenAction && (
@@ -63,7 +64,9 @@ const MapActionsOverlay = ({
   };
 
   const getItemTitle = (item) => {
-    if (item.key === 'toggleScaleBarUnits') return `Switch Scale Bar to ${isScaleBarMetric ? 'Imperial' : 'Metric'}`;
+    if (item.key === HOME_ACTIONS.TOGGLE_SCALE_BAR_UNITS) {
+      return `Switch Scale Bar to ${isScaleBarMetric ? 'Imperial' : 'Metric'}`;
+    }
     return item.title;
   };
 
@@ -113,7 +116,7 @@ const MapActionsOverlay = ({
           paddingVertical: SMALL_SCREEN ? 20 : 0,
           flexGrow: SMALL_SCREEN ? 1 : 0,
         }}
-        data={MAP_ACTIONS.filter(isItemVisible)}
+        data={MAP_ACTIONS_MENU_ITEMS.filter(isItemVisible)}
         key={'mapActions'}
         renderItem={({item}) => mapActionItem(item)}
         style={{width: '100%'}}

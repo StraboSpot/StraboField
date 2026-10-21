@@ -3,6 +3,7 @@ import {useEffect, useState} from 'react';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector, useStore} from 'react-redux';
 
+import {HOME_ACTIONS} from './home.constants';
 import {setIsOfflineMapsModalVisible, setLoadingStatus, setModalVisible} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
 import useAutoSave from '../../services/files/useAutoSave';
@@ -23,8 +24,8 @@ import useProject from '../project/useProject';
 import {clearedSelectedSpots, setIntersectedSpotsForTagging} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
-// clickHandler actions that create a Spot, leave the map or switch to another mode, so a map edit in progress has to
-// end before they run
+// Home actions that create a Spot, leave the map or switch to another mode, so a map edit in progress has to end
+// before they run
 const ACTIONS_THAT_END_MAP_EDITING = [
   MAP_MODES.DRAW.POINT,
   MAP_MODES.DRAW.LINE,
@@ -32,16 +33,20 @@ const ACTIONS_THAT_END_MAP_EDITING = [
   MAP_MODES.DRAW.FREEHANDPOLYGON,
   MAP_MODES.DRAW.FREEHANDLINE,
   MAP_MODES.DRAW.POINTLOCATION,
-  'addInterval',
-  'closeImageBasemap',
-  'closeStratSection',
-  'startIntervalDrag',
+  HOME_ACTIONS.ADD_INTERVAL,
+  HOME_ACTIONS.CLOSE_IMAGE_BASEMAP,
+  HOME_ACTIONS.CLOSE_STRAT_SECTION,
+  HOME_ACTIONS.START_INTERVAL_DRAG,
 ];
 
-// clickHandler actions that leave an interval drag running: its own buttons, and the location dot, which a timer can
-// also turn off. Any other action ends the drag first.
-const ACTIONS_ALLOWED_DURING_INTERVAL_DRAG = ['cancelIntervalDrag', 'saveReordering', 'startIntervalDrag',
-  'toggleUserLocation'];
+// Home actions that leave an interval drag running: its own buttons, and the location dot, which a timer can also
+// turn off. Any other action ends the drag first.
+const ACTIONS_ALLOWED_DURING_INTERVAL_DRAG = [
+  HOME_ACTIONS.CANCEL_INTERVAL_DRAG,
+  HOME_ACTIONS.SAVE_REORDERING,
+  HOME_ACTIONS.START_INTERVAL_DRAG,
+  HOME_ACTIONS.TOGGLE_USER_LOCATION,
+];
 
 const useHome = ({
                    closeMainMenuPanel,
@@ -167,7 +172,9 @@ const useHome = ({
 
   /* Exported Functions */
 
-  const clickHandler = async (name, value) => {
+  const endMeasurement = () => setMapMode(MAP_MODES.VIEW);
+
+  const handleHomeAction = async (name, value) => {
     const isEndingMapEditing = mapMode === MAP_MODES.INTERVAL_DRAG
       ? !ACTIONS_ALLOWED_DURING_INTERVAL_DRAG.includes(name) : ACTIONS_THAT_END_MAP_EDITING.includes(name);
     if (isEndingMapEditing && isMapEditing() && !await confirmEndMapEditing()) return;
@@ -190,75 +197,75 @@ const useHome = ({
         else if (!isEmpty(targetDataset)) setDraw(name).catch(console.error);
         else toast.show('No Target Dataset! \n A target dataset needs to be set before drawing Spots.');
         break;
-      case 'addInterval':
+      case HOME_ACTIONS.ADD_INTERVAL:
         dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
         break;
-      case 'cancelEdits':
+      case HOME_ACTIONS.CANCEL_EDITS:
         await endMapEditing(MAP_EDIT_CHOICES.CANCEL);
         break;
-      case 'saveEdits':
+      case HOME_ACTIONS.SAVE_EDITS:
         await endMapEditing(MAP_EDIT_CHOICES.SAVE);
         break;
-      case 'startEditing':
+      case HOME_ACTIONS.START_EDITING:
         if (!isEditModeUnavailable) mapComponentRef.current?.startEditingMode();
         break;
-      case 'toggleUserLocation':
+      case HOME_ACTIONS.TOGGLE_USER_LOCATION:
         if (value) zoomToCurrentLocation().catch(console.error);
         mapComponentRef.current?.toggleUserLocation(value);
         break;
-      case 'closeImageBasemap':
+      case HOME_ACTIONS.CLOSE_IMAGE_BASEMAP:
         const spotWithThisImageBasemap = getRootSpot(currentImageBasemap?.id);
         handleSpotSelected(spotWithThisImageBasemap);
         break;
-      case 'closeStratSection':
+      case HOME_ACTIONS.CLOSE_STRAT_SECTION:
         const spotWithThisStratSection = getSpotWithThisStratSection(stratSection?.strat_section_id);
         // If the strat section has been deleted there is no spot to select, so clear it directly to close the view
         if (spotWithThisStratSection) handleSpotSelected(spotWithThisStratSection);
         else dispatch(clearedStratSection());
         break;
       // Map Actions
-      case 'zoom':
+      case HOME_ACTIONS.ZOOM:
         mapComponentRef.current?.zoomToSpotsExtent();
         break;
-      case 'saveMap':
+      case HOME_ACTIONS.SAVE_MAP:
         dispatch(setIsOfflineMapsModalVisible(!isOfflineMapModalVisible));
         closeMainMenuPanel();
         break;
-      case 'addTag':
+      case HOME_ACTIONS.ADD_TAG:
         dispatch(setIntersectedSpotsForTagging([]));
         // console.log(`${name}`, ' was clicked');
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('tag');
         setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
-      case 'addToReport':
+      case HOME_ACTIONS.ADD_TO_REPORT:
         dispatch(setIntersectedSpotsForTagging([]));
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('report');
         setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
-      case 'stereonet':
+      case HOME_ACTIONS.STEREONET:
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('stereonet');
         setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
-      case 'selectSpots':
+      case HOME_ACTIONS.SELECT_SPOTS:
         mapComponentRef.current?.clearSelectedSpots();
         setSelectingMode('selectSpots');
         setDraw(MAP_MODES.DRAW.FREEHANDPOLYGON).catch(console.error);
         break;
-      case 'mapMeasurement':
+      case HOME_ACTIONS.MAP_MEASUREMENT:
         setDraw(MAP_MODES.DRAW.MEASURE).catch(console.error);
         break;
-      case 'stratSection':
+      case HOME_ACTIONS.STRAT_SECTION:
         const selectedSpotWithThisStratSection = getSpotWithThisStratSection(stratSection?.strat_section_id);
         handleSpotSelected(selectedSpotWithThisStratSection);
         openNotebookPanel(PAGE_KEYS.STRAT_SECTION);
         break;
-      case 'toggleScaleBarUnits':
+      case HOME_ACTIONS.TOGGLE_SCALE_BAR_UNITS:
         dispatch(setIsScaleBarMetric(!isScaleBarMetric));
         break;
-      case 'startIntervalDrag':
+      case HOME_ACTIONS.START_INTERVAL_DRAG:
         dispatch(startedIntervalDrag(
           Object.values(store.getState().spot.spots)
             .filter(s => s.properties.strat_section_id === stratSection?.strat_section_id)
@@ -266,21 +273,19 @@ const useHome = ({
         ));
         setMapMode(MAP_MODES.INTERVAL_DRAG);
         break;
-      case 'saveReordering':
+      case HOME_ACTIONS.SAVE_REORDERING:
         await endMapEditing(MAP_EDIT_CHOICES.SAVE);
         break;
-      case 'cancelIntervalDrag':
+      case HOME_ACTIONS.CANCEL_INTERVAL_DRAG:
         await endMapEditing(MAP_EDIT_CHOICES.CANCEL);
         break;
     }
   };
 
-  const dialogClickHandler = (dialog, name, position) => {
-    clickHandler(name, position);
+  const handleHomeActionFromMenu = (dialog, name) => {
+    handleHomeAction(name);
     toggleDialog(dialog);
   };
-
-  const endMeasurement = () => setMapMode(MAP_MODES.VIEW);
 
   const onCancel = async () => {
     console.log('Cancel');
@@ -326,11 +331,11 @@ const useHome = ({
   };
 
   return {
-    clickHandler,
-    dialogClickHandler,
     dialogs,
     distance,
     endMeasurement,
+    handleHomeAction,
+    handleHomeActionFromMenu,
     hasDrawTools,
     isCreateToolsDisabled,
     onCancel,

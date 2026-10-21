@@ -14,14 +14,14 @@ const HomeView = forwardRef(({
                                animateLeftSide,
                                animateNotebookDrawer,
                                animateRightSide,
-                               clickHandler,
                                closeMainMenuPanel,
                                closeNotebookPanel,
                                confirmEndMapEditing,
-                               dialogClickHandler,
                                dialogs,
                                distance,
                                endMeasurement,
+                               handleHomeAction,
+                               handleHomeActionFromMenu,
                                hasDrawTools,
                                isCreateToolsDisabled,
                                isMapEditing,
@@ -54,11 +54,11 @@ const HomeView = forwardRef(({
 
       <RightSideButtons
         animateRightSide={animateRightSide}
-        clickHandler={clickHandler}
         closeNotebookPanel={closeNotebookPanel}
         confirmEndMapEditing={confirmEndMapEditing}
         distance={distance}
         endMeasurement={endMeasurement}
+        handleHomeAction={handleHomeAction}
         hasDrawTools={hasDrawTools}
         isCreateToolsDisabled={isCreateToolsDisabled}
         isMapEditing={isMapEditing}
@@ -72,10 +72,10 @@ const HomeView = forwardRef(({
 
       <LeftSideButtons
         animateLeftSide={animateLeftSide}
-        clickHandler={clickHandler}
         closeMainMenuPanel={closeMainMenuPanel}
-        dialogClickHandler={dialogClickHandler}
         dialogs={dialogs}
+        handleHomeAction={handleHomeAction}
+        handleHomeActionFromMenu={handleHomeActionFromMenu}
         openMainMenuPanel={openMainMenuPanel}
         toggleDialog={toggleDialog}
         zoomToCustomMap={bbox => mapComponentRef?.current?.zoomToCustomMap(bbox)}

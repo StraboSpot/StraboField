@@ -13,7 +13,7 @@ import {setMenuSelectionPage, setSidePanelVisible} from '../../main-menu-panel/m
 import {MAP_MODES} from '../../maps/maps.constants';
 import homeStyles from '../home.styles';
 
-const DrawActionButtons = ({clickHandler, mapMode, openMainMenuPanel}) => {
+const DrawActionButtons = ({handleHomeAction, mapMode, openMainMenuPanel}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -27,7 +27,7 @@ const DrawActionButtons = ({clickHandler, mapMode, openMainMenuPanel}) => {
     handlePointPressed,
     handlePolygonPressed,
     stratSection,
-  } = useDrawActionButtons({clickHandler, mapMode});
+  } = useDrawActionButtons({handleHomeAction, mapMode});
   const {handleLineLongPressed, handlePointLongPressed, handlePolygonLongPressed} = useDrawGeometryToggle();
 
   /* Derived Variables */

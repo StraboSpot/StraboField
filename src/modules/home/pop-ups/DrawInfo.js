@@ -13,9 +13,9 @@ import IntervalDragCancelSaveButtons from '../buttons/IntervalDragCancelSaveButt
 import homeStyles from '../home.styles';
 
 const DrawInfo = ({
-                    clickHandler,
                     distance,
                     endMeasurement,
+                    handleHomeAction,
                     mapMode,
                     onCancel,
                     onEndDrawPressed,
@@ -50,8 +50,8 @@ const DrawInfo = ({
           )
         )}
         <View>
-          {mapMode === MAP_MODES.INTERVAL_DRAG ? <IntervalDragCancelSaveButtons clickHandler={clickHandler}/>
-            : mapMode === MAP_MODES.EDIT ? <EditCancelSaveButtons clickHandler={clickHandler}/>
+          {mapMode === MAP_MODES.INTERVAL_DRAG ? <IntervalDragCancelSaveButtons handleHomeAction={handleHomeAction}/>
+            : mapMode === MAP_MODES.EDIT ? <EditCancelSaveButtons handleHomeAction={handleHomeAction}/>
               : mapMode === MAP_MODES.DRAW.POINT ? (
                   <View>
                     <Text style={{textAlign: 'center'}}>Place a point </Text>

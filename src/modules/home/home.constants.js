@@ -9,17 +9,40 @@ export const DISMISSIBLE_WARNING_MESSAGES = {
     + 'not at shutter click. Hold the device steady and maintain the orientation until pressing the confirmation button.',
 };
 
-export const MAP_ACTIONS = [
-  {key: 'zoom', title: 'Zoom to Extent of Spots'},
-  {key: 'saveMap', title: 'Save Map for Offline Use'},
-  {key: 'stereonet', title: 'Lasso Spots for Stereonet'},
-  {key: 'selectSpots', title: 'Inspect Spots Raw Data'},
-  // {key: 'zoomToOfflineMap', title: 'Zoom to Offline Map'},
-  {key: 'addTag', title: 'Add Tag(s) to Spot(s)'},
-  {key: 'addToReport', title: 'Add Spot(s) to Memo'},
-  {key: 'mapMeasurement', title: 'Measure Distance'},
-  {key: 'stratSection', title: 'Strat Section Settings'},
-  {key: 'toggleScaleBarUnits', title: 'Toggle Scale Bar Units'},
+// The actions useHome's handleHomeAction runs. An action no case matches silently does nothing, so its cases and the
+// buttons that call it both use these names. The draw tools are home actions too, named by their MAP_MODES.DRAW mode.
+export const HOME_ACTIONS = {
+  ADD_INTERVAL: 'addInterval',
+  ADD_TAG: 'addTag',
+  ADD_TO_REPORT: 'addToReport',
+  CANCEL_EDITS: 'cancelEdits',
+  CANCEL_INTERVAL_DRAG: 'cancelIntervalDrag',
+  CLOSE_IMAGE_BASEMAP: 'closeImageBasemap',
+  CLOSE_STRAT_SECTION: 'closeStratSection',
+  MAP_MEASUREMENT: 'mapMeasurement',
+  SAVE_EDITS: 'saveEdits',
+  SAVE_MAP: 'saveMap',
+  SAVE_REORDERING: 'saveReordering',
+  SELECT_SPOTS: 'selectSpots',
+  START_EDITING: 'startEditing',
+  START_INTERVAL_DRAG: 'startIntervalDrag',
+  STEREONET: 'stereonet',
+  STRAT_SECTION: 'stratSection',
+  TOGGLE_SCALE_BAR_UNITS: 'toggleScaleBarUnits',
+  TOGGLE_USER_LOCATION: 'toggleUserLocation',
+  ZOOM: 'zoom',
+};
+
+export const MAP_ACTIONS_MENU_ITEMS = [
+  {key: HOME_ACTIONS.ZOOM, title: 'Zoom to Extent of Spots'},
+  {key: HOME_ACTIONS.SAVE_MAP, title: 'Save Map for Offline Use'},
+  {key: HOME_ACTIONS.STEREONET, title: 'Lasso Spots for Stereonet'},
+  {key: HOME_ACTIONS.SELECT_SPOTS, title: 'Inspect Spots Raw Data'},
+  {key: HOME_ACTIONS.ADD_TAG, title: 'Add Tag(s) to Spot(s)'},
+  {key: HOME_ACTIONS.ADD_TO_REPORT, title: 'Add Spot(s) to Memo'},
+  {key: HOME_ACTIONS.MAP_MEASUREMENT, title: 'Measure Distance'},
+  {key: HOME_ACTIONS.STRAT_SECTION, title: 'Strat Section Settings'},
+  {key: HOME_ACTIONS.TOGGLE_SCALE_BAR_UNITS, title: 'Toggle Scale Bar Units'},
 ];
 
 export const NAVIGATION_OPTIONS = {
