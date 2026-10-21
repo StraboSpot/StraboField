@@ -109,7 +109,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
 
   const renderNotebookContent = () => {
     const page = NOTEBOOK_PAGES.find(p => p.key === pageVisible);
-    const Page = page?.page_component || Overview;
+    const Page = page?.page_component() || Overview;
     let pageProps = {isReadOnly: isReadOnly, isSample: isSample, openMainMenuPanel: openMainMenuPanel, page: page};
     if (page?.key === PAGE_KEYS.SAMPLES) {
       pageProps = {

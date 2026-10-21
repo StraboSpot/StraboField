@@ -37,7 +37,7 @@ const ActiveModal = ({
   };
 
   if (modal?.modal_component) {
-    const ModalDisplayed = modal.modal_component;
+    const ModalDisplayed = modal.modal_component();
     if (activeModal && !Object.keys(MODAL_KEYS.SHORTCUTS).find(s => s.key === activeModal)) {
       return (
         <ModalDisplayed

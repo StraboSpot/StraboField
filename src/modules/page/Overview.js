@@ -191,7 +191,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
               return <TraceSurfaceFeatureOverview onPress={() => setIsTraceSurfaceFeatureEdit(true)}/>;
             }
             if (item.testing && !isTestingMode) return null;
-            const SectionOverview = item.overview_component;
+            const SectionOverview = item.overview_component();
             return (
               <SectionOverview
                 isReadOnly={isReadOnly}
