@@ -52,7 +52,7 @@ const TraceSurfaceFeaturePage = ({closePage, isReadOnly}) => {
   // anything can be shown here, so those exits can only ask with an alert
   useLayoutEffect(() => {
     console.log('ULE TraceSurfaceFeaturePage []');
-    return () => !isReadOnly && confirmLeavePage();
+    return () => confirmLeavePage();
   }, []);
 
   /* Event Handlers */
@@ -159,7 +159,9 @@ const TraceSurfaceFeaturePage = ({closePage, isReadOnly}) => {
     return 'Would you like to save your data before continuing?' + (removal ? ' ' + removal.message : '');
   };
 
-  const hasUnsavedChanges = () => !isDoneRef.current && !!formRef.current?.dirty;
+  // Never on a read only page: Form fills in a select field's default as it opens, which marks the form dirty even
+  // though nothing can be edited
+  const hasUnsavedChanges = () => !isReadOnly && !isDoneRef.current && !!formRef.current?.dirty;
 
   // Saved to this page's Spot by id, since a save agreed to on the way out can land after another Spot is selected.
   // trace_feature is no longer in the form but is still written for the server and older app versions.
