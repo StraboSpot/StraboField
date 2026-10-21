@@ -170,6 +170,27 @@ const homeStyles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  noTargetDatasetContainer: {
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    borderColor: themes.MEDIUMGREY,
+    borderRadius: 10,
+    borderWidth: 0.5,
+    elevation: 2,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  noTargetDatasetText: {
+    color: themes.DARKGREY,
+    fontSize: themes.SMALL_TEXT_SIZE,
+    fontStyle: 'italic',
+    textAlign: 'center',
+  },
+  noTargetDatasetTextSmallScreen: {
+    fontSize: 12,
+    paddingVertical: 4,
+  },
   notebookButton: {
     position: 'absolute',
     right: 10,

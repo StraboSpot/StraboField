@@ -201,6 +201,7 @@ const HomeViewSmallScreen = forwardRef(({
                     mapMode={mapMode}
                     onCancel={onCancel}
                     onEndDrawPressed={onEndDrawPressed}
+                    openMainMenuPanel={openMainMenuPanel}
                     selectingMode={selectingMode}
                     toggleDialog={toggleDialog}
                   />
