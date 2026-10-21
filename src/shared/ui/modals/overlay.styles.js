@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     borderRadius: themes.MODAL_BORDER_RADIUS,
     borderWidth: 0.5,
     elevation: 5,
+    paddingBottom: 5,
     shadowOpacity: 0.3,
     shadowRadius: 4,
     width: MODAL_WIDTH,
