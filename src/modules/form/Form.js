@@ -71,7 +71,9 @@ const Form = ({
   /* Side Effects */
 
   useEffect(() => {
-    // Set default values
+    // Set default values. Not on a read only form: nothing there can be saved, and a default filled in would mark the
+    // form as changed, so leaving the page would offer to save it.
+    if (isReadOnly) return;
     relevantFields.forEach((field) => {
       const [fieldType, choicesListName] = field.type.split(' ');
       if (fieldType === 'select_one' || fieldType === 'select_multiple') {
