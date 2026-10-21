@@ -112,7 +112,7 @@ const ModalWrapper = ({
   };
 
   // Fast path for the iOS two-phase modal switch (see setModalVisible): when this modal finishes dismissing, show any
-  // modal queued behind it. Fires on iOS only, and no-ops when nothing is queued; the OverlaysContainer timer is the
+  // modal queued behind it. Fires on iOS only, and no-ops when nothing is queued; the ModalsContainer timer is the
   // guaranteed fallback for modals that unmount without delivering onDismiss.
   const handleDismiss = () => {
     dispatch(applyPendingModal());

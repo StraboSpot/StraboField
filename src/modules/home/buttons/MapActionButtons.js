@@ -7,11 +7,11 @@ import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import useMapFeatures from '../../maps/features/useMapFeatures';
 import homeStyles from '../home.styles';
-import MapActionsOverlay from '../overlays/MapActionsOverlay';
-import MapLayersOverlay from '../overlays/MapLayersOverlay';
-import MapSymbolsOverlay from '../overlays/MapSymbolsOverlay';
+import MapActionsMenu from '../menus/MapActionsMenu';
+import MapLayersMenu from '../menus/MapLayersMenu';
+import MapSymbolsMenu from '../menus/MapSymbolsMenu';
 
-const MapActionButtons = ({dialogs, handleHomeActionFromMenu, toggleDialog, zoomToCustomMap}) => {
+const MapActionButtons = ({handleHomeActionFromMapMenu, mapMenus, toggleMapMenu, zoomToCustomMap}) => {
   /* Data Hooks */
 
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
@@ -23,9 +23,9 @@ const MapActionButtons = ({dialogs, handleHomeActionFromMenu, toggleDialog, zoom
 
   /* Logic Helpers */
 
-  const toggleMapSymbolsOverlay = () => {
-    if (!dialogs.mapSymbolsMenuVisible) updateFeatureTypes();
-    toggleDialog('mapSymbolsMenuVisible');
+  const toggleMapSymbolsMenu = () => {
+    if (!mapMenus.mapSymbolsMenuVisible) updateFeatureTypes();
+    toggleMapMenu('mapSymbolsMenuVisible');
   };
 
   /* View */
@@ -33,21 +33,21 @@ const MapActionButtons = ({dialogs, handleHomeActionFromMenu, toggleDialog, zoom
   return (
     <>
       <IconButton
-        onPress={() => toggleDialog('mapActionsMenuVisible')}
+        onPress={() => toggleMapMenu('mapActionsMenuVisible')}
         source={SMALL_SCREEN ? require('../../../assets/icons/MapActions.png')
           : require('../../../assets/icons/MapActionsButton.png')}
         style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
       />
       {isEmpty(featureTypesOff) && isEmpty(geometryTypesOff) ? (
         <IconButton
-          onPress={toggleMapSymbolsOverlay}
+          onPress={toggleMapSymbolsMenu}
           source={SMALL_SCREEN ? require('../../../assets/icons/Symbols.png')
             : require('../../../assets/icons/SymbolsButton.png')}
           style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
         />
       ) : (
         <IconButton
-          onPress={toggleMapSymbolsOverlay}
+          onPress={toggleMapSymbolsMenu}
           source={SMALL_SCREEN ? require('../../../assets/icons/Symbols_pressed.png')
             : require('../../../assets/icons/SymbolsButton_pressed.png')}
           style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
@@ -55,26 +55,26 @@ const MapActionButtons = ({dialogs, handleHomeActionFromMenu, toggleDialog, zoom
       )}
       {!currentImageBasemap && !stratSection && (
         <IconButton
-          onPress={() => toggleDialog('baseMapMenuVisible')}
+          onPress={() => toggleMapMenu('mapLayersMenuVisible')}
           source={SMALL_SCREEN ? require('../../../assets/icons/Layers.png')
             : require('../../../assets/icons/LayersButton.png')}
           style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
         />
       )}
 
-      {/* Modals */}
-      <MapActionsOverlay
-        onPress={name => handleHomeActionFromMenu('mapActionsMenuVisible', name)}
-        onTouchOutside={() => toggleDialog('mapActionsMenuVisible')}
-        visible={dialogs.mapActionsMenuVisible}
+      {/* Menus */}
+      <MapActionsMenu
+        onPress={name => handleHomeActionFromMapMenu('mapActionsMenuVisible', name)}
+        onTouchOutside={() => toggleMapMenu('mapActionsMenuVisible')}
+        visible={mapMenus.mapActionsMenuVisible}
       />
-      <MapSymbolsOverlay
-        onTouchOutside={() => toggleDialog('mapSymbolsMenuVisible')}
-        visible={dialogs.mapSymbolsMenuVisible}
+      <MapSymbolsMenu
+        onTouchOutside={() => toggleMapMenu('mapSymbolsMenuVisible')}
+        visible={mapMenus.mapSymbolsMenuVisible}
       />
-      <MapLayersOverlay
-        onTouchOutside={() => toggleDialog('baseMapMenuVisible')}
-        visible={dialogs.baseMapMenuVisible}
+      <MapLayersMenu
+        onTouchOutside={() => toggleMapMenu('mapLayersMenuVisible')}
+        visible={mapMenus.mapLayersMenuVisible}
         zoomToCustomMap={zoomToCustomMap}
       />
     </>

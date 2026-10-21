@@ -82,9 +82,9 @@ const useHome = ({
 
   /* Local State */
 
-  const [dialogs, setDialogs] = useState(
-    {mapActionsMenuVisible: false, mapSymbolsMenuVisible: false, baseMapMenuVisible: false});
   const [distance, setDistance] = useState(0);
+  const [mapMenus, setMapMenus] = useState(
+    {mapActionsMenuVisible: false, mapLayersMenuVisible: false, mapSymbolsMenuVisible: false});
   const [selectingMode, setSelectingMode] = useState(null);
 
   /* Derived Variables */
@@ -282,9 +282,9 @@ const useHome = ({
     }
   };
 
-  const handleHomeActionFromMenu = (dialog, name) => {
+  const handleHomeActionFromMapMenu = (menu, name) => {
     handleHomeAction(name);
-    toggleDialog(dialog);
+    toggleMapMenu(menu);
   };
 
   const onCancel = async () => {
@@ -315,35 +315,33 @@ const useHome = ({
     setMapMode(MAP_MODES.EDIT);
   };
 
-  // Toggle given dialog between true (visible) and false (hidden)
-  const toggleDialog = async (dialog) => {
-    // Most map actions change Spots or the map mode, so a map edit ends when the menu opens, and opening any dialog
-    // ends an interval drag. Waiting for the chosen action would raise the prompt while the menu's modal closes,
-    // which iOS can drop.
-    const isEndingMapEditing = !dialogs[dialog]
-      && (dialog === 'mapActionsMenuVisible' || mapMode === MAP_MODES.INTERVAL_DRAG);
+  const toggleMapMenu = async (menu) => {
+    // Most map actions change Spots or the map mode, so a map edit ends when the Map Actions menu opens, and opening
+    // any menu ends an interval drag. Waiting for the chosen action would raise the prompt while the menu's modal
+    // closes, which iOS can drop.
+    const isEndingMapEditing = !mapMenus[menu]
+      && (menu === 'mapActionsMenuVisible' || mapMode === MAP_MODES.INTERVAL_DRAG);
     if (isEndingMapEditing && isMapEditing() && !await confirmEndMapEditing()) return;
     dispatch(canceledIntervalDrag());
-    console.log('Toggle', dialog);
-    // Uses the current dialogs, since this render's copy may be stale after waiting on confirmEndMapEditing
-    setDialogs(prevDialogs => ({...prevDialogs, [dialog]: !prevDialogs[dialog]}));
-    console.log(dialog, 'is set to', dialogs[dialog]);
+    console.log('Toggle', menu);
+    // Functional update, since this render's mapMenus may be stale after waiting on confirmEndMapEditing
+    setMapMenus(prevMapMenus => ({...prevMapMenus, [menu]: !prevMapMenus[menu]}));
   };
 
   return {
-    dialogs,
     distance,
     endMeasurement,
     handleHomeAction,
-    handleHomeActionFromMenu,
+    handleHomeActionFromMapMenu,
     hasDrawTools,
     isCreateToolsDisabled,
+    mapMenus,
     onCancel,
     onEndDrawPressed,
     selectingMode,
     setDistance,
     setMapModeToEdit,
-    toggleDialog,
+    toggleMapMenu,
   };
 };
 

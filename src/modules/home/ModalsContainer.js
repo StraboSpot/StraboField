@@ -3,7 +3,7 @@ import {Platform} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import Dialog from './Dialog';
+import ActiveModal from './ActiveModal';
 import {applyPendingModal} from './home.slice';
 import LoadingSpinner from '../../shared/ui/Loading';
 import MessageModal from '../../shared/ui/modals/MessageModal';
@@ -17,14 +17,14 @@ import ReauthModal from '../sign-in/ReauthModal';
 // isProjectLoadSelectionModalVisible flag still runs on web — MapContainer uses it to arm the initial map zoom.
 const isWeb = Platform.OS === 'web';
 
-const OverlaysContainer = forwardRef(({
-                                        closeMainMenuPanel,
-                                        closeNotebookPanel,
-                                        openMainMenuPanel,
-                                        openNotebookPanel,
-                                        openSpotInNotebook,
-                                        zoomToCurrentLocation,
-                                      }, mapComponentRef) => {
+const ModalsContainer = forwardRef(({
+                                      closeMainMenuPanel,
+                                      closeNotebookPanel,
+                                      openMainMenuPanel,
+                                      openNotebookPanel,
+                                      openSpotInNotebook,
+                                      zoomToCurrentLocation,
+                                    }, mapComponentRef) => {
   const dispatch = useDispatch();
   const isHomeLoading = useSelector(state => state.home.loading.home);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
@@ -33,7 +33,7 @@ const OverlaysContainer = forwardRef(({
   const pendingModal = useSelector(state => state.home.pendingModal);
 
   // Drive the second phase of an iOS modal switch: once a modal is queued (and the outgoing one is dismissing), wait
-  // out the dismiss transition, then show it. Guaranteed to fire even for Dialog-driven modals, which unmount rather
+  // out the dismiss transition, then show it. Guaranteed to fire even for ActiveModal's modals, which unmount rather
   // than toggle `visible` and so never deliver an onDismiss to JS. Re-running on pendingModal cancels a stale timer.
   useEffect(() => {
     if (!pendingModal) return;
@@ -56,7 +56,7 @@ const OverlaysContainer = forwardRef(({
       {/*------------------------*/}
       <LoadingSpinner isLoading={isHomeLoading}/>
       {modalVisible && (
-        <Dialog
+        <ActiveModal
           closeNotebookPanel={closeNotebookPanel}
           openNotebookPanel={openNotebookPanel}
           openSpotInNotebook={openSpotInNotebook}
@@ -74,4 +74,4 @@ const OverlaysContainer = forwardRef(({
   );
 });
 
-export default OverlaysContainer;
+export default ModalsContainer;

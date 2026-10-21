@@ -13,11 +13,11 @@ import homeStyles from '../home.styles';
 const LeftSideButtons = ({
                            animateLeftSide,
                            closeMainMenuPanel,
-                           dialogs,
                            handleHomeAction,
-                           handleHomeActionFromMenu,
+                           handleHomeActionFromMapMenu,
+                           mapMenus,
                            openMainMenuPanel,
-                           toggleDialog,
+                           toggleMapMenu,
                            zoomToCustomMap,
                          }) => {
   console.log('Rendering LeftSideButtons...');
@@ -37,9 +37,9 @@ const LeftSideButtons = ({
 
       <Animated.View style={[homeStyles.mapActionsContainer, animateLeftSide]}>
         <MapActionButtons
-          dialogs={dialogs}
-          handleHomeActionFromMenu={handleHomeActionFromMenu}
-          toggleDialog={toggleDialog}
+          handleHomeActionFromMapMenu={handleHomeActionFromMapMenu}
+          mapMenus={mapMenus}
+          toggleMapMenu={toggleMapMenu}
           zoomToCustomMap={zoomToCustomMap}
         />
       </Animated.View>

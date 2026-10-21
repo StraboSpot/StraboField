@@ -30,14 +30,14 @@ const HomeViewSmallScreen = forwardRef(({
                                           closeMainMenuPanel,
                                           closeNotebookPanel,
                                           confirmEndMapEditing,
-                                          dialogs,
                                           distance,
                                           endMeasurement,
                                           handleHomeAction,
-                                          handleHomeActionFromMenu,
+                                          handleHomeActionFromMapMenu,
                                           hasDrawTools,
                                           isCreateToolsDisabled,
                                           isMapEditing,
+                                          mapMenus,
                                           mapMode,
                                           onCancel,
                                           onEndDrawPressed,
@@ -47,7 +47,7 @@ const HomeViewSmallScreen = forwardRef(({
                                           selectingMode,
                                           setDistance,
                                           setMapModeToEdit,
-                                          toggleDialog,
+                                          toggleMapMenu,
                                         }, mapComponentRef) => {
   console.log('Rendering HomeViewSmallScreen...');
 
@@ -195,18 +195,18 @@ const HomeViewSmallScreen = forwardRef(({
                       : homeStyles.actionButtonsSmallScreenContainerLandscape]}
                 >
                   <ActionButtonsSmallScreen
-                    dialogs={dialogs}
                     distance={distance}
                     endMeasurement={endMeasurement}
                     handleHomeAction={handleHomeAction}
-                    handleHomeActionFromMenu={handleHomeActionFromMenu}
+                    handleHomeActionFromMapMenu={handleHomeActionFromMapMenu}
                     hasDrawTools={hasDrawTools}
+                    mapMenus={mapMenus}
                     mapMode={mapMode}
                     onCancel={onCancel}
                     onEndDrawPressed={onEndDrawPressed}
                     openMainMenuPanel={openMainMenuPanel}
                     selectingMode={selectingMode}
-                    toggleDialog={toggleDialog}
+                    toggleMapMenu={toggleMapMenu}
                     zoomToCustomMap={bbox => mapComponentRef?.current?.zoomToCustomMap(bbox)}
                   />
                 </View>

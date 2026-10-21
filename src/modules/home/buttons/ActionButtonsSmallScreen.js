@@ -9,18 +9,18 @@ import homeStyles from '../home.styles';
 import DrawInfo from '../pop-ups/DrawInfo';
 
 const ActionButtonsSmallScreen = ({
-                                    dialogs,
                                     distance,
                                     onCancel,
                                     endMeasurement,
                                     handleHomeAction,
-                                    handleHomeActionFromMenu,
+                                    handleHomeActionFromMapMenu,
                                     hasDrawTools,
+                                    mapMenus,
                                     mapMode,
                                     onEndDrawPressed,
                                     openMainMenuPanel,
                                     selectingMode,
-                                    toggleDialog,
+                                    toggleMapMenu,
                                     zoomToCustomMap,
                                   }) => {
   /* View */
@@ -53,9 +53,9 @@ const ActionButtonsSmallScreen = ({
         <View style={homeStyles.mapActionsPill}>
           <View style={homeStyles.smallScreenMapActionButtons}>
             <MapActionButtons
-              dialogs={dialogs}
-              handleHomeActionFromMenu={handleHomeActionFromMenu}
-              toggleDialog={toggleDialog}
+              handleHomeActionFromMapMenu={handleHomeActionFromMapMenu}
+              mapMenus={mapMenus}
+              toggleMapMenu={toggleMapMenu}
               zoomToCustomMap={zoomToCustomMap}
             />
           </View>

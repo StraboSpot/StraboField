@@ -17,14 +17,14 @@ const HomeView = forwardRef(({
                                closeMainMenuPanel,
                                closeNotebookPanel,
                                confirmEndMapEditing,
-                               dialogs,
                                distance,
                                endMeasurement,
                                handleHomeAction,
-                               handleHomeActionFromMenu,
+                               handleHomeActionFromMapMenu,
                                hasDrawTools,
                                isCreateToolsDisabled,
                                isMapEditing,
+                               mapMenus,
                                mapMode,
                                onCancel,
                                onEndDrawPressed,
@@ -33,7 +33,7 @@ const HomeView = forwardRef(({
                                selectingMode,
                                setDistance,
                                setMapModeToEdit,
-                               toggleDialog,
+                               toggleMapMenu,
                              }, mapComponentRef) => {
   console.log('Rendering HomeView...');
 
@@ -73,11 +73,11 @@ const HomeView = forwardRef(({
       <LeftSideButtons
         animateLeftSide={animateLeftSide}
         closeMainMenuPanel={closeMainMenuPanel}
-        dialogs={dialogs}
         handleHomeAction={handleHomeAction}
-        handleHomeActionFromMenu={handleHomeActionFromMenu}
+        handleHomeActionFromMapMenu={handleHomeActionFromMapMenu}
+        mapMenus={mapMenus}
         openMainMenuPanel={openMainMenuPanel}
-        toggleDialog={toggleDialog}
+        toggleMapMenu={toggleMapMenu}
         zoomToCustomMap={bbox => mapComponentRef?.current?.zoomToCustomMap(bbox)}
       />
 

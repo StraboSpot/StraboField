@@ -31,7 +31,7 @@ const GEOMETRY_TYPE_IMAGE = {
   polygons: DRAW_ACTION_IMAGES.POLYGON.ICON,
 };
 
-const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
+const MapSymbolsMenu = ({onTouchOutside, visible}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -261,4 +261,4 @@ const MapSymbolsOverlay = ({onTouchOutside, visible}) => {
   );
 };
 
-export default MapSymbolsOverlay;
+export default MapSymbolsMenu;

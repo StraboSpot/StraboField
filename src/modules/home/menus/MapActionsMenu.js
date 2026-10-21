@@ -12,11 +12,11 @@ import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import useSpots from '../../spots/useSpots';
 import {HOME_ACTIONS, MAP_ACTIONS_MENU_ITEMS} from '../home.constants';
 
-const MapActionsOverlay = ({
-                             onPress,
-                             onTouchOutside,
-                             visible,
-                           }) => {
+const MapActionsMenu = ({
+                          onPress,
+                          onTouchOutside,
+                          visible,
+                        }) => {
   /* Data Hooks */
 
   const currentBasemap = useSelector(state => state.map.currentBasemap);
@@ -125,4 +125,4 @@ const MapActionsOverlay = ({
   );
 };
 
-export default MapActionsOverlay;
+export default MapActionsMenu;

@@ -26,19 +26,19 @@ const Home = forwardRef(({
   console.log('Rendering Home...');
 
   const {
-    dialogs,
     distance,
     endMeasurement,
     handleHomeAction,
-    handleHomeActionFromMenu,
+    handleHomeActionFromMapMenu,
     hasDrawTools,
     isCreateToolsDisabled,
+    mapMenus,
     onCancel,
     onEndDrawPressed,
     selectingMode,
     setDistance,
     setMapModeToEdit,
-    toggleDialog,
+    toggleMapMenu,
   } = useHome({
     closeMainMenuPanel,
     closeNotebookPanel,
@@ -59,14 +59,14 @@ const Home = forwardRef(({
           closeMainMenuPanel={closeMainMenuPanel}
           closeNotebookPanel={closeNotebookPanel}
           confirmEndMapEditing={confirmEndMapEditing}
-          dialogs={dialogs}
           distance={distance}
           endMeasurement={endMeasurement}
           handleHomeAction={handleHomeAction}
-          handleHomeActionFromMenu={handleHomeActionFromMenu}
+          handleHomeActionFromMapMenu={handleHomeActionFromMapMenu}
           hasDrawTools={hasDrawTools}
           isCreateToolsDisabled={isCreateToolsDisabled}
           isMapEditing={isMapEditing}
+          mapMenus={mapMenus}
           mapMode={mapMode}
           onCancel={onCancel}
           onEndDrawPressed={onEndDrawPressed}
@@ -77,7 +77,7 @@ const Home = forwardRef(({
           selectingMode={selectingMode}
           setDistance={setDistance}
           setMapModeToEdit={setMapModeToEdit}
-          toggleDialog={toggleDialog}
+          toggleMapMenu={toggleMapMenu}
         />
       </Animated.View>
     );
@@ -91,14 +91,14 @@ const Home = forwardRef(({
         closeMainMenuPanel={closeMainMenuPanel}
         closeNotebookPanel={closeNotebookPanel}
         confirmEndMapEditing={confirmEndMapEditing}
-        dialogs={dialogs}
         distance={distance}
         endMeasurement={endMeasurement}
         handleHomeAction={handleHomeAction}
-        handleHomeActionFromMenu={handleHomeActionFromMenu}
+        handleHomeActionFromMapMenu={handleHomeActionFromMapMenu}
         hasDrawTools={hasDrawTools}
         isCreateToolsDisabled={isCreateToolsDisabled}
         isMapEditing={isMapEditing}
+        mapMenus={mapMenus}
         mapMode={mapMode}
         onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}
@@ -108,7 +108,7 @@ const Home = forwardRef(({
         selectingMode={selectingMode}
         setDistance={setDistance}
         setMapModeToEdit={setMapModeToEdit}
-        toggleDialog={toggleDialog}
+        toggleMapMenu={toggleMapMenu}
       />
     );
   }

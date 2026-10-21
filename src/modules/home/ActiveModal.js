@@ -8,13 +8,14 @@ import {MODALS} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {clearedSelectedSpots} from '../spots/spots.slice';
 
-const Dialog = ({
-                  closeNotebookPanel,
-                  openNotebookPanel,
-                  openSpotInNotebook,
-                  zoomToCurrentLocation,
-                }) => {
-  console.log('Rendering Dialog...');
+// Shows whichever modal home.modalVisible names
+const ActiveModal = ({
+                       closeNotebookPanel,
+                       openNotebookPanel,
+                       openSpotInNotebook,
+                       zoomToCurrentLocation,
+                     }) => {
+  console.log('Rendering ActiveModal...');
 
   const dispatch = useDispatch();
   const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);
@@ -51,4 +52,4 @@ const Dialog = ({
   }
 };
 
-export default Dialog;
+export default ActiveModal;

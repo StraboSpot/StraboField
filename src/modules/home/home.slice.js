@@ -134,7 +134,7 @@ const homeSlice = createSlice({
     // single commit runs a present and a dismiss concurrently, which trips UIViewControllerHierarchyInconsistency
     // (a fatal crash, Sentry STRABOSPOT-2-6JN) or silently drops the incoming modal. Two-phase it on iOS: dismiss the
     // current modal now and stash the next key in pendingModal, then let applyPendingModal show it once the dismiss
-    // transition has finished (driven centrally in OverlaysContainer, with ModalWrapper's onDismiss as a fast path).
+    // transition has finished (driven centrally in ModalsContainer, with ModalWrapper's onDismiss as a fast path).
     // Other platforms have no such race, so they swap directly.
     setModalVisible(state, action) {
       const next = action.payload.modal;

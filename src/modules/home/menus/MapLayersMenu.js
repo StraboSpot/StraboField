@@ -32,7 +32,7 @@ import useMap from '../../maps/useMap';
 const isWeb = Platform.OS === 'web';
 const listItemStyle = {paddingHorizontal: 10, paddingVertical: 5};
 const listSubtitle = 'Tap a map to use it as the basemap, or open its options to draw it over the basemap.';
-const overlayStyle = {...overlayStyles.overlayMapMenuPosition, height: '80%'};
+const menuStyle = {...overlayStyles.overlayMapMenuPosition, height: '80%'};
 // Options take the width of the list rather than lining up under the map's name: there are only ever one map's
 // worth open, so nothing is gained by indenting them, and the slider wants every pixel it can get.
 // Web sets these apart differently: its small text is 10px against 14, and its switch is a plain checkbox, so
@@ -70,7 +70,7 @@ const attributionTextStyle = {
   textAlign: 'center',
 };
 
-const MapLayersOverlay = ({onTouchOutside, visible, zoomToCustomMap}) => {
+const MapLayersMenu = ({onTouchOutside, visible, zoomToCustomMap}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -91,7 +91,7 @@ const MapLayersOverlay = ({onTouchOutside, visible, zoomToCustomMap}) => {
 
   /* Local State */
 
-  const [dialogTitle, setDialogTitle] = useState('Map Layers');
+  const [menuTitle, setMenuTitle] = useState('Map Layers');
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
   // Held only while a slider is being dragged, so the percentage keeps up with the thumb. The map is redrawn, and
   // the project written, when the drag ends rather than at every step of it.
@@ -102,7 +102,7 @@ const MapLayersOverlay = ({onTouchOutside, visible, zoomToCustomMap}) => {
   /* Side Effects */
 
   useEffect(() => {
-    if (customEndpoint.isSelected) setDialogTitle(`Map Layers - ${customEndpoint.endpoint}`);
+    if (customEndpoint.isSelected) setMenuTitle(`Map Layers - ${customEndpoint.endpoint}`);
   }, [customEndpoint.isSelected, customEndpoint.endpoint]);
 
   useEffect(() => {
@@ -408,10 +408,10 @@ const MapLayersOverlay = ({onTouchOutside, visible, zoomToCustomMap}) => {
     <ModalWrapper
       closeModal={onTouchOutside}
       fullscreen={SMALL_SCREEN}
-      headerTitle={dialogTitle}
+      headerTitle={menuTitle}
       isVisible={visible}
       onBackdropPress={onTouchOutside}
-      overlayStyleOverride={overlayStyle}
+      overlayStyleOverride={menuStyle}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={SMALL_SCREEN}
@@ -434,4 +434,4 @@ const MapLayersOverlay = ({onTouchOutside, visible, zoomToCustomMap}) => {
   );
 };
 
-export default MapLayersOverlay;
+export default MapLayersMenu;
