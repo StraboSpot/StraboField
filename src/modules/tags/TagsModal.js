@@ -70,9 +70,9 @@ const TagsModal = ({
   // that already exist
   const isShortcutTagging = activeModal === MODAL_KEYS.SHORTCUTS.TAG
     || activeModal === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS;
-  const isSaveButtonVisible = !isEmpty(tags)
+  const isSaveButtonVisible = !isEmpty(tags) && !isFeatureLevelTagging
     && activeModal !== MODAL_KEYS.NOTEBOOK.TAGS && activeModal !== MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
-    && activeModal !== MODAL_KEYS.OTHER.FEATURE_TAGS && activeModal !== MODAL_KEYS.NOTEBOOK.REPORTS
+    && activeModal !== MODAL_KEYS.NOTEBOOK.REPORTS
     && activeModal !== MODAL_KEYS.NOTEBOOK.SAMPLES && activeModal !== MODAL_KEYS.SHORTCUTS.SAMPLE;
 
   /* Logic Helpers */

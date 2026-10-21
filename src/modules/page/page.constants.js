@@ -52,7 +52,6 @@ import StratSectionPage from '../sed/StratSectionPage';
 import SiteSafetyPage from '../site-safety/SiteSafetyPage';
 import SpotsRawDataView from '../spots/SpotsRawDataView';
 import AddTagsToSpotsShortcutModal from '../tags/AddTagsToSpotsShortcutModal';
-import FeatureTagsModal from '../tags/FeatureTagsModal';
 import TagsAtSpotList from '../tags/TagsAtSpotList';
 import TagsNotebook from '../tags/TagsNotebook';
 import TagsNotebookModal from '../tags/TagsNotebookModal';
@@ -491,10 +490,6 @@ const OTHER_MODALS = [
     key: MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS,
     label: 'Add Tags To Spots',
     modal_component: () => AddTagsToSpotsShortcutModal,
-  }, {
-    key: MODAL_KEYS.OTHER.FEATURE_TAGS,
-    label: 'Add Feature Tags',
-    modal_component: () => FeatureTagsModal,
   },
 ];
 

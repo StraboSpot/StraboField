@@ -69,7 +69,6 @@ export const MODAL_KEYS = {
     ADD_SPOTS_TO_REPORTS: 'AddSpotsToReports',
     INSPECT_SPOTS_RAW_DATA: 'InspectSpotsRawData',
     ADD_TAGS_TO_SPOTS: 'AddTagsToSpots',
-    FEATURE_TAGS: 'FeatureTags',
     GEOLOGIC_UNITS: 'geologic_unit',
   },
 };
