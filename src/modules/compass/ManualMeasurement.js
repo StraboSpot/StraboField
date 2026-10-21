@@ -16,9 +16,13 @@ import FormikWrapper from '../form/FormikWrapper';
 import NumberInputField from '../form/inputs/NumberInputField';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
+// Formik keeps no values at all without initial ones, and the first write then fails. This is one object rather than
+// a fresh {} per render, which enableReinitialize would take as new initial values and clear what was typed.
+const NO_INITIAL_VALUES = {};
+
 const ManualMeasurement = ({
                              addAttributeMeasurement,
-                             initialValues,
+                             initialValues = NO_INITIAL_VALUES,
                              measurementTypes,
                              setAttributeMeasurements,
                              setSliderValue,
