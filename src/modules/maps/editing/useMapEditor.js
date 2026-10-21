@@ -330,6 +330,7 @@ const useMapEditor = ({
     getEditSession,
     getSpotToEdit,
     handleSelectedVertexLongPress,
+    hasPendingEdits: !isEmpty(spotsEdited),
     isEditingSpot: !isEmpty(spotEditing),
     moveVertex,
     saveEdits,

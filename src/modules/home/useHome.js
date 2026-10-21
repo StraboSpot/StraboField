@@ -1,42 +1,65 @@
 import {useEffect, useState} from 'react';
-import {Platform} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector, useStore} from 'react-redux';
 
-import {setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
+import {setIsOfflineMapsModalVisible, setLoadingStatus, setModalVisible} from './home.slice';
 import useDeviceOrientation from './useDeviceOrientation';
 import useAutoSave from '../../services/files/useAutoSave';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
+import {MAP_EDIT_CHOICES} from '../maps/editing/editing.constants';
 import {MAP_MODES} from '../maps/maps.constants';
 import {
   canceledIntervalDrag,
   clearedStratSection,
-  savedIntervalDragReordering,
   setFreehandFeatureCoords,
   setIsScaleBarMetric,
   startedIntervalDrag,
 } from '../maps/maps.slice';
 import useMapLocation from '../maps/view/useMapLocation';
-import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
-import {
-  clearedSelectedSpots,
-  editedOrCreatedSpots,
-  restoredIntervalDragSnapshot,
-  setIntersectedSpotsForTagging,
-} from '../spots/spots.slice';
+import {clearedSelectedSpots, setIntersectedSpotsForTagging} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
-const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomToCurrentLocation}) => {
+// clickHandler actions that create a Spot, leave the map or switch to another mode, so a map edit in progress has to
+// end before they run
+const ACTIONS_THAT_END_MAP_EDITING = [
+  MAP_MODES.DRAW.POINT,
+  MAP_MODES.DRAW.LINE,
+  MAP_MODES.DRAW.POLYGON,
+  MAP_MODES.DRAW.FREEHANDPOLYGON,
+  MAP_MODES.DRAW.FREEHANDLINE,
+  MAP_MODES.DRAW.POINTLOCATION,
+  'addInterval',
+  'closeImageBasemap',
+  'closeStratSection',
+  'startIntervalDrag',
+];
+
+// clickHandler actions that leave an interval drag running: its own buttons, and the location dot, which a timer can
+// also turn off. Any other action ends the drag first.
+const ACTIONS_ALLOWED_DURING_INTERVAL_DRAG = ['cancelIntervalDrag', 'saveReordering', 'startIntervalDrag',
+  'toggleUserLocation'];
+
+const useHome = ({
+                   closeMainMenuPanel,
+                   closeNotebookPanel,
+                   confirmEndMapEditing,
+                   endMapEditing,
+                   isMapEditing,
+                   mapComponentRef,
+                   mapMode,
+                   openNotebookPanel,
+                   setMapMode,
+                   zoomToCurrentLocation,
+                 }) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
-  const intervalDragSnapshot = useSelector(state => state.map.intervalDragSnapshot);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const isOfflineMapModalVisible = useSelector(state => state.home.isOfflineMapModalVisible);
   const isScaleBarMetric = useSelector(state => state.map.isScaleBarMetric);
@@ -45,7 +68,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   const store = useStore();
 
-  const {lockOrientation, unlockOrientation} = useDeviceOrientation();
+  const {lockOrientation} = useDeviceOrientation();
   const {setPointAtCurrentLocation} = useMapLocation();
   const {getTargetDatasetFromId, isReadOnlyDataset} = useProject();
   const {getRootSpot, getSpotWithThisStratSection, handleSpotSelected, isCurrentMapReadOnly} = useSpots();
@@ -57,7 +80,6 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   const [dialogs, setDialogs] = useState(
     {mapActionsMenuVisible: false, mapSymbolsMenuVisible: false, baseMapMenuVisible: false});
   const [distance, setDistance] = useState(0);
-  const [mapMode, setMapMode] = useState(MAP_MODES.VIEW);
   const [selectingMode, setSelectingMode] = useState(null);
 
   /* Derived Variables */
@@ -80,6 +102,11 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   useEffect(() => {
     // console.log('UE Home [mapMode]', mapMode);
     if (mapMode !== MAP_MODES.DRAW.MEASURE) mapComponentRef.current?.endMapMeasurement();
+    // Opening the notebook or main menu ends a map edit, so close both when an edit starts
+    if (mapMode === MAP_MODES.EDIT) {
+      closeMainMenuPanel();
+      closeNotebookPanel();
+    }
   }, [mapMode]);
 
   // Switching to an image basemap or strat section leaves the current map, so cancel any in-progress
@@ -94,8 +121,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   useEffect(() => {
     if (!isEditModeUnavailable || mapMode !== MAP_MODES.EDIT) return;
-    mapComponentRef.current?.cancelEdits();
-    setMapMode(MAP_MODES.VIEW);
+    endMapEditing(MAP_EDIT_CHOICES.CANCEL).catch(console.error);
   }, [isEditModeUnavailable, mapComponentRef, mapMode]);
 
   useEffect(() => {
@@ -112,12 +138,6 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   }, [isCreateToolsDisabled, mapMode, selectingMode]);
 
   /* Internal Functions */
-
-  const cancelEdits = async () => {
-    await mapComponentRef.current?.cancelEdits();
-    setMapMode(MAP_MODES.VIEW);
-    if (!SMALL_SCREEN) unlockOrientation();
-  };
 
   const createPointAtCurrentLocation = async () => {
     const targetDataset = getTargetDatasetFromId();
@@ -136,13 +156,6 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     }
   };
 
-  const saveEdits = async () => {
-    mapComponentRef.current?.saveEdits();
-    //cancelEdits();
-    setMapMode(MAP_MODES.VIEW);
-    if (!SMALL_SCREEN) unlockOrientation();
-  };
-
   const setDraw = async (mapModeToSet) => {
     mapComponentRef.current?.cancelDraw();
     if (mapMode === mapModeToSet
@@ -155,7 +168,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   /* Exported Functions */
 
   const clickHandler = async (name, value) => {
-    if (name !== 'startIntervalDrag' && name !== 'saveReordering' && name !== 'cancelIntervalDrag') {
+    const isEndingMapEditing = mapMode === MAP_MODES.INTERVAL_DRAG
+      ? !ACTIONS_ALLOWED_DURING_INTERVAL_DRAG.includes(name) : ACTIONS_THAT_END_MAP_EDITING.includes(name);
+    if (isEndingMapEditing && isMapEditing() && !await confirmEndMapEditing()) return;
+    if (!ACTIONS_ALLOWED_DURING_INTERVAL_DRAG.includes(name)) {
       if (isDragIntervalMode) setMapMode(MAP_MODES.VIEW);
       dispatch(canceledIntervalDrag());
     }
@@ -174,11 +190,14 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         else if (!isEmpty(targetDataset)) setDraw(name).catch(console.error);
         else toast.show('No Target Dataset! \n A target dataset needs to be set before drawing Spots.');
         break;
+      case 'addInterval':
+        dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
+        break;
       case 'cancelEdits':
-        await cancelEdits();
+        await endMapEditing(MAP_EDIT_CHOICES.CANCEL);
         break;
       case 'saveEdits':
-        await saveEdits();
+        await endMapEditing(MAP_EDIT_CHOICES.SAVE);
         break;
       case 'startEditing':
         if (!isEditModeUnavailable) mapComponentRef.current?.startEditingMode();
@@ -248,20 +267,10 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
         setMapMode(MAP_MODES.INTERVAL_DRAG);
         break;
       case 'saveReordering':
-        // Commit the deferred timestamp bump for spots actually moved during the drag, so only a
-        // real reorder dirties the dataset/project. Nothing moved → nothing to bump.
-        const changedSpotIds = store.getState().map.intervalDragChangedSpotIds;
-        if (changedSpotIds?.length > 0) dispatch(updatedModifiedTimestampsBySpotsIds(changedSpotIds));
-        dispatch(savedIntervalDragReordering());
-        setMapMode(MAP_MODES.VIEW);
+        await endMapEditing(MAP_EDIT_CHOICES.SAVE);
         break;
       case 'cancelIntervalDrag':
-        if (intervalDragSnapshot?.length > 0) {
-          dispatch(restoredIntervalDragSnapshot(intervalDragSnapshot));
-          if (Platform.OS !== 'web') dispatch(editedOrCreatedSpots(intervalDragSnapshot));
-        }
-        dispatch(canceledIntervalDrag());
-        setMapMode(MAP_MODES.VIEW);
+        await endMapEditing(MAP_EDIT_CHOICES.CANCEL);
         break;
     }
   };
@@ -275,7 +284,7 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
 
   const onCancel = async () => {
     console.log('Cancel');
-    await cancelEdits();
+    await endMapEditing(MAP_EDIT_CHOICES.CANCEL);
     dispatch(setFreehandFeatureCoords(undefined));  // reset the freeHandCoordinates
   };
 
@@ -302,13 +311,17 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
   };
 
   // Toggle given dialog between true (visible) and false (hidden)
-  const toggleDialog = (dialog) => {
+  const toggleDialog = async (dialog) => {
+    // Most map actions change Spots or the map mode, so a map edit ends when the menu opens, and opening any dialog
+    // ends an interval drag. Waiting for the chosen action would raise the prompt while the menu's modal closes,
+    // which iOS can drop.
+    const isEndingMapEditing = !dialogs[dialog]
+      && (dialog === 'mapActionsMenuVisible' || mapMode === MAP_MODES.INTERVAL_DRAG);
+    if (isEndingMapEditing && isMapEditing() && !await confirmEndMapEditing()) return;
     dispatch(canceledIntervalDrag());
     console.log('Toggle', dialog);
-    setDialogs({
-      ...dialogs,
-      [dialog]: !dialogs[dialog],
-    });
+    // Uses the current dialogs, since this render's copy may be stale after waiting on confirmEndMapEditing
+    setDialogs(prevDialogs => ({...prevDialogs, [dialog]: !prevDialogs[dialog]}));
     console.log(dialog, 'is set to', dialogs[dialog]);
   };
 
@@ -320,7 +333,6 @@ const useHome = ({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomTo
     endMeasurement,
     hasDrawTools,
     isCreateToolsDisabled,
-    mapMode,
     onCancel,
     onEndDrawPressed,
     selectingMode,

@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {Animated, View} from 'react-native';
 
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import useDeviceOrientation from '../useDeviceOrientation';
 import DrawActionButtons from './DrawActionButtons';
@@ -9,10 +9,8 @@ import NotebookButton from './NotebookButton';
 import ShortcutButtons from './ShortcutButtons';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import {MAP_MODES} from '../../maps/maps.constants';
-import {canceledIntervalDrag} from '../../maps/maps.slice';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import useSpots from '../../spots/useSpots';
-import {setModalVisible} from '../home.slice';
 import homeStyles from '../home.styles';
 import DrawInfo from '../pop-ups/DrawInfo';
 
@@ -20,10 +18,12 @@ const RightSideButtons = ({
                             animateRightSide,
                             clickHandler,
                             closeNotebookPanel,
+                            confirmEndMapEditing,
                             distance,
                             endMeasurement,
                             hasDrawTools,
                             isCreateToolsDisabled,
+                            isMapEditing,
                             mapMode,
                             onCancel,
                             onEndDrawPressed,
@@ -35,7 +35,6 @@ const RightSideButtons = ({
 
   /* Data Hooks */
 
-  const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const modalVisible = useSelector(state => state.home.modalVisible);
   const stratSection = useSelector(state => state.map.stratSection);
@@ -55,10 +54,7 @@ const RightSideButtons = ({
       {stratSection && !isCurrentMapReadOnly() && !isCreateToolsDisabled && (
         <Animated.View style={[homeStyles.addIntervalButton, animateRightSide]}>
           <IconButton
-            onPress={() => {
-              dispatch(canceledIntervalDrag());
-              dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
-            }}
+            onPress={() => clickHandler('addInterval')}
             source={modalVisible === MODAL_KEYS.OTHER.ADD_INTERVAL
               ? require('../../../assets/icons/AddIntervalButton_pressed.png')
               : require('../../../assets/icons/AddIntervalButton.png')}
@@ -72,7 +68,11 @@ const RightSideButtons = ({
 
       {!currentImageBasemap && !stratSection && (
         <Animated.View style={[homeStyles.shortcutButtons, animateRightSide]}>
-          <ShortcutButtons openNotebookPanel={openNotebookPanel}/>
+          <ShortcutButtons
+            confirmEndMapEditing={confirmEndMapEditing}
+            isMapEditing={isMapEditing}
+            openNotebookPanel={openNotebookPanel}
+          />
         </Animated.View>
       )}
 

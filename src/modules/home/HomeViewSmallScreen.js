@@ -9,17 +9,16 @@ import ActionButtonsSmallScreen from './buttons/ActionButtonsSmallScreen';
 import MainMenuButton from './buttons/MainMenuButton';
 import ShortcutButtons from './buttons/ShortcutButtons';
 import {NAVIGATION_OPTIONS} from './home.constants';
-import {setModalVisible} from './home.slice';
 import homeStyles from './home.styles';
 import * as themes from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import useDeviceOrientation from '../home/useDeviceOrientation';
 import MapContainer from '../maps/MapContainer';
+import {MAP_MODES} from '../maps/maps.constants';
 import {canceledIntervalDrag} from '../maps/maps.slice';
 import OfflineMapPreviewBanner from '../maps/offline-maps/OfflineMapPreviewBanner';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
 import BackupStatusIcons from '../project/backup/BackupStatusIcons';
 import SpotNavigator from '../spots/SpotNavigator';
 import useSpots from '../spots/useSpots';
@@ -31,12 +30,14 @@ const HomeViewSmallScreen = forwardRef(({
                                           clickHandler,
                                           closeMainMenuPanel,
                                           closeNotebookPanel,
+                                          confirmEndMapEditing,
                                           dialogClickHandler,
                                           dialogs,
                                           distance,
                                           endMeasurement,
                                           hasDrawTools,
                                           isCreateToolsDisabled,
+                                          isMapEditing,
                                           mapMode,
                                           onCancel,
                                           onEndDrawPressed,
@@ -73,7 +74,9 @@ const HomeViewSmallScreen = forwardRef(({
     openSpotInNotebook(spot, notebookPage, attributes);
   };
 
-  const toggleSpotNavigator = () => {
+  // The navigator takes the map's place, so a map edit ends before it shows
+  const toggleSpotNavigator = async () => {
+    if (isMapEditing() && !await confirmEndMapEditing()) return;
     dispatch(canceledIntervalDrag());
     closeNotebookPanel();
     setIsShowingSpotNavigator(s => !s);
@@ -124,6 +127,8 @@ const HomeViewSmallScreen = forwardRef(({
         <Tab.Navigator
           screenListeners={{focus: () => dispatch(canceledIntervalDrag())}}
           screenOptions={{
+            // A swipe to the Notebook can't wait for a map edit or interval drag to end, so it is off during either
+            swipeEnabled: mapMode !== MAP_MODES.EDIT && mapMode !== MAP_MODES.INTERVAL_DRAG,
             tabBarIndicatorContainerStyle: {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR},
             tabBarIndicatorStyle: {backgroundColor: themes.BLACK, height: 5},
             tabBarItemStyle: {padding: 0},
@@ -168,10 +173,7 @@ const HomeViewSmallScreen = forwardRef(({
 
                 {stratSection && !isCurrentMapReadOnly() && !isCreateToolsDisabled && (
                   <IconButton
-                    onPress={() => {
-                      dispatch(canceledIntervalDrag());
-                      dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
-                    }}
+                    onPress={() => clickHandler('addInterval')}
                     source={require('../../assets/icons/AddIntervalButton.png')}
                     style={homeStyles.addIntervalButton}
                   />
@@ -179,7 +181,11 @@ const HomeViewSmallScreen = forwardRef(({
 
                 {!currentImageBasemap && !stratSection && (
                   <View style={homeStyles.shortcutButtons}>
-                    <ShortcutButtons openNotebookPanel={openNotebookPanel}/>
+                    <ShortcutButtons
+                      confirmEndMapEditing={confirmEndMapEditing}
+                      isMapEditing={isMapEditing}
+                      openNotebookPanel={openNotebookPanel}
+                    />
                   </View>
                 )}
 
@@ -210,7 +216,18 @@ const HomeViewSmallScreen = forwardRef(({
               </>
             }
           </Tab.Screen>
-          <Tab.Screen name={'Notebook'} options={NAVIGATION_OPTIONS}>
+          <Tab.Screen
+            // While editing, the tab opens the notebook through openNotebookPanel, which ends the edit first
+            listeners={{
+              tabPress: (e) => {
+                if (!isMapEditing()) return;
+                e.preventDefault();
+                openNotebookPanel();
+              },
+            }}
+            name={'Notebook'}
+            options={NAVIGATION_OPTIONS}
+          >
             {() =>
               <NotebookPanel
                 closeNotebookPanel={closeNotebookPanel}

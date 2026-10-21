@@ -13,9 +13,14 @@ const Home = forwardRef(({
                            animateRightSide,
                            closeMainMenuPanel,
                            closeNotebookPanel,
+                           confirmEndMapEditing,
+                           endMapEditing,
+                           isMapEditing,
+                           mapMode,
                            openMainMenuPanel,
                            openNotebookPanel,
                            openSpotInNotebook,
+                           setMapMode,
                            zoomToCurrentLocation,
                          }, mapComponentRef) => {
   console.log('Rendering Home...');
@@ -28,14 +33,24 @@ const Home = forwardRef(({
     endMeasurement,
     hasDrawTools,
     isCreateToolsDisabled,
-    mapMode,
     onCancel,
     onEndDrawPressed,
     selectingMode,
     setDistance,
     setMapModeToEdit,
     toggleDialog,
-  } = useHome({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomToCurrentLocation});
+  } = useHome({
+    closeMainMenuPanel,
+    closeNotebookPanel,
+    confirmEndMapEditing,
+    endMapEditing,
+    isMapEditing,
+    mapComponentRef,
+    mapMode,
+    openNotebookPanel,
+    setMapMode,
+    zoomToCurrentLocation,
+  });
 
   if (SMALL_SCREEN) {
     return (
@@ -44,12 +59,14 @@ const Home = forwardRef(({
           clickHandler={clickHandler}
           closeMainMenuPanel={closeMainMenuPanel}
           closeNotebookPanel={closeNotebookPanel}
+          confirmEndMapEditing={confirmEndMapEditing}
           dialogClickHandler={dialogClickHandler}
           dialogs={dialogs}
           distance={distance}
           endMeasurement={endMeasurement}
           hasDrawTools={hasDrawTools}
           isCreateToolsDisabled={isCreateToolsDisabled}
+          isMapEditing={isMapEditing}
           mapMode={mapMode}
           onCancel={onCancel}
           onEndDrawPressed={onEndDrawPressed}
@@ -74,12 +91,14 @@ const Home = forwardRef(({
         clickHandler={clickHandler}
         closeMainMenuPanel={closeMainMenuPanel}
         closeNotebookPanel={closeNotebookPanel}
+        confirmEndMapEditing={confirmEndMapEditing}
         dialogClickHandler={dialogClickHandler}
         dialogs={dialogs}
         distance={distance}
         endMeasurement={endMeasurement}
         hasDrawTools={hasDrawTools}
         isCreateToolsDisabled={isCreateToolsDisabled}
+        isMapEditing={isMapEditing}
         mapMode={mapMode}
         onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}

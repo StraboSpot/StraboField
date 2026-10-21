@@ -7,7 +7,7 @@ import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedAttributes} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
-const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
+const useHomeContainer = ({confirmEndMapEditing, isMapEditing, mapComponentRef, openNotebookPanel}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -20,8 +20,10 @@ const useHomeContainer = ({mapComponentRef, openNotebookPanel}) => {
   // Selecting the Spot and opening the page both drop whatever was selected before (see spots.slice), so the
   // features to open come last, the same way openFeatureInNotebook orders them. They are written every time
   // rather than only when they differ from what is selected: what is selected has just been cleared twice, so
-  // comparing against it would skip the write that reopens the feature.
-  const openSpotInNotebook = (spot, notebookPage, attributes) => {
+  // comparing against it would skip the write that reopens the feature. A map edit ends before the Spot is
+  // selected, so Keep Editing doesn't switch the Spot under the edit.
+  const openSpotInNotebook = async (spot, notebookPage, attributes) => {
+    if (isMapEditing() && !await confirmEndMapEditing()) return;
     handleSpotSelected(spot);
     if (notebookPage) openNotebookPanel(notebookPage);
     else openNotebookPanel(PAGE_KEYS.OVERVIEW);

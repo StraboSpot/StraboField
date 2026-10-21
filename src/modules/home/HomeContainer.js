@@ -14,6 +14,8 @@ import useDevice from '../../services/device/useDevice';
 import {isEmpty} from '../../shared/helpers';
 import MainMenuPanel from '../main-menu-panel/MainMenuPanel';
 import settingPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
+import EndMapEditingModal from '../maps/editing/EndMapEditingModal';
+import useMapMode from '../maps/useMapMode';
 
 const HomeContainer = ({navigation, route}) => {
   console.log('Rendering HomeContainer...');
@@ -25,7 +27,19 @@ const HomeContainer = ({navigation, route}) => {
   const {email, name} = useSelector(state => state.user);
   const isProjectLoadSelectionModalVisible = useSelector(state => state.home.isProjectLoadSelectionModalVisible);
 
+  const mapComponentRef = useRef(null);
+
   const {createProjectDirectories} = useDevice();
+  const {
+    confirmEndMapEditing,
+    endMapEditing,
+    handleEndPromptChoice,
+    handleEndPromptDismissed,
+    isEndPromptVisible,
+    isMapEditing,
+    mapMode,
+    setMapMode,
+  } = useMapMode({mapComponentRef});
   const {
     animateLeftSide,
     animateMainMenuDrawer,
@@ -36,10 +50,9 @@ const HomeContainer = ({navigation, route}) => {
     closeNotebookPanel,
     openMainMenuPanel,
     openNotebookPanel,
-  } = useHomeAnimations({navigation});
-
-  const mapComponentRef = useRef(null);
-  const {openSpotInNotebook, zoomToCurrentLocation} = useHomeContainer({mapComponentRef, openNotebookPanel});
+  } = useHomeAnimations({confirmEndMapEditing, isMapEditing, navigation});
+  const {openSpotInNotebook, zoomToCurrentLocation} = useHomeContainer(
+    {confirmEndMapEditing, isMapEditing, mapComponentRef, openNotebookPanel});
 
   /* Side Effects */
 
@@ -70,10 +83,15 @@ const HomeContainer = ({navigation, route}) => {
         animateRightSide={animateRightSide}
         closeMainMenuPanel={closeMainMenuPanel}
         closeNotebookPanel={closeNotebookPanel}
+        confirmEndMapEditing={confirmEndMapEditing}
+        endMapEditing={endMapEditing}
+        isMapEditing={isMapEditing}
+        mapMode={mapMode}
         openMainMenuPanel={openMainMenuPanel}
         openNotebookPanel={openNotebookPanel}
         openSpotInNotebook={openSpotInNotebook}
         ref={mapComponentRef}
+        setMapMode={setMapMode}
         zoomToCurrentLocation={zoomToCurrentLocation}
       />
       <OverlaysContainer
@@ -97,6 +115,11 @@ const HomeContainer = ({navigation, route}) => {
           />
         </Animated.View>
       )}
+      <EndMapEditingModal
+        isVisible={isEndPromptVisible}
+        onChoose={handleEndPromptChoice}
+        onDismiss={handleEndPromptDismissed}
+      />
     </Animated.View>
   );
 };

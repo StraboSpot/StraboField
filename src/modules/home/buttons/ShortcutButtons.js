@@ -18,7 +18,7 @@ import {DISMISSIBLE_WARNING_MESSAGES, DISMISSIBLE_WARNINGS} from '../home.consta
 import {setLoadingStatus, setModalVisible} from '../home.slice';
 import useShortcutSwitches from '../useShortcutSwitches';
 
-const ShortcutButtons = ({openNotebookPanel}) => {
+const ShortcutButtons = ({confirmEndMapEditing, isMapEditing, openNotebookPanel}) => {
   console.log('Rendering ShortcutButtons...');
 
   /* Data Hooks */
@@ -96,7 +96,9 @@ const ShortcutButtons = ({openNotebookPanel}) => {
     openNotebookPanel(PAGE_KEYS.IMAGES);
   };
 
+  // Each shortcut creates a Spot, so a map edit in progress ends before it runs
   const toggleShortcutModal = async (key) => {
+    if (isMapEditing() && !await confirmEndMapEditing()) return;
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     dispatch(clearedSelectedSpots());
     switch (key) {
