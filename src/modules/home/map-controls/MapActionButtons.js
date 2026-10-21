@@ -7,9 +7,9 @@ import {SMALL_SCREEN} from '../../../shared/styles.constants';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import useMapFeatures from '../../maps/features/useMapFeatures';
 import homeStyles from '../home.styles';
-import MapActionsMenu from '../menus/MapActionsMenu';
-import MapLayersMenu from '../menus/MapLayersMenu';
-import MapSymbolsMenu from '../menus/MapSymbolsMenu';
+import MapActionsMenu from './MapActionsMenu';
+import MapLayersMenu from './MapLayersMenu';
+import MapSymbolsMenu from './MapSymbolsMenu';
 
 const MapActionButtons = ({handleHomeActionFromMapMenu, mapMenus, toggleMapMenu, zoomToCustomMap}) => {
   /* Data Hooks */

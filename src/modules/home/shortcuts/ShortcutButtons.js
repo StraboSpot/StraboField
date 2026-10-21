@@ -16,7 +16,7 @@ import {clearedSelectedSpots, editedSpotImages} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 import {DISMISSIBLE_WARNING_MESSAGES, DISMISSIBLE_WARNINGS} from '../home.constants';
 import {setActiveModal, setLoadingStatus} from '../home.slice';
-import useShortcutSwitches from '../useShortcutSwitches';
+import useShortcutSwitches from './useShortcutSwitches';
 
 const ShortcutButtons = ({confirmEndMapEditing, isMapEditing, openNotebookPanel}) => {
   console.log('Rendering ShortcutButtons...');

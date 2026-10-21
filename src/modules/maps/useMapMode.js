@@ -6,9 +6,9 @@ import {useDispatch, useStore} from 'react-redux';
 import {MAP_EDIT_CHOICES} from './editing/editing.constants';
 import {MAP_MODES} from './maps.constants';
 import {canceledIntervalDrag, savedIntervalDragReordering} from './maps.slice';
+import useDeviceOrientation from '../../services/device/useDeviceOrientation';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import useDeviceOrientation from '../home/useDeviceOrientation';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpots, restoredIntervalDragSnapshot} from '../spots/spots.slice';
 

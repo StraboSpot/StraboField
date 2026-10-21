@@ -5,7 +5,7 @@ import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {HOME_ACTIONS} from './home.constants';
 import {setActiveModal, setIsOfflineMapsModalVisible, setLoadingStatus} from './home.slice';
-import useDeviceOrientation from './useDeviceOrientation';
+import useDeviceOrientation from '../../services/device/useDeviceOrientation';
 import useAutoSave from '../../services/files/useAutoSave';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';

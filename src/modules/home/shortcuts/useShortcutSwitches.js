@@ -2,8 +2,8 @@ import {useEffect} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {setShortcutSwitchPositions} from './home.slice';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty} from '../../../shared/helpers';
+import {setShortcutSwitchPositions} from '../home.slice';
 
 // Every shortcut creates a Spot, so the shortcuts are only usable while there is a target dataset to file
 // them into. Losing the target turns them all off rather than leaving switches on that would only report

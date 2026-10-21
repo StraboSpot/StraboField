@@ -10,7 +10,7 @@ import mapReducer, {addedIntervalDragChangedSpotIds, startedIntervalDrag} from '
 import useMapMode from './useMapMode';
 import spotReducer, {editedOrCreatedSpots} from '../spots/spots.slice';
 
-jest.mock('../home/useDeviceOrientation', () => () => ({unlockOrientation: () => {}}));
+jest.mock('../../services/device/useDeviceOrientation', () => () => ({unlockOrientation: () => {}}));
 
 // Whatever is waiting on confirmEndMapEditing goes ahead only when it resolves true. Getting that wrong either runs the
 // action over a live edit, whose Save then overwrites what it changed, or never runs it at all.

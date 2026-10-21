@@ -3,13 +3,13 @@ import {Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
+import EditCancelSaveButtons from './EditCancelSaveButtons';
+import IntervalDragCancelSaveButtons from './IntervalDragCancelSaveButtons';
 import {isEmpty, truncateText} from '../../../shared/helpers';
 import ActionButton from '../../../shared/ui/buttons/ActionButton';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import {MAP_MODES} from '../../maps/maps.constants';
 import useProject from '../../project/useProject';
-import EditCancelSaveButtons from '../buttons/EditCancelSaveButtons';
-import IntervalDragCancelSaveButtons from '../buttons/IntervalDragCancelSaveButtons';
 import homeStyles from '../home.styles';
 
 const DrawInfo = ({

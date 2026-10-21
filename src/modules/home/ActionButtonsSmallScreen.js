@@ -1,12 +1,12 @@
 import React from 'react';
 import {View} from 'react-native';
 
-import DrawActionButtons from './DrawActionButtons';
-import MapActionButtons from './MapActionButtons';
-import UserLocationButton from './UserLocationButton';
-import MapControlsContainer from '../../maps/controls/MapControlsContainer';
-import homeStyles from '../home.styles';
-import DrawInfo from '../pop-ups/DrawInfo';
+import DrawActionButtons from './drawing/DrawActionButtons';
+import DrawInfo from './drawing/DrawInfo';
+import homeStyles from './home.styles';
+import MapActionButtons from './map-controls/MapActionButtons';
+import UserLocationButton from './map-controls/UserLocationButton';
+import MapControlsContainer from '../maps/controls/MapControlsContainer';
 
 const ActionButtonsSmallScreen = ({
                                     distance,

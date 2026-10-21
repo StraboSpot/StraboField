@@ -23,7 +23,7 @@ import {
 import {MAP_SYMBOLS} from '../../maps/symbology/mapSymbology.constants';
 import styles from '../../measurements/measurements.styles';
 import useMeasurements from '../../measurements/useMeasurements';
-import {DRAW_ACTION_IMAGES} from '../buttons/drawActionButtons.constants';
+import {DRAW_ACTION_IMAGES} from '../drawing/drawActionButtons.constants';
 
 const GEOMETRY_TYPE_IMAGE = {
   points: MAP_SYMBOLS.default_point,

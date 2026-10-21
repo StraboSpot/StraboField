@@ -3,17 +3,17 @@ import {Animated, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
-import useDeviceOrientation from '../useDeviceOrientation';
-import DrawActionButtons from './DrawActionButtons';
+import DrawActionButtons from './drawing/DrawActionButtons';
+import DrawInfo from './drawing/DrawInfo';
+import {HOME_ACTIONS} from './home.constants';
+import homeStyles from './home.styles';
 import NotebookButton from './NotebookButton';
-import ShortcutButtons from './ShortcutButtons';
-import IconButton from '../../../shared/ui/buttons/IconButton';
-import {MAP_MODES} from '../../maps/maps.constants';
-import {MODAL_KEYS} from '../../page/pageKeys.constants';
-import useSpots from '../../spots/useSpots';
-import {HOME_ACTIONS} from '../home.constants';
-import homeStyles from '../home.styles';
-import DrawInfo from '../pop-ups/DrawInfo';
+import ShortcutButtons from './shortcuts/ShortcutButtons';
+import useDeviceOrientation from '../../services/device/useDeviceOrientation';
+import IconButton from '../../shared/ui/buttons/IconButton';
+import {MAP_MODES} from '../maps/maps.constants';
+import {MODAL_KEYS} from '../page/pageKeys.constants';
+import useSpots from '../spots/useSpots';
 
 const RightSideButtons = ({
                             animateRightSide,
@@ -57,8 +57,8 @@ const RightSideButtons = ({
           <IconButton
             onPress={() => handleHomeAction(HOME_ACTIONS.ADD_INTERVAL)}
             source={activeModal === MODAL_KEYS.OTHER.ADD_INTERVAL
-              ? require('../../../assets/icons/AddIntervalButton_pressed.png')
-              : require('../../../assets/icons/AddIntervalButton.png')}
+              ? require('../../assets/icons/AddIntervalButton_pressed.png')
+              : require('../../assets/icons/AddIntervalButton.png')}
           />
         </Animated.View>
       )}

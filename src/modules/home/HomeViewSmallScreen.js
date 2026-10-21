@@ -5,15 +5,15 @@ import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs
 import {Button, Header, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import ActionButtonsSmallScreen from './buttons/ActionButtonsSmallScreen';
-import MainMenuButton from './buttons/MainMenuButton';
-import ShortcutButtons from './buttons/ShortcutButtons';
+import ActionButtonsSmallScreen from './ActionButtonsSmallScreen';
 import {HOME_ACTIONS, NAVIGATION_OPTIONS} from './home.constants';
 import homeStyles from './home.styles';
+import MainMenuButton from './MainMenuButton';
+import ShortcutButtons from './shortcuts/ShortcutButtons';
+import useDeviceOrientation from '../../services/device/useDeviceOrientation';
 import * as themes from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import useDeviceOrientation from '../home/useDeviceOrientation';
 import MapContainer from '../maps/MapContainer';
 import {MAP_MODES} from '../maps/maps.constants';
 import {canceledIntervalDrag} from '../maps/maps.slice';

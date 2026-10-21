@@ -2,7 +2,7 @@ import React from 'react';
 
 import {useSelector} from 'react-redux';
 
-import IconButton from '../../../shared/ui/buttons/IconButton';
+import IconButton from '../../shared/ui/buttons/IconButton';
 
 const NotebookButton = ({closeNotebookPanel, openNotebookPanel}) => {
   /* Data Hooks */
@@ -22,8 +22,8 @@ const NotebookButton = ({closeNotebookPanel, openNotebookPanel}) => {
     <IconButton
       onPress={toggleNotebookPanel}
       source={isNotebookPanelVisible
-        ? require('../../../assets/icons/NotebookViewButton_pressed.png')
-        : require('../../../assets/icons/NotebookViewButton.png')}
+        ? require('../../assets/icons/NotebookViewButton_pressed.png')
+        : require('../../assets/icons/NotebookViewButton.png')}
     />
   );
 };

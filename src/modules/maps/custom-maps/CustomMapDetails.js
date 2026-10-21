@@ -20,8 +20,6 @@ import Loading from '../../../shared/ui/Loading';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
-import SliderBar from '../../../shared/ui/SliderBar';
-import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
 import TextInput from '../../../shared/ui/TextInput';
 import formStyles from '../../form/form.styles';
 import FormikWrapper from '../../form/FormikWrapper';

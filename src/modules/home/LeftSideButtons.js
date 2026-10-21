@@ -3,12 +3,12 @@ import {Animated} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
+import {HOME_ACTIONS} from './home.constants';
+import homeStyles from './home.styles';
 import MainMenuButton from './MainMenuButton';
-import MapActionButtons from './MapActionButtons';
-import UserLocationButton from './UserLocationButton';
-import IconButton from '../../../shared/ui/buttons/IconButton';
-import {HOME_ACTIONS} from '../home.constants';
-import homeStyles from '../home.styles';
+import MapActionButtons from './map-controls/MapActionButtons';
+import UserLocationButton from './map-controls/UserLocationButton';
+import IconButton from '../../shared/ui/buttons/IconButton';
 
 const LeftSideButtons = ({
                            animateLeftSide,
@@ -50,13 +50,13 @@ const LeftSideButtons = ({
         {currentImageBasemap && (
           <IconButton
             onPress={() => handleHomeAction(HOME_ACTIONS.CLOSE_IMAGE_BASEMAP)}
-            source={require('../../../assets/icons/Close.png')}
+            source={require('../../assets/icons/Close.png')}
           />
         )}
         {stratSection && (
           <IconButton
             onPress={() => handleHomeAction(HOME_ACTIONS.CLOSE_STRAT_SECTION)}
-            source={require('../../../assets/icons/Close.png')}
+            source={require('../../assets/icons/Close.png')}
           />
         )}
       </Animated.View>

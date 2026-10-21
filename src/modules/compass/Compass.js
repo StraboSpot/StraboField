@@ -10,10 +10,10 @@ import CompassDebug from './CompassDebug';
 import CompassFace from './CompassFace';
 import useCompassSound from './useCompassSound';
 import useCompassCore, {DECLINATION_SOURCE} from '../../services/device/useCompassCore';
+import useDeviceOrientation from '../../services/device/useDeviceOrientation';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setActiveModal} from '../home/home.slice';
-import useDeviceOrientation from '../home/useDeviceOrientation';
 import useMeasurements from '../measurements/useMeasurements';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
