@@ -9,6 +9,8 @@ import {canceledIntervalDrag, savedIntervalDragReordering} from './maps.slice';
 import useDeviceOrientation from '../../services/device/useDeviceOrientation';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
+import {UNSAVED_CHANGES_CHOICES} from '../../shared/ui/modals/unsavedChanges.constants';
+import useUnsavedChangesPrompt from '../../shared/ui/modals/useUnsavedChangesPrompt';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpots, restoredIntervalDragSnapshot} from '../spots/spots.slice';
 
@@ -21,23 +23,15 @@ const useMapMode = ({mapComponentRef}) => {
   const store = useStore();
 
   const {unlockOrientation} = useDeviceOrientation();
+  const {askAboutUnsavedChanges, promptProps: endPromptProps} = useUnsavedChangesPrompt();
 
   /* Local State */
 
-  const [isEndPromptVisible, setIsEndPromptVisible] = useState(false);
   const [mapMode, setMapModeState] = useState(MAP_MODES.VIEW);
-  // The prompt's answer, and the confirmEndMapEditing waiting for it
-  const endPromptRef = useRef({choice: null, resolve: null});
   // Lets a check made right after the mode changes see the change without waiting for a render
   const mapModeRef = useRef(mapMode);
 
   /* Internal Functions */
-
-  const answerEndPrompt = () => {
-    const {choice, resolve} = endPromptRef.current;
-    endPromptRef.current = {choice: null, resolve: null};
-    resolve?.(choice);
-  };
 
   // A drag moves the intervals as it goes, recording each one it moves. Saving marks those changed for upload;
   // canceling puts back the snapshot taken when the drag started.
@@ -64,19 +58,16 @@ const useMapMode = ({mapComponentRef}) => {
 
   // A map edit writes whole copies of the Spots on Save, and an interval drag's changes aren't kept until Save, so
   // either has to end before anything else changes or creates a Spot. With no changes it just ends; otherwise the
-  // user picks Save Edits or Keep Editing. Resolves false only for Keep Editing, meaning the caller must stop.
+  // user picks Save, Discard or Keep Editing. Resolves false only for Keep Editing, meaning the caller must stop.
   const confirmEndMapEditing = async () => {
     if (!isMapEditing()) return true;
     if (!hasPendingChanges()) {
       await endMapEditing(MAP_EDIT_CHOICES.CANCEL);
       return true;
     }
-    const choice = await new Promise((resolve) => {
-      endPromptRef.current = {choice: MAP_EDIT_CHOICES.CONTINUE_EDITING, resolve};
-      setIsEndPromptVisible(true);
-    });
-    if (choice === MAP_EDIT_CHOICES.CONTINUE_EDITING) return false;
-    await endMapEditing(choice);
+    const choice = await askAboutUnsavedChanges();
+    if (choice === UNSAVED_CHANGES_CHOICES.KEEP_EDITING) return false;
+    await endMapEditing(choice === UNSAVED_CHANGES_CHOICES.SAVE ? MAP_EDIT_CHOICES.SAVE : MAP_EDIT_CHOICES.CANCEL);
     return true;
   };
 
@@ -87,18 +78,6 @@ const useMapMode = ({mapComponentRef}) => {
     else await mapComponentRef.current?.cancelEdits();
     setMapMode(MAP_MODES.VIEW);
     if (!SMALL_SCREEN) unlockOrientation();
-  };
-
-  // iOS drops a modal opened while another is still closing, and the action waiting on the prompt may open one, so
-  // on iOS the answer goes out once the prompt has closed (handleEndPromptDismissed)
-  const handleEndPromptChoice = (choice) => {
-    endPromptRef.current.choice = choice;
-    setIsEndPromptVisible(false);
-    if (Platform.OS !== 'ios') answerEndPrompt();
-  };
-
-  const handleEndPromptDismissed = () => {
-    if (Platform.OS === 'ios') answerEndPrompt();
   };
 
   // Map editing here covers an interval drag too. Checked before awaiting confirmEndMapEditing, so callers stay
@@ -113,9 +92,7 @@ const useMapMode = ({mapComponentRef}) => {
   return {
     confirmEndMapEditing,
     endMapEditing,
-    handleEndPromptChoice,
-    handleEndPromptDismissed,
-    isEndPromptVisible,
+    endPromptProps,
     isMapEditing,
     mapMode,
     setMapMode,

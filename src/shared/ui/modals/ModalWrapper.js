@@ -33,6 +33,7 @@ const ModalWrapper = ({
                         cancelTitle,
                         children,
                         closeModal,
+                        deleteTitle,
                         disabled,
                         doesRenderAsView,
                         fullscreen,
@@ -209,6 +210,7 @@ const ModalWrapper = ({
       <ModalSaveAndCancelButtons
         actionTitle={actionTitle}
         cancelTitle={cancelTitle}
+        deleteTitle={deleteTitle}
         disabled={disabled}
         isLoading={isLoading}
         onActionPressed={onActionPressed}

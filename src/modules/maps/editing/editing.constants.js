@@ -1,7 +1,6 @@
-// What becomes of a map edit: endMapEditing takes CANCEL or SAVE, and the unsaved edits prompt answers SAVE or
-// CONTINUE_EDITING, which leaves the edit open
+// What becomes of a map edit: endMapEditing takes CANCEL or SAVE. The unsaved changes prompt answers with its own
+// UNSAVED_CHANGES_CHOICES, which confirmEndMapEditing turns into one of these.
 export const MAP_EDIT_CHOICES = {
   CANCEL: 'cancel',
-  CONTINUE_EDITING: 'continueEditing',
   SAVE: 'save',
 };

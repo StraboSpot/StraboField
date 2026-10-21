@@ -8,6 +8,7 @@ import {MAP_EDIT_CHOICES} from './editing/editing.constants';
 import {MAP_MODES} from './maps.constants';
 import mapReducer, {addedIntervalDragChangedSpotIds, startedIntervalDrag} from './maps.slice';
 import useMapMode from './useMapMode';
+import {UNSAVED_CHANGES_CHOICES} from '../../shared/ui/modals/unsavedChanges.constants';
 import spotReducer, {editedOrCreatedSpots} from '../spots/spots.slice';
 
 jest.mock('../../services/device/useDeviceOrientation', () => () => ({unlockOrientation: () => {}}));
@@ -31,15 +32,15 @@ describe('confirmEndMapEditing', () => {
 
   const startEditing = getHook => ReactTestRenderer.act(() => getHook().setMapMode(MAP_MODES.EDIT));
 
-  // Calls confirmEndMapEditing and, when a choice is given, answers its prompt the way EndMapEditingModal does. Tests
+  // Calls confirmEndMapEditing and, when a choice is given, answers its prompt the way UnsavedChangesModal does. Tests
   // run as iOS, where the answer goes out once the prompt has closed.
   const callConfirmEndMapEditing = async (getHook, choice) => {
     let hasEnded;
     await ReactTestRenderer.act(async () => {
       const ending = getHook().confirmEndMapEditing();
       if (choice) {
-        getHook().handleEndPromptChoice(choice);
-        getHook().handleEndPromptDismissed();
+        getHook().endPromptProps.onChoose(choice);
+        getHook().endPromptProps.onDismiss();
       }
       hasEnded = await ending;
     });
@@ -49,7 +50,7 @@ describe('confirmEndMapEditing', () => {
   it('goes ahead without asking when nothing is being edited', async () => {
     const {getHook, map} = renderHook({hasPendingEdits: true});
     expect(await callConfirmEndMapEditing(getHook)).toBe(true);
-    expect(getHook().isEndPromptVisible).toBe(false);
+    expect(getHook().endPromptProps.isVisible).toBe(false);
     expect(map.cancelEdits).not.toHaveBeenCalled();
   });
 
@@ -57,7 +58,7 @@ describe('confirmEndMapEditing', () => {
     const {getHook, map} = renderHook({hasPendingEdits: false});
     startEditing(getHook);
     expect(await callConfirmEndMapEditing(getHook)).toBe(true);
-    expect(getHook().isEndPromptVisible).toBe(false);
+    expect(getHook().endPromptProps.isVisible).toBe(false);
     expect(map.cancelEdits).toHaveBeenCalled();
     expect(getHook().isMapEditing()).toBe(false);
   });
@@ -68,23 +69,32 @@ describe('confirmEndMapEditing', () => {
     ReactTestRenderer.act(() => {
       getHook().confirmEndMapEditing();
     });
-    expect(getHook().isEndPromptVisible).toBe(true);
+    expect(getHook().endPromptProps.isVisible).toBe(true);
   });
 
-  it('saves the edit and goes ahead on Save Edits', async () => {
+  it('saves the edit and goes ahead on Save', async () => {
     const {getHook, map} = renderHook({hasPendingEdits: true});
     startEditing(getHook);
-    expect(await callConfirmEndMapEditing(getHook, MAP_EDIT_CHOICES.SAVE)).toBe(true);
+    expect(await callConfirmEndMapEditing(getHook, UNSAVED_CHANGES_CHOICES.SAVE)).toBe(true);
     expect(map.saveEdits).toHaveBeenCalled();
     expect(map.cancelEdits).not.toHaveBeenCalled();
     expect(getHook().isMapEditing()).toBe(false);
-    expect(getHook().isEndPromptVisible).toBe(false);
+    expect(getHook().endPromptProps.isVisible).toBe(false);
+  });
+
+  it('cancels the edit and goes ahead on Discard', async () => {
+    const {getHook, map} = renderHook({hasPendingEdits: true});
+    startEditing(getHook);
+    expect(await callConfirmEndMapEditing(getHook, UNSAVED_CHANGES_CHOICES.DISCARD)).toBe(true);
+    expect(map.cancelEdits).toHaveBeenCalled();
+    expect(map.saveEdits).not.toHaveBeenCalled();
+    expect(getHook().isMapEditing()).toBe(false);
   });
 
   it('leaves the edit alone and holds back on Keep Editing', async () => {
     const {getHook, map} = renderHook({hasPendingEdits: true});
     startEditing(getHook);
-    expect(await callConfirmEndMapEditing(getHook, MAP_EDIT_CHOICES.CONTINUE_EDITING)).toBe(false);
+    expect(await callConfirmEndMapEditing(getHook, UNSAVED_CHANGES_CHOICES.KEEP_EDITING)).toBe(false);
     expect(map.saveEdits).not.toHaveBeenCalled();
     expect(map.cancelEdits).not.toHaveBeenCalled();
     expect(getHook().isMapEditing()).toBe(true);
@@ -114,21 +124,28 @@ describe('confirmEndMapEditing', () => {
     it('ends a drag that moved nothing without asking', async () => {
       const {getHook, store} = startDragging({hasMoved: false});
       expect(await callConfirmEndMapEditing(getHook)).toBe(true);
-      expect(getHook().isEndPromptVisible).toBe(false);
+      expect(getHook().endPromptProps.isVisible).toBe(false);
       expect(store.getState().map.isDragIntervalMode).toBe(false);
       expect(getHook().isMapEditing()).toBe(false);
     });
 
-    it('keeps the moved intervals on Save Edits', async () => {
+    it('keeps the moved intervals on Save', async () => {
       const {getHook, store} = startDragging({hasMoved: true});
-      expect(await callConfirmEndMapEditing(getHook, MAP_EDIT_CHOICES.SAVE)).toBe(true);
+      expect(await callConfirmEndMapEditing(getHook, UNSAVED_CHANGES_CHOICES.SAVE)).toBe(true);
       expect(getIntervalCoords(store)).toEqual([0, 10]);
+      expect(store.getState().map.isDragIntervalMode).toBe(false);
+    });
+
+    it('puts the intervals back on Discard', async () => {
+      const {getHook, store} = startDragging({hasMoved: true});
+      expect(await callConfirmEndMapEditing(getHook, UNSAVED_CHANGES_CHOICES.DISCARD)).toBe(true);
+      expect(getIntervalCoords(store)).toEqual([0, 0]);
       expect(store.getState().map.isDragIntervalMode).toBe(false);
     });
 
     it('keeps dragging on Keep Editing', async () => {
       const {getHook, store} = startDragging({hasMoved: true});
-      expect(await callConfirmEndMapEditing(getHook, MAP_EDIT_CHOICES.CONTINUE_EDITING)).toBe(false);
+      expect(await callConfirmEndMapEditing(getHook, UNSAVED_CHANGES_CHOICES.KEEP_EDITING)).toBe(false);
       expect(getIntervalCoords(store)).toEqual([0, 10]);
       expect(store.getState().map.isDragIntervalMode).toBe(true);
       expect(getHook().isMapEditing()).toBe(true);

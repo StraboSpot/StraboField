@@ -12,9 +12,9 @@ import useHomeAnimations from './useHomeAnimations';
 import useHomeContainer from './useHomeContainer';
 import useDevice from '../../services/device/useDevice';
 import {isEmpty} from '../../shared/helpers';
+import UnsavedChangesModal from '../../shared/ui/modals/UnsavedChangesModal';
 import MainMenuPanel from '../main-menu-panel/MainMenuPanel';
 import settingPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
-import EndMapEditingModal from '../maps/editing/EndMapEditingModal';
 import useMapMode from '../maps/useMapMode';
 
 const HomeContainer = ({navigation, route}) => {
@@ -33,9 +33,7 @@ const HomeContainer = ({navigation, route}) => {
   const {
     confirmEndMapEditing,
     endMapEditing,
-    handleEndPromptChoice,
-    handleEndPromptDismissed,
-    isEndPromptVisible,
+    endPromptProps,
     isMapEditing,
     mapMode,
     setMapMode,
@@ -115,10 +113,10 @@ const HomeContainer = ({navigation, route}) => {
           />
         </Animated.View>
       )}
-      <EndMapEditingModal
-        isVisible={isEndPromptVisible}
-        onChoose={handleEndPromptChoice}
-        onDismiss={handleEndPromptDismissed}
+      <UnsavedChangesModal
+        {...endPromptProps}
+        headerTitle={'Unsaved Map Edits'}
+        message={'Your map edits haven\'t been saved.'}
       />
     </Animated.View>
   );
