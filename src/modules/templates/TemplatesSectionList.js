@@ -36,9 +36,10 @@ const TemplatesSectionList = ({handleTemplatePressed}) => {
     else return [...acc, {title: key, data: templatesForKey}];
   }, []);
 
+  // Sorted as copies: a section's data is the stored template list itself, which the store has frozen
   const templatesSectionedSorted = templatesSectioned.map(section => ({
     ...section,
-    data: section.data.sort((a, b) => a.name.localeCompare(b.name)),
+    data: [...section.data].sort((a, b) => a.name.localeCompare(b.name)),
   })).sort((a, b) => a.title.localeCompare(b.title));
 
   /* Render Functions */
