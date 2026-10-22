@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {View} from 'react-native';
 
 import {isEmpty} from '../../shared/helpers';
 import ImagesList from '../images/ImagesList';
 import useImages from '../images/useImages';
+import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import ActiveDatasetsSummary from '../project/datasets/ActiveDatasetsSummary';
 import useSpots from '../spots/useSpots';
 
@@ -11,6 +12,8 @@ const ImageBasemapsList = ({closeManMenuPanel, openDatasetsPage}) => {
   console.log('Rendering ImageBasemaps...');
 
   /* Data Hooks */
+
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const {getImageBasemap} = useImages();
   const {getActiveImageBasemaps} = useSpots();
@@ -21,7 +24,9 @@ const ImageBasemapsList = ({closeManMenuPanel, openDatasetsPage}) => {
 
   /* Event Handlers */
 
-  const handleOpenImage = (image) => {
+  // Opening a basemap clears the selected Spot, which leaves the notebook page on screen
+  const handleOpenImage = async (image) => {
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     closeManMenuPanel();
     getImageBasemap(image);
   };

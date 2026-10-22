@@ -46,6 +46,22 @@ describe('useUnsavedChangesPrompt', () => {
     expect(getHook().promptProps.isVisible).toBe(false);
   });
 
+  it('holds back a second ask while the prompt is open', async () => {
+    const getHook = renderHook();
+    let firstAnswer;
+    let secondAnswer;
+    await ReactTestRenderer.act(async () => {
+      getHook().askAboutUnsavedChanges().then((value) => {
+        firstAnswer = value;
+      });
+      secondAnswer = await getHook().askAboutUnsavedChanges();
+    });
+    expect(secondAnswer).toBe(UNSAVED_CHANGES_CHOICES.KEEP_EDITING);
+    await ReactTestRenderer.act(async () => getHook().promptProps.onChoose(UNSAVED_CHANGES_CHOICES.SAVE));
+    await ReactTestRenderer.act(async () => getHook().promptProps.onDismiss());
+    expect(firstAnswer).toBe(UNSAVED_CHANGES_CHOICES.SAVE);
+  });
+
   it('answers elsewhere as soon as a choice is made', async () => {
     jest.replaceProperty(Platform, 'OS', 'android');
     const getHook = renderHook();

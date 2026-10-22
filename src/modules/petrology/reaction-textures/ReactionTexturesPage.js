@@ -56,6 +56,8 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
   const editReaction = (reaction) => {
     setIsDetailView(true);
     setSelectedReaction(reaction);
+    // In Redux too, or the next change to the Spot finds no selected reaction and closes the detail view
+    dispatch(setSelectedAttributes([reaction]));
     dispatch(setActiveModal({modal: null}));
   };
 

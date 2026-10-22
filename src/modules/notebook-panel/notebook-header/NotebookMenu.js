@@ -69,9 +69,10 @@ const NotebookMenu = ({
 
   /* Event Handlers */
 
+  // Unsaved changes on the page on screen were asked about as this menu opened (NotebookHeader)
   const onPress = (key) => {
     if (key === 'copy') {
-      copySpot().catch(err => console.error('Error copying Spot!', err));
+      copySpot(spot).catch(err => console.error('Error copying Spot!', err));
       dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
     else if (key === 'zoom') {

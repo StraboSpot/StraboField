@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import {Platform} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
@@ -8,6 +8,7 @@ import IconButton from '../../../shared/ui/buttons/IconButton';
 import DismissibleWarningModal from '../../../shared/ui/modals/DismissibleWarningModal';
 import useImages from '../../images/useImages';
 import useMapLocation from '../../maps/view/useMapLocation';
+import {LeavePageContext} from '../../notebook-panel/LeavePageContext';
 import {SHORTCUT_MODALS} from '../../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
@@ -29,6 +30,7 @@ const ShortcutButtons = ({confirmEndMapEditing, isMapEditing, openNotebookPanel}
     state => state.home.hiddenWarnings[DISMISSIBLE_WARNINGS.CAMERA_ORIENTATION]);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const {launchCameraFromNotebook} = useImages();
   const {setPointAtCurrentLocation} = useMapLocation();
@@ -96,9 +98,10 @@ const ShortcutButtons = ({confirmEndMapEditing, isMapEditing, openNotebookPanel}
     openNotebookPanel(PAGE_KEYS.IMAGES);
   };
 
-  // Each shortcut creates a Spot, so a map edit in progress ends before it runs
+  // Each shortcut creates a Spot, so a map edit ends first, and clears the selected one, which leaves its notebook page
   const toggleShortcutModal = async (key) => {
     if (isMapEditing() && !await confirmEndMapEditing()) return;
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     dispatch(clearedSelectedSpots());
     switch (key) {

@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
 import {ButtonGroup, ListItem} from '@rn-vui/base';
@@ -11,7 +11,7 @@ import {isEmptyMeasurement, isPlanarType} from './measurements.helpers';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, isEqual, toTitleCase} from '../../shared/helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import AddButton from '../../shared/ui/buttons/AddButton';
@@ -26,6 +26,7 @@ import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {setActiveModal} from '../home/home.slice';
+import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import PageHeader from '../page/PageHeader';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
@@ -45,23 +46,26 @@ const MeasurementDetail = ({
   const compassMeasurements = useSelector(state => state.compass.measurements);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const {getLabel, getLabels, submitAndShowErrors} = useForm();
   const {deleteMeasurements} = useMeasurements();
   const toast = useToast();
 
-  /* Local State */
-
+  // A template (saveTemplate given) is saved from its own notebook, so there is no page to leave
   const formRef = useRef(null);
-  // The values already saved, so leaving straight afterwards does not ask about them again. The form's own
-  // dirty flag is not enough on its own: the page can unmount in the same render pass as the save, leaving
-  // this ref holding the form as it was before it.
-  const savedValuesRef = useRef(null);
+  const {isFormDirty, isFormInvalid, markSaved, setIsFormDirty, setIsFormInvalid} = useUnsavedFormChanges({
+    formRef: formRef,
+    getMessage: () => (selectedAttributes.length > 1 ? 'Your changes to these measurements haven\'t been saved.'
+      : 'Your changes to this measurement haven\'t been saved.'),
+    isAsking: !saveTemplate,
+    save: () => saveForm(formRef.current),
+  });
+
+  /* Local State */
 
   const [formName, setFormName] = useState([]);
   const [isAddingAssociatedMeasurementAfterSave, setIsAddingAssociatedMeasurementAfterSave] = useState(false);
-  const [isFormDirty, setIsFormDirty] = useState(false);
-  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [selectedMeasurement, setSelectedMeasurement] = useState(null);
 
   /* Derived Variables */
@@ -73,9 +77,10 @@ const MeasurementDetail = ({
 
   /* Side Effects */
 
+  // The measurements stay selected only while their detail is open
   useLayoutEffect(() => {
     console.log('ULE MeasurementDetail []');
-    return () => confirmLeavePage();
+    return () => dispatch(setSelectedAttributes([]));
   }, []);
 
   // Update selected Measurement on selected Attitudes changed or return to Measurements page if no selected Attitude
@@ -197,7 +202,9 @@ const MeasurementDetail = ({
     dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.MEASUREMENTS}));
   };
 
-  const cancelFormAndGo = () => {
+  // A template isn't registered with the gate, so asking would be about whichever page is under it
+  const cancelFormAndGo = async () => {
+    if (!isTemplate && hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     setSelectedMeasurement({});
     formRef.current?.resetForm();
     if (isEmptyMeasurement(selectedAttitude)) {
@@ -223,31 +230,6 @@ const MeasurementDetail = ({
     );
   };
 
-  const confirmLeavePage = () => {
-    if (!isTemplate && formRef.current?.dirty && !isEqual(formRef.current.values, savedValuesRef.current)) {
-      const formCurrent = formRef.current;
-      alert('Unsaved Changes',
-        'Would you like to save your data before continuing?',
-        [{
-          text: 'No',
-          style: 'cancel',
-          onPress: () => {
-            dispatch(setSelectedAttributes([]));
-            console.log('Cancel Pressed', selectedAttributes);
-          },
-        }, {
-          text: 'Yes',
-          onPress: async () => {
-            await saveForm(formCurrent, true);
-            dispatch(setSelectedAttributes([]));
-          },
-        }],
-        {cancelable: false},
-      );
-    }
-    else dispatch(setSelectedAttributes([]));
-  };
-
   // Delete a single measurement
   const deleteMeasurement = () => {
     try {
@@ -267,14 +249,11 @@ const MeasurementDetail = ({
     else return 'Measurement Detail';
   };
 
-  // Whether the page is being left is the caller's to say, not this function's to read off the ref - that guessed
-  // wrong whenever the prompt was answered before the form had gone, refusing whole an edit meant to be kept apart
-  // from its one bad field. What comes back says whether the save happened: a refusal has already alerted about
-  // the field it stopped on, so the caller stays where it is for that to be fixed rather than carrying on.
-  const saveForm = async (formCurrent, isLeavingPage) => {
+  // What comes back says whether the save happened: a refusal has already alerted about the field it stopped on,
+  // so the caller stays where it is for that to be fixed rather than carrying on.
+  const saveForm = async (formCurrent) => {
     try {
-      let {errors, values: formValues} = await submitAndShowErrors(formRef.current || formCurrent,
-        isLeavingPage);
+      let {errors, values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
       // A bulk edit leaves the label out below, along with everything else that names one measurement rather
       // than the group, so only a single measurement is labeled here
       if (selectedAttributes.length === 1) {
@@ -319,9 +298,9 @@ const MeasurementDetail = ({
       const spotId = spot.properties.id;
       dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: 'orientation_data', value: orientationDataCopy, spotId: spotId}));
-      savedValuesRef.current = {...formCurrent.values};
+      markSaved();
       await formCurrent.resetForm();
-      // Leaving the page with invalid fields alerts and saves only the valid ones, so don't claim a full save
+      // A value already invalid when the form opened is rolled back and the rest saved, so don't claim a full save
       if (Platform.OS !== 'web' && isEmpty(errors)) toast.show('Measurement Saved', {type: 'success'});
       console.log('Finished saving form data to Spot');
       return true;

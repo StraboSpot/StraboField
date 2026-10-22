@@ -1,8 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import {LeavePageContext} from './LeavePageContext';
 import NotebookFooter from './notebook-footer/NotebookFooter';
 import NotebookHeader from './notebook-header/NotebookHeader';
 import {setNotebookPageVisible} from './notebook.slice';
@@ -38,6 +39,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const projectName = useSelector(state => state.project.project?.description?.project_name);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {goToNotebookPage} = useContext(LeavePageContext);
 
   const {getAllRelevantPages, getPopulatedPagesKeys} = usePage();
   const {
@@ -87,8 +89,8 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
 
   /* Logic Helpers */
 
-  const openPage = (key) => {
-    dispatch(setNotebookPageVisible(key));
+  const openPage = async (key) => {
+    if (!await goToNotebookPage(key)) return;
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
     if (SMALL_SCREEN || isReadOnly) dispatch(setActiveModal({modal: null}));
     else if (page.modal_component) {

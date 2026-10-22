@@ -1,16 +1,16 @@
-import React, {useLayoutEffect, useRef} from 'react';
+import React, {useContext, useRef} from 'react';
 import {Platform, View} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewUUID, isEmpty, isEqual} from '../../shared/helpers';
-import alert from '../../shared/ui/alert';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import Form from '../form/Form';
 import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
+import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
@@ -25,17 +25,17 @@ const OutcropSummaryPage = ({isReadOnly, page}) => {
 
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {goToNotebookPage} = useContext(LeavePageContext);
 
   const {submitAndShowErrors} = useForm();
   const toast = useToast();
 
-  /* Local State */
-
   const formRef = useRef(null);
-  // The values already saved, so leaving straight afterwards does not ask about them again. The form's own
-  // dirty flag is not enough on its own: the page can unmount in the same render pass as the save, leaving
-  // this ref holding the form as it was before it.
-  const savedValuesRef = useRef(null);
+  const {markSaved, setIsFormDirty} = useUnsavedFormChanges({
+    formRef: formRef,
+    getMessage: () => `Your changes to ${page.label} haven't been saved.`,
+    save: () => saveForm(formRef.current),
+  });
 
   /* Derived Variables */
 
@@ -43,50 +43,25 @@ const OutcropSummaryPage = ({isReadOnly, page}) => {
   const outcropSummaries = spot.properties?.[pageKey] || [];
   const initialValues = outcropSummaries[0] || {};
 
-  /* Side Effects */
-
-  useLayoutEffect(() => {
-    console.log('ULE OutcropSummaryPage []');
-    return () => confirmLeavePage();
-  }, []);
-
   /* Logic Helpers */
 
-  const cancelFormAndGo = () => {
-    dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-  };
-
-  const confirmLeavePage = () => {
-    if (formRef.current?.dirty && !isEqual(formRef.current.values, savedValuesRef.current)) {
-      const formCurrent = formRef.current;
-      alert('Unsaved Changes',
-        'Would you like to save your data before continuing?',
-        [{
-          text: 'No',
-          style: 'cancel',
-        }, {
-          text: 'Yes',
-          onPress: () => saveFormAndGo(formCurrent),
-        }],
-        {cancelable: false},
-      );
-    }
-  };
+  const cancelFormAndGo = () => goToNotebookPage(PAGE_KEYS.OVERVIEW);
 
   // Reports whether the save happened. A refusal has already alerted about the field it stopped on, so a caller
   // stays where it is for that to be fixed rather than carrying on.
   const saveForm = async (currentForm) => {
     try {
-      const {values: editedOutcropSummaryData} = await submitAndShowErrors(currentForm);
+      const {errors, values: editedOutcropSummaryData} = await submitAndShowErrors(currentForm);
       const spotId = spot.properties.id;
       // An empty form saves an empty array, which removes the property from the Spot
       const editedOutcropSummaries = isEmpty(editedOutcropSummaryData) ? []
         : [{...editedOutcropSummaryData, id: outcropSummaries[0]?.id || getNewUUID()}];
       dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: pageKey, value: editedOutcropSummaries, spotId: spotId}));
-      savedValuesRef.current = {...currentForm.values};
+      markSaved();
       await currentForm.resetForm();
-      if (Platform.OS !== 'web') toast.show('Outcrop Summary Saved', {type: 'success'});
+      // A value already invalid when the form opened is rolled back and the rest saved, so don't claim a full save
+      if (Platform.OS !== 'web' && isEmpty(errors)) toast.show('Outcrop Summary Saved', {type: 'success'});
       return true;
     }
     catch (err) {
@@ -120,6 +95,7 @@ const OutcropSummaryPage = ({isReadOnly, page}) => {
         initialValues={initialValues}
         innerRef={formRef}
         onReset={() => console.log('Resetting form...')}
+        setIsFormDirty={setIsFormDirty}
       >
         {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}
       </FormikWrapper>

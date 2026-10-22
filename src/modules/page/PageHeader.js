@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
@@ -16,7 +16,7 @@ import {
 import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
-import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
 import TagsNotebookModal from '../tags/TagsNotebookModal';
 
@@ -34,6 +34,7 @@ const PageHeader = ({
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {goToNotebookPage} = useContext(LeavePageContext);
 
   /* Local State */
 
@@ -45,7 +46,7 @@ const PageHeader = ({
 
   /* Logic Helpers */
 
-  const returnToOverview = () => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+  const returnToOverview = () => goToNotebookPage(PAGE_KEYS.OVERVIEW);
 
   const selectTagsForFeatures = () => {
     if (isEmpty(selectedFeaturesForTagging)) {

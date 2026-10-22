@@ -1,17 +1,17 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useContext, useLayoutEffect, useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import NoteForm from './NoteForm';
-import {isEmpty, isEqual} from '../../shared/helpers';
-import alert from '../../shared/ui/alert';
+import {isEmpty} from '../../shared/helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import uiStyles from '../../shared/ui/ui.styles';
 import {setActiveModal, setLoadingStatus} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
+import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
@@ -28,17 +28,25 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
   const initialNote = useSelector(state => state.spot.selectedSpot?.properties?.notes) || undefined;
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
+  const {goToNotebookPage} = useContext(LeavePageContext);
 
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
 
-  /* Local State */
-
+  // The shortcut note (see isShortcutNote) is a modal that makes a new Spot, so it has no page to leave. A save that
+  // fails has said why and leaves the note unsaved, which is what tells the gate it did not go through.
   const formRef = useRef(null);
-  // The values already saved, so leaving straight afterwards does not ask about them again. The form's own
-  // dirty flag is not enough on its own: the page can unmount in the same render pass as the save, leaving
-  // this ref holding the form as it was before it.
-  const savedValuesRef = useRef(null);
+  const {hasUnsavedChanges, markSaved, setIsFormDirty} = useUnsavedFormChanges({
+    formRef: formRef,
+    getMessage: () => 'Your note hasn\'t been saved.',
+    isAsking: !registerSave,
+    save: async () => {
+      await saveForm(formRef.current);
+      return !hasUnsavedChanges();
+    },
+  });
+
+  /* Local State */
 
   const [initialNotesValues, setInitialNotesValues] = useState({note: initialNote});
   const [isShowTemplates, setIsShowTemplates] = useState(false);
@@ -68,32 +76,11 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
     else {
       setInitialNotesValues({note: initialNote});
     }
-    return () => confirmLeavePage();
   }, [templates, spot?.properties?.id, initialNote]);
 
   /* Logic Helpers */
 
-  const cancelFormAndGo = () => {
-    dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-  };
-
-  const confirmLeavePage = () => {
-    if (formRef.current?.dirty && !isShortcutNote
-      && !isEqual(formRef.current.values, savedValuesRef.current)) {
-      const formCurrent = formRef.current;
-      alert('Unsaved Changes',
-        'Would you like to save your data before continuing?',
-        [{
-          text: 'No',
-          style: 'cancel',
-        }, {
-          text: 'Yes',
-          onPress: () => saveFormAndGo(formCurrent),
-        }],
-        {cancelable: false},
-      );
-    }
-  };
+  const cancelFormAndGo = () => goToNotebookPage(PAGE_KEYS.OVERVIEW);
 
   // Returns the Spot a shortcut note created, for the caller to show; editing an existing Spot returns undefined.
   const saveForm = async (currentForm) => {
@@ -119,9 +106,9 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
         const spotId = spot.properties.id;
         dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
         dispatch(editedSpotProperties({field: 'notes', value: currentForm.values.note, spotId: spotId}));
+        markSaved();
         await currentForm.resetForm();
       }
-      savedValuesRef.current = {...currentForm.values};
       dispatch(setLoadingStatus({view: 'home', bool: false}));
       // A shortcut note toasts from saveFormAndGo instead, once the modal is gone and the zoom has finished -
       // both of which would otherwise cover it
@@ -137,8 +124,8 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
   const saveFormAndGo = async (currentForm) => {
     try {
       // A Spot coming back means the shortcut save worked. Show it and let the shortcut go - nothing else closes
-      // it, as Notes' unmount cleanup skips the shortcut - then zoom, and only then say so: the modal and the
-      // zoom's full-screen spinner would each paint over the toast.
+      // it - then zoom, and only then say so: the modal and the zoom's full-screen spinner would each paint over
+      // the toast.
       const createdSpot = await saveForm(currentForm);
       if (createdSpot) {
         openSpotInNotebook(createdSpot, PAGE_KEYS.NOTES);
@@ -205,6 +192,7 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
             initialNotesValues={initialNotesValues}
             isFillHeight={isShortcutNote}
             isReadOnly={isReadOnly}
+            setIsFormDirty={setIsFormDirty}
           />
         </>
       )}

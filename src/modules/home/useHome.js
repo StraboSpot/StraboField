@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector, useStore} from 'react-redux';
@@ -19,6 +19,7 @@ import {
   startedIntervalDrag,
 } from '../maps/maps.slice';
 import useMapLocation from '../maps/view/useMapLocation';
+import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import useProject from '../project/useProject';
 import {clearedSelectedSpots, setIntersectedSpotsForTagging} from '../spots/spots.slice';
@@ -37,6 +38,28 @@ const ACTIONS_THAT_END_MAP_EDITING = [
   HOME_ACTIONS.CLOSE_IMAGE_BASEMAP,
   HOME_ACTIONS.CLOSE_STRAT_SECTION,
   HOME_ACTIONS.START_INTERVAL_DRAG,
+];
+
+// Home actions that leave a notebook page by selecting or clearing a Spot or closing the notebook. The lasso tools
+// clear the selected Spots as they start, starting an edit closes the notebook, and a drag selects each interval
+// pressed.
+const ACTIONS_THAT_LEAVE_NOTEBOOK_PAGE = [
+  MAP_MODES.DRAW.POINT,
+  MAP_MODES.DRAW.LINE,
+  MAP_MODES.DRAW.POLYGON,
+  MAP_MODES.DRAW.FREEHANDPOLYGON,
+  MAP_MODES.DRAW.FREEHANDLINE,
+  MAP_MODES.DRAW.POINTLOCATION,
+  HOME_ACTIONS.ADD_INTERVAL,
+  HOME_ACTIONS.ADD_TAG,
+  HOME_ACTIONS.ADD_TO_REPORT,
+  HOME_ACTIONS.CLOSE_IMAGE_BASEMAP,
+  HOME_ACTIONS.CLOSE_STRAT_SECTION,
+  HOME_ACTIONS.SELECT_SPOTS,
+  HOME_ACTIONS.START_EDITING,
+  HOME_ACTIONS.START_INTERVAL_DRAG,
+  HOME_ACTIONS.STEREONET,
+  HOME_ACTIONS.STRAT_SECTION,
 ];
 
 // Home actions that leave an interval drag running: its own buttons, and the location dot, which a timer can also
@@ -70,6 +93,8 @@ const useHome = ({
   const isScaleBarMetric = useSelector(state => state.map.isScaleBarMetric);
   const stratSection = useSelector(state => state.map.stratSection);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
+
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const store = useStore();
 
@@ -178,6 +203,7 @@ const useHome = ({
     const isEndingMapEditing = mapMode === MAP_MODES.INTERVAL_DRAG
       ? !ACTIONS_ALLOWED_DURING_INTERVAL_DRAG.includes(name) : ACTIONS_THAT_END_MAP_EDITING.includes(name);
     if (isEndingMapEditing && isMapEditing() && !await confirmEndMapEditing()) return;
+    if (ACTIONS_THAT_LEAVE_NOTEBOOK_PAGE.includes(name) && hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     if (!ACTIONS_ALLOWED_DURING_INTERVAL_DRAG.includes(name)) {
       if (isDragIntervalMode) setMapMode(MAP_MODES.VIEW);
       dispatch(canceledIntervalDrag());
@@ -293,7 +319,10 @@ const useHome = ({
     dispatch(setFreehandFeatureCoords(undefined));  // reset the freeHandCoordinates
   };
 
+  // Ending a draw selects the new Spot. The draw tool asked as it started, but the notebook can be opened on a page
+  // and edited while drawing.
   const onEndDrawPressed = async () => {
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     try {
       dispatch(setLoadingStatus({view: 'home', bool: true}));
       const newOrEditedSpot = await mapComponentRef.current?.endDraw();
@@ -318,10 +347,11 @@ const useHome = ({
   const toggleMapMenu = async (menu) => {
     // Most map actions change Spots or the map mode, so a map edit ends when the Map Actions menu opens, and opening
     // any menu ends an interval drag. Waiting for the chosen action would raise the prompt while the menu's modal
-    // closes, which iOS can drop.
-    const isEndingMapEditing = !mapMenus[menu]
-      && (menu === 'mapActionsMenuVisible' || mapMode === MAP_MODES.INTERVAL_DRAG);
+    // closes, which iOS can drop. Several map actions leave a notebook page too, so that is asked about here as well.
+    const isOpeningMapActions = !mapMenus[menu] && menu === 'mapActionsMenuVisible';
+    const isEndingMapEditing = isOpeningMapActions || (!mapMenus[menu] && mapMode === MAP_MODES.INTERVAL_DRAG);
     if (isEndingMapEditing && isMapEditing() && !await confirmEndMapEditing()) return;
+    if (isOpeningMapActions && hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     dispatch(canceledIntervalDrag());
     console.log('Toggle', menu);
     // Functional update, since this render's mapMenus may be stale after waiting on confirmEndMapEditing

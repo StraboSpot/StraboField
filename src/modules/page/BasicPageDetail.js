@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
@@ -8,7 +8,7 @@ import {resolveLabelOnSave} from './featureLabels.helpers';
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
 import useServerRequests from '../../services/network/useServerRequests';
-import {isEmpty, isEqual, toTitleCase} from '../../shared/helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
@@ -21,6 +21,7 @@ import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
+import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {setMineralFieldValue} from '../petrology/minerals/minerals.helpers';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -66,6 +67,7 @@ const BasicPageDetail = ({
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const {encoded_login, sesar} = useSelector(state => state.user);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const {getLabel, getLabels, showErrors, submitAndShowErrors, validateForm} = useForm();
   const {deletePetFeature, savePetFeature} = usePetrology();
@@ -75,20 +77,30 @@ const BasicPageDetail = ({
   const {getOrcidToken} = useServerRequests();
   const toast = useToast();
 
+  // Save on the way out is this page's Save, held for the same reasons, so a value that needs fixing keeps the page
+  // open to fix it. A template (saveTemplate given) is saved from its own notebook, so there is no page to leave.
+  const formRef = useRef(null);
+  const {
+    hasUnsavedChanges,
+    isFormDirty,
+    isFormInvalid,
+    markSaved,
+    setIsFormDirty,
+    setIsFormInvalid,
+  } = useUnsavedFormChanges({
+    formRef: formRef,
+    getMessage: () => `Your changes to this ${title} haven't been saved.`,
+    getSaveHeldReason: () => sesarSaveHeldReason,
+    isAsking: !saveTemplate,
+    onDiscard: closeDetailView,
+    save: () => saveForm(formRef.current),
+  });
+
   /* Local State */
 
-  const formRef = useRef(null);
-  // The values already dealt with, by a save or by a caller taking them to write itself. Leaving straight
-  // afterwards must not ask about them again, and the page can unmount in the same render pass as the save, so
-  // the form ref may still be holding what it looked like beforehand.
-  const savedValuesRef = useRef(null);
-  // Set once edits to a sample on SESAR are discarded from Cancel, so leaving does not go on to ask about them
-  const isDiscardedRef = useRef(false);
   const [igsnFormValues, setIgsnFormValues] = useState(null);
   const [initialValues, setInitialValues] = useState(selectedFeature);
   const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
-  const [isFormDirty, setIsFormDirty] = useState(false);
-  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
   const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
 
@@ -119,6 +131,14 @@ const BasicPageDetail = ({
   // Save opens, so Save becomes the sign-in. An access token that has merely expired is refreshed on save instead.
   const isSesarSignInNeeded = !!selectedFeature.isOnMySesar && !!selectedFeature.Sample_IGSN && isInternetReachable
     && (!sesar?.sesarToken?.access || isTokenExpired(sesar.sesarToken.refresh));
+  // Why SESAR holds Save, shown on the page and in the unsaved changes prompt, whose Save is held the same way
+  const sesarSaveHeldReason = isRegisteredSampleOffline
+    ? 'This sample has an IGSN assigned and must be updated with SESAR. Please save changes when device is online.'
+    : isSesarSignInNeeded
+      ? 'This sample has an IGSN, so changes are also saved to SESAR. Please sign in to SESAR to save.'
+      : isSesarRegistrationBlocked
+        ? 'Registering this sample with SESAR needs a SESAR sign-in and a user code. Please sign in to SESAR to save.'
+        : undefined;
   // Pages whose form fills one orientation field in from another name the pairs it uses
   const orientationFields = page.key === PAGE_KEYS.THREE_D_STRUCTURES ? THREE_D_STRUCTURE_ORIENTATION_FIELDS
     : page.key === PAGE_KEYS.EARTHQUAKES ? EARTHQUAKE_ORIENTATION_FIELDS
@@ -129,11 +149,6 @@ const BasicPageDetail = ({
     : page.label_singular || toTitleCase(page.label).slice(0, -1);
 
   /* Side Effects */
-
-  useLayoutEffect(() => {
-    console.log('ULE BasicPageDetail []');
-    return () => !isReadOnly && confirmLeavePage();
-  }, []);
 
   useEffect(() => {
     console.log('UE BasicPageDetail []');
@@ -168,54 +183,10 @@ const BasicPageDetail = ({
 
   /* Logic Helpers */
 
+  // A template isn't registered with the gate, so asking would be about whichever page is under it
   const cancelForm = async () => {
-    // A sample on SESAR can only be saved through Save, which updates SESAR too (see saveForm). Ask here, while the
-    // page is still open, so the edits can be kept and saved properly; leaving would only be able to drop them.
-    if (hasUnsavedChanges() && isOnSesar(formRef.current.values)) {
-      alert('Unsaved Changes',
-        'This sample has an IGSN, so changes must be saved with Save, which also updates SESAR. Discard your changes?',
-        [{
-          text: 'Keep Editing',
-          style: 'cancel',
-        }, {
-          text: 'Discard',
-          style: 'destructive',
-          onPress: () => {
-            isDiscardedRef.current = true;
-            closeDetailView();
-          },
-        }],
-        {cancelable: false},
-      );
-      return;
-    }
+    if (!isTemplate && hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     closeDetailView();
-  };
-
-  // Runs as the page unmounts, from the closure of its first render, so it reads the form rather than props/state
-  const confirmLeavePage = () => {
-    if (hasUnsavedChanges()) {
-      const formCurrent = formRef.current;
-      // Saving a sample on SESAR opens the IGSN modal to update it there, and that modal is part of this page, which
-      // is going away. Saving here would change the sample locally only, leaving SESAR out of step.
-      if (isOnSesar(formCurrent.values)) {
-        alert('Changes Not Saved',
-          'This sample has an IGSN, so changes can only be saved with Save, which also updates SESAR. Your changes '
-          + 'were not saved.');
-        return;
-      }
-      alert('Unsaved Changes',
-        'Would you like to save your data before continuing?',
-        [{
-          text: 'No',
-          style: 'cancel',
-        }, {
-          text: 'Yes',
-          onPress: () => saveForm(formCurrent, true),
-        }],
-        {cancelable: false},
-      );
-    }
   };
 
   const deleteFeature = () => {
@@ -296,20 +267,13 @@ const BasicPageDetail = ({
       (acc, key) => (isEmpty(values[key]) ? {...acc, [key]: 'Required'} : acc), {...siblingErrors, ...errors});
   };
 
-  // Changes typed into the form that neither a save, a caller taking the values, nor a discard has dealt with yet
-  const hasUnsavedChanges = () => !isTemplate && !isDiscardedRef.current && !!formRef.current?.dirty
-    && !isEqual(formRef.current.values, savedValuesRef.current);
-
-  // Saved through the IGSN modal so SESAR is updated too, as in saveForm
-  const isOnSesar = values => !!values?.Sample_IGSN && !!values?.isOnMySesar;
-
   const saveButtonOnPress = () => {
     isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
   };
 
-  const saveFeature = async (formCurrent, isLeavingPage) => {
+  const saveFeature = async (formCurrent) => {
     try {
-      const {errors, values} = await submitAndShowErrors(formRef.current || formCurrent, isLeavingPage);
+      const {errors, values} = await submitAndShowErrors(formRef.current || formCurrent);
       // page.key rather than pageKey: a deprecated fabric is stored with the 3D structures but is still titled
       // as a fabric
       const editedFeatureData = resolveLabelOnSave(
@@ -351,43 +315,40 @@ const BasicPageDetail = ({
     const errors = await formCurrent.validateForm();
     const values = showErrors({...formCurrent, errors: errors});
     // Marks these values as dealt with, so leaving the page does not go on to ask about them
-    savedValuesRef.current = {...formCurrent.values};
+    markSaved();
     return values;
   };
 
-  // Whether the page is being left is the caller's to say. Reading it back off the ref guessed, and guessed
-  // wrong whenever the prompt was answered before the form had gone: an edit meant to be kept apart from its
-  // one bad field was refused whole instead.
-  const saveForm = async (formCurrent, isLeavingPage) => {
+  // Resolves whether the changes were saved. A sample on SESAR is not yet: the IGSN modal opens to finish it.
+  const saveForm = async (formCurrent) => {
     try {
       console.log('Saving form...', formCurrent);
       if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
         await updateIGSNAndShowModal(formCurrent);
-        return;
+        return false;
       }
       let errors;
       if (groupKey === 'pet') {
-        errors = await savePetFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage,
-          selectedFeature);
+        errors = await savePetFeature(pageKey, spot, formRef.current || formCurrent, selectedFeature);
       }
       else if (groupKey === 'sed' && pageKey === 'bedding') {
-        errors = await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage,
-          selectedFeature);
+        errors = await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, selectedFeature);
       }
       else if (groupKey === 'sed') {
-        errors = await saveSedFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage, undefined,
-          selectedFeature);
+        errors = await saveSedFeature(pageKey, spot, formRef.current || formCurrent, undefined, selectedFeature);
       }
-      else errors = await saveFeature(formCurrent, isLeavingPage);
-      savedValuesRef.current = {...(formRef.current || formCurrent).values};
-      // Leaving the page with invalid fields alerts and saves only the valid ones, so don't claim a full save
+      else errors = await saveFeature(formCurrent);
+      markSaved();
+      // A value already invalid when the form opened is rolled back and the rest saved, so don't claim a full save
       if (Platform.OS !== 'web' && isEmpty(errors)) toast.show('Changes Saved', {type: 'success'});
       closeDetailView();
       console.log('Done');
+      return true;
     }
     catch (err) {
       toast.show('Error Saving Changes', {type: 'danger'});
       console.error('ERROR saving form', err);
+      return false;
     }
   };
 
@@ -403,7 +364,7 @@ const BasicPageDetail = ({
     }
     try {
       await saveFeature(formCurrent);
-      savedValuesRef.current = {...(formRef.current || formCurrent).values};
+      markSaved();
       return true;
     }
     catch (err) {
@@ -511,23 +472,9 @@ const BasicPageDetail = ({
             {tabContent}
             {!isReadOnly && !tabContent && (
               <>
-                {isRegisteredSampleOffline && (
-                  <View>
-                    <Text style={{
-                      color: RED,
-                      fontSize: 16,
-                      fontWeight: '500',
-                      padding: 10,
-                      textAlign: 'center',
-                    }}>
-                      This sample has an IGSN assigned and must be updated with SESAR. Please save changes when device
-                      is online.
-                    </Text>
-                  </View>
-                )}
-                {isSesarSignInNeeded && (
+                {!!sesarSaveHeldReason && (
                   <Text style={{color: RED, fontSize: 16, fontWeight: '500', padding: 10, textAlign: 'center'}}>
-                    This sample has an IGSN, so changes are also saved to SESAR. Please sign in to SESAR to save.
+                    {sesarSaveHeldReason}
                   </Text>
                 )}
                 <SaveAndCancelButtons

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
@@ -12,6 +12,7 @@ import alert from '../../../shared/ui/alert';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import {setLoadingStatus} from '../../home/home.slice';
+import {LeavePageContext} from '../../notebook-panel/LeavePageContext';
 import ActiveDatasetsSummary from '../../project/datasets/ActiveDatasetsSummary';
 import {setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
@@ -21,6 +22,7 @@ const StratSectionsList = ({closeManMenuPanel, openDatasetsPage}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const navigation = useNavigation();
   const {getSpotsWithStratSection} = useSpots();
@@ -32,7 +34,9 @@ const StratSectionsList = ({closeManMenuPanel, openDatasetsPage}) => {
 
   /* Event Handlers */
 
-  const handleStratSectionPressed = (spot) => {
+  // Opening a section selects its Spot, which leaves the notebook page on screen
+  const handleStratSectionPressed = async (spot) => {
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     dispatch(setLoadingStatus({view: 'home', bool: true}));
     const stratSectionSettings = spot?.properties?.sed?.strat_section;
     if (stratSectionSettings) {

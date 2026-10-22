@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
 import {setActiveModal} from './home.slice';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
+import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import {MODALS} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {clearedSelectedSpots} from '../spots/spots.slice';
@@ -20,10 +21,13 @@ const ActiveModal = ({
   const dispatch = useDispatch();
   const activeModal = useSelector(state => state.home.activeModal);
   const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const modal = MODALS.find(m => m.key === activeModal);
 
-  const modalHandler = (modalKey) => {
+  // Switching between a shortcut and its notebook page closes the notebook or changes its page
+  const modalHandler = async (modalKey) => {
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     if (isNotebookPanelVisible || SMALL_SCREEN) {
       if (isNotebookPanelVisible) closeNotebookPanel();
       if (Object.values(MODAL_KEYS.SHORTCUTS).includes(modalKey)) dispatch(clearedSelectedSpots());

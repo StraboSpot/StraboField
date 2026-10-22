@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {Button, Image} from '@rn-vui/base';
 import * as turf from '@turf/turf';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import notebookHeaderStyles from './notebookHeader.styles';
 import NotebookMenu from './NotebookMenu';
@@ -26,6 +26,7 @@ import {isLineSpot, isPolygonSpot} from '../../spots/spots.helpers';
 import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 import {getTraceSurfaceFeatureText} from '../../trace-surface-feature/traceSurfaceFeature.helpers';
+import {LeavePageContext} from '../LeavePageContext';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
@@ -45,8 +46,10 @@ const NotebookHeader = ({
   const isUtmDisplay = useSelector(state => state.user.is_utm_display);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {confirmLeavePage, goToNotebookPage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const navigation = useNavigation();
+  const store = useStore();
   const {getLabel} = useForm();
   const {getCurrentLocation} = useMapLocation();
   const {
@@ -146,7 +149,8 @@ const NotebookHeader = ({
     else return undefined;
   };
 
-  const goBackToParentSpot = () => {
+  const goBackToParentSpot = async () => {
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     setSelectedSample({});
     if (!isEmpty(parentSpot)) {
       dispatch(setSelectedSpot(parentSpot));
@@ -164,12 +168,28 @@ const NotebookHeader = ({
     if (openMainMenuPanel) openMainMenuPanel();
   };
 
+  // Renaming writes the Spot with every keystroke, and a page built from the Spot, such as Geography, starts over
+  // when it changes, so the page's changes are asked about first
+  const startEditingTitle = async () => {
+    if (isReadOnly || isLegacySample) return;
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
+    setIsEditingTitle(true);
+  };
+
+  // Much of Spot Actions leaves the page on screen, so its changes are asked about as the menu opens
+  const openNotebookMenu = async () => {
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
+    setIsNotebookMenuVisible(true);
+  };
+
   // A GPS reading puts the Spot on the geo map whichever map is on screen. So the properties that only mean something
   // on a pixel map go - a copy inherits them with no geometry to match, see copySpot - and the open map goes with
-  // them, which handleSpotSelected does and setSelectedSpot does not.
+  // them, which handleSpotSelected does and setSelectedSpot does not. Selecting the Spot again leaves the page open
+  // on it, and saving that page changes the Spot, so the Spot is read after the answer.
   const setToCurrentLocation = async () => {
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
+    let editedSpot = JSON.parse(JSON.stringify(store.getState().spot.selectedSpot));
     const currentLocation = await getCurrentLocation();
-    let editedSpot = JSON.parse(JSON.stringify(spot));
     editedSpot.geometry = turf.point([currentLocation.longitude, currentLocation.latitude]).geometry;
     delete editedSpot.properties.image_basemap;
     delete editedSpot.properties.lat;
@@ -188,7 +208,7 @@ const NotebookHeader = ({
     return (
       <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
         <ClearButton
-          onPress={() => !isLegacySample && dispatch(setNotebookPageVisible(PAGE_KEYS.GEOGRAPHY))}
+          onPress={() => !isLegacySample && goToNotebookPage(PAGE_KEYS.GEOGRAPHY)}
           title={getSpotCoordText()}
           titleProps={{style: {fontSize: MEDIUM_TEXT_SIZE, color: PRIMARY_TEXT_COLOR}}}
         />
@@ -201,7 +221,7 @@ const NotebookHeader = ({
       <>
         <View style={{paddingLeft: 10, paddingRight: 5}}>
           <Image
-            onPress={() => !isLegacySample && dispatch(setNotebookPageVisible(PAGE_KEYS.METADATA))}
+            onPress={() => !isLegacySample && goToNotebookPage(PAGE_KEYS.METADATA)}
             resizeMode={'contain'}
             source={spot.properties.isSample ? getSampleSpotIconSource() : getSpotGeometryIconSource(spot)}
             style={notebookHeaderStyles.headerImage}
@@ -226,7 +246,7 @@ const NotebookHeader = ({
             <Text
               ellipsizeMode={'tail'}
               numberOfLines={1}
-              onPress={() => !isReadOnly && !isLegacySample && setIsEditingTitle(true)}
+              onPress={startEditingTitle}
               style={notebookHeaderStyles.headerSpotName}
             >
               {headerTitle}
@@ -249,7 +269,7 @@ const NotebookHeader = ({
             />
           )}
           <IconButton
-            onPress={() => setIsNotebookMenuVisible(prevState => !prevState)}
+            onPress={openNotebookMenu}
             source={require('../../../assets/icons/MapActions.png')}
             style={notebookHeaderStyles.threeDotMenu}
           />
@@ -316,7 +336,8 @@ const NotebookHeader = ({
         {!isCurrentMapReadOnly() && (
           <View style={{alignSelf: 'flex-start', margin: -10, paddingBottom: 5}}>
             <ClearButton
-              onPress={() => {
+              onPress={async () => {
+                if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
                 createDefaultGeom();
                 // The geometry goes onto the map, so show it. On a small screen the Notebook is a tab rather than a
                 // drawer, and closeNotebookPanel only hides it where it stands, blanking the tab being looked at.

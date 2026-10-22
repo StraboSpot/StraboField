@@ -34,8 +34,13 @@ const useUnsavedChangesPrompt = () => {
 
   /* Exported Functions */
 
-  // Resolves with one of UNSAVED_CHANGES_CHOICES
+  // Resolves with one of UNSAVED_CHANGES_CHOICES. Asking again while the prompt is open, as a double tap or a web
+  // double click does, answers the second ask with KEEP_EDITING so only the first caller goes on.
   const askAboutUnsavedChanges = () => new Promise((resolve) => {
+    if (answerRef.current.resolve) {
+      resolve(UNSAVED_CHANGES_CHOICES.KEEP_EDITING);
+      return;
+    }
     answerRef.current = {choice: UNSAVED_CHANGES_CHOICES.KEEP_EDITING, resolve};
     setIsVisible(true);
   });

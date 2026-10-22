@@ -1,10 +1,11 @@
-import {useState} from 'react';
+import {useContext, useState} from 'react';
 import {PixelRatio, Platform} from 'react-native';
 
 import * as turf from '@turf/turf';
 import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {isEmpty} from '../../../shared/helpers';
+import {LeavePageContext} from '../../notebook-panel/LeavePageContext';
 import useProject from '../../project/useProject';
 import {isStratInterval} from '../../spots/spots.helpers';
 import {setSelectedSpot} from '../../spots/spots.slice';
@@ -44,6 +45,7 @@ const useMapPressEvents = ({
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const stratSection = useSelector(state => state.map.stratSection);
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
@@ -89,6 +91,8 @@ const useMapPressEvents = ({
 
     if (mapMode === MAP_MODES.VIEW && !isSingleActiveReadOnlyDataset && !isEmpty(getAllMappedSpots())) {
       const spotsToEdit = await getSpotsAtPress(screenPointX, screenPointY);
+      // Editing closes the notebook, so its page is asked about once there is a Spot to edit
+      if (!isEmpty(spotsToEdit) && hasUnsavedPageChanges() && !await confirmLeavePage()) return;
       // Several Spots overlap - let the user pick which to edit.
       if (spotsToEdit.length > 1) {
         setSpotsAtPress(spotsToEdit);
@@ -147,6 +151,8 @@ const useMapPressEvents = ({
     else if (mapMode !== MAP_MODES.DRAW.FREEHANDPOLYGON && mapMode !== MAP_MODES.DRAW.FREEHANDLINE) {
       // Select/Unselect a feature
       if (mapMode === MAP_MODES.VIEW) {
+        // Every press here selects or clears a Spot, which leaves the notebook page on screen
+        if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
         console.log('Selecting or unselect a feature ...');
         const [screenPointX, screenPointY] = getScreenPoint(e);
         const isMacrostratBasemap = currentBasemap?.source === 'macrostrat' && !stratSection && !currentImageBasemap;

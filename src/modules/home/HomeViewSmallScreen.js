@@ -1,4 +1,4 @@
-import React, {forwardRef, useEffect, useState} from 'react';
+import React, {forwardRef, useContext, useEffect, useState} from 'react';
 import {Platform, View} from 'react-native';
 
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
@@ -18,6 +18,7 @@ import MapContainer from '../maps/MapContainer';
 import {MAP_MODES} from '../maps/maps.constants';
 import {canceledIntervalDrag} from '../maps/maps.slice';
 import OfflineMapPreviewBanner from '../maps/offline-maps/OfflineMapPreviewBanner';
+import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
 import BackupStatusIcons from '../project/backup/BackupStatusIcons';
 import SpotNavigator from '../spots/SpotNavigator';
@@ -56,6 +57,7 @@ const HomeViewSmallScreen = forwardRef(({
   const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
+  const {confirmLeavePage, hasUnsavedPageChanges, isPageChanged} = useContext(LeavePageContext);
 
   const [isShowingSpotNavigator, setIsShowingSpotNavigator] = useState(false);
 
@@ -74,9 +76,10 @@ const HomeViewSmallScreen = forwardRef(({
     openSpotInNotebook(spot, notebookPage, attributes);
   };
 
-  // The navigator takes the map's place, so a map edit ends before it shows
+  // The navigator takes the place of the map, so a map edit ends first, and of the Notebook, so its page is asked about
   const toggleSpotNavigator = async () => {
     if (isMapEditing() && !await confirmEndMapEditing()) return;
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     dispatch(canceledIntervalDrag());
     closeNotebookPanel();
     setIsShowingSpotNavigator(s => !s);
@@ -127,8 +130,9 @@ const HomeViewSmallScreen = forwardRef(({
         <Tab.Navigator
           screenListeners={{focus: () => dispatch(canceledIntervalDrag())}}
           screenOptions={{
-            // A swipe to the Notebook can't wait for a map edit or interval drag to end, so it is off during either
-            swipeEnabled: mapMode !== MAP_MODES.EDIT && mapMode !== MAP_MODES.INTERVAL_DRAG,
+            // A swipe can't wait for an answer, so it is off while there is one to give: a map edit or interval drag
+            // to end before the Notebook shows, or a notebook page's unsaved changes before the Map does
+            swipeEnabled: mapMode !== MAP_MODES.EDIT && mapMode !== MAP_MODES.INTERVAL_DRAG && !isPageChanged,
             tabBarIndicatorContainerStyle: {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR},
             tabBarIndicatorStyle: {backgroundColor: themes.BLACK, height: 5},
             tabBarItemStyle: {padding: 0},
@@ -137,6 +141,14 @@ const HomeViewSmallScreen = forwardRef(({
           }}
         >
           <Tab.Screen
+            // Showing the Map closes the Notebook and the page on it
+            listeners={({navigation}) => ({
+              tabPress: async (e) => {
+                if (!hasUnsavedPageChanges()) return;
+                e.preventDefault();
+                if (await confirmLeavePage()) navigation.navigate('Map');
+              },
+            })}
             name={'Map'}
             options={{
               ...NAVIGATION_OPTIONS,

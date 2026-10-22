@@ -11,7 +11,7 @@ import {setIsNotebookPanelVisible, setNotebookPageVisible} from '../notebook-pan
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 // Animations for Drawers & Keyboard
-const useHomeAnimations = ({confirmEndMapEditing, isMapEditing, navigation}) => {
+const useHomeAnimations = ({confirmEndMapEditing, isMapEditing, leavePage, navigation}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -85,8 +85,10 @@ const useHomeAnimations = ({confirmEndMapEditing, isMapEditing, navigation}) => 
     animateDrawer(animatedValueLeftSide, MAIN_MENU_WIDTH);
   };
 
+  // Opening the notebook on a page leaves any page it already shows
   const openNotebookPanel = async (pageView) => {
     if (isMapEditing() && !await confirmEndMapEditing()) return;
+    if (leavePage.hasUnsavedPageChanges() && !await leavePage.confirmLeavePage()) return;
     console.log('Opening Notebook Panel...');
     dispatch(canceledIntervalDrag());
     dispatch(setNotebookPageVisible(pageView || PAGE_KEYS.OVERVIEW));

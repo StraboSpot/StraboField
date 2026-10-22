@@ -4,6 +4,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import ReactTestRenderer from 'react-test-renderer';
 
+import {LeavePageContext} from '../src/modules/notebook-panel/LeavePageContext';
 import BasicSedPage from '../src/modules/sed/BasicSedPage';
 import TephraPage from '../src/modules/tephra/TephraPage';
 
@@ -23,6 +24,16 @@ const getStore = (spot, selectedAttribute) => {
     user: {sesar: {userCodes: [], selectedUserCode: undefined, sesarToken: {}}},
   };
   return {getState: () => state, subscribe: () => () => {}, dispatch: action => action};
+};
+
+// The pages register with the leave-page gate HomeContainer provides, which these tests never ask
+const leavePage = {
+  confirmLeavePage: async () => true,
+  goToNotebookPage: async () => true,
+  hasUnsavedPageChanges: () => false,
+  registerOpenPage: () => {},
+  reportOpenPageChanged: () => {},
+  unregisterOpenPage: () => {},
 };
 
 // The tab bar, kept apart from the form below it: the fields carry their own required asterisks, so reading the
@@ -53,7 +64,7 @@ const openDetail = async ({isEdited, page, spot, selectedAttribute, tabIndex}) =
         initialMetrics={{frame: {x: 0, y: 0, width: 400, height: 800}, insets: {top: 0, bottom: 0, left: 0, right: 0}}}
       >
         <Provider store={getStore(spot, selectedAttribute)}>
-          {page}
+          <LeavePageContext.Provider value={leavePage}>{page}</LeavePageContext.Provider>
         </Provider>
       </SafeAreaProvider>,
     );

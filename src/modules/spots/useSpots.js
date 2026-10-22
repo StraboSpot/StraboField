@@ -61,7 +61,6 @@ const useSpots = () => {
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const recentViews = useSelector(state => state.spot.recentViews);
   const reports = useSelector(state => state.project.project?.reports);
-  const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
   const spotsInMapExtentIds = useSelector(state => state.map.spotsInMapExtentIds);
   const stratSection = useSelector(state => state.map.stratSection);
@@ -251,8 +250,8 @@ const useSpots = () => {
     }
   };
 
-  // Copy Spot to a new Spot omitting specific properties
-  const copySpot = async () => {
+  // Copy a Spot to a new Spot, omitting specific properties
+  const copySpot = async (spotToCopy) => {
     let copiedSpot = {'type': 'Feature'};
     let {
       name,
@@ -269,7 +268,7 @@ const useSpots = () => {
       orientation_data,
       spot_radius,
       ...properties
-    } = selectedSpot.properties;
+    } = spotToCopy.properties;
     copiedSpot.properties = properties;
     // Omit strat_section from copied properties
     if (copiedSpot.properties?.sed?.strat_section) {

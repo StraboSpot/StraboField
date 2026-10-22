@@ -28,7 +28,7 @@ import PageHeader from '../../page/PageHeader';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {hasSedRockData} from '../../sed/sed.helpers';
-import {editedSpotProperties} from '../../spots/spots.slice';
+import {editedSpotProperties, setSelectedAttributes} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 
 const RockPage = ({isReadOnly, page}) => {
@@ -149,6 +149,8 @@ const RockPage = ({isReadOnly, page}) => {
     }
     setIsDetailView(true);
     setSelectedRock(rock);
+    // In Redux too, or the next change to the Spot finds no selected rock and closes the detail view
+    dispatch(setSelectedAttributes([rock]));
     dispatch(setActiveModal({modal: null}));
   };
 

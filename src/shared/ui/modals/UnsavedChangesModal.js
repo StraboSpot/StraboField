@@ -7,8 +7,9 @@ import {UNSAVED_CHANGES_CHOICES} from './unsavedChanges.constants';
 import {MAX_CONTENT_WIDTH} from '../../styles.constants';
 
 // Asks what to do with unsaved changes before something else runs, with the same three choices wherever it is shown.
-// The caller says what the changes are, and gets the rest from useUnsavedChangesPrompt's promptProps.
-const UnsavedChangesModal = ({headerTitle, isVisible, message, onChoose, onDismiss}) => {
+// The caller says what the changes are, and gets the rest from useUnsavedChangesPrompt's promptProps. A tap on the
+// backdrop doesn't answer it: on web the second click of a double click on the map lands there as the prompt opens.
+const UnsavedChangesModal = ({headerTitle, isSaveDisabled, isVisible, message, onChoose, onDismiss}) => {
   const keepEditing = () => onChoose(UNSAVED_CHANGES_CHOICES.KEEP_EDITING);
 
   return (
@@ -17,11 +18,11 @@ const UnsavedChangesModal = ({headerTitle, isVisible, message, onChoose, onDismi
       cancelTitle={'Keep Editing'}
       closeModal={keepEditing}
       deleteTitle={'Discard'}
+      disabled={isSaveDisabled}
       headerTitle={headerTitle}
       isContentSized
       isVisible={isVisible}
       onActionPressed={() => onChoose(UNSAVED_CHANGES_CHOICES.SAVE)}
-      onBackdropPress={keepEditing}
       onCancelPress={keepEditing}
       onDeletePress={() => onChoose(UNSAVED_CHANGES_CHOICES.DISCARD)}
       onDismiss={onDismiss}

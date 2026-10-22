@@ -1,12 +1,13 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useContext, useRef} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {OTHER_FEATURE_FIELD_LABELS} from './otherFeatures.constants';
 import {getEnteredLabel} from './otherFeatures.helpers';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, isEqual} from '../../shared/helpers';
+import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -14,6 +15,7 @@ import FormikWrapper from '../form/FormikWrapper';
 import SelectInputField from '../form/inputs/SelectInputField';
 import TextInputField from '../form/inputs/TextInputField';
 import useForm from '../form/useForm';
+import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
@@ -33,52 +35,24 @@ const OtherFeatureDetail = ({
   const dispatch = useDispatch();
   const projectFeatures = useSelector(state => state.project.project?.other_features);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const {getLabel, getLabels, submitAndShowErrors} = useForm();
   const {deleteFeatureTags} = useTags();
 
-  /* Local State */
-
   const formRef = useRef(null);
-  // The values already saved, so leaving straight afterwards does not ask about them again. The form's own
-  // dirty flag is not enough on its own: the page can unmount in the same render pass as the save, leaving
-  // this ref holding the form as it was before it.
-  const savedValuesRef = useRef(null);
-
-  const [isFormDirty, setIsFormDirty] = useState(false);
-  const [isFormInvalid, setIsFormInvalid] = useState(false);
-
-  /* Side Effects */
-
-  useLayoutEffect(() => {
-    console.log('ULE OtherFeatureDetail []');
-    return () => confirmLeavePage();
-  }, []);
+  const {isFormDirty, isFormInvalid, markSaved, setIsFormDirty, setIsFormInvalid} = useUnsavedFormChanges({
+    formRef: formRef,
+    getMessage: () => `Your changes to this ${page.label_singular} haven't been saved.`,
+    onDiscard: hideFeatureDetail,
+    save: () => saveForm(formRef.current),
+  });
 
   /* Logic Helpers */
 
   const cancelForm = async () => {
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     hideFeatureDetail();
-  };
-
-  const confirmLeavePage = () => {
-    if (formRef.current?.dirty && !isEqual(formRef.current.values, savedValuesRef.current)) {
-      const formCurrent = formRef.current;
-      alert('Unsaved Changes',
-        'Would you like to save your data before continuing?',
-        [
-          {
-            text: 'No',
-            style: 'cancel',
-          },
-          {
-            text: 'Yes',
-            onPress: () => saveForm(formCurrent, true),
-          },
-        ],
-        {cancelable: false},
-      );
-    }
   };
 
   const deleteFeature = () => {
@@ -111,11 +85,10 @@ const OtherFeatureDetail = ({
     );
   };
 
-  // Whether the page is being left is the caller's to say, rather than read back off a ref that may not have
-  // been cleared yet - guessing it wrong refuses an edit whole that was meant to keep all but its bad field
-  const saveForm = async (formCurrent, isLeavingPage) => {
+  // Resolves whether the feature was saved. A refusal has already alerted about the field it stopped on.
+  const saveForm = async (formCurrent) => {
     try {
-      const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent, isLeavingPage);
+      const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
       let featureToEdit;
       let otherFeatures = spot.properties.other_features;
       if (otherFeatures && otherFeatures.length > 0) {
@@ -133,22 +106,23 @@ const OtherFeatureDetail = ({
         otherFeatures = [];
         featureToEdit = selectedFeature;
       }
-      if (updateFeature(featureToEdit, otherFeatures, formValues)) {
-        savedValuesRef.current = {...formRef.current.values};
-        await formRef.current.resetForm();
-        hideFeatureDetail();
-      }
+      if (!updateFeature(featureToEdit, otherFeatures, formValues)) return false;
+      markSaved();
+      await formRef.current.resetForm();
+      hideFeatureDetail();
+      return true;
     }
     catch (err) {
       console.error('Error submitting form', err);
+      return false;
     }
   };
 
   const updateFeature = (feature, otherFeatures, formValues) => {
     feature.name = formValues.name;
     if (formValues.type === 'other') {
-      // Leaving the page rolls a field in error back to what it was, so the new type can still be missing here
-      // even though the form holds Save until it is named
+      // A field already in error when the form opened is rolled back rather than refused (see showErrors), so the
+      // new type can still be missing here even though the form holds Save until it is named
       if (isEmpty(formValues.otherType)) return false;
       feature.type = formValues.otherType;
       dispatch(addedCustomFeatureTypes([...projectFeatures, formValues.otherType]));
@@ -171,15 +145,15 @@ const OtherFeatureDetail = ({
   /* Render Functions */
 
   const renderForm = () => {
-    // Validate the feature
+    // Worded like a survey's messages, which leave naming the field to its label
     const validateFeature = (values) => {
       const errors = {};
-      if (isEmpty(values.name)) errors.name = 'Feature name cannot be empty';
-      if (isEmpty(values.type)) errors.type = 'Feature type cannot be empty';
+      if (isEmpty(values.name)) errors.name = 'Required';
+      if (isEmpty(values.type)) errors.type = 'Required';
       if (values.type === 'other') {
-        if (isEmpty(values.otherType)) errors.otherType = 'New feature type cannot be empty';
+        if (isEmpty(values.otherType)) errors.otherType = 'Required';
         else if (projectFeatures.includes(values.otherType)) {
-          errors.otherType = 'The type ' + values.otherType + ' is already being used';
+          errors.otherType = 'The type ' + values.otherType + ' is already being used.';
         }
       }
       return errors;
@@ -197,6 +171,7 @@ const OtherFeatureDetail = ({
       <View style={{flex: 1}}>
         <FormikWrapper
           enableReinitialize={true}
+          fieldLabels={OTHER_FEATURE_FIELD_LABELS}
           initialValues={initialFeatureValues}
           innerRef={formRef}
           setIsFormDirty={setIsFormDirty}
@@ -209,7 +184,7 @@ const OtherFeatureDetail = ({
                 <ListItem.Content>
                   <TextInputField
                     editable={!isReadOnly}
-                    label={'Label'}
+                    label={OTHER_FEATURE_FIELD_LABELS.label}
                     name={'label'}
                   />
                 </ListItem.Content>
@@ -219,7 +194,7 @@ const OtherFeatureDetail = ({
                   <TextInputField
                     editable={!isReadOnly}
                     isRequired={true}
-                    label={'Name'}
+                    label={OTHER_FEATURE_FIELD_LABELS.name}
                     name={'name'}
                   />
                 </ListItem.Content>
@@ -232,7 +207,7 @@ const OtherFeatureDetail = ({
                     isReadOnly={isReadOnly}
                     isRequired={true}
                     isSingleSelect={true}
-                    label={'Feature Type'}
+                    label={OTHER_FEATURE_FIELD_LABELS.type}
                     name={'type'}
                   />
                 </ListItem.Content>
@@ -243,7 +218,7 @@ const OtherFeatureDetail = ({
                     <TextInputField
                       editable={!isReadOnly}
                       isRequired={true}
-                      label={'Other Feature Type'}
+                      label={OTHER_FEATURE_FIELD_LABELS.otherType}
                       name={'otherType'}
                     />
                   </ListItem.Content>
@@ -254,7 +229,7 @@ const OtherFeatureDetail = ({
                   <TextInputField
                     appearance={'multiline'}
                     editable={!isReadOnly}
-                    label={'Feature Description'}
+                    label={OTHER_FEATURE_FIELD_LABELS.description}
                     name={'description'}
                   />
                 </ListItem.Content>
