@@ -8,7 +8,7 @@ import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import PageHeader from '../page/PageHeader';
 
-const QAQC = ({page}) => {
+const QAQCPage = ({page}) => {
   /* Data Hooks */
 
   const existingQAQC = useSelector(state => state.spot.selectedSpot?.properties?.qaqc);
@@ -41,4 +41,4 @@ const QAQC = ({page}) => {
   );
 };
 
-export default QAQC;
+export default QAQCPage;

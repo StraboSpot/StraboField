@@ -31,7 +31,7 @@ import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
-const Geography = ({isReadOnly, page}) => {
+const GeographyPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -264,4 +264,4 @@ const Geography = ({isReadOnly, page}) => {
   );
 };
 
-export default Geography;
+export default GeographyPage;

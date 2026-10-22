@@ -20,7 +20,7 @@ import useForm from '../../form/useForm';
 import {setActiveModal, setModalValues} from '../../home/home.slice';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {getActiveTemplateList, getIsTemplateInUse} from '../../templates/templates.helpers';
-import TemplatesNotebook from '../../templates/TemplatesNotebook';
+import TemplatesPicker from '../../templates/TemplatesPicker';
 import usePetrology from '../usePetrology';
 
 const {firstKeys, igOrMetKey, igButtonsKeys, metButtonsKeys, lastKeys} = ADD_MINERAL_KEYS;
@@ -232,7 +232,7 @@ const AddMineralModal = () => {
       showCloseButton={!areMultipleTemplates}
     >
       {!choicesViewKey && isEmpty(selectedTypeIndex) && (
-        <TemplatesNotebook
+        <TemplatesPicker
           isShowTemplates={isShowTemplates}
           setIsShowTemplates={bool => setIsShowTemplates(bool)}
         />

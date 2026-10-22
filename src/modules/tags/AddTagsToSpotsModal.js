@@ -1,12 +1,12 @@
 import React from 'react';
 
-import TagsModal from './TagsModal';
+import TagsChecklist from './TagsChecklist';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
-const AddTagsToSpotsShortcutModal = ({zoomToCurrentLocation}) => {
+const AddTagsToSpotsModal = ({zoomToCurrentLocation}) => {
   /* Render Functions */
 
-  const renderAddTagsToSpotsShortcutModal = () => {
+  const renderAddTagsToSpotsModal = () => {
     return (
       <ModalWrapper
         isChildrenFilled={true}
@@ -14,14 +14,14 @@ const AddTagsToSpotsShortcutModal = ({zoomToCurrentLocation}) => {
         showCancelButton={false}
         showCloseButton={true}
       >
-        <TagsModal zoomToCurrentLocation={zoomToCurrentLocation}/>
+        <TagsChecklist zoomToCurrentLocation={zoomToCurrentLocation}/>
       </ModalWrapper>
     );
   };
 
   /* View */
 
-  return renderAddTagsToSpotsShortcutModal();
+  return renderAddTagsToSpotsModal();
 };
 
-export default AddTagsToSpotsShortcutModal;
+export default AddTagsToSpotsModal;

@@ -14,7 +14,7 @@ import PageHeader from '../page/PageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 import useProject from '../project/useProject';
 
-const Metadata = ({isReadOnly, page}) => {
+const MetadataPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -135,4 +135,4 @@ const Metadata = ({isReadOnly, page}) => {
   );
 };
 
-export default Metadata;
+export default MetadataPage;

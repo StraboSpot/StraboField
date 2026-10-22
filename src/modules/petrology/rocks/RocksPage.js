@@ -22,8 +22,8 @@ import FormikWrapper from '../../form/FormikWrapper';
 import SelectInputField from '../../form/inputs/SelectInputField';
 import useForm from '../../form/useForm';
 import {setActiveModal, setModalValues} from '../../home/home.slice';
-import BasicListItem from '../../page/BasicListItem';
-import BasicPageDetail from '../../page/BasicPageDetail';
+import FeatureDetail from '../../page/FeatureDetail';
+import FeatureListItem from '../../page/FeatureListItem';
 import PageHeader from '../../page/PageHeader';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
@@ -31,7 +31,7 @@ import {hasSedRockData} from '../../sed/sed.helpers';
 import {editedSpotProperties, setSelectedAttributes} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 
-const RockPage = ({isReadOnly, page}) => {
+const RocksPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -63,7 +63,7 @@ const RockPage = ({isReadOnly, page}) => {
   /* Side Effects */
 
   useEffect(() => {
-    console.log('UE RockPage [selectedAttributes, spot]', selectedAttributes, spot);
+    console.log('UE RocksPage [selectedAttributes, spot]', selectedAttributes, spot);
     if (isEmpty(selectedAttributes)) setSelectedRock({});
     else {
       setSelectedRock(selectedAttributes[0]);
@@ -188,7 +188,7 @@ const RockPage = ({isReadOnly, page}) => {
 
   const renderRockDetail = () => {
     return (
-      <BasicPageDetail
+      <FeatureDetail
         closeDetailView={() => setIsDetailView(false)}
         groupKey={groupKey}
         isReadOnly={isReadOnly}
@@ -237,7 +237,7 @@ const RockPage = ({isReadOnly, page}) => {
         ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
         renderItem={({item}) => (
-          <BasicListItem
+          <FeatureListItem
             editItem={editRock}
             item={item}
             page={page}
@@ -265,4 +265,4 @@ const RockPage = ({isReadOnly, page}) => {
   return isDetailView ? renderRockDetail() : renderRockMain();
 };
 
-export default RockPage;
+export default RocksPage;

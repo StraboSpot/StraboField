@@ -5,7 +5,7 @@ import {Provider} from 'react-redux';
 import ReactTestRenderer from 'react-test-renderer';
 
 import {LeavePageContext} from '../src/modules/notebook-panel/LeavePageContext';
-import BasicSedPage from '../src/modules/sed/BasicSedPage';
+import SedFeaturesPage from '../src/modules/sed/SedFeaturesPage';
 import TephraPage from '../src/modules/tephra/TephraPage';
 
 jest.mock('@react-navigation/native', () => ({
@@ -104,7 +104,7 @@ describe('lithology tabs', () => {
 
   const openLithology = (lithology, isEdited) => openDetail({
     isEdited: isEdited,
-    page: <BasicSedPage isReadOnly={false} page={{key: 'lithologies', label: 'Lithologies'}}/>,
+    page: <SedFeaturesPage isReadOnly={false} page={{key: 'lithologies', label: 'Lithologies'}}/>,
     selectedAttribute: lithology,
     spot: getIntervalSpot(lithology),
   });

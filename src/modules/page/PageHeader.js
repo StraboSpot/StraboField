@@ -18,7 +18,7 @@ import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
-import TagsNotebookModal from '../tags/TagsNotebookModal';
+import AddTagsModal from '../tags/AddTagsModal';
 
 const PageHeader = ({
                       hideBackButton,
@@ -122,7 +122,7 @@ const PageHeader = ({
         </View>
       )}
       {isFeatureTagsModalVisible && (
-        <TagsNotebookModal
+        <AddTagsModal
           closeModal={() => setIsFeatureTagsModalVisible(false)}
           headerTitle={'Add Feature Tags'}
           isFeatureLevelTagging

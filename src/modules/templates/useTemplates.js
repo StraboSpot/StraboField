@@ -45,14 +45,14 @@ const useTemplates = () => {
     else if (key) return toTitleCase(key.replaceAll('_', ' ').trim());
   };
 
-  // Saves the form on screen as a template. The half TemplatesNotebook also needs is in saveTemplateValues.
+  // Saves the form on screen as a template. The half TemplatesPicker also needs is in saveTemplateValues.
   const saveTemplate = async (formCurrent, templateKey, selectedTemplate, name) => {
     // The form holds Save until the name is filled in, so this is a backstop. It throws rather than returns
     // because the caller leaves the page on a save that comes back.
     if (isEmpty(name?.trim())) throw Error('Template name is empty.');
     const {values: values} = await submitAndShowErrors(formCurrent);
     saveTemplateValues(templateKey, selectedTemplate, name, values);
-    // Saving from a detail page turns templates on for that key. TemplatesNotebook deliberately does not -
+    // Saving from a detail page turns templates on for that key. TemplatesPicker deliberately does not -
     // it shows the user a switch for this instead.
     dispatch(setUseTemplate({key: templateKey, bool: true}));
   };

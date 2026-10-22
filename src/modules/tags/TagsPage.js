@@ -13,7 +13,7 @@ import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {addedTagToSelectedSpot} from '../project/projects.slice';
 
-const TagsNotebook = ({isReadOnly, isSample, openMainMenuPanel, page}) => {
+const TagsPage = ({isReadOnly, isSample, openMainMenuPanel, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -66,4 +66,4 @@ const TagsNotebook = ({isReadOnly, isSample, openMainMenuPanel, page}) => {
   );
 };
 
-export default TagsNotebook;
+export default TagsPage;

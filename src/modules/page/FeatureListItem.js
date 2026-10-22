@@ -9,7 +9,7 @@ import {MEDIUMGREY} from '../../shared/styles.constants';
 import useForm from '../form/useForm';
 import useSed from '../sed/useSed';
 
-const BasicListItem = ({
+const FeatureListItem = ({
                          drag,
                          editItem,
                          index,
@@ -87,4 +87,4 @@ const BasicListItem = ({
   );
 };
 
-export default BasicListItem;
+export default FeatureListItem;

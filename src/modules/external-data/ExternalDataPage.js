@@ -14,7 +14,7 @@ import TextInput from '../../shared/ui/TextInput';
 import formStyles from '../form/form.styles';
 import PageHeader from '../page/PageHeader';
 
-const ExternalData = ({isReadOnly, page}) => {
+const ExternalDataPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -151,4 +151,4 @@ const ExternalData = ({isReadOnly, page}) => {
   );
 };
 
-export default ExternalData;
+export default ExternalDataPage;

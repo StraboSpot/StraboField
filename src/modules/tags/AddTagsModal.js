@@ -2,14 +2,14 @@ import React from 'react';
 
 import {useSelector} from 'react-redux';
 
-import TagsModal from './TagsModal';
+import TagsChecklist from './TagsChecklist';
 import {isEmpty} from '../../shared/helpers';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
-const TagsNotebookModal = ({closeModal, headerTitle, isFeatureLevelTagging}) => {
+const AddTagsModal = ({closeModal, headerTitle, isFeatureLevelTagging}) => {
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
-  const renderTagsModalContent = () => {
+  const renderAddTagsModal = () => {
     return (
       <ModalWrapper
         closeModal={closeModal}
@@ -19,13 +19,13 @@ const TagsNotebookModal = ({closeModal, headerTitle, isFeatureLevelTagging}) => 
         showCancelButton={false}
         showCloseButton
       >
-        <TagsModal isFeatureLevelTagging={isFeatureLevelTagging}/>
+        <TagsChecklist isFeatureLevelTagging={isFeatureLevelTagging}/>
       </ModalWrapper>
     );
   };
 
-  if (!isEmpty(selectedSpot)) return renderTagsModalContent();
+  if (!isEmpty(selectedSpot)) return renderAddTagsModal();
   else return null;
 };
 
-export default TagsNotebookModal;
+export default AddTagsModal;

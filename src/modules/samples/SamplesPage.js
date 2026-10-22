@@ -11,7 +11,7 @@ import {isEmpty} from '../../shared/helpers';
 import {setActiveModal} from '../home/home.slice';
 import MicroProjectPDFLink from '../micro/MicroProjectPDFLink';
 import {setNotebookPageVisible, setRequestedSampleDetailTab} from '../notebook-panel/notebook.slice';
-import BasicPageDetail from '../page/BasicPageDetail';
+import FeatureDetail from '../page/FeatureDetail';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import SubpageTabs from '../page/SubpageTabs';
@@ -92,7 +92,7 @@ const SamplesPage = ({
   /* Render Functions */
 
   const renderSampleDetail = () => (
-    <BasicPageDetail
+    <FeatureDetail
       PageTabsComponent={tabs.length > 1 && (
         <SubpageTabs
           formCategory={'general'}

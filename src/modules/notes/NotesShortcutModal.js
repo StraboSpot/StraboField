@@ -1,10 +1,10 @@
 import React, {useRef, useState} from 'react';
 
-import Notes from './Notes';
+import NotesPage from './NotesPage';
 import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
-const ShortcutNotesModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}) => {
+const NotesShortcutModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}) => {
   /* Data Hooks */
 
   // const {lockToPortrait, unlockOrientation} = useDeviceOrientation();
@@ -13,7 +13,7 @@ const ShortcutNotesModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}
 
   const [isSaving, setIsSaving] = useState(false);
 
-  // Holds the note-saving action that <Notes> registers, so the sticky footer button can call it.
+  // Holds the note-saving action that <NotesPage> registers, so the sticky footer button can call it.
   const saveRef = useRef(null);
 
   /* Side Effects */
@@ -52,7 +52,7 @@ const ShortcutNotesModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}
       showCancelButton={false}
       showCloseButton
     >
-      <Notes
+      <NotesPage
         openSpotInNotebook={openSpotInNotebook}
         registerSave={saveRef}
         zoomToCurrentLocation={zoomToCurrentLocation}
@@ -62,4 +62,4 @@ const ShortcutNotesModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}
   );
 };
 
-export default ShortcutNotesModal;
+export default NotesShortcutModal;

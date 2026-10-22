@@ -13,8 +13,8 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import useForm from '../form/useForm';
 import {setActiveModal} from '../home/home.slice';
-import BasicListItem from '../page/BasicListItem';
-import BasicPageDetail from '../page/BasicPageDetail';
+import FeatureDetail from '../page/FeatureDetail';
+import FeatureListItem from '../page/FeatureListItem';
 import PageHeader from '../page/PageHeader';
 import SubpageTabs from '../page/SubpageTabs';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -105,7 +105,7 @@ const TephraPage = ({isReadOnly, page}) => {
     const siblingSurvey = getSiblingSurvey(['tephra', subpageKey], subpageKeys);
     return (
       <>
-        <BasicPageDetail
+        <FeatureDetail
           PageTabsComponent={
             <SubpageTabs
               formCategory={'tephra'}
@@ -145,7 +145,7 @@ const TephraPage = ({isReadOnly, page}) => {
             onDragEnd={({data}) => setData(data)}
             renderItem={({item, getIndex, drag}) => (
               <ShadowDecorator>
-                <BasicListItem
+                <FeatureListItem
                   drag={Platform.OS === 'web' || isReadOnly ? undefined : drag}
                   editItem={editAttribute}
                   index={getIndex()}

@@ -10,15 +10,15 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import useForm from '../form/useForm';
 import {setActiveModal} from '../home/home.slice';
-import BasicListItem from '../page/BasicListItem';
-import BasicPageDetail from '../page/BasicPageDetail';
+import FeatureDetail from '../page/FeatureDetail';
+import FeatureListItem from '../page/FeatureListItem';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import SubpageTabs from '../page/SubpageTabs';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const BasicSedPage = ({isReadOnly, page}) => {
+const SedFeaturesPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -47,7 +47,7 @@ const BasicSedPage = ({isReadOnly, page}) => {
   /* Side Effects */
 
   useEffect(() => {
-    // console.log('UE BasicSedPage [selectedAttributes, spot]', selectedAttributes, spot);
+    // console.log('UE SedFeaturesPage [selectedAttributes, spot]', selectedAttributes, spot);
     if (!isEmpty(selectedAttributes)) {
       setSelectedAttribute(selectedAttributes[0]);
       setIsDetailView(true);
@@ -89,31 +89,29 @@ const BasicSedPage = ({isReadOnly, page}) => {
       // field another asks for is unanswered wherever you are standing. Both are checked against these
       const siblingSurvey = getSiblingSurvey(['sed', subpageKey], subpageKeys);
       return (
-        <>
-          <BasicPageDetail
-            PageTabsComponent={
-              <SubpageTabs
-                formCategory={'sed'}
-                invalidFields={invalidFields}
-                onPress={i => setSelectedTypeIndex(i)}
-                selectedIndex={selectedTypeIndex}
-                subpageKeys={subpageKeys}
-              />
-            }
-            closeDetailView={() => setIsDetailView(false)}
-            groupKey={'sed'}
-            isReadOnly={isReadOnly}
-            page={{...page, key: subpageKey}}
-            selectedFeature={selectedAttribute}
-            setInvalidFields={setInvalidFields}
-            siblingSurvey={siblingSurvey}
-          />
-        </>
+        <FeatureDetail
+          PageTabsComponent={
+            <SubpageTabs
+              formCategory={'sed'}
+              invalidFields={invalidFields}
+              onPress={i => setSelectedTypeIndex(i)}
+              selectedIndex={selectedTypeIndex}
+              subpageKeys={subpageKeys}
+            />
+          }
+          closeDetailView={() => setIsDetailView(false)}
+          groupKey={'sed'}
+          isReadOnly={isReadOnly}
+          page={{...page, key: subpageKey}}
+          selectedFeature={selectedAttribute}
+          setInvalidFields={setInvalidFields}
+          siblingSurvey={siblingSurvey}
+        />
       );
     }
     else {
       return (
-        <BasicPageDetail
+        <FeatureDetail
           closeDetailView={() => setIsDetailView(false)}
           groupKey={'sed'}
           isReadOnly={isReadOnly}
@@ -136,7 +134,7 @@ const BasicSedPage = ({isReadOnly, page}) => {
           data={attributes}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item, index}) => (
-            <BasicListItem
+            <FeatureListItem
               editItem={itemToEdit => editAttribute(itemToEdit, index)}
               index={index}
               item={item}
@@ -153,4 +151,4 @@ const BasicSedPage = ({isReadOnly, page}) => {
   return isDetailView ? renderAttributeDetail() : renderAttributesMain();
 };
 
-export default BasicSedPage;
+export default SedFeaturesPage;

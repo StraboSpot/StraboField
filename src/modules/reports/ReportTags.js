@@ -13,8 +13,8 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import imageStyles from '../images/image.styles';
+import TagsChecklist from '../tags/TagsChecklist';
 import TagsListItem from '../tags/TagsListItem';
-import TagsModal from '../tags/TagsModal';
 
 const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed, isReadOnly}) => {
   /* Data Hooks */
@@ -86,11 +86,11 @@ const ReportTags = ({checkedTagsIds, handleTagChecked, handleTagPressed, isReadO
         >
           {Platform.OS === 'web' ? (
             <ScrollView>
-              <TagsModal checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>
+              <TagsChecklist checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>
             </ScrollView>
           ) : (
             <FlatList
-              ListHeaderComponent={<TagsModal checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>}
+              ListHeaderComponent={<TagsChecklist checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>}
             />
           )}
         </ModalWrapper>

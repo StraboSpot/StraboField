@@ -17,7 +17,7 @@ const findMissingComponents = (pageConstants) => {
 
 test.each([
   '../src/modules/page/PageHeader',
-  '../src/modules/tags/TagsNotebookModal',
+  '../src/modules/tags/AddTagsModal',
   '../src/modules/fabrics/AddFabricModal',
   '../src/shared/ui/modals/ModalWrapper',
 ])('page.constants resolves every registered component with %s loaded first', (path) => {

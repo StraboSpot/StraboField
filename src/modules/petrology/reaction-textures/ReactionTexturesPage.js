@@ -12,9 +12,9 @@ import SectionDivider from '../../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import useForm from '../../form/useForm';
 import {setActiveModal} from '../../home/home.slice';
-import BasicListItem from '../../page/BasicListItem';
-import BasicPageDetail from '../../page/BasicPageDetail';
+import FeatureDetail from '../../page/FeatureDetail';
 import {getFeatureTitle} from '../../page/featureLabels.helpers';
+import FeatureListItem from '../../page/FeatureListItem';
 import PageHeader from '../../page/PageHeader';
 import {setSelectedAttributes} from '../../spots/spots.slice';
 import {getMineralTitle} from '../minerals/minerals.helpers';
@@ -76,7 +76,7 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
 
   const renderReactionDetail = () => {
     return (
-      <BasicPageDetail
+      <FeatureDetail
         closeDetailView={() => setIsDetailView(false)}
         groupKey={'pet'}
         isReadOnly={isReadOnly}
@@ -119,7 +119,7 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
               (a, b) => getFeatureTitle(page.key, a, getLabel, getLabels)
                 .localeCompare(getFeatureTitle(page.key, b, getLabel, getLabels)))}
           keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => <BasicListItem editItem={editReaction} item={item} page={page}/>}
+          renderItem={({item}) => <FeatureListItem editItem={editReaction} item={item} page={page}/>}
         />
       </View>
     );

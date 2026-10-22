@@ -6,7 +6,7 @@ import TablesData from './TablesData';
 import UrlData from './URLData';
 import {isEmpty} from '../../shared/helpers';
 
-const DataOverview = () => {
+const ExternalDataOverview = () => {
   /* Data Hooks */
 
   const spot = useSelector(state => state.spot.selectedSpot);
@@ -21,4 +21,4 @@ const DataOverview = () => {
   );
 };
 
-export default DataOverview;
+export default ExternalDataOverview;

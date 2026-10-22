@@ -19,9 +19,9 @@ import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import {getActiveTemplateList, getIsTemplateInUse} from '../templates/templates.helpers';
-import TemplatesNotebook from '../templates/TemplatesNotebook';
+import TemplatesPicker from '../templates/TemplatesPicker';
 
-const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocation}) => {
+const NotesPage = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocation}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -66,7 +66,7 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
   // the Spot is created and selected first, then the note written into it, so the id alone never sees the note
   // arrive and the page would hold the blank values it initialized with.
   useLayoutEffect(() => {
-    console.log('ULE Notes [templates, selectedSpot id, initialNote]', templates);
+    console.log('ULE NotesPage [templates, selectedSpot id, initialNote]', templates);
     const activeNoteTemplates = getActiveTemplateList(templates, PAGE_KEYS.NOTES);
     if (!isReadOnly && isEmpty(initialNote) && getIsTemplateInUse(templates, PAGE_KEYS.NOTES)
       && !isEmpty(activeNoteTemplates)) {
@@ -140,7 +140,7 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
     }
   };
 
-  // Expose the save action to a parent-owned sticky footer button (see ShortcutNotesModal).
+  // Expose the save action to a parent-owned sticky footer button (see NotesShortcutModal).
   if (registerSave) registerSave.current = () => saveFormAndGo(formRef.current);
 
   /* Render Functions */
@@ -166,7 +166,7 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
               <Text>a new spot.</Text>
             </View>
           )}
-          <TemplatesNotebook
+          <TemplatesPicker
             isShowTemplates={isShowTemplates}
             page={page}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}
@@ -176,7 +176,7 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
         <>
           {!isShowTemplates && renderCancelSaveButtons()}
           {!isReadOnly && (
-            <TemplatesNotebook
+            <TemplatesPicker
               isShowTemplates={isShowTemplates}
               page={page}
               setIsShowTemplates={bool => setIsShowTemplates(bool)}
@@ -186,18 +186,16 @@ const Notes = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentLocat
       )}
       <FlatListItemSeparator/>
       {!isShowTemplates && (
-        <>
-          <NoteForm
-            formRef={formRef}
-            initialNotesValues={initialNotesValues}
-            isFillHeight={isShortcutNote}
-            isReadOnly={isReadOnly}
-            setIsFormDirty={setIsFormDirty}
-          />
-        </>
+        <NoteForm
+          formRef={formRef}
+          initialNotesValues={initialNotesValues}
+          isFillHeight={isShortcutNote}
+          isReadOnly={isReadOnly}
+          setIsFormDirty={setIsFormDirty}
+        />
       )}
     </View>
   );
 };
 
-export default Notes;
+export default NotesPage;

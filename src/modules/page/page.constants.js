@@ -1,12 +1,12 @@
-import BasicOverviewList from './BasicOverviewList';
+import FeatureOverviewList from './FeatureOverviewList';
 import Overview from './Overview';
 import {MODAL_KEYS, PAGE_KEYS} from './pageKeys.constants';
-import DataOverview from '../external-data/DataOverview';
-import ExternalData from '../external-data/ExternalData';
+import ExternalDataOverview from '../external-data/ExternalDataOverview';
+import ExternalDataPage from '../external-data/ExternalDataPage';
 import AddFabricModal from '../fabrics/AddFabricModal';
 import FabricsOverview from '../fabrics/FabricsOverview';
 import FabricsPage from '../fabrics/FabricsPage';
-import Geography from '../geography/Geography';
+import GeographyPage from '../geography/GeographyPage';
 import AddEarthquakeModal from '../geomorph/AddEarthquakeModal';
 import EarthquakesPage from '../geomorph/EarthquakesPage';
 import ImagesOverview from '../images/ImagesOverview';
@@ -15,11 +15,11 @@ import AddIntervalModal from '../maps/strat-section/AddIntervalModal';
 import AddMeasurementModal from '../measurements/AddMeasurementModal';
 import MeasurementsOverview from '../measurements/MeasurementsOverview';
 import MeasurementsPage from '../measurements/MeasurementsPage';
-import Metadata from '../metadata/Metadata';
-import Nesting from '../nesting/Nesting';
-import NotesPage from '../notes/Notes';
+import MetadataPage from '../metadata/MetadataPage';
+import NestingPage from '../nesting/NestingPage';
 import NotesOverview from '../notes/NotesOverview';
-import ShortcutNotesModal from '../notes/ShortcutNotesModal';
+import NotesPage from '../notes/NotesPage';
+import NotesShortcutModal from '../notes/NotesShortcutModal';
 import OtherFeaturesOverview from '../other-features/OtherFeaturesOverview';
 import OtherFeaturesPage from '../other-features/OtherFeaturesPage';
 import OutcropSummaryPage from '../outcrop-summary/OutcropSummaryPage';
@@ -34,8 +34,8 @@ import RockFaultPage from '../petrology/rocks/RockFaultPage';
 import RockIgneousPage from '../petrology/rocks/RockIgneousPage';
 import RockMetamorphicPage from '../petrology/rocks/RockMetamorphicPage';
 import RockSedimentaryPage from '../petrology/rocks/RockSedimentaryPage';
-import QAQCPage from '../qaqc/QAQC';
 import QAQCOverview from '../qaqc/QAQCOverview';
+import QAQCPage from '../qaqc/QAQCPage';
 import ReportModal from '../reports/ReportModal';
 import ReportsListModal from '../reports/ReportsListModal';
 import ReportsOverview from '../reports/ReportsOverview';
@@ -44,17 +44,17 @@ import IGSNPage from '../samples/igsn/IGSNPage';
 import SampleModal from '../samples/SampleModal';
 import SamplesOverview from '../samples/SamplesOverview';
 import SamplesPage from '../samples/SamplesPage';
-import BasicSedPage from '../sed/BasicSedPage';
 import BeddingPage from '../sed/BeddingPage';
 import IntervalOverview from '../sed/IntervalOverview';
 import IntervalPage from '../sed/IntervalPage';
+import SedFeaturesPage from '../sed/SedFeaturesPage';
 import StratSectionPage from '../sed/StratSectionPage';
 import SiteSafetyPage from '../site-safety/SiteSafetyPage';
 import SpotsRawDataView from '../spots/SpotsRawDataView';
-import AddTagsToSpotsShortcutModal from '../tags/AddTagsToSpotsShortcutModal';
+import AddTagsModal from '../tags/AddTagsModal';
+import AddTagsToSpotsModal from '../tags/AddTagsToSpotsModal';
 import TagsAtSpotList from '../tags/TagsAtSpotList';
-import TagsNotebook from '../tags/TagsNotebook';
-import TagsNotebookModal from '../tags/TagsNotebookModal';
+import TagsPage from '../tags/TagsPage';
 import TagsShortcutModal from '../tags/TagsShortcutModal';
 import TephraPage from '../tephra/TephraPage';
 import AddThreeDStructureModal from '../three-d-structures/AddThreeDStructureModal';
@@ -80,8 +80,8 @@ export const PRIMARY_PAGES = [
     icon_src: require('../../assets/icons/GeologicUnit.png'),
     icon_pressed_src: require('../../assets/icons/GeologicUnit_pressed.png'),
     overview_component: () => TagsAtSpotList,
-    page_component: () => TagsNotebook,
-    modal_component: () => TagsNotebookModal,
+    page_component: () => TagsPage,
+    modal_component: () => AddTagsModal,
     action_label: 'Add Geologic Units',
   }, {
     key: PAGE_KEYS.IMAGES,
@@ -121,8 +121,8 @@ export const PRIMARY_PAGES = [
     icon_src: require('../../assets/icons/Tag.png'),
     icon_pressed_src: require('../../assets/icons/Tag_pressed.png'),
     overview_component: () => TagsAtSpotList,
-    page_component: () => TagsNotebook,
-    modal_component: () => TagsNotebookModal,
+    page_component: () => TagsPage,
+    modal_component: () => AddTagsModal,
     action_label: 'Add Tags',
   },
 ];
@@ -145,7 +145,7 @@ const GENERAL_FEATURES_PAGES = [
     icon_pressed_src: require('../../assets/icons/Earthquake_pressed.png'),
     page_component: () => EarthquakesPage,
     modal_component: () => AddEarthquakeModal,
-    overview_component: () => BasicOverviewList,
+    overview_component: () => FeatureOverviewList,
     action_label: 'Add an Earthquake Feature',
   }, {
     key: PAGE_KEYS.FABRICS,
@@ -177,7 +177,7 @@ const GENERAL_FEATURES_PAGES = [
     icon_src: require('../../assets/icons/Tephra.png'),
     icon_pressed_src: require('../../assets/icons/Tephra_pressed.png'),
     page_component: () => TephraPage,
-    overview_component: () => BasicOverviewList,
+    overview_component: () => FeatureOverviewList,
     action_label: 'Add a Tephra Layer',
   },
 ];
@@ -188,8 +188,8 @@ export const SUPPLEMENTAL_PAGES = [
     label: 'Links & Tables',
     icon_src: require('../../assets/icons/Data.png'),
     icon_pressed_src: require('../../assets/icons/Data_pressed.png'),
-    page_component: () => ExternalData,
-    overview_component: () => DataOverview,
+    page_component: () => ExternalDataPage,
+    overview_component: () => ExternalDataOverview,
   }, {
     key: PAGE_KEYS.REPORTS,
     label: 'Memos',
@@ -219,7 +219,7 @@ export const SUBPAGES = [
   {
     key: PAGE_KEYS.GEOGRAPHY,
     label: 'Geography',
-    page_component: () => Geography,
+    page_component: () => GeographyPage,
   },
   {
     key: PAGE_KEYS.IGSN,
@@ -229,11 +229,11 @@ export const SUBPAGES = [
   {
     key: PAGE_KEYS.NESTING,
     label: 'Nesting',
-    page_component: () => Nesting,
+    page_component: () => NestingPage,
   }, {
     key: PAGE_KEYS.METADATA,
     label: 'Metadata',
-    page_component: () => Metadata,
+    page_component: () => MetadataPage,
   },
 ];
 
@@ -243,7 +243,7 @@ export const PET_PAGES = [
     label: 'Alteration, Ore Rocks',
     icon_src: require('../../assets/icons/Economic.png'),
     icon_pressed_src: require('../../assets/icons/Economic_pressed.png'),
-    overview_component: () => BasicOverviewList,
+    overview_component: () => FeatureOverviewList,
     page_component: () => RockAlterationOrePage,
     modal_component: () => AddRockModal,
     action_label: 'Add an Alteration, Ore Rock',
@@ -252,7 +252,7 @@ export const PET_PAGES = [
     label: 'Fault & Shear Zone Rocks',
     icon_src: require('../../assets/icons/FaultRock.png'),
     icon_pressed_src: require('../../assets/icons/FaultRock_pressed.png'),
-    overview_component: () => BasicOverviewList,
+    overview_component: () => FeatureOverviewList,
     page_component: () => RockFaultPage,
     modal_component: () => AddRockModal,
     action_label: 'Add a Fault or Shear Zone Rock',
@@ -261,7 +261,7 @@ export const PET_PAGES = [
     label: 'Igneous Rocks',
     icon_src: require('../../assets/icons/Igneous.png'),
     icon_pressed_src: require('../../assets/icons/Igneous_pressed.png'),
-    overview_component: () => BasicOverviewList,
+    overview_component: () => FeatureOverviewList,
     page_component: () => RockIgneousPage,
     modal_component: () => AddRockModal,
     action_label: 'Add an Igneous Rock',
@@ -270,7 +270,7 @@ export const PET_PAGES = [
     label: 'Metamorphic Rocks',
     icon_src: require('../../assets/icons/Metamorphic.png'),
     icon_pressed_src: require('../../assets/icons/Metamorphic_pressed.png'),
-    overview_component: () => BasicOverviewList,
+    overview_component: () => FeatureOverviewList,
     page_component: () => RockMetamorphicPage,
     modal_component: () => AddRockModal,
     action_label: 'Add a Metamorphic Rock',
@@ -279,7 +279,7 @@ export const PET_PAGES = [
     label: 'Minerals',
     icon_src: require('../../assets/icons/Minerals.png'),
     icon_pressed_src: require('../../assets/icons/Minerals_pressed.png'),
-    overview_component: () => BasicOverviewList,
+    overview_component: () => FeatureOverviewList,
     page_component: () => MineralsPage,
     modal_component: () => AddMineralModal,
     action_label: 'Add Mineral Data',
@@ -288,7 +288,7 @@ export const PET_PAGES = [
     label: 'Reaction Textures',
     icon_src: require('../../assets/icons/Reactions.png'),
     icon_pressed_src: require('../../assets/icons/Reactions_pressed.png'),
-    overview_component: () => BasicOverviewList,
+    overview_component: () => FeatureOverviewList,
     page_component: () => ReactionTexturesPage,
     modal_component: () => AddReactionTextureModal,
     action_label: 'Add a Reaction Texture',
@@ -312,7 +312,7 @@ const SEDIMENTARY_ROCKS_PAGE = {
   label: 'Sedimentary Rocks',
   icon_src: require('../../assets/icons/Sedimentary.png'),
   icon_pressed_src: require('../../assets/icons/Sedimentary_pressed.png'),
-  overview_component: () => BasicOverviewList,
+  overview_component: () => FeatureOverviewList,
   page_component: () => RockSedimentaryPage,
   modal_component: () => AddRockModal,
   action_label: 'Add a Sedimentary Rock',
@@ -326,31 +326,31 @@ const SEDIMENTOLOGY_PAGES = [
     icon_src: require('../../assets/icons/SedBedding.png'),
     icon_pressed_src: require('../../assets/icons/SedBedding_pressed.png'),
     page_component: () => BeddingPage,
-    overview_component: () => BasicOverviewList,
+    overview_component: () => FeatureOverviewList,
   }, {
     key: PAGE_KEYS.DIAGENESIS,
     label: 'Diagenesis',
     label_singular: 'Diagenesis',
     icon_src: require('../../assets/icons/SedDiagenesis.png'),
     icon_pressed_src: require('../../assets/icons/SedDiagenesis_pressed.png'),
-    overview_component: () => BasicOverviewList,
-    page_component: () => BasicSedPage,
+    overview_component: () => FeatureOverviewList,
+    page_component: () => SedFeaturesPage,
   }, {
     key: PAGE_KEYS.FOSSILS,
     label: 'Fossils',
     label_singular: 'Fossil',
     icon_src: require('../../assets/icons/SedFossil.png'),
     icon_pressed_src: require('../../assets/icons/SedFossil_pressed.png'),
-    overview_component: () => BasicOverviewList,
-    page_component: () => BasicSedPage,
+    overview_component: () => FeatureOverviewList,
+    page_component: () => SedFeaturesPage,
   }, {
     key: PAGE_KEYS.INTERPRETATIONS,
     label: 'Interpretations',
     label_singular: 'Interpretation',
     icon_src: require('../../assets/icons/SedInterpretation.png'),
     icon_pressed_src: require('../../assets/icons/SedInterpretation_pressed.png'),
-    overview_component: () => BasicOverviewList,
-    page_component: () => BasicSedPage,
+    overview_component: () => FeatureOverviewList,
+    page_component: () => SedFeaturesPage,
   }, {
     key: PAGE_KEYS.INTERVAL,
     label: 'Interval',
@@ -365,23 +365,23 @@ const SEDIMENTOLOGY_PAGES = [
     label_singular: 'Lithology',
     icon_src: require('../../assets/icons/SedLithologies.png'),
     icon_pressed_src: require('../../assets/icons/SedLithologies_pressed.png'),
-    overview_component: () => BasicOverviewList,
-    page_component: () => BasicSedPage,
+    overview_component: () => FeatureOverviewList,
+    page_component: () => SedFeaturesPage,
   }, {
     key: PAGE_KEYS.STRUCTURES,
     label: 'Sedimentology Structures',
     label_singular: 'Sedimentology Structure',
     icon_src: require('../../assets/icons/SedStructure.png'),
     icon_pressed_src: require('../../assets/icons/SedStructure_pressed.png'),
-    overview_component: () => BasicOverviewList,
-    page_component: () => BasicSedPage,
+    overview_component: () => FeatureOverviewList,
+    page_component: () => SedFeaturesPage,
   }, {
     key: PAGE_KEYS.STRAT_SECTION,
     label: 'Strat Section',
     label_singular: 'Strat Section',
     icon_src: require('../../assets/icons/SedStratColumn.png'),
     icon_pressed_src: require('../../assets/icons/SedStratColumn_pressed.png'),
-    overview_component: () => BasicOverviewList,
+    overview_component: () => FeatureOverviewList,
     page_component: () => StratSectionPage,
   },
 ];
@@ -456,7 +456,7 @@ export const SHORTCUT_MODALS = [
     action_label: 'Shortcut Mode: \nAdd a Note',
     icon_src: require('../../assets/icons/NotesButtonShortcut.png'),
     icon_pressed_src: require('../../assets/icons/NotesButtonShortcut_pressed.png'),
-    modal_component: () => ShortcutNotesModal,
+    modal_component: () => NotesShortcutModal,
     notebook_modal_key: PAGE_KEYS.NOTES,
   }, {
     key: MODAL_KEYS.SHORTCUTS.PHOTO,
@@ -489,7 +489,7 @@ const OTHER_MODALS = [
   }, {
     key: MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS,
     label: 'Add Tags To Spots',
-    modal_component: () => AddTagsToSpotsShortcutModal,
+    modal_component: () => AddTagsToSpotsModal,
   },
 ];
 

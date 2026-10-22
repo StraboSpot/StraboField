@@ -25,7 +25,7 @@ import {setActiveModal, setModalValues} from '../../home/home.slice';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import useSed from '../../sed/useSed';
 import {getActiveTemplateList, getIsTemplateInUse} from '../../templates/templates.helpers';
-import TemplatesNotebook from '../../templates/TemplatesNotebook';
+import TemplatesPicker from '../../templates/TemplatesPicker';
 import usePetrology from '../usePetrology';
 
 const AddRockModal = ({modalKey}) => {
@@ -187,7 +187,7 @@ const AddRockModal = ({modalKey}) => {
           />
         )}
         {!choicesViewKey && (
-          <TemplatesNotebook
+          <TemplatesPicker
             isShowTemplates={isShowTemplates}
             rockKey={rockKey}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}

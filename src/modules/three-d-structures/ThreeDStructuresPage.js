@@ -12,7 +12,7 @@ import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import useForm from '../form/useForm';
 import {setActiveModal, setModalValues} from '../home/home.slice';
-import BasicPageDetail from '../page/BasicPageDetail';
+import FeatureDetail from '../page/FeatureDetail';
 import PageHeader from '../page/PageHeader';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
@@ -133,7 +133,7 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
         </View>
       )}
       {isDetailView && (
-        <BasicPageDetail
+        <FeatureDetail
           closeDetailView={() => setIsDetailView(false)}
           isReadOnly={isReadOnly}
           page={page}

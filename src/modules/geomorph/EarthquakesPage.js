@@ -7,8 +7,8 @@ import {getNewUUID, isEmpty} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {setActiveModal} from '../home/home.slice';
-import BasicListItem from '../page/BasicListItem';
-import BasicPageDetail from '../page/BasicPageDetail';
+import FeatureDetail from '../page/FeatureDetail';
+import FeatureListItem from '../page/FeatureListItem';
 import PageHeader from '../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
@@ -64,7 +64,7 @@ const EarthquakesPage = ({isReadOnly, page}) => {
 
   const renderAttributeDetail = () => {
     return (
-      <BasicPageDetail
+      <FeatureDetail
         closeDetailView={() => setIsDetailView(false)}
         isReadOnly={isReadOnly}
         page={page}
@@ -83,7 +83,7 @@ const EarthquakesPage = ({isReadOnly, page}) => {
           data={attributes}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item, index}) => (
-            <BasicListItem
+            <FeatureListItem
               editItem={itemToEdit => editAttribute(itemToEdit, index)}
               index={index}
               item={item}

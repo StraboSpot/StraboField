@@ -43,7 +43,7 @@ const FormDirtyReporter = ({dirty, setIsFormDirty}) => {
   return null;
 };
 
-const BasicPageDetail = ({
+const FeatureDetail = ({
                            PageTabsComponent,
                            closeDetailView,
                            deleteTemplate,
@@ -151,7 +151,7 @@ const BasicPageDetail = ({
   /* Side Effects */
 
   useEffect(() => {
-    console.log('UE BasicPageDetail []');
+    console.log('UE FeatureDetail []');
     setInitialValues(selectedFeature);
     return () => {
       if (registerGetValues) registerGetValues.current = null;
@@ -161,7 +161,7 @@ const BasicPageDetail = ({
   }, []);
 
   useEffect(() => {
-    console.log('UE BasicPageDetail [selectedFeature]', selectedFeature);
+    console.log('UE FeatureDetail [selectedFeature]', selectedFeature);
     setInitialValues(selectedFeature);
     if (!isTemplate && isEmpty(selectedFeature)) closeDetailView();
   }, [selectedFeature]);
@@ -536,4 +536,4 @@ const BasicPageDetail = ({
   );
 };
 
-export default BasicPageDetail;
+export default FeatureDetail;

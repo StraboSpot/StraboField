@@ -16,8 +16,8 @@ import SampleListItem from '../samples/SampleListItem';
 import SpotsListItem from '../spots/SpotsListItem';
 import useSpots from '../spots/useSpots';
 
-const Nesting = ({page}) => {
-  console.log('Rendering Nesting');
+const NestingPage = ({page}) => {
+  console.log('Rendering NestingPage');
 
   /* Data Hooks */
 
@@ -42,7 +42,7 @@ const Nesting = ({page}) => {
   /* Side Effects */
 
   useEffect(() => {
-    console.log('UE Nesting [activeDatasetsIds, spots, selectedSpot]');
+    console.log('UE NestingPage [activeDatasetsIds, spots, selectedSpot]');
     if (notebookPageVisible === PAGE_KEYS.NESTING) updateNest();
   }, [activeDatasetsIds, spots, selectedSpot]);
 
@@ -214,4 +214,4 @@ const Nesting = ({page}) => {
   );
 };
 
-export default Nesting;
+export default NestingPage;

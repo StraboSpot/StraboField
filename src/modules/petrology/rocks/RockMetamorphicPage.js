@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 
 import {useDispatch} from 'react-redux';
 
-import RockPage from './RockPage';
+import RocksPage from './RocksPage';
 import {setSelectedAttributes} from '../../spots/spots.slice';
 
 const RockMetamorphicPage = ({isReadOnly, page}) => {
@@ -20,7 +20,7 @@ const RockMetamorphicPage = ({isReadOnly, page}) => {
   /* View */
 
   return (
-    <RockPage isReadOnly={isReadOnly} page={page}/>
+    <RocksPage isReadOnly={isReadOnly} page={page}/>
   );
 };
 

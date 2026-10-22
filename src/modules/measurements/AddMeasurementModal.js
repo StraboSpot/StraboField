@@ -41,7 +41,7 @@ import {
   getLinearTemplates,
   getPlanarTemplates,
 } from '../templates/templates.helpers';
-import TemplatesNotebook from '../templates/TemplatesNotebook';
+import TemplatesPicker from '../templates/TemplatesPicker';
 import {setUserData} from '../user/userProfile.slice';
 
 const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}) => {
@@ -377,7 +377,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
           />
         )}
         {!isSelectedAttitude && (
-          <TemplatesNotebook
+          <TemplatesPicker
             isShowTemplates={isShowTemplates}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}
             typeKey={typeKey}

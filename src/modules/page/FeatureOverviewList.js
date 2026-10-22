@@ -3,7 +3,7 @@ import {FlatList} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import BasicListItem from './BasicListItem';
+import FeatureListItem from './FeatureListItem';
 import {PET_PAGES, SED_PAGES} from './page.constants';
 import {PAGE_KEYS} from './pageKeys.constants';
 import {getNewUUID, isEmpty} from '../../shared/helpers';
@@ -15,7 +15,7 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {hasSedRockData} from '../sed/sed.helpers';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const BasicOverviewList = ({page}) => {
+const FeatureOverviewList = ({page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -84,7 +84,7 @@ const BasicOverviewList = ({page}) => {
       data={getData()}
       keyExtractor={(item, index) => index.toString()}
       renderItem={({item, index}) => (
-        <BasicListItem
+        <FeatureListItem
           editItem={itemToEdit => onItemPressed(itemToEdit, index)}
           index={index}
           item={item}
@@ -95,4 +95,4 @@ const BasicOverviewList = ({page}) => {
   );
 };
 
-export default BasicOverviewList;
+export default FeatureOverviewList;

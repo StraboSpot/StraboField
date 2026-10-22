@@ -15,8 +15,8 @@ import FormikWrapper from '../form/FormikWrapper';
 import {setActiveModal} from '../home/home.slice';
 import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import BasicListItem from '../page/BasicListItem';
-import BasicPageDetail from '../page/BasicPageDetail';
+import FeatureDetail from '../page/FeatureDetail';
+import FeatureListItem from '../page/FeatureListItem';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
@@ -110,7 +110,7 @@ const BeddingPage = ({isReadOnly, page}) => {
 
   const renderAttributeDetail = () => {
     return (
-      <BasicPageDetail
+      <FeatureDetail
         closeDetailView={() => setIsDetailView(false)}
         groupKey={'sed'}
         isReadOnly={isReadOnly}
@@ -139,7 +139,7 @@ const BeddingPage = ({isReadOnly, page}) => {
           data={bedding.beds}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item, index}) => (
-            <BasicListItem
+            <FeatureListItem
               editItem={itemToEdit => editAttribute(itemToEdit, index)}
               index={index}
               item={item}

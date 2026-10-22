@@ -12,9 +12,9 @@ import FormikWrapper from '../../form/FormikWrapper';
 import SelectInputField from '../../form/inputs/SelectInputField';
 import useForm from '../../form/useForm';
 import {setActiveModal} from '../../home/home.slice';
-import BasicListItem from '../../page/BasicListItem';
-import BasicPageDetail from '../../page/BasicPageDetail';
+import FeatureDetail from '../../page/FeatureDetail';
 import {getFeatureTitle} from '../../page/featureLabels.helpers';
+import FeatureListItem from '../../page/FeatureListItem';
 import PageHeader from '../../page/PageHeader';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../../spots/spots.slice';
@@ -115,7 +115,7 @@ const MineralsPage = ({isReadOnly, page}) => {
 
   const renderMineralDetail = () => {
     return (
-      <BasicPageDetail
+      <FeatureDetail
         closeDetailView={() => setIsDetailView(false)}
         groupKey={'pet'}
         isReadOnly={isReadOnly}
@@ -140,7 +140,7 @@ const MineralsPage = ({isReadOnly, page}) => {
         }
         data={mineralDataSorted}
         keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-        renderItem={({item}) => <BasicListItem editItem={editMineral} item={item} page={page}/>}
+        renderItem={({item}) => <FeatureListItem editItem={editMineral} item={item} page={page}/>}
       />
     );
   };

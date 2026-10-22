@@ -25,13 +25,13 @@ import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {TAG_TYPES} from '../project/project.constants';
 import {addedTagToSelectedSpot, setSelectedTag} from '../project/projects.slice';
 
-const TagsModal = ({
-                     checkedTagsIds,
-                     handleTagChecked,
-                     isFeatureLevelTagging,
-                     openSpotInNotebook,
-                     zoomToCurrentLocation,
-                   }) => {
+const TagsChecklist = ({
+                         checkedTagsIds,
+                         handleTagChecked,
+                         isFeatureLevelTagging,
+                         openSpotInNotebook,
+                         zoomToCurrentLocation,
+                       }) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -219,7 +219,7 @@ const TagsModal = ({
     );
   };
 
-  const renderTagsModalContent = () => {
+  const renderTagsChecklist = () => {
     return (
       <>
         <View style={{flex: 1}}>
@@ -246,7 +246,7 @@ const TagsModal = ({
 
   /* View */
 
-  return renderTagsModalContent();
+  return renderTagsChecklist();
 };
 
-export default TagsModal;
+export default TagsChecklist;

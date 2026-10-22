@@ -30,18 +30,18 @@ import MeasurementDetail from '../measurements/MeasurementDetail';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 import {isPlanarType} from '../measurements/measurements.helpers';
 import NoteForm from '../notes/NoteForm';
-import BasicPageDetail from '../page/BasicPageDetail';
+import FeatureDetail from '../page/FeatureDetail';
 import {MODALS, PET_PAGES, SED_PAGES} from '../page/page.constants';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
-const TemplatesNotebook = ({
-                             isShowTemplates,
-                             page = {},
-                             rockKey,
-                             setIsShowTemplates,
-                             typeKey,
-                           }) => {
+const TemplatesPicker = ({
+                           isShowTemplates,
+                           page = {},
+                           rockKey,
+                           setIsShowTemplates,
+                           typeKey,
+                         }) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -79,7 +79,7 @@ const TemplatesNotebook = ({
   /* Side Effects */
 
   useEffect(() => {
-    console.log('UE TemplatesNotebook [templates, templateKey, typeKey]', templates, templateKey, typeKey);
+    console.log('UE TemplatesPicker [templates, templateKey, typeKey]', templates, templateKey, typeKey);
     setIsTemplateInUse(getIsTemplateInUse(templates, templateKey) || false);
     setTemplatesForKey(getTemplateList(templates, templateKey) || []);
     setActiveTemplatesForKey(getActiveTemplateList(templates, templateKey) || []);
@@ -202,7 +202,7 @@ const TemplatesNotebook = ({
     const isSed = SED_PAGES.find(p => p.key === page.key);
     const groupKey = isPet ? 'pet' : isSed ? 'sed' : 'general';
     return (
-      <BasicPageDetail
+      <FeatureDetail
         closeDetailView={() => setIsShowForm(false)}
         deleteTemplate={deleteTemplateConfirm}
         groupKey={groupKey}
@@ -234,7 +234,7 @@ const TemplatesNotebook = ({
     return (
       <ModalWrapper
         closeModal={closeTemplates}
-        headerTitle={isShowForm || isShowNameInput ? 'Edit Notes Template' : 'Notes TemplatesNotebook'}
+        headerTitle={isShowForm || isShowNameInput ? 'Edit Notes Template' : 'Notes Templates'}
         onActionPressed={() => isShowForm && saveTemplate(notesTemplateFormRef.current.values)}
         onCancelPress={() => setIsShowForm(false)}
         showActionButton={false}
@@ -428,4 +428,4 @@ const TemplatesNotebook = ({
   );
 };
 
-export default TemplatesNotebook;
+export default TemplatesPicker;
