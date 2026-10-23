@@ -77,6 +77,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
   const [sliderValue, setSliderValue] = useState(6);
   const [survey, setSurvey] = useState({});
+  const [templatesHeaderTitle, setTemplatesHeaderTitle] = useState(null);
 
   /* Derived Variables */
 
@@ -382,6 +383,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
             isShowTemplates={isShowTemplates}
             registerCloseTemplates={closeTemplatesRef}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}
+            setTemplatesHeaderTitle={setTemplatesHeaderTitle}
             typeKey={typeKey}
           />
         )}
@@ -460,6 +462,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseButton}
         disabled={isFormInvalid}
+        headerTitle={isShowTemplates ? templatesHeaderTitle : undefined}
         isLoading={isSaving}
         onActionPressed={saveMeasurement}
         onFooterButtonPress={onPress}

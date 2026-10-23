@@ -1,13 +1,14 @@
 import React, {useContext, useRef, useState} from 'react';
-import {Text, View} from 'react-native';
+import {Text} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch} from 'react-redux';
 
-import {MEASUREMENT_TEMPLATE_KEY, MEASUREMENT_TEMPLATE_TYPES, TEMPLATE_NAME_FIELD} from './templates.constants';
+import TemplateNameField from './TemplateNameField';
+import {MEASUREMENT_TEMPLATE_KEY, MEASUREMENT_TEMPLATE_TYPES, TEMPLATE_FIELD_LABELS} from './templates.constants';
+import {getTemplateFormValues, getTemplateSurvey, validateTemplateName} from './templates.helpers';
 import useTemplates from './useTemplates';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/helpers';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import DeleteConformationDialogBox from '../../shared/ui/modals/DeleteConformationDialogBox';
@@ -16,7 +17,6 @@ import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
 import TextInputField from '../form/inputs/TextInputField';
 import useForm from '../form/useForm';
-import {MEASUREMENT_GROUP_KEY} from '../measurements/measurements.constants';
 import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {PET_PAGES, SED_PAGES} from '../page/page.constants';
 import {IGNEOUS_ROCK_CLASSES} from '../petrology/rocks/rocks.constants';
@@ -28,12 +28,12 @@ const TemplateDetail = ({goBack, template, templateType}) => {
   const dispatch = useDispatch();
   const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
-  const {validateForm} = useForm();
+  const {getSurvey, validateForm} = useForm();
   const {saveTemplate} = useTemplates();
 
   // Asks the gate Templates provides. The name is in the same form as the values, so a rename alone asks too.
   const formRef = useRef(null);
-  const {isFormInvalid, markSaved, setIsFormDirty, setIsFormInvalid} = useUnsavedFormChanges({
+  const {isFormDirty, isFormInvalid, markSaved, setIsFormDirty, setIsFormInvalid} = useUnsavedFormChanges({
     formRef: formRef,
     getMessage: () => 'Your changes to this template haven\'t been saved.',
     save: () => saveTemplateForm(),
@@ -51,10 +51,10 @@ const TemplateDetail = ({goBack, template, templateType}) => {
     || Object.values(IGNEOUS_ROCK_CLASSES).includes(templateType);
   const isSed = SED_PAGES.some(p => p.key === templateType);
   const groupKey = isPet ? 'pet' : isSed ? 'sed' : 'general';
-  // A measurement template names its own orientation in values.type; every other kind is named by its page. A note
-  // has no survey to check.
+  // A measurement template names its own orientation in values.type and, as in TemplatesPicker, uses the bulk edit
+  // survey, which has no label or reading. Every other kind is named by its page. A note has no survey to check.
   const formName = isNotes ? undefined
-    : template.values.type ? [MEASUREMENT_GROUP_KEY, template.values.type] : [groupKey, templateType];
+    : template.values.type ? ['measurement_bulk', template.values.type] : [groupKey, templateType];
   const templateKey = MEASUREMENT_TEMPLATE_TYPES.includes(templateType) ? MEASUREMENT_TEMPLATE_KEY : templateType;
 
   /* Event Handlers */
@@ -90,10 +90,8 @@ const TemplateDetail = ({goBack, template, templateType}) => {
     if (await saveTemplateForm()) goBack();
   };
 
-  const validateTemplate = (values) => {
-    const errors = formName ? validateForm({formName: formName, values: values}).errors : {};
-    return isEmpty(values[TEMPLATE_NAME_FIELD]?.trim()) ? {...errors, [TEMPLATE_NAME_FIELD]: 'Required'} : errors;
-  };
+  const validateTemplate = values => ({...(formName ? validateForm({formName: formName, values: values}).errors : {}),
+    ...validateTemplateName(values)});
 
   /* Render Functions */
 
@@ -110,27 +108,12 @@ const TemplateDetail = ({goBack, template, templateType}) => {
     );
   };
 
-  const renderNameField = () => {
-    return (
-      <View style={{alignContent: 'flex-start'}}>
-        <ListItem containerStyle={commonStyles.listItemFormField}>
-          <ListItem.Content
-            style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}
-          >
-            <View style={{flex: 1}}>
-              <TextInputField isRequired={true} label={'Template Name'} name={TEMPLATE_NAME_FIELD}/>
-            </View>
-          </ListItem.Content>
-        </ListItem>
-      </View>
-    );
-  };
-
+  // The name takes the focus while a new template still needs one
   const renderNoteField = () => {
     return (
       <ListItem containerStyle={commonStyles.listItemFormField}>
         <ListItem.Content>
-          <TextInputField appearance={'multiline'} autoFocus={true} customHeight={300} name={'note'}/>
+          <TextInputField appearance={'multiline'} autoFocus={!!template.name} customHeight={300} name={'note'}/>
         </ListItem.Content>
       </ListItem>
     );
@@ -141,9 +124,9 @@ const TemplateDetail = ({goBack, template, templateType}) => {
     return (
       <FormFlatList>
         <FormikWrapper
-          fieldLabels={{[TEMPLATE_NAME_FIELD]: 'Template Name'}}
+          fieldLabels={TEMPLATE_FIELD_LABELS}
           formName={formName}
-          initialValues={{...template.values, [TEMPLATE_NAME_FIELD]: template.name}}
+          initialValues={getTemplateFormValues(template)}
           innerRef={formRef}
           setIsFormDirty={setIsFormDirty}
           setIsFormInvalid={setIsFormInvalid}
@@ -151,8 +134,15 @@ const TemplateDetail = ({goBack, template, templateType}) => {
         >
           {formProps => (
             <>
-              {renderNameField()}
-              {isNotes ? renderNoteField() : <Form {...formProps} formName={formName} renderInline={true}/>}
+              <TemplateNameField/>
+              {isNotes ? renderNoteField() : (
+                <Form
+                  {...formProps}
+                  formName={formName}
+                  renderInline={true}
+                  surveyFragment={getTemplateSurvey(getSurvey(formName))}
+                />
+              )}
             </>
           )}
         </FormikWrapper>
@@ -165,7 +155,12 @@ const TemplateDetail = ({goBack, template, templateType}) => {
 
   return (
     <>
-      <SaveAndCancelButtons cancel={handleCancelPressed} getIsDisabled={isFormInvalid} save={saveTemplateAndGo}/>
+      {/* Nothing changed means nothing to save */}
+      <SaveAndCancelButtons
+        cancel={handleCancelPressed}
+        getIsDisabled={isFormInvalid || !isFormDirty}
+        save={saveTemplateAndGo}
+      />
       {renderTemplateFields()}
 
       {/* Child Modal */}

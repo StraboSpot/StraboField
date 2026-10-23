@@ -1,5 +1,51 @@
-import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
-import {getActiveTemplateList, getIsTemplateInUse, getTemplateList, mergeTemplates} from './templates.helpers';
+import {MEASUREMENT_TEMPLATE_KEY, TEMPLATE_NAME_FIELD} from './templates.constants';
+import {
+  getActiveTemplateList,
+  getIsTemplateInUse,
+  getTemplateFormValues,
+  getTemplateList,
+  getTemplateSurvey,
+  getTemplateValues,
+  mergeTemplates,
+  validateTemplateName,
+} from './templates.helpers';
+
+// A template's values are copied into every feature made from it, so what would be wrong shared by them all, or
+// what the compass supplies, never goes in one
+describe('what a template holds', () => {
+  it('saves a feature template without its label, name or id', () => {
+    expect(getTemplateValues('minerals', {id: 1, label: 'Qz 1', mineral: 'quartz', [TEMPLATE_NAME_FIELD]: 'Quartz'}))
+      .toEqual({mineral: 'quartz'});
+  });
+
+  it('saves a measurement template without its reading', () => {
+    const formValues = {dip: 30, feature_type: 'bedding', label: 'B', strike: 100, type: 'planar_orientation'};
+    expect(getTemplateValues(MEASUREMENT_TEMPLATE_KEY, formValues))
+      .toEqual({feature_type: 'bedding', type: 'planar_orientation'});
+  });
+
+  it('keeps a reading in a feature template, where it isn\'t one', () => {
+    expect(getTemplateValues('_3d_structures', {strike: 100})).toEqual({strike: 100});
+  });
+
+  it('leaves the label out of a template\'s form', () => {
+    expect(getTemplateSurvey([{name: 'label'}, {name: 'mineral'}])).toEqual([{name: 'mineral'}]);
+  });
+});
+
+// A template's name is edited in the same form as its values, so it goes in beside them and is checked with them
+describe('template name in the form', () => {
+  it('puts the name beside the values', () => {
+    expect(getTemplateFormValues({id: 'a', name: 'Quartz', values: {mineral: 'quartz'}}))
+      .toEqual({mineral: 'quartz', [TEMPLATE_NAME_FIELD]: 'Quartz'});
+  });
+
+  it('requires a name that is more than spaces', () => {
+    expect(validateTemplateName({[TEMPLATE_NAME_FIELD]: '  '})).toEqual({[TEMPLATE_NAME_FIELD]: 'Required'});
+    expect(validateTemplateName({})).toEqual({[TEMPLATE_NAME_FIELD]: 'Required'});
+    expect(validateTemplateName({[TEMPLATE_NAME_FIELD]: 'Quartz'})).toEqual({});
+  });
+});
 
 // A template backup carries only the template lists, never which of them are active, so merging one has to
 // leave the project's own active lists intact - and refresh them, since an active template is a full copy.

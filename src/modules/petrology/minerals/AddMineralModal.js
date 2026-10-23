@@ -45,6 +45,7 @@ const AddMineralModal = () => {
   const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
+  const [templatesHeaderTitle, setTemplatesHeaderTitle] = useState(null);
 
   /* Derived Variables */
 
@@ -226,7 +227,8 @@ const AddMineralModal = () => {
       buttonTitleRight={choicesViewKey || !isEmpty(selectedTypeIndex) ? 'Done' : isShowTemplates ? '' : null}
       closeModal={onCloseModalPressed}
       disabled={isFormInvalid}
-      headerTitle={isEmpty(selectedTypeIndex) ? 'Add Mineral Data' : 'Select Mineral'}
+      headerTitle={isShowTemplates ? templatesHeaderTitle : isEmpty(selectedTypeIndex) ? 'Add Mineral Data'
+        : 'Select Mineral'}
       onActionPressed={saveMineral}
       showActionButton={!isShowTemplates && isEmpty(selectedTypeIndex) && !choicesViewKey}
       showCancelButton={false}
@@ -237,6 +239,7 @@ const AddMineralModal = () => {
           isShowTemplates={isShowTemplates}
           registerCloseTemplates={closeTemplatesRef}
           setIsShowTemplates={bool => setIsShowTemplates(bool)}
+          setTemplatesHeaderTitle={setTemplatesHeaderTitle}
         />
       )}
       {!isShowTemplates && renderAddMineral()}

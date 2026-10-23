@@ -52,6 +52,7 @@ const AddRockModal = ({modalKey}) => {
   const [rockKey, setRockKey] = useState(null);
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
   const [survey, setSurvey] = useState({});
+  const [templatesHeaderTitle, setTemplatesHeaderTitle] = useState(null);
 
   /* Derived Variables */
 
@@ -171,6 +172,7 @@ const AddRockModal = ({modalKey}) => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseModalPressed}
+        headerTitle={isShowTemplates ? templatesHeaderTitle : undefined}
         onActionPressed={saveRock}
         showActionButton={!isShowTemplates && !choicesViewKey}
         showCancelButton={false}
@@ -193,6 +195,7 @@ const AddRockModal = ({modalKey}) => {
             registerCloseTemplates={closeTemplatesRef}
             rockKey={rockKey}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}
+            setTemplatesHeaderTitle={setTemplatesHeaderTitle}
           />
         )}
         {!isShowTemplates && renderAddRock()}

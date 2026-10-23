@@ -1,21 +1,28 @@
 import React, {useContext, useRef} from 'react';
 import {ScrollView} from 'react-native';
 
+import {ListItem} from '@rn-vui/base';
+
+import TemplateNameField from './TemplateNameField';
+import {TEMPLATE_FIELD_LABELS, TEMPLATE_NAME_FIELD} from './templates.constants';
+import {validateTemplateName} from './templates.helpers';
+import commonStyles from '../../shared/common.styles';
+import {isEmpty} from '../../shared/helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
+import FormikWrapper from '../form/FormikWrapper';
+import TextInputField from '../form/inputs/TextInputField';
 import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
-import NoteForm from '../notes/NoteForm';
 
 // A notes template's form, as TemplatesPicker shows it. Asks the gate TemplatesPicker provides before Cancel leaves.
-const NoteTemplateForm = ({closeForm, initialNotesValues, isTemplateNameChanged, saveTemplate}) => {
+const NoteTemplateForm = ({closeForm, initialValues, saveTemplate}) => {
   /* Data Hooks */
 
   const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const formRef = useRef(null);
-  const {markSaved, setIsFormDirty} = useUnsavedFormChanges({
+  const {isFormDirty, isFormInvalid, markSaved, setIsFormDirty, setIsFormInvalid} = useUnsavedFormChanges({
     formRef: formRef,
     getMessage: () => 'Your changes to this note template haven\'t been saved.',
-    isChangedOutsideForm: isTemplateNameChanged,
     save: () => saveTemplateForm(),
   });
 
@@ -28,7 +35,7 @@ const NoteTemplateForm = ({closeForm, initialNotesValues, isTemplateNameChanged,
 
   /* Logic Helpers */
 
-  // Always resolves true for the gate: a note has nothing to refuse
+  // Always resolves true for the gate, which already holds Save while the name is missing
   const saveTemplateForm = async () => {
     markSaved();
     saveTemplate(formRef.current.values);
@@ -39,14 +46,33 @@ const NoteTemplateForm = ({closeForm, initialNotesValues, isTemplateNameChanged,
 
   return (
     <ScrollView>
-      <SaveAndCancelButtons cancel={handleCancelPressed} save={saveTemplateForm}/>
-      <NoteForm
-        appearance={'multiline'}
-        customHeight={300}
-        formRef={formRef}
-        initialNotesValues={initialNotesValues}
-        setIsFormDirty={setIsFormDirty}
+      {/* Nothing changed means nothing to save */}
+      <SaveAndCancelButtons
+        cancel={handleCancelPressed}
+        getIsDisabled={isFormInvalid || !isFormDirty}
+        save={saveTemplateForm}
       />
+      <FormikWrapper
+        fieldLabels={TEMPLATE_FIELD_LABELS}
+        initialValues={initialValues}
+        innerRef={formRef}
+        setIsFormDirty={setIsFormDirty}
+        setIsFormInvalid={setIsFormInvalid}
+        validate={validateTemplateName}
+      >
+        <TemplateNameField/>
+        <ListItem containerStyle={commonStyles.listItemFormField}>
+          <ListItem.Content>
+            {/* The name takes the focus while a new template still needs one */}
+            <TextInputField
+              appearance={'multiline'}
+              autoFocus={!isEmpty(initialValues[TEMPLATE_NAME_FIELD])}
+              customHeight={300}
+              name={'note'}
+            />
+          </ListItem.Content>
+        </ListItem>
+      </FormikWrapper>
     </ScrollView>
   );
 };

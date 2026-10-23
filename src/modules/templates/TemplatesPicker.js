@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList, Text, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -11,12 +11,12 @@ import {
   getIsTemplateInUse,
   getLinearTemplates,
   getPlanarTemplates,
+  getTemplateFormValues,
   getTemplateList,
 } from './templates.helpers';
 import useTemplates from './useTemplates';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
-import * as themes from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import buttonsStyles from '../../shared/ui/buttons/buttons.styles';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -25,8 +25,6 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import UnsavedChangesModal from '../../shared/ui/modals/UnsavedChangesModal';
 import SwitchWrapper from '../../shared/ui/SwitchWrapper';
-import TextInput from '../../shared/ui/TextInput';
-import formStyles from '../form/form.styles';
 import MeasurementDetail from '../measurements/MeasurementDetail';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 import {isPlanarType} from '../measurements/measurements.helpers';
@@ -38,14 +36,16 @@ import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
 // The template being edited asks about its unsaved changes through a gate of its own, not the notebook page's:
-// closing it leaves the page or modal it was opened from still open. registerCloseTemplates hands the parent a close
-// that asks first, for the parent's own close button.
+// closing it leaves the page or modal it was opened from still open. A parent modal the templates fill passes
+// registerCloseTemplates, for a close of its own that asks first, and setTemplatesHeaderTitle, to head the modal
+// with what the templates are while they show.
 const TemplatesPicker = ({
                            isShowTemplates,
                            page = {},
                            registerCloseTemplates,
                            rockKey,
                            setIsShowTemplates,
+                           setTemplatesHeaderTitle,
                            typeKey,
                          }) => {
   /* Data Hooks */
@@ -61,9 +61,8 @@ const TemplatesPicker = ({
 
   const [activeTemplatesForKey, setActiveTemplatesForKey] = useState([]);
   const [isShowForm, setIsShowForm] = useState(false);
-  const [isShowNameInput, setIsShowNameInput] = useState(false);
   const [isTemplateInUse, setIsTemplateInUse] = useState(false);
-  const [name, setName] = useState('');
+  // The template open in the form, its values already holding its name for the form to edit
   const [selectedTemplate, setSelectedTemplate] = useState({values: {}});
   const [templatesForKey, setTemplatesForKey] = useState([]);
   const [templateType, setTemplateType] = useState(null);
@@ -80,8 +79,11 @@ const TemplatesPicker = ({
         : page.notebook_modal_key ? page.notebook_modal_key
           : activeModal;
   }
-  // The name is typed before the form opens, so the form can't tell it changed. A new template counts once named.
-  const isTemplateNameChanged = name !== (selectedTemplate.name || '');
+  // What the templates being picked from are called: a measurement's by its orientation, the rest by their page
+  const templateKindLabel = templateType === MEASUREMENT_KEYS.PLANAR ? 'Planar'
+    : templateType === MEASUREMENT_KEYS.LINEAR ? 'Linear'
+      : activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS ? toTitleCase(templateKey) + ' Rock'
+        : page.label_singular || toTitleCase(page.label).slice(0, -1) || 'Unknown';
 
   /* Side Effects */
 
@@ -91,6 +93,10 @@ const TemplatesPicker = ({
     setTemplatesForKey(getTemplateList(templates, templateKey) || []);
     setActiveTemplatesForKey(getActiveTemplateList(templates, templateKey) || []);
   }, [templates, templateKey, typeKey]);
+
+  useEffect(() => {
+    setTemplatesHeaderTitle?.(isShowForm ? `Edit ${templateKindLabel} Template` : `${templateKindLabel} Templates`);
+  }, [isShowForm, templateKindLabel]);
 
   /* Logic Helpers */
 
@@ -117,19 +123,12 @@ const TemplatesPicker = ({
     setIsShowTemplates(false);
   };
 
-  const continueToTemplateForm = () => {
-    setIsShowNameInput(false);
-    setIsShowForm(true);
-  };
-
   const createNewTemplate = () => {
-    setIsShowNameInput(true);
-    setName('');
-    if (templateKey === MEASUREMENT_TEMPLATE_KEY) setSelectedTemplate({values: {type: templateType}});
+    if (templateKey === MEASUREMENT_TEMPLATE_KEY) openTemplateForm({values: {type: templateType}});
     else if (activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS) {
-      setSelectedTemplate({values: {igneous_rock_class: templateType}});
+      openTemplateForm({values: {igneous_rock_class: templateType}});
     }
-    else setSelectedTemplate({values: {}});
+    else openTemplateForm({values: {}});
   };
 
   const deleteTemplate = (template) => {
@@ -150,18 +149,16 @@ const TemplatesPicker = ({
     );
   };
 
-  const editTemplate = (template) => {
-    setIsShowNameInput(true);
-    setSelectedTemplate(template);
-    setName(template.name);
+  // Set once as the form opens, so the form is handed the same values on every render
+  const openTemplateForm = (template) => {
+    setSelectedTemplate({...template, values: getTemplateFormValues(template)});
+    setIsShowForm(true);
   };
 
+  // The form holds Save until the template is named
   const saveTemplate = (values) => {
-    if (isEmpty(name)) alert('Template name empty', 'Provide a template name.');
-    else {
-      saveTemplateValues(templateKey, selectedTemplate, name, values);
-      closeTemplates();
-    }
+    saveTemplateValues(templateKey, selectedTemplate, values);
+    closeTemplates();
   };
 
   const setAsTemplate = (template) => {
@@ -205,7 +202,6 @@ const TemplatesPicker = ({
       <MeasurementDetail
         closeDetailView={() => setIsShowForm(false)}
         deleteTemplate={deleteTemplateConfirm}
-        isTemplateNameChanged={isTemplateNameChanged}
         saveTemplate={saveTemplate}
         selectedAttitudes={[values]}
       />
@@ -221,7 +217,6 @@ const TemplatesPicker = ({
         closeDetailView={() => setIsShowForm(false)}
         deleteTemplate={deleteTemplateConfirm}
         groupKey={groupKey}
-        isTemplateNameChanged={isTemplateNameChanged}
         page={page}
         saveTemplate={saveTemplate}
         selectedFeature={selectedTemplate.values}
@@ -233,8 +228,7 @@ const TemplatesPicker = ({
     return (
       <NoteTemplateForm
         closeForm={() => setIsShowForm(false)}
-        initialNotesValues={selectedTemplate.values}
-        isTemplateNameChanged={isTemplateNameChanged}
+        initialValues={selectedTemplate.values}
         saveTemplate={saveTemplate}
       />
     );
@@ -244,14 +238,12 @@ const TemplatesPicker = ({
     return (
       <ModalWrapper
         closeModal={askAndCloseTemplates}
-        headerTitle={isShowForm || isShowNameInput ? 'Edit Notes Template' : 'Notes Templates'}
+        headerTitle={isShowForm ? 'Edit Notes Template' : 'Notes Templates'}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton
       >
-        {isShowNameInput ? renderTemplateNameInput()
-          : isShowForm ? renderNotesForm()
-            : renderTemplatesList()}
+        {isShowForm ? renderNotesForm() : renderTemplatesList()}
       </ModalWrapper>
     );
   };
@@ -274,35 +266,13 @@ const TemplatesPicker = ({
             </ListItem.Title>
           </ListItem.Content>
           <ClearButton
-            onPress={() => editTemplate(template)}
+            onPress={() => openTemplateForm(template)}
             title={'Edit'}
             titleProps={{style: buttonsStyles.standardButtonText}}
             type={'save'}
           />
         </ListItem>
       </View>
-    );
-  };
-
-  const renderTemplateNameInput = () => {
-    return (
-      <>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <ClearButton onPress={() => setIsShowNameInput(false)} title={'Cancel'}/>
-          <ClearButton disabled={isEmpty(name)} onPress={() => continueToTemplateForm()} title={'Continue'}/>
-        </View>
-        <View style={[commonStyles.listItemFormField, {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}]}>
-          <View style={formStyles.fieldLabelContainer}>
-            <Text style={formStyles.fieldLabel}>{'Template Name'}</Text>
-          </View>
-          <TextInput
-            autoFocus={isEmpty(name)}
-            onChangeText={value => setName(value)}
-            style={formStyles.fieldValue}
-            value={name || ''}
-          />
-        </View>
-      </>
     );
   };
 
@@ -362,18 +332,9 @@ const TemplatesPicker = ({
   };
 
   const renderTemplatesList = () => {
-    let label = activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS ? toTitleCase(templateKey) + ' Rock'
-      : page.label_singular || toTitleCase(page.label).slice(0, -1) || 'Unknown';
-
-    let relevantTemplates = templatesForKey;
-    if (templateType === MEASUREMENT_KEYS.PLANAR) {
-      relevantTemplates = getPlanarTemplates(relevantTemplates);
-      label = 'Planar';
-    }
-    else if (templateType === MEASUREMENT_KEYS.LINEAR) {
-      relevantTemplates = getLinearTemplates(relevantTemplates);
-      label = 'Linear';
-    }
+    const relevantTemplates = templateType === MEASUREMENT_KEYS.PLANAR ? getPlanarTemplates(templatesForKey)
+      : templateType === MEASUREMENT_KEYS.LINEAR ? getLinearTemplates(templatesForKey)
+        : templatesForKey;
 
     return (
       <>
@@ -387,7 +348,7 @@ const TemplatesPicker = ({
         />
         <ClearButton onPress={closeTemplates} title={'Done'}/>
         {!isEmpty(relevantTemplates) && <ClearButton onPress={clearTemplate} title={'Clear Selected Template'}/>}
-        <ClearButton onPress={createNewTemplate} title={'Define New ' + label + ' Template'}/>
+        <ClearButton onPress={createNewTemplate} title={'Define New ' + templateKindLabel + ' Template'}/>
       </>
     );
   };
@@ -428,10 +389,9 @@ const TemplatesPicker = ({
   return (
     <LeavePageContext.Provider value={templateGate}>
       {isShowTemplates && templateType === 'notes' ? renderNotesTemplateModal()
-        : isShowTemplates && isShowNameInput ? renderTemplateNameInput()
-          : isShowTemplates && isShowForm ? renderFormFields()
-            : isShowTemplates ? renderTemplatesList()
-              : renderTemplateToggle()}
+        : isShowTemplates && isShowForm ? renderFormFields()
+          : isShowTemplates ? renderTemplatesList()
+            : renderTemplateToggle()}
       <UnsavedChangesModal {...templateGate.leavePromptProps} headerTitle={'Unsaved Changes'}/>
     </LeavePageContext.Provider>
   );

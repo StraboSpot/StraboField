@@ -1,7 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TEMPLATE_NAME_FIELD} from './templates.constants';
-import {getActiveTemplateList, getTemplateList} from './templates.helpers';
+import {getActiveTemplateList, getTemplateList, getTemplateValues} from './templates.helpers';
 import forms from '../../assets/forms';
 import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
 import useForm from '../form/useForm';
@@ -46,30 +46,26 @@ const useTemplates = () => {
     else if (key) return toTitleCase(key.replaceAll('_', ' ').trim());
   };
 
-  // Saves the form on screen as a template, named by its TEMPLATE_NAME_FIELD. The half TemplatesPicker also needs is
-  // in saveTemplateValues.
+  // Saves the form on screen as a template. The half TemplatesPicker also needs is in saveTemplateValues.
   const saveTemplate = async (formCurrent, templateKey, selectedTemplate) => {
     const {values: formValues} = await submitAndShowErrors(formCurrent);
-    const {[TEMPLATE_NAME_FIELD]: name, ...values} = formValues;
     // The form holds Save until the name is filled in, so this is a backstop. It throws rather than returns
     // because the caller leaves the page on a save that comes back.
-    if (isEmpty(name?.trim())) throw Error('Template name is empty.');
-    saveTemplateValues(templateKey, selectedTemplate, name.trim(), values);
+    if (isEmpty(formValues[TEMPLATE_NAME_FIELD]?.trim())) throw Error('Template name is empty.');
+    saveTemplateValues(templateKey, selectedTemplate, formValues);
     // Saving from a detail page turns templates on for that key. TemplatesPicker deliberately does not -
     // it shows the user a switch for this instead.
     dispatch(setUseTemplate({key: templateKey, bool: true}));
   };
 
   // Writes a template into the project and makes it the active one for its key, whether it is new or an edit
-  // of an existing one. Both save paths go through here so they cannot drift apart.
-  const saveTemplateValues = (templateKey, selectedTemplate, name, values) => {
-    // A template holds only what was typed into the template form, so an id has no business in it. Stripped
-    // in case an older one arrived carrying a stale feature id; consumers mint a fresh id from it regardless.
-    const {id, ...templateValues} = values;
+  // of an existing one, from the template form's values with its name among them. Both save paths go through here
+  // so they cannot drift apart.
+  const saveTemplateValues = (templateKey, selectedTemplate, formValues) => {
     const templateObject = {
       'id': isEmpty(selectedTemplate?.id) ? getNewUUID() : selectedTemplate.id,
-      'name': name,
-      'values': templateValues,
+      'name': formValues[TEMPLATE_NAME_FIELD].trim(),
+      'values': getTemplateValues(templateKey, formValues),
     };
     const templatesForKey = getTemplateList(templates, templateKey);
     const existingTemplates = !isEmpty(templatesForKey) ? JSON.parse(JSON.stringify(templatesForKey)) : [];

@@ -32,12 +32,14 @@ import PageHeader from '../page/PageHeader';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {deselectedAttributes, editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
+import TemplateNameField from '../templates/TemplateNameField';
+import {TEMPLATE_FIELD_LABELS} from '../templates/templates.constants';
+import {validateTemplateName} from '../templates/templates.helpers';
 
 const MeasurementDetail = ({
                              closeDetailView,
                              deleteTemplate,
                              isReadOnly,
-                             isTemplateNameChanged,
                              selectedAttitudes,
                              saveTemplate,
                            }) => {
@@ -49,18 +51,17 @@ const MeasurementDetail = ({
   const spot = useSelector(state => state.spot.selectedSpot);
   const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
-  const {getLabel, getLabels, submitAndShowErrors} = useForm();
+  const {getLabel, getLabels, submitAndShowErrors, validateForm} = useForm();
   const {deleteMeasurements} = useMeasurements();
   const toast = useToast();
 
-  // A template (saveTemplate given) registers with TemplatesPicker's gate, and a rename counts as a change
+  // A template (saveTemplate given) registers with TemplatesPicker's gate instead
   const formRef = useRef(null);
   const {isFormDirty, isFormInvalid, markSaved, setIsFormDirty, setIsFormInvalid} = useUnsavedFormChanges({
     formRef: formRef,
     getMessage: () => (saveTemplate ? 'Your changes to this measurement template haven\'t been saved.'
       : selectedAttributes.length > 1 ? 'Your changes to these measurements haven\'t been saved.'
         : 'Your changes to this measurement haven\'t been saved.'),
-    isChangedOutsideForm: isTemplateNameChanged,
     save: () => (saveTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current)),
   });
 
@@ -337,10 +338,8 @@ const MeasurementDetail = ({
   // Always resolves true for the gate, which already holds Save while the form has errors
   const saveTemplateForm = async (formCurrent) => {
     const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
-    // A template is copied into every measurement made from it, so a label would be shared by all of them
-    const {label, ...templateValues} = formValues;
     markSaved();
-    await saveTemplate(templateValues);
+    await saveTemplate(formValues);
     return true;
   };
 
@@ -356,6 +355,9 @@ const MeasurementDetail = ({
     let formCategory = selectedAttributes.length === 1 && !isTemplate ? 'measurement' : 'measurement_bulk';
     setFormName([formCategory, measurement.type]);
   };
+
+  const validateTemplate = values => ({...validateForm({formName: formName, values: values}).errors,
+    ...validateTemplateName(values)});
 
   /* Render Functions */
 
@@ -403,8 +405,8 @@ const MeasurementDetail = ({
     return (
       <SaveAndCancelButtons
         cancel={cancelFormAndGo}
-        // Nothing changed means nothing to save. A template is left out, as its name is edited outside the form.
-        getIsDisabled={isFormInvalid || (!isTemplate && !isFormDirty)}
+        // Nothing changed means nothing to save
+        getIsDisabled={isFormInvalid || !isFormDirty}
         save={() => isTemplate ? saveTemplateForm(formRef.current) : saveFormAndGo()}
       />
     );
@@ -418,20 +420,25 @@ const MeasurementDetail = ({
         <View style={{flex: 1}}>
           <FormikWrapper
             enableReinitialize={true}
+            fieldLabels={isTemplate ? TEMPLATE_FIELD_LABELS : undefined}
             formName={formName}
             initialValues={selectedMeasurement}
             innerRef={formRef}
             onReset={() => console.log('Resetting form...')}
             setIsFormDirty={setIsFormDirty}
             setIsFormInvalid={setIsFormInvalid}
+            validate={isTemplate ? validateTemplate : undefined}
           >
             {formProps => (
-              <Form
-                {...formProps}
-                formName={formName}
-                isReadOnly={isReadOnly}
-                setNumberFieldValueOverride={setFieldValueAndPairedOrientation}
-              />
+              <>
+                {isTemplate && <TemplateNameField/>}
+                <Form
+                  {...formProps}
+                  formName={formName}
+                  isReadOnly={isReadOnly}
+                  setNumberFieldValueOverride={setFieldValueAndPairedOrientation}
+                />
+              </>
             )}
           </FormikWrapper>
         </View>
@@ -523,7 +530,10 @@ const MeasurementDetail = ({
       <View style={{flex: 1}}>
         {selectedMeasurement && (
           <View style={styles.measurementsContentContainer}>
-            <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={getPageTitle()}/>
+            {/* A template is edited in a modal whose header already names it */}
+            {!isTemplate && (
+              <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelFormAndGo} pageTitle={getPageTitle()}/>
+            )}
             {!isReadOnly && renderCancelSaveButtons()}
             <FormFlatList>
               <View>

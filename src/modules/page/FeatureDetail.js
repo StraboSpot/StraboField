@@ -34,6 +34,9 @@ import useSed from '../sed/useSed';
 import {deselectedAttributes, editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 import useTags from '../tags/useTags';
+import TemplateNameField from '../templates/TemplateNameField';
+import {TEMPLATE_FIELD_LABELS} from '../templates/templates.constants';
+import {getTemplateSurvey, validateTemplateName} from '../templates/templates.helpers';
 import {THREE_D_STRUCTURE_ORIENTATION_FIELDS} from '../three-d-structures/threeDStructures.constants';
 import {messages} from './ui/Messages';
 
@@ -49,7 +52,6 @@ const FeatureDetail = ({
                            deleteTemplate,
                            groupKey = 'general',
                            isReadOnly,
-                           isTemplateNameChanged,
                            page,
                            registerGetValues,
                            registerSaveChanges,
@@ -71,7 +73,7 @@ const FeatureDetail = ({
   const spot = useSelector(state => state.spot.selectedSpot);
   const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
-  const {getLabel, getLabels, showErrors, submitAndShowErrors, validateForm} = useForm();
+  const {getLabel, getLabels, getSurvey, showErrors, submitAndShowErrors, validateForm} = useForm();
   const {deletePetFeature, savePetFeature} = usePetrology();
   const {deleteSedFeature, saveSedBedFeature, saveSedFeature, setSedFieldValue} = useSed();
   const {checkSampleName} = useSpots();
@@ -80,7 +82,7 @@ const FeatureDetail = ({
   const toast = useToast();
 
   // Save on the way out is this page's Save, held for the same reasons, so a value that needs fixing keeps the page
-  // open to fix it. A template (saveTemplate given) registers with TemplatesPicker's gate instead, and a rename counts.
+  // open to fix it. A template (saveTemplate given) registers with TemplatesPicker's gate instead.
   const formRef = useRef(null);
   const {
     hasUnsavedChanges,
@@ -93,7 +95,6 @@ const FeatureDetail = ({
     formRef: formRef,
     getMessage: () => `Your changes to this ${title}${saveTemplate ? ' template' : ''} haven't been saved.`,
     getSaveHeldReason: () => sesarSaveHeldReason,
-    isChangedOutsideForm: isTemplateNameChanged,
     onDiscard: closeDetailView,
     save: () => (saveTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current)),
   });
@@ -128,8 +129,8 @@ const FeatureDetail = ({
   const isSesarRegistrationBlocked = isIGSNChecked && (!sesar.sesarToken.access
     || (isEmpty(sesar.selectedUserCode) && !(selectedFeature.isOnMySesar && isInternetReachable)));
   // A feature with nothing changed has nothing to save, and saving a sample with an IGSN would send the same data
-  // to SESAR again. A template is left out, as its name is edited outside the form and can be saved on its own.
-  const isFeatureUnchanged = !isTemplate && !isFormDirty;
+  // to SESAR again
+  const isFeatureUnchanged = !isFormDirty;
   // Every reason the save itself is refused, held at the button rather than failing once it is pressed
   const isSaveDisabled = isRegisteredSampleOffline || isSesarRegistrationBlocked || isFeatureUnchanged;
   // Saving a sample already on SESAR updates it there, which needs a SESAR session: one was never made, was dropped
@@ -268,8 +269,9 @@ const FeatureDetail = ({
     // does, and SubpageTabs marks the tab holding it. Errors only - what a save writes is still cleaned by the
     // survey of the tab being shown, which is also the reading that wins for a field both tabs define.
     const siblingErrors = siblingSurvey ? validateForm({survey: siblingSurvey, values: values}).errors : {};
-    return getRequiredFields(values).reduce(
-      (acc, key) => (isEmpty(values[key]) ? {...acc, [key]: 'Required'} : acc), {...siblingErrors, ...errors});
+    const templateErrors = isTemplate ? validateTemplateName(values) : {};
+    return getRequiredFields(values).reduce((acc, key) => (isEmpty(values[key]) ? {...acc, [key]: 'Required'} : acc),
+      {...siblingErrors, ...errors, ...templateErrors});
   };
 
   const saveButtonOnPress = () => {
@@ -382,11 +384,8 @@ const FeatureDetail = ({
   // Always resolves true for the gate, which already holds Save while the form has errors
   const saveTemplateForm = async (formCurrent) => {
     const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
-    // A template's values are copied wholesale into every feature made from it, so a label would be shared by
-    // all of them. Each feature is labeled for itself as it is created instead.
-    const {label, ...templateValues} = formValues;
     markSaved();
-    saveTemplate(templateValues);
+    saveTemplate(formValues);
     return true;
   };
 
@@ -420,6 +419,7 @@ const FeatureDetail = ({
       <View style={{flex: 1}}>
         <FormikWrapper
           enableReinitialize={true}
+          fieldLabels={isTemplate ? TEMPLATE_FIELD_LABELS : undefined}
           formName={formName}
           initialValues={initialValues}
           innerRef={formRef}
@@ -433,6 +433,7 @@ const FeatureDetail = ({
           {formProps => (
             <>
               <FormDirtyReporter dirty={formProps.dirty} setIsFormDirty={setIsFormDirty}/>
+              {isTemplate && <TemplateNameField/>}
               <Form
                 {...formProps}
                 formName={formName}
@@ -449,6 +450,7 @@ const FeatureDetail = ({
                     {orientationFields: orientationFields}))
                   : undefined}
                 siblingSurvey={siblingSurvey}
+                surveyFragment={isTemplate ? getTemplateSurvey(getSurvey(formName)) : undefined}
               />
             </>
           )}
@@ -470,12 +472,15 @@ const FeatureDetail = ({
       <View style={{flex: 1}}>
         {(isTemplate || !isEmpty(selectedFeature)) && (
           <>
-            {/* A tab showing its own content hides Save and Cancel, so it is left by the back button */}
-            <PageHeader
-              hideBackButton={!isReadOnly && !tabContent}
-              onPressBack={cancelForm}
-              pageTitle={title + ' Detail'}
-            />
+            {/* A tab showing its own content hides Save and Cancel, so it is left by the back button. A template is
+             edited in a modal whose header already names it. */}
+            {!isTemplate && (
+              <PageHeader
+                hideBackButton={!isReadOnly && !tabContent}
+                onPressBack={cancelForm}
+                pageTitle={title + ' Detail'}
+              />
+            )}
             {PageTabsComponent && PageTabsComponent}
             {tabContent}
             {!isReadOnly && !tabContent && (

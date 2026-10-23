@@ -1,4 +1,9 @@
-import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
+import {
+  MEASUREMENT_TEMPLATE_EXCLUDED_FIELDS,
+  MEASUREMENT_TEMPLATE_KEY,
+  TEMPLATE_EXCLUDED_FIELDS,
+  TEMPLATE_NAME_FIELD,
+} from './templates.constants';
 import {isEmpty} from '../../shared/helpers';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 import {isPlanarType} from '../measurements/measurements.helpers';
@@ -67,6 +72,21 @@ export const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
 export const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
   t => isPlanarType(t.values?.type) || t.type === MEASUREMENT_KEYS.PLANAR);
 
+// What a template's form starts from: its values, with its name beside them to be edited in the same form
+export const getTemplateFormValues = template => ({...template.values, [TEMPLATE_NAME_FIELD]: template.name});
+
+// A feature survey as a template's form shows it, without the fields a template never holds
+export const getTemplateSurvey = survey => survey.filter(field => !TEMPLATE_EXCLUDED_FIELDS.includes(field.name));
+
+// The values a template keeps from its form: everything but its name, the fields a template never holds, and an id,
+// which an older template can still carry from the feature it was made from
+export const getTemplateValues = (templateKey, formValues) => {
+  const excludedFields = templateKey === MEASUREMENT_TEMPLATE_KEY ? MEASUREMENT_TEMPLATE_EXCLUDED_FIELDS
+    : TEMPLATE_EXCLUDED_FIELDS;
+  return Object.fromEntries(Object.entries(formValues).filter(
+    ([key]) => key !== 'id' && key !== TEMPLATE_NAME_FIELD && !excludedFields.includes(key)));
+};
+
 // The keys of `templates` that name a template bucket - Object.keys would also hand back the two measurement
 // fields that sit alongside the buckets rather than inside one.
 export const getTemplateKeys = templates => Object.keys(templates || {}).filter(
@@ -104,3 +124,7 @@ export const setActiveTemplateList = (templates, key, value) => setTemplateField
 export const setIsTemplateInUse = (templates, key, value) => setTemplateField(templates, key, 'isInUse', value);
 
 export const setTemplateList = (templates, key, value) => setTemplateField(templates, key, 'templates', value);
+
+// A template form's errors for its name, to add to the errors for its values
+export const validateTemplateName = values => (isEmpty(values[TEMPLATE_NAME_FIELD]?.trim())
+  ? {[TEMPLATE_NAME_FIELD]: 'Required'} : {});

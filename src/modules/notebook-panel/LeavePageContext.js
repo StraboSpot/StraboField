@@ -10,18 +10,9 @@ export const LeavePageContext = createContext(null);
 // save resolves whether it saved, and every save calls markSaved before resetting the form. Neither save nor Discard
 // leaves the page, as whatever asked does that, and a menu that asks as it opens may not leave at all, so Discard
 // clears the changes from the screen: onDiscard when given, otherwise the form is put back as it was. isAsking
-// false is for a form there is nothing to ask about. isChangedOutsideForm counts a change the form doesn't hold,
-// such as a template's name. The prompt holds its Save, and says why, while the page's own would be held: while
-// the form has errors, or for the reason getSaveHeldReason gives.
-export const useUnsavedFormChanges = ({
-                                        formRef,
-                                        getMessage,
-                                        getSaveHeldReason,
-                                        isAsking = true,
-                                        isChangedOutsideForm = false,
-                                        onDiscard,
-                                        save,
-                                      }) => {
+// false is for a form there is nothing to ask about. The prompt holds its Save, and says why, while the page's own
+// would be held: while the form has errors, or for the reason getSaveHeldReason gives.
+export const useUnsavedFormChanges = ({formRef, getMessage, getSaveHeldReason, isAsking = true, onDiscard, save}) => {
   /* Data Hooks */
 
   const leavePage = useContext(LeavePageContext);
@@ -43,8 +34,8 @@ export const useUnsavedFormChanges = ({
 
   // isFormDirty is reported as state for what has to know as it renders, such as whether a phone swipe can leave
   useEffect(() => {
-    leavePage?.reportOpenPageChanged(ownerRef.current, isAsking && (isFormDirty || isChangedOutsideForm));
-  }, [isAsking, isChangedOutsideForm, isFormDirty]);
+    leavePage?.reportOpenPageChanged(ownerRef.current, isAsking && isFormDirty);
+  }, [isAsking, isFormDirty]);
 
   useEffect(() => () => {
     leavePage?.reportOpenPageChanged(ownerRef.current, false);
@@ -53,8 +44,7 @@ export const useUnsavedFormChanges = ({
 
   /* Exported Functions */
 
-  const hasUnsavedChanges = () => isChangedOutsideForm
-    || (!!formRef.current?.dirty && !isEqual(formRef.current.values, savedValuesRef.current));
+  const hasUnsavedChanges = () => !!formRef.current?.dirty && !isEqual(formRef.current.values, savedValuesRef.current);
 
   const markSaved = () => {
     savedValuesRef.current = {...formRef.current?.values};
