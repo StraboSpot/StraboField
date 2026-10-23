@@ -5,6 +5,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import NoteTemplateForm from './NoteTemplateForm';
+import {getPickerTypeLabel} from './templateLabels.helpers';
 import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
 import {
   getActiveTemplateList,
@@ -13,7 +14,6 @@ import {
   getPlanarTemplates,
   getTemplateFormValues,
   getTemplateList,
-  getTemplateTypeLabel,
   getTemplatesOfType,
 } from './templates.helpers';
 import useTemplates from './useTemplates';
@@ -82,9 +82,8 @@ const TemplatesPicker = ({
   const activeTemplatesForKey = getActiveTemplateList(templates, templateKey) || [];
   const isTemplateInUse = !!getIsTemplateInUse(templates, templateKey);
   const templatesForKey = getTemplateList(templates, templateKey) || [];
-  const isIgneousRock = activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS;
   // The type shown in the list, or before the list is opened, the key's own
-  const templateTypeLabel = getTemplateTypeLabel(templateType || templateKey, page, isIgneousRock);
+  const templateTypeLabel = getPickerTypeLabel(templateType || templateKey);
 
   /* Side Effects */
 
@@ -275,7 +274,7 @@ const TemplatesPicker = ({
 
   const renderTemplateSelection = (type) => {
     const activeTemplates = getTemplatesOfType(activeTemplatesForKey, type);
-    const label = getTemplateTypeLabel(type, page, isIgneousRock);
+    const label = getPickerTypeLabel(type);
 
     const title = templateKey === MEASUREMENT_TEMPLATE_KEY ? 'Select ' + label + ' Template'
       : 'Select ' + label + ' Template(s)';

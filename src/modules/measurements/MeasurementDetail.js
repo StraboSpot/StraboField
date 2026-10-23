@@ -6,7 +6,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import MeasurementItem from './MeasurementItem';
-import {MEASUREMENT_KEYS} from './measurements.constants';
+import {MEASUREMENT_KEYS, MEASUREMENT_TYPE_LABELS} from './measurements.constants';
 import {isEmptyMeasurement, isPlanarType} from './measurements.helpers';
 import styles from './measurements.styles';
 import useMeasurements from './useMeasurements';
@@ -161,7 +161,7 @@ const MeasurementDetail = ({
     const currentType = formRef.current.values.type;
     if ((i === 0 && currentType === MEASUREMENT_KEYS.TABULAR) || (i === 1 && currentType === MEASUREMENT_KEYS.PLANAR)) {
       const newType = currentType === MEASUREMENT_KEYS.TABULAR ? MEASUREMENT_KEYS.PLANAR : MEASUREMENT_KEYS.TABULAR;
-      const typeText = newType === MEASUREMENT_KEYS.TABULAR ? 'Tabular Zone' : 'Planar Orientation';
+      const typeText = newType === MEASUREMENT_KEYS.TABULAR ? MEASUREMENT_TYPE_LABELS[newType] : 'Planar Orientation';
       const alertTextEnd = selectedAttributes.length === 1 ? 'this measurement to a ' + typeText + '? You will '
         + 'lose all data for this measurement not relevant to ' + typeText + '.'
         : 'these measurements to ' + typeText + '? You will lose all data for these measurements not relevant to '
@@ -250,8 +250,9 @@ const MeasurementDetail = ({
 
   const getPageTitle = () => {
     if (selectedMeasurement?.type) {
-      if (selectedMeasurement.type === MEASUREMENT_KEYS.TABULAR) return 'Tabular Zone Detail';
-      else return toTitleCase(selectedMeasurement.type.replace('_', ' ').replace('orientation', 'feature')) + ' Detail';
+      const {type} = selectedMeasurement;
+      if (type === MEASUREMENT_KEYS.TABULAR) return MEASUREMENT_TYPE_LABELS[type] + ' Detail';
+      else return toTitleCase(type.replace('_', ' ').replace('orientation', 'feature')) + ' Detail';
     }
     else return 'Measurement Detail';
   };
@@ -513,7 +514,7 @@ const MeasurementDetail = ({
   const renderPlanarTabularSwitches = () => {
     return (
       <ButtonGroup
-        buttons={['Planar Feature', 'Tabular Zone']}
+        buttons={['Planar Feature', MEASUREMENT_TYPE_LABELS[MEASUREMENT_KEYS.TABULAR]]}
         containerStyle={styles.measurementDetailSwitches}
         onPress={i => onSwitchPlanarTabular(i)}
         selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}

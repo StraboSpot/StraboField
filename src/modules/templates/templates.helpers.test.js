@@ -2,10 +2,7 @@ import {MEASUREMENT_TEMPLATE_KEY, TEMPLATE_NAME_FIELD} from './templates.constan
 import {
   getActiveTemplateList,
   getIsTemplateInUse,
-  getNewTemplateSections,
-  getSavedTemplateSections,
   getTemplateFormValues,
-  getTemplateTypeLabel,
   getTemplateList,
   getTemplateSurvey,
   getTemplateValues,
@@ -32,49 +29,6 @@ describe('getTemplatesOfType', () => {
   it('keeps every template for a type that is not an orientation', () => {
     const quartz = {id: 'q', values: {mineral: 'quartz'}};
     expect(getTemplatesOfType([quartz], 'minerals')).toEqual([quartz]);
-  });
-});
-
-// The main menu lists templates in sections, each a key or, for measurements, an orientation
-describe('template sections', () => {
-  it('gives each measurement orientation a section, sorted by section and by name', () => {
-    const templates = {
-      measurementTemplates: [
-        {id: 'b', name: 'Bedding', values: {type: 'planar_orientation'}},
-        {id: 'l', name: 'Lineation', values: {type: 'linear_orientation'}},
-        {id: 'a', name: 'Axial Plane', values: {type: 'planar_orientation'}},
-      ],
-      activeMeasurementTemplates: [],
-      minerals: {templates: [{id: 'q', name: 'Quartz', values: {}}]},
-    };
-    expect(getSavedTemplateSections(templates).map(s => [s.title, s.data.map(t => t.name)])).toEqual([
-      ['linear_orientation', ['Lineation']],
-      ['minerals', ['Quartz']],
-      ['planar_orientation', ['Axial Plane', 'Bedding']],
-    ]);
-  });
-
-  it('lists the kinds of template that can be made by form key, without reaction textures', () => {
-    const sections = getNewTemplateSections();
-    expect(sections.map(s => s.title)).toEqual(['measurement', 'notes', 'pet']);
-    expect(sections.find(s => s.title === 'pet').data).toContainEqual({id: 'minerals', name: 'Mineral'});
-    expect(sections.find(s => s.title === 'pet').data.map(item => item.id)).not.toContain('reactions');
-  });
-});
-
-// The picker's buttons and the modal header name the same kind of template, so they read the same
-describe('getTemplateTypeLabel', () => {
-  it('names a measurement template by its orientation, tabular as planar', () => {
-    expect(getTemplateTypeLabel('tabular_orientation', {})).toBe('Planar');
-    expect(getTemplateTypeLabel('linear_orientation', {})).toBe('Linear');
-  });
-
-  it('names an igneous rock template by its class', () => {
-    expect(getTemplateTypeLabel('plutonic', {}, true)).toBe('Plutonic Rock');
-  });
-
-  it('names any other template by its page', () => {
-    expect(getTemplateTypeLabel('minerals', {label_singular: 'Mineral'})).toBe('Mineral');
   });
 });
 

@@ -5,7 +5,8 @@ import {useSelector} from 'react-redux';
 import BackupTemplatesModal from './BackupTemplatesModal';
 import LoadTemplatesModal from './LoadTemplatesModal';
 import TemplateDetail from './TemplateDetail';
-import {getNewTemplateSections, getSavedTemplateSections, getTemplateTitle} from './templates.helpers';
+import {getNewTemplateSections, getSavedTemplateSections, getTemplateTypeLabel} from './templateLabels.helpers';
+import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
 import TemplateSectionList from './TemplateSectionList';
 import TemplatesOverflowMenuModal from './TemplatesOverflowMenuModal';
 import {isEmpty} from '../../shared/helpers';
@@ -13,6 +14,7 @@ import AddButton from '../../shared/ui/buttons/AddButton';
 import UnsavedChangesModal from '../../shared/ui/modals/UnsavedChangesModal';
 import MainMenuPanelHeader from '../main-menu-panel/MainMenuPanelHeader';
 import SidePanelHeader from '../main-menu-panel/side-panel/SidePanelHeader';
+import {MEASUREMENT_GROUP_KEY} from '../measurements/measurements.constants';
 import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import useLeavePage from '../notebook-panel/useLeavePage';
 
@@ -47,11 +49,13 @@ const Templates = () => {
   const handleNewTemplatePressed = ({id: formKey}, section) => {
     setIsNewTemplateListVisible(false);
     setTemplateType(formKey);
-    setTemplateVisible({values: section.title === 'measurement' ? {type: formKey} : {}});
+    setTemplateVisible({values: section.groupKey === MEASUREMENT_GROUP_KEY ? {type: formKey} : {}});
   };
 
+  // A measurement section holds more than one type, tabular templates sharing the planar section
   const handleTemplatePressed = (templatePressed, section) => {
-    setTemplateType(section.title);
+    setTemplateType(section.templateKey === MEASUREMENT_TEMPLATE_KEY ? templatePressed.values.type
+      : section.templateKey);
     setTemplateVisible(templatePressed);
   };
 
@@ -82,7 +86,7 @@ const Templates = () => {
       <LeavePageContext.Provider value={templateGate}>
         <SidePanelHeader
           backButton={handleBackPressed}
-          headerTitle={getTemplateTitle(templateType) + ' Template'}
+          headerTitle={getTemplateTypeLabel(templateType) + ' Template'}
           title={'Templates'}
         />
         <TemplateDetail goBack={goBack} template={templateVisible} templateType={templateType}/>

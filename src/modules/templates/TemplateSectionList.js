@@ -3,14 +3,13 @@ import {SectionList} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 
-import {getTemplateTitle} from './templates.helpers';
 import commonStyles from '../../shared/common.styles';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 
-// The main menu's lists of templates, saved ones or the kinds that can be made: sections titled by template key or
-// type, of items with an id and a name
+// The main menu's lists of templates, saved ones or the kinds that can be made: labeled sections of items with an id
+// and a name
 const TemplateSectionList = ({emptyText, onItemPressed, sections}) => {
   /* Render Functions */
 
@@ -33,7 +32,7 @@ const TemplateSectionList = ({emptyText, onItemPressed, sections}) => {
       ListEmptyComponent={emptyText && <ListEmptyText text={emptyText}/>}
       keyExtractor={item => item.id.toString()}
       renderItem={renderItem}
-      renderSectionHeader={({section}) => <SectionDivider dividerText={getTemplateTitle(section.title)}/>}
+      renderSectionHeader={({section}) => <SectionDivider dividerText={section.label}/>}
       sections={sections}
       stickySectionHeadersEnabled={true}
     />
