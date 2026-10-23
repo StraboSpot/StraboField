@@ -4,7 +4,7 @@ import LottieView from 'lottie-react-native';
 
 import {getAnimationType} from './animations.helpers';
 
-const LottieAnimation = ({animationStyle, doesLoop, type}) => {
+const LottieAnimations = ({animationStyle, doesLoop, type}) => {
   /* View */
 
   return (
@@ -17,4 +17,4 @@ const LottieAnimation = ({animationStyle, doesLoop, type}) => {
   );
 };
 
-export default LottieAnimation;
+export default LottieAnimations;

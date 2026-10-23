@@ -13,13 +13,13 @@ import useDevice from '../../services/device/useDevice';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {LIGHTGREY, MEDIUMGREY, PRIMARY_ACCENT_COLOR, PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
-import UrlLinkButton from '../../shared/ui/buttons/UrlLinkButton';
+import URLLinkButton from '../../shared/ui/buttons/URLLinkButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 
-const MicroProjectsList = () => {
+const MicroProjects = () => {
   /* Data Hooks */
 
   const {isConnected, isInternetReachable} = useSelector(state => state.connections.isOnline);
@@ -51,14 +51,14 @@ const MicroProjectsList = () => {
   /* Side Effects */
 
   useEffect(() => {
-    console.log('UE ProjectList');
+    console.log('UE MicroProjects');
     return () => {
       closeStatusOverlay();
     };
   }, []);
 
   useEffect(() => {
-    console.log('UE ProjectList [showComplete, isConnected, isInternetReachable]');
+    console.log('UE MicroProjects [showComplete, isConnected, isInternetReachable]');
     // deleteFromDevice(APP_DIRECTORIES.MICRO);  // Delete Micro folder (for testing)
     getAllMicroProjects().then(() => console.log('Got StraboMico Projects'));
   }, [showComplete, isConnected, isInternetReachable]);
@@ -182,7 +182,7 @@ const MicroProjectsList = () => {
     );
   };
 
-  const renderMicroProjectsList = () => {
+  const renderMicroProjects = () => {
     if (!isEmpty(userData)) {
       return (
         <View style={{flex: 1}}>
@@ -206,7 +206,7 @@ const MicroProjectsList = () => {
     <View style={{flex: 1}}>
       <Loading isLoading={loading} style={{backgroundColor: PRIMARY_BACKGROUND_COLOR}}/>
       {Platform.OS === 'web' && (
-        <UrlLinkButton
+        <URLLinkButton
           color={PRIMARY_ACCENT_COLOR}
           icon={'globe-outline'}
           key={'micro-link'}
@@ -214,7 +214,7 @@ const MicroProjectsList = () => {
           url={'https://strabospot.org/my_micro_data'}
         />
       )}
-      {renderMicroProjectsList()}
+      {renderMicroProjects()}
 
       {/* Modals */}
       <MicroProjectsStatusOverlay
@@ -232,4 +232,4 @@ const MicroProjectsList = () => {
   );
 };
 
-export default MicroProjectsList;
+export default MicroProjects;

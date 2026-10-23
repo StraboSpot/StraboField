@@ -6,7 +6,7 @@ import DatasetList from './DatasetList';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import MainMenuPanelHeader from '../../main-menu-panel/MainMenuPanelHeader';
 
-const DatasetsPage = ({isAddDatasetModalVisible, setIsAddDatasetModalVisible, setDatasetToView}) => {
+const DatasetsOverview = ({isAddDatasetModalVisible, setIsAddDatasetModalVisible, setDatasetToView}) => {
 
   /* View */
 
@@ -30,4 +30,4 @@ const DatasetsPage = ({isAddDatasetModalVisible, setIsAddDatasetModalVisible, se
   );
 };
 
-export default DatasetsPage;
+export default DatasetsOverview;

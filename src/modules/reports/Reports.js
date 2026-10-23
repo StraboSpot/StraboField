@@ -8,8 +8,8 @@ import AddButton from '../../shared/ui/buttons/AddButton';
 import {setActiveModal, setModalValues} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
-const ReportsMenu = ({}) => {
-  console.log('Rendering ReportsMenu...');
+const Reports = () => {
+  console.log('Rendering Reports...');
 
   /* Data Hooks */
 
@@ -32,4 +32,4 @@ const ReportsMenu = ({}) => {
   );
 };
 
-export default ReportsMenu;
+export default Reports;

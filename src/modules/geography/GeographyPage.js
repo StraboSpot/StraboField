@@ -14,7 +14,7 @@ import {
   getInitialGeomValues,
   getParsedGeomValues,
 } from './geography.helpers';
-import UtmFieldInputs from './UtmFieldInputs';
+import UTMFieldInputs from './UTMFieldInputs';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -118,7 +118,7 @@ const GeographyPage = ({isReadOnly, page}) => {
 
   const renderGeoCoords = () => {
     if (isEmpty(initialGeomValues.latitude) || isEmpty(initialGeomValues.longitude)) return renderGeoFieldText();
-    return isUtmDisplay ? <UtmFieldInputs formRef={formRef} isReadOnly={isReadOnly}/>
+    return isUtmDisplay ? <UTMFieldInputs formRef={formRef} isReadOnly={isReadOnly}/>
       : <GeoFieldInputs formRef={formRef} isReadOnly={isReadOnly}/>;
   };
 

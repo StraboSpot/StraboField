@@ -7,7 +7,7 @@ import {openUrl} from '../../helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../styles.constants';
 import alert from '../alert';
 
-const UrlLinkButton = ({color, icon, title, url}) => {
+const URLLinkButton = ({color, icon, title, url}) => {
 
   const isOnline = useSelector(state => state.connections.isOnline.isInternetReachable);
 
@@ -38,4 +38,4 @@ const UrlLinkButton = ({color, icon, title, url}) => {
   }
 };
 
-export default UrlLinkButton;
+export default URLLinkButton;

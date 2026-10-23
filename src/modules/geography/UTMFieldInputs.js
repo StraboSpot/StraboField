@@ -11,7 +11,7 @@ import TextInputField from '../form/inputs/TextInputField';
 import {convertLatLngToUtm} from '../maps/maps.helpers';
 import useMapLocation from '../maps/view/useMapLocation';
 
-const UtmFieldInputs = ({formRef, isReadOnly}) => {
+const UTMFieldInputs = ({formRef, isReadOnly}) => {
   /* Data Hooks */
 
   const {getCurrentLocation} = useMapLocation();
@@ -97,4 +97,4 @@ const UtmFieldInputs = ({formRef, isReadOnly}) => {
   );
 };
 
-export default UtmFieldInputs;
+export default UTMFieldInputs;

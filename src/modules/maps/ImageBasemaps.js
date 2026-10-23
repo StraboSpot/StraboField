@@ -8,7 +8,7 @@ import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import ActiveDatasetsSummary from '../project/datasets/ActiveDatasetsSummary';
 import useSpots from '../spots/useSpots';
 
-const ImageBasemapsList = ({closeManMenuPanel, openDatasetsPage}) => {
+const ImageBasemaps = ({closeManMenuPanel, openDatasetsPage}) => {
   console.log('Rendering ImageBasemaps...');
 
   /* Data Hooks */
@@ -45,4 +45,4 @@ const ImageBasemapsList = ({closeManMenuPanel, openDatasetsPage}) => {
   );
 };
 
-export default ImageBasemapsList;
+export default ImageBasemaps;

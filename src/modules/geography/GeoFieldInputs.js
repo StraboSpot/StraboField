@@ -9,7 +9,7 @@ import ClearButton from '../../shared/ui/buttons/ClearButton';
 import NumberInputField from '../form/inputs/NumberInputField';
 import useMapLocation from '../maps/view/useMapLocation';
 
-const GeoFieldsInputs = ({formRef, isReadOnly}) => {
+const GeoFieldInputs = ({formRef, isReadOnly}) => {
   /* Data Hooks */
 
   const {getCurrentLocation} = useMapLocation();
@@ -79,4 +79,4 @@ const GeoFieldsInputs = ({formRef, isReadOnly}) => {
   );
 };
 
-export default GeoFieldsInputs;
+export default GeoFieldInputs;

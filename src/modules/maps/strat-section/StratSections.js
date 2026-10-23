@@ -18,7 +18,7 @@ import {setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 import {setStratSection} from '../maps.slice';
 
-const StratSectionsList = ({closeManMenuPanel, openDatasetsPage}) => {
+const StratSections = ({closeManMenuPanel, openDatasetsPage}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -94,4 +94,4 @@ const StratSectionsList = ({closeManMenuPanel, openDatasetsPage}) => {
   );
 };
 
-export default StratSectionsList;
+export default StratSections;

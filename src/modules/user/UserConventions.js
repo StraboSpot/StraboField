@@ -28,7 +28,7 @@ import {calculateMissingOrientations, getSpotOrientations} from '../spots/spots.
 import {editedOrCreatedSpots, setSelectedAttributes} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
-const UserProfile = () => {
+const UserConventions = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -299,4 +299,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default UserConventions;

@@ -118,6 +118,7 @@ npm run remove:packages    # clean node_modules + iOS Pods
 - **Nesting** — parent/child spot hierarchy via `properties.nesting`.
 - **Feature type** — the category/schema a spot's measurements follow.
 - **Tag** — cross-cutting label linking spots (lives in projects.slice).
+- **Memo** — what the UI calls a report; code and data (`project.reports`) say report.
 
 ## Why It's Built This Way
 

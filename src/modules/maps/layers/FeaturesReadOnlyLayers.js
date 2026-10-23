@@ -5,7 +5,7 @@ import * as turf from '@turf/turf';
 
 import useMapSymbology from '../symbology/useMapSymbology';
 
-const FeaturesNotSelectedLayers = ({features}) => {
+const FeaturesReadOnlyLayers = ({features}) => {
   /* Data Hooks */
 
   const {getMapSymbology} = useMapSymbology();
@@ -44,4 +44,4 @@ const FeaturesNotSelectedLayers = ({features}) => {
   );
 };
 
-export default FeaturesNotSelectedLayers;
+export default FeaturesReadOnlyLayers;

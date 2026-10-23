@@ -5,7 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import ActiveModal from './ActiveModal';
 import {applyPendingModal} from './home.slice';
-import LoadingSpinner from '../../shared/ui/Loading';
+import Loading from '../../shared/ui/Loading';
 import MessageModal from '../../shared/ui/modals/MessageModal';
 import {MODAL_TRANSITION_DELAY} from '../../shared/ui/modals/modal.constants';
 import StatusModal from '../../shared/ui/modals/StatusModal';
@@ -54,7 +54,7 @@ const ModalsContainer = forwardRef(({
       <StatusModal/>
       <ReauthModal/>
       {/*------------------------*/}
-      <LoadingSpinner isLoading={isHomeLoading}/>
+      <Loading isLoading={isHomeLoading}/>
       {activeModal && (
         <ActiveModal
           closeNotebookPanel={closeNotebookPanel}
