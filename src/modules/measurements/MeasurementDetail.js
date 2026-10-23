@@ -37,6 +37,7 @@ const MeasurementDetail = ({
                              closeDetailView,
                              deleteTemplate,
                              isReadOnly,
+                             isTemplateNameChanged,
                              selectedAttitudes,
                              saveTemplate,
                            }) => {
@@ -52,14 +53,15 @@ const MeasurementDetail = ({
   const {deleteMeasurements} = useMeasurements();
   const toast = useToast();
 
-  // A template (saveTemplate given) is saved from its own notebook, so there is no page to leave
+  // A template (saveTemplate given) registers with TemplatesPicker's gate, and a rename counts as a change
   const formRef = useRef(null);
   const {isFormDirty, isFormInvalid, markSaved, setIsFormDirty, setIsFormInvalid} = useUnsavedFormChanges({
     formRef: formRef,
-    getMessage: () => (selectedAttributes.length > 1 ? 'Your changes to these measurements haven\'t been saved.'
-      : 'Your changes to this measurement haven\'t been saved.'),
-    isAsking: !saveTemplate,
-    save: () => saveForm(formRef.current),
+    getMessage: () => (saveTemplate ? 'Your changes to this measurement template haven\'t been saved.'
+      : selectedAttributes.length > 1 ? 'Your changes to these measurements haven\'t been saved.'
+        : 'Your changes to this measurement haven\'t been saved.'),
+    isChangedOutsideForm: isTemplateNameChanged,
+    save: () => (saveTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current)),
   });
 
   /* Local State */
@@ -206,12 +208,12 @@ const MeasurementDetail = ({
     dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.MEASUREMENTS}));
   };
 
-  // A template isn't registered with the gate, so asking would be about whichever page is under it
   const cancelFormAndGo = async () => {
-    if (!isTemplate && hasUnsavedPageChanges() && !await confirmLeavePage()) return;
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     setSelectedMeasurement({});
     formRef.current?.resetForm();
-    if (isEmptyMeasurement(selectedAttitude)) {
+    // A measurement left empty is removed from the Spot; a template is not on one
+    if (!isTemplate && isEmptyMeasurement(selectedAttitude)) {
       const aOs = selectedAttitude.associated_orientation || [];
       deleteMeasurements([...aOs, selectedAttitude]);
     }
@@ -332,11 +334,14 @@ const MeasurementDetail = ({
     if (await saveForm(formRef.current)) switchSelectedMeasurement(measurement);
   };
 
+  // Always resolves true for the gate, which already holds Save while the form has errors
   const saveTemplateForm = async (formCurrent) => {
     const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
     // A template is copied into every measurement made from it, so a label would be shared by all of them
     const {label, ...templateValues} = formValues;
+    markSaved();
     await saveTemplate(templateValues);
+    return true;
   };
 
   // Switch between Planar and Tabular Zone

@@ -61,6 +61,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
 
   /* Local State */
 
+  const closeTemplatesRef = useRef(null);
   const formRef = useRef(null);
   const prevValuesRef = useRef({compassMeasurementTypes: null, templates: null});
 
@@ -156,7 +157,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
       setChoicesViewKey(null);
       setAssocChoicesViewKey(null);
     }
-    else if (isShowTemplates) setIsShowTemplates(false);
+    else if (isShowTemplates) closeTemplatesRef.current();
     else dispatch(setActiveModal({modal: null}));
   };
 
@@ -379,6 +380,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
         {!isSelectedAttitude && (
           <TemplatesPicker
             isShowTemplates={isShowTemplates}
+            registerCloseTemplates={closeTemplatesRef}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}
             typeKey={typeKey}
           />

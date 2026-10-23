@@ -160,12 +160,10 @@ const NotesPage = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentL
     <View style={{flex: 1}}>
       {isShortcutNote ? (
         <>
-          {!isShowTemplates && (
-            <View style={uiStyles.alignItemsToCenter}>
-              <Text>Saving a note will create</Text>
-              <Text>a new spot.</Text>
-            </View>
-          )}
+          <View style={uiStyles.alignItemsToCenter}>
+            <Text>Saving a note will create</Text>
+            <Text>a new spot.</Text>
+          </View>
           <TemplatesPicker
             isShowTemplates={isShowTemplates}
             page={page}
@@ -174,7 +172,7 @@ const NotesPage = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentL
         </>
       ) : (
         <>
-          {!isShowTemplates && renderCancelSaveButtons()}
+          {renderCancelSaveButtons()}
           {!isReadOnly && (
             <TemplatesPicker
               isShowTemplates={isShowTemplates}
@@ -185,15 +183,14 @@ const NotesPage = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentL
         </>
       )}
       <FlatListItemSeparator/>
-      {!isShowTemplates && (
-        <NoteForm
-          formRef={formRef}
-          initialNotesValues={initialNotesValues}
-          isFillHeight={isShortcutNote}
-          isReadOnly={isReadOnly}
-          setIsFormDirty={setIsFormDirty}
-        />
-      )}
+      {/* Stays mounted while the Notes Template modal is open over it, so what was typed is kept */}
+      <NoteForm
+        formRef={formRef}
+        initialNotesValues={initialNotesValues}
+        isFillHeight={isShortcutNote}
+        isReadOnly={isReadOnly}
+        setIsFormDirty={setIsFormDirty}
+      />
     </View>
   );
 };

@@ -7,7 +7,7 @@ import {LeavePageContext, useUnsavedFormChanges} from './LeavePageContext';
 // What a page tells the gate about its form. Getting it wrong either asks about changes already saved or thrown away,
 // or lets the page be left with changes nobody was asked about.
 describe('useUnsavedFormChanges', () => {
-  const renderHook = ({getSaveHeldReason, isAsking, onDiscard} = {}) => {
+  const renderHook = ({getSaveHeldReason, isAsking, isChangedOutsideForm, onDiscard} = {}) => {
     const form = {dirty: false, errors: {}, resetForm: jest.fn(), status: {formName: []}, values: {note: ''}};
     let openPage = null;
     const leavePage = {
@@ -26,6 +26,7 @@ describe('useUnsavedFormChanges', () => {
         getMessage: () => 'Your note hasn\'t been saved.',
         getSaveHeldReason: getSaveHeldReason,
         isAsking: isAsking,
+        isChangedOutsideForm: isChangedOutsideForm,
         onDiscard: onDiscard,
         save: async () => true,
       });
@@ -91,6 +92,12 @@ describe('useUnsavedFormChanges', () => {
     form.errors = {strike: 'Required'};
     ReactTestRenderer.act(() => getHook().setIsFormInvalid(true));
     expect(getOpenPage().getSaveHeldReasons()).toEqual(['Please sign in to SESAR to save.', 'strike: Required']);
+  });
+
+  // A template renamed before its form opened has a change the form itself never saw
+  it('reports a change made outside the form as unsaved', () => {
+    const {getOpenPage} = renderHook({isChangedOutsideForm: true});
+    expect(getOpenPage().getHasUnsavedChanges()).toBe(true);
   });
 
   it('registers nothing for a form that is not asked about', () => {

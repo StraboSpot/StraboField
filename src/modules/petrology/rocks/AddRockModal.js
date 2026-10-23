@@ -42,6 +42,7 @@ const AddRockModal = ({modalKey}) => {
 
   /* Local State */
 
+  const closeTemplatesRef = useRef(null);
   const formRef = useRef(null);
 
   const [choices, setChoices] = useState({});
@@ -96,7 +97,7 @@ const AddRockModal = ({modalKey}) => {
 
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
-    else if (isShowTemplates) setIsShowTemplates(false);
+    else if (isShowTemplates) closeTemplatesRef.current();
     else dispatch(setActiveModal({modal: null}));
   };
 
@@ -189,6 +190,7 @@ const AddRockModal = ({modalKey}) => {
         {!choicesViewKey && (
           <TemplatesPicker
             isShowTemplates={isShowTemplates}
+            registerCloseTemplates={closeTemplatesRef}
             rockKey={rockKey}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}
           />

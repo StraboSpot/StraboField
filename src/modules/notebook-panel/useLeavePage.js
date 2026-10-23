@@ -9,8 +9,10 @@ import useSpots from '../spots/useSpots';
 
 // Asks about a notebook page's unsaved changes before anything leaves it. The page is still open while it asks, so
 // Save is the page's own Save. HomeContainer calls this once and provides it through LeavePageContext, since a page
-// is left from the map, the main menu and the shortcuts as well as from inside the notebook.
-const useLeavePage = () => {
+// is left from the map, the main menu and the shortcuts as well as from inside the notebook. A template editor
+// provides one of its own, with isForSpot false: a template isn't part of the selected Spot, so a Read Only Spot
+// doesn't mean it has nothing to save.
+const useLeavePage = ({isForSpot = true} = {}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -57,7 +59,7 @@ const useLeavePage = () => {
   // Checked before awaiting confirmLeavePage, so callers stay synchronous when there is nothing to ask about. A
   // Read Only Spot has nothing to save, including one whose dataset was locked after the changes were made.
   const hasUnsavedPageChanges = () => !!openPageRef.current?.getHasUnsavedChanges()
-    && !isSpotReadOnly(store.getState().spot.selectedSpot);
+    && !(isForSpot && isSpotReadOnly(store.getState().spot.selectedSpot));
 
   // Called as the page renders, so it only touches the ref. Changes are reported separately, from an effect.
   const registerOpenPage = (owner, openPage) => {

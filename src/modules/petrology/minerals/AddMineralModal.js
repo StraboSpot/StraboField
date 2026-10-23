@@ -37,6 +37,7 @@ const AddMineralModal = () => {
 
   /* Local State */
 
+  const closeTemplatesRef = useRef(null);
   const formRef = useRef(null);
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
@@ -70,7 +71,7 @@ const AddMineralModal = () => {
 
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
-    else if (isShowTemplates) setIsShowTemplates(false);
+    else if (isShowTemplates) closeTemplatesRef.current();
     else if (!isEmpty(selectedTypeIndex)) setSelectedTypeIndex(null);
     else dispatch(setActiveModal({modal: null}));
   };
@@ -234,6 +235,7 @@ const AddMineralModal = () => {
       {!choicesViewKey && isEmpty(selectedTypeIndex) && (
         <TemplatesPicker
           isShowTemplates={isShowTemplates}
+          registerCloseTemplates={closeTemplatesRef}
           setIsShowTemplates={bool => setIsShowTemplates(bool)}
         />
       )}

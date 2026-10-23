@@ -15,11 +15,11 @@ jest.mock('../spots/useSpots', () => () => ({isSpotReadOnly: () => mockIsReadOnl
 // A page goes only when goToNotebookPage resolves true. Getting that wrong either leaves over unsaved changes, which
 // are then lost, or keeps the user on a page they chose to leave.
 describe('goToNotebookPage', () => {
-  const renderHook = () => {
+  const renderHook = (options) => {
     const store = configureStore({reducer: {notebook: notebookReducer, spot: spotReducer}});
     let hookApi;
     const Probe = () => {
-      hookApi = useLeavePage();
+      hookApi = useLeavePage(options);
       return null;
     };
     ReactTestRenderer.act(() => {
@@ -83,6 +83,14 @@ describe('goToNotebookPage', () => {
     expect(await callGoToNotebookPage(getHook)).toBe(true);
     expect(page.save).not.toHaveBeenCalled();
     expect(getPageVisible(store)).toBe('notes');
+  });
+
+  // A template editor's gate: the template isn't part of the Spot, so it still has its changes to save
+  it('asks from a Read Only Spot when the gate is not for the Spot', () => {
+    mockIsReadOnly = true;
+    const {getHook} = renderHook({isForSpot: false});
+    openPage({getHook, hasUnsavedChanges: true});
+    expect(getHook().hasUnsavedPageChanges()).toBe(true);
   });
 
   it('asks with the page\'s own message before leaving its changes', () => {

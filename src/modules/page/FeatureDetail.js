@@ -49,6 +49,7 @@ const FeatureDetail = ({
                            deleteTemplate,
                            groupKey = 'general',
                            isReadOnly,
+                           isTemplateNameChanged,
                            page,
                            registerGetValues,
                            registerSaveChanges,
@@ -79,7 +80,7 @@ const FeatureDetail = ({
   const toast = useToast();
 
   // Save on the way out is this page's Save, held for the same reasons, so a value that needs fixing keeps the page
-  // open to fix it. A template (saveTemplate given) is saved from its own notebook, so there is no page to leave.
+  // open to fix it. A template (saveTemplate given) registers with TemplatesPicker's gate instead, and a rename counts.
   const formRef = useRef(null);
   const {
     hasUnsavedChanges,
@@ -90,11 +91,11 @@ const FeatureDetail = ({
     setIsFormInvalid,
   } = useUnsavedFormChanges({
     formRef: formRef,
-    getMessage: () => `Your changes to this ${title} haven't been saved.`,
+    getMessage: () => `Your changes to this ${title}${saveTemplate ? ' template' : ''} haven't been saved.`,
     getSaveHeldReason: () => sesarSaveHeldReason,
-    isAsking: !saveTemplate,
+    isChangedOutsideForm: isTemplateNameChanged,
     onDiscard: closeDetailView,
-    save: () => saveForm(formRef.current),
+    save: () => (saveTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current)),
   });
 
   /* Local State */
@@ -188,9 +189,8 @@ const FeatureDetail = ({
 
   /* Logic Helpers */
 
-  // A template isn't registered with the gate, so asking would be about whichever page is under it
   const cancelForm = async () => {
-    if (!isTemplate && hasUnsavedPageChanges() && !await confirmLeavePage()) return;
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     closeDetailView();
   };
 
@@ -379,12 +379,15 @@ const FeatureDetail = ({
     }
   };
 
+  // Always resolves true for the gate, which already holds Save while the form has errors
   const saveTemplateForm = async (formCurrent) => {
     const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
     // A template's values are copied wholesale into every feature made from it, so a label would be shared by
     // all of them. Each feature is labeled for itself as it is created instead.
     const {label, ...templateValues} = formValues;
+    markSaved();
     saveTemplate(templateValues);
+    return true;
   };
 
   // The ORCID redirect comes back to the IGSN modal mounted below, which stores the SESAR tokens; Save then returns.

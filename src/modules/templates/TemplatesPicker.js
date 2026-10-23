@@ -1,9 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, ScrollView, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {FlatList, Text, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import NoteTemplateForm from './NoteTemplateForm';
 import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
 import {
   getActiveTemplateList,
@@ -19,25 +20,30 @@ import * as themes from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import buttonsStyles from '../../shared/ui/buttons/buttons.styles';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
-import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import UnsavedChangesModal from '../../shared/ui/modals/UnsavedChangesModal';
 import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import TextInput from '../../shared/ui/TextInput';
 import formStyles from '../form/form.styles';
 import MeasurementDetail from '../measurements/MeasurementDetail';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 import {isPlanarType} from '../measurements/measurements.helpers';
-import NoteForm from '../notes/NoteForm';
+import {LeavePageContext} from '../notebook-panel/LeavePageContext';
+import useLeavePage from '../notebook-panel/useLeavePage';
 import FeatureDetail from '../page/FeatureDetail';
 import {MODALS, PET_PAGES, SED_PAGES} from '../page/page.constants';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
+// The template being edited asks about its unsaved changes through a gate of its own, not the notebook page's:
+// closing it leaves the page or modal it was opened from still open. registerCloseTemplates hands the parent a close
+// that asks first, for the parent's own close button.
 const TemplatesPicker = ({
                            isShowTemplates,
                            page = {},
+                           registerCloseTemplates,
                            rockKey,
                            setIsShowTemplates,
                            typeKey,
@@ -48,11 +54,10 @@ const TemplatesPicker = ({
   const activeModal = useSelector(state => state.home.activeModal);
   const templates = useSelector(state => state.project.project?.templates);
 
+  const templateGate = useLeavePage({isForSpot: false});
   const {saveTemplateValues} = useTemplates();
 
   /* Local State */
-
-  const notesTemplateFormRef = useRef(null);
 
   const [activeTemplatesForKey, setActiveTemplatesForKey] = useState([]);
   const [isShowForm, setIsShowForm] = useState(false);
@@ -75,6 +80,8 @@ const TemplatesPicker = ({
         : page.notebook_modal_key ? page.notebook_modal_key
           : activeModal;
   }
+  // The name is typed before the form opens, so the form can't tell it changed. A new template counts once named.
+  const isTemplateNameChanged = name !== (selectedTemplate.name || '');
 
   /* Side Effects */
 
@@ -86,6 +93,11 @@ const TemplatesPicker = ({
   }, [templates, templateKey, typeKey]);
 
   /* Logic Helpers */
+
+  const askAndCloseTemplates = async () => {
+    if (templateGate.hasUnsavedPageChanges() && !await templateGate.confirmLeavePage()) return;
+    closeTemplates();
+  };
 
   const clearTemplate = () => {
     if (templateType === MEASUREMENT_KEYS.PLANAR) {
@@ -168,6 +180,8 @@ const TemplatesPicker = ({
     dispatch(setUseTemplate({key: templateKey, bool: value}));
   };
 
+  if (registerCloseTemplates) registerCloseTemplates.current = askAndCloseTemplates;
+
   /* Render Functions */
 
   const renderFormFields = () => {
@@ -191,6 +205,7 @@ const TemplatesPicker = ({
       <MeasurementDetail
         closeDetailView={() => setIsShowForm(false)}
         deleteTemplate={deleteTemplateConfirm}
+        isTemplateNameChanged={isTemplateNameChanged}
         saveTemplate={saveTemplate}
         selectedAttitudes={[values]}
       />
@@ -206,6 +221,7 @@ const TemplatesPicker = ({
         closeDetailView={() => setIsShowForm(false)}
         deleteTemplate={deleteTemplateConfirm}
         groupKey={groupKey}
+        isTemplateNameChanged={isTemplateNameChanged}
         page={page}
         saveTemplate={saveTemplate}
         selectedFeature={selectedTemplate.values}
@@ -215,28 +231,20 @@ const TemplatesPicker = ({
 
   const renderNotesForm = () => {
     return (
-      <ScrollView>
-        <SaveAndCancelButtons
-          cancel={() => setIsShowForm(false)}
-          save={() => saveTemplate(notesTemplateFormRef.current.values)}
-        />
-        <NoteForm
-          appearance={'multiline'}
-          customHeight={300}
-          formRef={notesTemplateFormRef}
-          initialNotesValues={selectedTemplate.values}
-        />
-      </ScrollView>
+      <NoteTemplateForm
+        closeForm={() => setIsShowForm(false)}
+        initialNotesValues={selectedTemplate.values}
+        isTemplateNameChanged={isTemplateNameChanged}
+        saveTemplate={saveTemplate}
+      />
     );
   };
 
   const renderNotesTemplateModal = () => {
     return (
       <ModalWrapper
-        closeModal={closeTemplates}
+        closeModal={askAndCloseTemplates}
         headerTitle={isShowForm || isShowNameInput ? 'Edit Notes Template' : 'Notes Templates'}
-        onActionPressed={() => isShowForm && saveTemplate(notesTemplateFormRef.current.values)}
-        onCancelPress={() => setIsShowForm(false)}
         showActionButton={false}
         showCancelButton={false}
         showCloseButton
@@ -418,13 +426,14 @@ const TemplatesPicker = ({
   /* View */
 
   return (
-    <>
+    <LeavePageContext.Provider value={templateGate}>
       {isShowTemplates && templateType === 'notes' ? renderNotesTemplateModal()
         : isShowTemplates && isShowNameInput ? renderTemplateNameInput()
           : isShowTemplates && isShowForm ? renderFormFields()
             : isShowTemplates ? renderTemplatesList()
               : renderTemplateToggle()}
-    </>
+      <UnsavedChangesModal {...templateGate.leavePromptProps} headerTitle={'Unsaved Changes'}/>
+    </LeavePageContext.Provider>
   );
 };
 
