@@ -31,7 +31,7 @@ import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import PageHeader from '../page/PageHeader';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
+import {deselectedAttributes, editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 
 const MeasurementDetail = ({
                              closeDetailView,
@@ -64,6 +64,10 @@ const MeasurementDetail = ({
 
   /* Local State */
 
+  // The selection as this view last showed it, which is all it may drop as it closes
+  const selectedAttributesRef = useRef(selectedAttributes);
+  selectedAttributesRef.current = selectedAttributes;
+
   const [formName, setFormName] = useState([]);
   const [isAddingAssociatedMeasurementAfterSave, setIsAddingAssociatedMeasurementAfterSave] = useState(false);
   const [selectedMeasurement, setSelectedMeasurement] = useState(null);
@@ -80,7 +84,7 @@ const MeasurementDetail = ({
   // The measurements stay selected only while their detail is open
   useLayoutEffect(() => {
     console.log('ULE MeasurementDetail []');
-    return () => dispatch(setSelectedAttributes([]));
+    return () => dispatch(deselectedAttributes(selectedAttributesRef.current));
   }, []);
 
   // Update selected Measurement on selected Attitudes changed or return to Measurements page if no selected Attitude

@@ -2,6 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
 import {getNewId, isEmpty, isEqual, isSameId} from '../../shared/helpers';
+import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {
   deleteTemplateKey,
   getActiveTemplateList,
@@ -371,6 +372,13 @@ const projectSlice = createSlice({
       state.project.preferences = {...state.project.preferences, [key]: value};
       state.project.modified_timestamp = Date.now();
     },
+  },
+  extraReducers: (builder) => {
+    // Tagging several features is something done on one page, so leaving the page ends it - here rather than in an
+    // effect, which would run only after the next page had already read it and skipped the feature it was opened to
+    builder.addCase(setNotebookPageVisible, (state) => {
+      state.isMultipleFeaturesTaggingEnabled = false;
+    });
   },
 });
 

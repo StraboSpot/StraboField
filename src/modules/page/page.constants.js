@@ -29,11 +29,7 @@ import TernaryPage from '../petrology/minerals/TernaryPage';
 import AddReactionTextureModal from '../petrology/reaction-textures/AddReactionTextureModal';
 import ReactionTexturesPage from '../petrology/reaction-textures/ReactionTexturesPage';
 import AddRockModal from '../petrology/rocks/AddRockModal';
-import RockAlterationOrePage from '../petrology/rocks/RockAlterationOrePage';
-import RockFaultPage from '../petrology/rocks/RockFaultPage';
-import RockIgneousPage from '../petrology/rocks/RockIgneousPage';
-import RockMetamorphicPage from '../petrology/rocks/RockMetamorphicPage';
-import RockSedimentaryPage from '../petrology/rocks/RockSedimentaryPage';
+import RocksPage from '../petrology/rocks/RocksPage';
 import QAQCOverview from '../qaqc/QAQCOverview';
 import QAQCPage from '../qaqc/QAQCPage';
 import ReportModal from '../reports/ReportModal';
@@ -244,7 +240,7 @@ export const PET_PAGES = [
     icon_src: require('../../assets/icons/Economic.png'),
     icon_pressed_src: require('../../assets/icons/Economic_pressed.png'),
     overview_component: () => FeatureOverviewList,
-    page_component: () => RockAlterationOrePage,
+    page_component: () => RocksPage,
     modal_component: () => AddRockModal,
     action_label: 'Add an Alteration, Ore Rock',
   }, {
@@ -253,7 +249,7 @@ export const PET_PAGES = [
     icon_src: require('../../assets/icons/FaultRock.png'),
     icon_pressed_src: require('../../assets/icons/FaultRock_pressed.png'),
     overview_component: () => FeatureOverviewList,
-    page_component: () => RockFaultPage,
+    page_component: () => RocksPage,
     modal_component: () => AddRockModal,
     action_label: 'Add a Fault or Shear Zone Rock',
   }, {
@@ -262,7 +258,7 @@ export const PET_PAGES = [
     icon_src: require('../../assets/icons/Igneous.png'),
     icon_pressed_src: require('../../assets/icons/Igneous_pressed.png'),
     overview_component: () => FeatureOverviewList,
-    page_component: () => RockIgneousPage,
+    page_component: () => RocksPage,
     modal_component: () => AddRockModal,
     action_label: 'Add an Igneous Rock',
   }, {
@@ -271,7 +267,7 @@ export const PET_PAGES = [
     icon_src: require('../../assets/icons/Metamorphic.png'),
     icon_pressed_src: require('../../assets/icons/Metamorphic_pressed.png'),
     overview_component: () => FeatureOverviewList,
-    page_component: () => RockMetamorphicPage,
+    page_component: () => RocksPage,
     modal_component: () => AddRockModal,
     action_label: 'Add a Metamorphic Rock',
   }, {
@@ -313,7 +309,7 @@ const SEDIMENTARY_ROCKS_PAGE = {
   icon_src: require('../../assets/icons/Sedimentary.png'),
   icon_pressed_src: require('../../assets/icons/Sedimentary_pressed.png'),
   overview_component: () => FeatureOverviewList,
-  page_component: () => RockSedimentaryPage,
+  page_component: () => RocksPage,
   modal_component: () => AddRockModal,
   action_label: 'Add a Sedimentary Rock',
 };

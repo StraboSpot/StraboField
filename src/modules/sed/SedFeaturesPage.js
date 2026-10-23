@@ -1,20 +1,20 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
 import {INTERPRETATIONS_SUBPAGES, LITHOLOGY_SUBPAGES, STRUCTURE_SUBPAGES} from './sed.constants';
 import {isLithologyRequiredForInterval} from './sed.helpers';
-import {getNewUUID, isEmpty} from '../../shared/helpers';
+import {getNewUUID} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import useForm from '../form/useForm';
-import {setActiveModal} from '../home/home.slice';
 import FeatureDetail from '../page/FeatureDetail';
 import FeatureListItem from '../page/FeatureListItem';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import SubpageTabs from '../page/SubpageTabs';
+import useFeatureDetailView from '../page/useFeatureDetailView';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -22,16 +22,14 @@ const SedFeaturesPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {closeDetailView, isDetailView, openDetailView, selectedFeature} = useFeatureDetailView();
   const {getLabel, getSiblingSurvey} = useForm();
 
   /* Local State */
 
   const [invalidFields, setInvalidFields] = useState([]);
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selectedAttribute, setSelectedAttribute] = useState({});
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
 
   /* Derived Variables */
@@ -44,23 +42,9 @@ const SedFeaturesPage = ({isReadOnly, page}) => {
     ? '.\n\nAt least one is required for ' + getLabel(intervalCharacter, ['sed', 'interval']) + ' intervals.'
     : '');
 
-  /* Side Effects */
-
-  useEffect(() => {
-    // console.log('UE SedFeaturesPage [selectedAttributes, spot]', selectedAttributes, spot);
-    if (!isEmpty(selectedAttributes)) {
-      setSelectedAttribute(selectedAttributes[0]);
-      setIsDetailView(true);
-    }
-  }, [selectedAttributes, spot]);
-
   /* Logic Helpers */
 
-  const addAttribute = () => {
-    setIsDetailView(true);
-    setSelectedAttribute({id: getNewUUID()});
-    dispatch(setActiveModal({modal: null}));
-  };
+  const addAttribute = () => openDetailView({id: getNewUUID()});
 
   const editAttribute = (attribute, i) => {
     if (!attribute.id) {
@@ -70,9 +54,7 @@ const SedFeaturesPage = ({isReadOnly, page}) => {
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     }
-    setIsDetailView(true);
-    setSelectedAttribute(attribute);
-    dispatch(setActiveModal({modal: null}));
+    openDetailView(attribute);
   };
 
   /* Render Functions */
@@ -99,11 +81,11 @@ const SedFeaturesPage = ({isReadOnly, page}) => {
               subpageKeys={subpageKeys}
             />
           }
-          closeDetailView={() => setIsDetailView(false)}
+          closeDetailView={closeDetailView}
           groupKey={'sed'}
           isReadOnly={isReadOnly}
           page={{...page, key: subpageKey}}
-          selectedFeature={selectedAttribute}
+          selectedFeature={selectedFeature}
           setInvalidFields={setInvalidFields}
           siblingSurvey={siblingSurvey}
         />
@@ -112,11 +94,11 @@ const SedFeaturesPage = ({isReadOnly, page}) => {
     else {
       return (
         <FeatureDetail
-          closeDetailView={() => setIsDetailView(false)}
+          closeDetailView={closeDetailView}
           groupKey={'sed'}
           isReadOnly={isReadOnly}
           page={page}
-          selectedFeature={selectedAttribute}
+          selectedFeature={selectedFeature}
         />
       );
     }

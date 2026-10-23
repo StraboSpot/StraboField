@@ -89,24 +89,10 @@ const OtherFeatureDetail = ({
   const saveForm = async (formCurrent) => {
     try {
       const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
-      let featureToEdit;
-      let otherFeatures = spot.properties.other_features;
-      if (otherFeatures && otherFeatures.length > 0) {
-        let existingFeatures = otherFeatures.filter(feature => feature.id === selectedFeature.id);
-        if (!isEmpty(existingFeatures)) {
-          otherFeatures = otherFeatures.filter(feature => feature.id !== selectedFeature.id);
-          featureToEdit = JSON.parse(JSON.stringify(existingFeatures[0]));
-        }
-        else {
-          otherFeatures = JSON.parse(JSON.stringify(otherFeatures));
-          featureToEdit = selectedFeature;
-        }
-      }
-      else {
-        otherFeatures = [];
-        featureToEdit = selectedFeature;
-      }
-      if (!updateFeature(featureToEdit, otherFeatures, formValues)) return false;
+      const existingFeature = spot.properties.other_features?.find(feature => feature.id === selectedFeature.id);
+      // A copy, since the open feature is also the one in the Redux selection, which is frozen
+      const featureToEdit = {...existingFeature || selectedFeature};
+      if (!updateFeature(featureToEdit, formValues)) return false;
       markSaved();
       await formRef.current.resetForm();
       hideFeatureDetail();
@@ -118,7 +104,7 @@ const OtherFeatureDetail = ({
     }
   };
 
-  const updateFeature = (feature, otherFeatures, formValues) => {
+  const updateFeature = (feature, formValues) => {
     feature.name = formValues.name;
     if (formValues.type === 'other') {
       // A field already in error when the form opened is rolled back rather than refused (see showErrors), so the
@@ -135,7 +121,11 @@ const OtherFeatureDetail = ({
       previousFeature: selectedFeature, values: {...feature, label: formValues.label},
       getLabel: getLabel, getLabels: getLabels,
     }).label;
-    otherFeatures.push(feature);
+    // An edited feature keeps its place in the list
+    const otherFeatures = [...spot.properties.other_features || []];
+    const i = otherFeatures.findIndex(f => f.id === feature.id);
+    if (i === -1) otherFeatures.push(feature);
+    else otherFeatures.splice(i, 1, feature);
     const spotId = spot.properties.id;
     dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
     dispatch(editedSpotProperties({field: 'other_features', value: otherFeatures, spotId: spotId}));

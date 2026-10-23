@@ -26,18 +26,19 @@ import FeatureDetail from '../../page/FeatureDetail';
 import FeatureListItem from '../../page/FeatureListItem';
 import PageHeader from '../../page/PageHeader';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import useFeatureDetailView from '../../page/useFeatureDetailView';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {hasSedRockData} from '../../sed/sed.helpers';
-import {editedSpotProperties, setSelectedAttributes} from '../../spots/spots.slice';
+import {editedSpotProperties} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 
 const RocksPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {closeDetailView, isDetailView, openDetailView, selectedFeature} = useFeatureDetailView();
   const {getSurvey} = useForm();
   const {getSpotById, getSpotsWithKey} = useSpots();
 
@@ -45,8 +46,6 @@ const RocksPage = ({isReadOnly, page}) => {
 
   const preFormRef = useRef(null);
 
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selectedRock, setSelectedRock] = useState({});
   const [spotsWithRockType, setSpotsWithRockType] = useState([]);
 
   /* Derived Variables */
@@ -63,14 +62,9 @@ const RocksPage = ({isReadOnly, page}) => {
   /* Side Effects */
 
   useEffect(() => {
-    console.log('UE RocksPage [selectedAttributes, spot]', selectedAttributes, spot);
-    if (isEmpty(selectedAttributes)) setSelectedRock({});
-    else {
-      setSelectedRock(selectedAttributes[0]);
-      setIsDetailView(true);
-    }
+    console.log('UE RocksPage [spot]', spot);
     getSpotsWithRockType();
-  }, [selectedAttributes, spot]);
+  }, [spot]);
 
   /* Logic Helpers */
 
@@ -147,11 +141,7 @@ const RocksPage = ({isReadOnly, page}) => {
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     }
-    setIsDetailView(true);
-    setSelectedRock(rock);
-    // In Redux too, or the next change to the Spot finds no selected rock and closes the detail view
-    dispatch(setSelectedAttributes([rock]));
-    dispatch(setActiveModal({modal: null}));
+    openDetailView(rock);
   };
 
   const getSpotsWithRockType = () => {
@@ -189,11 +179,11 @@ const RocksPage = ({isReadOnly, page}) => {
   const renderRockDetail = () => {
     return (
       <FeatureDetail
-        closeDetailView={() => setIsDetailView(false)}
+        closeDetailView={closeDetailView}
         groupKey={groupKey}
         isReadOnly={isReadOnly}
         page={page}
-        selectedFeature={selectedRock}
+        selectedFeature={selectedFeature}
       />
     );
   };

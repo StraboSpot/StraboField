@@ -139,7 +139,8 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
         </View>
         <View style={[{flex: 1}, isSampleOrSampleChild && notebookStyles.sampleBorder]}>
           <View style={notebookStyles.centerContainer}>
-            <Page {...pageProps}/>
+            {/* Keyed by page, so a component that serves several pages (RocksPage, SedFeaturesPage) starts fresh */}
+            <Page key={page?.key} {...pageProps}/>
           </View>
           <NotebookFooter
             isReadOnly={isReadOnly}

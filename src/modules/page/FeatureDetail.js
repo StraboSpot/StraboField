@@ -31,7 +31,7 @@ import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
 import {getRequiredLithologyKeys, hasOtherLithologyTabData} from '../sed/sed.helpers';
 import SedRockLithologyNote from '../sed/SedRockLithologyNote';
 import useSed from '../sed/useSed';
-import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
+import {deselectedAttributes, editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 import useTags from '../tags/useTags';
 import {THREE_D_STRUCTURE_ORIENTATION_FIELDS} from '../three-d-structures/threeDStructures.constants';
@@ -66,6 +66,7 @@ const FeatureDetail = ({
   const dispatch = useDispatch();
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
   const {encoded_login, sesar} = useSelector(state => state.user);
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
   const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
@@ -97,6 +98,10 @@ const FeatureDetail = ({
   });
 
   /* Local State */
+
+  // The selection as this view last showed it, which is all it may drop as it closes
+  const selectedAttributesRef = useRef(selectedAttributes);
+  selectedAttributesRef.current = selectedAttributes;
 
   const [igsnFormValues, setIgsnFormValues] = useState(null);
   const [initialValues, setInitialValues] = useState(selectedFeature);
@@ -156,7 +161,7 @@ const FeatureDetail = ({
     return () => {
       if (registerGetValues) registerGetValues.current = null;
       if (registerSaveChanges) registerSaveChanges.current = null;
-      dispatch(setSelectedAttributes([]));
+      dispatch(deselectedAttributes(selectedAttributesRef.current));
     };
   }, []);
 

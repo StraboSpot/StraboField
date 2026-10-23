@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {useContext, useRef} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -12,13 +12,13 @@ import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRig
 import Form from '../form/Form';
 import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
-import {setActiveModal} from '../home/home.slice';
 import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import FeatureDetail from '../page/FeatureDetail';
 import FeatureListItem from '../page/FeatureListItem';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
+import useFeatureDetailView from '../page/useFeatureDetailView';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -27,14 +27,13 @@ const BeddingPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
   const {confirmLeavePage, goToNotebookPage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
+  const {closeDetailView, isDetailView, openDetailView, selectedFeature} = useFeatureDetailView();
   const {saveSedFeature} = useSed();
 
   // A bed's detail view asks about its own changes while it shows in place of the shared bedding
-  const [isDetailView, setIsDetailView] = useState(false);
   const beddingSharedRef = useRef(null);
   const {isFormInvalid, markSaved, setIsFormDirty, setIsFormInvalid} = useUnsavedFormChanges({
     formRef: beddingSharedRef,
@@ -43,33 +42,16 @@ const BeddingPage = ({isReadOnly, page}) => {
     save: () => saveBeddingShared(beddingSharedRef.current),
   });
 
-  /* Local State */
-
-  const [selectedAttribute, setSelectedAttribute] = useState({});
-
   /* Derived Variables */
 
   const bedding = spot.properties?.sed?.bedding || {};
-
-  /* Side Effects */
-
-  useEffect(() => {
-    // console.log('UE BeddingPage [selectedAttributes, spot]', selectedAttributes, spot);
-    // console.log('Bedding:', bedding);
-    if (!isEmpty(selectedAttributes)) {
-      setSelectedAttribute(selectedAttributes[0]);
-      setIsDetailView(true);
-    }
-  }, [selectedAttributes, spot]);
 
   /* Logic Helpers */
 
   // A bed's detail view takes the shared bedding form's place
   const addAttribute = async () => {
     if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
-    setIsDetailView(true);
-    setSelectedAttribute({id: getNewUUID()});
-    dispatch(setActiveModal({modal: null}));
+    openDetailView({id: getNewUUID()});
   };
 
   const cancelFormAndGo = () => goToNotebookPage(PAGE_KEYS.OVERVIEW);
@@ -83,9 +65,7 @@ const BeddingPage = ({isReadOnly, page}) => {
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     }
-    setIsDetailView(true);
-    setSelectedAttribute(attribute);
-    dispatch(setActiveModal({modal: null}));
+    openDetailView(attribute);
   };
 
   // Resolves whether the shared bedding was saved. A refusal has already alerted about the field it stopped on.
@@ -111,11 +91,11 @@ const BeddingPage = ({isReadOnly, page}) => {
   const renderAttributeDetail = () => {
     return (
       <FeatureDetail
-        closeDetailView={() => setIsDetailView(false)}
+        closeDetailView={closeDetailView}
         groupKey={'sed'}
         isReadOnly={isReadOnly}
         page={page}
-        selectedFeature={selectedAttribute}
+        selectedFeature={selectedFeature}
       />
     );
   };

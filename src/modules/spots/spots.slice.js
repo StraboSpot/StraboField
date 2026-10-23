@@ -1,4 +1,4 @@
-import {createSlice, current} from '@reduxjs/toolkit';
+import {createSlice, current, original} from '@reduxjs/toolkit';
 
 import {getUniqueTitle, isEmpty} from '../../shared/helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
@@ -60,6 +60,11 @@ const spotSlice = createSlice({
       state.selectedSpot = {};
       state.spots = remainingSpotsObj;
       state.recentViews = state.recentViews.filter(id => !spotIds.includes(id));
+    },
+    // Drops the selection only if it is still the one given, not one the next page has made since - even of the same
+    // feature. original(state), because the draft hands back a stand-in that never matches the dispatched array.
+    deselectedAttributes(state, action) {
+      if (original(state).selectedAttributes === action.payload) state.selectedAttributes = [];
     },
     editedOrCreatedSpot(state, action) {
       const modifiedSpot = {
@@ -212,6 +217,7 @@ export const {
   clearedSpots,
   deletedSpot,
   deletedSpots,
+  deselectedAttributes,
   editedOrCreatedSpot,
   editedOrCreatedSpots,
   editedSpotImage,

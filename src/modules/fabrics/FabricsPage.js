@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {SectionList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -13,35 +13,15 @@ import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRig
 import {setActiveModal, setModalValues} from '../home/home.slice';
 import FeatureDetail from '../page/FeatureDetail';
 import PageHeader from '../page/PageHeader';
-import {setSelectedAttributes} from '../spots/spots.slice';
+import useFeatureDetailView from '../page/useFeatureDetailView';
 
 const FabricsPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  /* Local State */
-
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selectedFabric, setSelectedFabric] = useState({});
-
-  /* Side Effects */
-
-  useEffect(() => {
-    console.log('UE FabricsPage []');
-    return () => dispatch(setSelectedAttributes([]));
-  }, []);
-
-  useEffect(() => {
-    console.log('UE FabricsPage [selectedAttributes, spot]', selectedAttributes, spot);
-    if (isEmpty(selectedAttributes)) setSelectedFabric({});
-    else {
-      setSelectedFabric(selectedAttributes[0]);
-      setIsDetailView(true);
-    }
-  }, [selectedAttributes, spot]);
+  const {closeDetailView, isDetailView, openDetailView, selectedFeature} = useFeatureDetailView();
 
   /* Logic Helpers */
 
@@ -50,23 +30,15 @@ const FabricsPage = ({isReadOnly, page}) => {
     dispatch(setActiveModal({modal: page.key}));
   };
 
-  const editFabric = (fabric) => {
-    setIsDetailView(true);
-    setSelectedFabric(fabric);
-    // In Redux too, so an edit from elsewhere can hand the open detail view back its updated record
-    dispatch(setSelectedAttributes([fabric]));
-    dispatch(setActiveModal({modal: null}));
-  };
-
   /* Render Functions */
 
   const renderFabricDetail = () => {
     return (
       <FeatureDetail
-        closeDetailView={() => setIsDetailView(false)}
+        closeDetailView={closeDetailView}
         isReadOnly={isReadOnly}
         page={page}
-        selectedFeature={selectedFabric}
+        selectedFeature={selectedFeature}
       />
     );
   };
@@ -83,7 +55,7 @@ const FabricsPage = ({isReadOnly, page}) => {
       <SectionList
         ItemSeparatorComponent={FlatListItemSeparator}
         keyExtractor={(item, index) => item + index}
-        renderItem={({item}) => <FabricListItem editFabric={editFabric} fabric={item}/>}
+        renderItem={({item}) => <FabricListItem editFabric={openDetailView} fabric={item}/>}
         renderSectionFooter={({section}) => {
           return (
             section.data.length === 0 && (

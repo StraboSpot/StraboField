@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -15,7 +15,7 @@ import FeatureDetail from '../page/FeatureDetail';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import SubpageTabs from '../page/SubpageTabs';
-import {setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
+import {deselectedAttributes, setSelectedAttributes, setSelectedSpot} from '../spots/spots.slice';
 
 const SamplesPage = ({
                        isReadOnly,
@@ -34,6 +34,10 @@ const SamplesPage = ({
 
   /* Local State */
 
+  // The selection as this page last showed it, which is all it may drop as it closes
+  const selectedAttributesRef = useRef(selectedAttributes);
+  selectedAttributesRef.current = selectedAttributes;
+
   const [selectedTabKey, setSelectedTabKey] = useState(requestedTabKey ?? SAMPLE_DETAIL_TABS[0].key);
 
   /* Derived Variables */
@@ -51,7 +55,7 @@ const SamplesPage = ({
 
   useEffect(() => {
     console.log('UE SamplesPage []');
-    return () => dispatch(setSelectedAttributes([]));
+    return () => dispatch(deselectedAttributes(selectedAttributesRef.current));
   }, []);
 
   // Every sample opens on its Field tab, unless it was opened for another one, which is asked for only that once

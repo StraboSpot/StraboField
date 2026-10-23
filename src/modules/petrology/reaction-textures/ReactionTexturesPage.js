@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
@@ -16,50 +16,21 @@ import FeatureDetail from '../../page/FeatureDetail';
 import {getFeatureTitle} from '../../page/featureLabels.helpers';
 import FeatureListItem from '../../page/FeatureListItem';
 import PageHeader from '../../page/PageHeader';
-import {setSelectedAttributes} from '../../spots/spots.slice';
+import useFeatureDetailView from '../../page/useFeatureDetailView';
 import {getMineralTitle} from '../minerals/minerals.helpers';
 
 const ReactionTexturesPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {closeDetailView, isDetailView, openDetailView, selectedFeature} = useFeatureDetailView();
   const {getLabel, getLabels} = useForm();
-
-  /* Local State */
-
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selectedReaction, setSelectedReaction] = useState({});
-
-  /* Side Effects */
-
-  useEffect(() => {
-    console.log('UE ReactionTexturesPage []');
-    return () => dispatch(setSelectedAttributes([]));
-  }, []);
-
-  useEffect(() => {
-    console.log('UE ReactionTexturesPage [selectedAttributes, spot]', selectedAttributes, spot);
-    if (isEmpty(selectedAttributes)) setSelectedReaction({});
-    else {
-      setSelectedReaction(selectedAttributes[0]);
-      setIsDetailView(true);
-    }
-  }, [selectedAttributes, spot]);
 
   /* Logic Helpers */
 
   const addReaction = () => dispatch(setActiveModal({modal: page.key}));
-
-  const editReaction = (reaction) => {
-    setIsDetailView(true);
-    setSelectedReaction(reaction);
-    // In Redux too, or the next change to the Spot finds no selected reaction and closes the detail view
-    dispatch(setSelectedAttributes([reaction]));
-    dispatch(setActiveModal({modal: null}));
-  };
 
   const getExistingMineralsText = () => {
     if (!spot.properties.pet || isEmpty(spot.properties.pet.minerals) || !Array.isArray(spot.properties.pet.minerals)) {
@@ -77,11 +48,11 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
   const renderReactionDetail = () => {
     return (
       <FeatureDetail
-        closeDetailView={() => setIsDetailView(false)}
+        closeDetailView={closeDetailView}
         groupKey={'pet'}
         isReadOnly={isReadOnly}
         page={page}
-        selectedFeature={selectedReaction}
+        selectedFeature={selectedFeature}
       />
     );
   };
@@ -119,7 +90,7 @@ const ReactionTexturesPage = ({isReadOnly, page}) => {
               (a, b) => getFeatureTitle(page.key, a, getLabel, getLabels)
                 .localeCompare(getFeatureTitle(page.key, b, getLabel, getLabels)))}
           keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => <FeatureListItem editItem={editReaction} item={item} page={page}/>}
+          renderItem={({item}) => <FeatureListItem editItem={openDetailView} item={item} page={page}/>}
         />
       </View>
     );

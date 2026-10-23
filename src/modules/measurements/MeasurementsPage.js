@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {SectionList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -20,7 +20,7 @@ import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
 import {setActiveModal} from '../home/home.slice';
 import PageHeader from '../page/PageHeader';
-import {setSelectedAttributes} from '../spots/spots.slice';
+import {deselectedAttributes, setSelectedAttributes} from '../spots/spots.slice';
 
 const MeasurementsPage = ({isReadOnly, page}) => {
   /* Data Hooks */
@@ -35,6 +35,10 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   const {createNewMeasurement, deleteMeasurements} = useMeasurements();
 
   /* Local State */
+
+  // The selection as this page last showed it, which is all it may drop as it closes
+  const selectedAttributesRef = useRef(selectedAttributes);
+  selectedAttributesRef.current = selectedAttributes;
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [multiSelectMode, setMultiSelectMode] = useState();
@@ -61,7 +65,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
 
   useEffect(() => {
     console.log('UE MeasurementsPage []');
-    return () => dispatch(setSelectedAttributes([]));
+    return () => dispatch(deselectedAttributes(selectedAttributesRef.current));
   }, []);
 
   useEffect(() => {
