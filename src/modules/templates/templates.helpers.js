@@ -4,7 +4,7 @@ import {
   TEMPLATE_EXCLUDED_FIELDS,
   TEMPLATE_NAME_FIELD,
 } from './templates.constants';
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 import {isPlanarType} from '../measurements/measurements.helpers';
 
@@ -75,8 +75,22 @@ export const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
 // What a template's form starts from: its values, with its name beside them to be edited in the same form
 export const getTemplateFormValues = template => ({...template.values, [TEMPLATE_NAME_FIELD]: template.name});
 
+// The keys of `templates` that name a template bucket - Object.keys would also hand back the two measurement
+// fields that sit alongside the buckets rather than inside one.
+export const getTemplateKeys = templates => Object.keys(templates || {}).filter(
+  key => key !== MEASUREMENT_FIELD_NAMES.active && key !== MEASUREMENT_FIELD_NAMES.isInUse);
+
+export const getTemplateList = (templates, key) => getTemplateField(templates, key, 'templates');
+
 // A feature survey as a template's form shows it, without the fields a template never holds
 export const getTemplateSurvey = survey => survey.filter(field => !TEMPLATE_EXCLUDED_FIELDS.includes(field.name));
+
+// What the templates of a type are called: a measurement's by its orientation, an igneous rock's by its class, the
+// rest by their page
+export const getTemplateTypeLabel = (type, page, isIgneousRock) => (isPlanarType(type) ? 'Planar'
+  : type === MEASUREMENT_KEYS.LINEAR ? 'Linear'
+    : isIgneousRock ? toTitleCase(type) + ' Rock'
+      : page.label_singular || toTitleCase(page.label).slice(0, -1) || 'Unknown');
 
 // The values a template keeps from its form: everything but its name, the fields a template never holds, and an id,
 // which an older template can still carry from the feature it was made from
@@ -87,12 +101,9 @@ export const getTemplateValues = (templateKey, formValues) => {
     ([key]) => key !== 'id' && key !== TEMPLATE_NAME_FIELD && !excludedFields.includes(key)));
 };
 
-// The keys of `templates` that name a template bucket - Object.keys would also hand back the two measurement
-// fields that sit alongside the buckets rather than inside one.
-export const getTemplateKeys = templates => Object.keys(templates || {}).filter(
-  key => key !== MEASUREMENT_FIELD_NAMES.active && key !== MEASUREMENT_FIELD_NAMES.isInUse);
-
-export const getTemplateList = (templates, key) => getTemplateField(templates, key, 'templates');
+// The templates of one measurement orientation, planar taking in tabular, or every template for any other type
+export const getTemplatesOfType = (templatesToFilter, type) => (isPlanarType(type) ? getPlanarTemplates(templatesToFilter)
+  : type === MEASUREMENT_KEYS.LINEAR ? getLinearTemplates(templatesToFilter) : templatesToFilter);
 
 // Merges a whole imported `templates` object into the project's own, counting what was added and what was
 // filled in. Hands back a new object, leaving `existing` as it found it - that is still the live state.

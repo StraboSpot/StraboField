@@ -3,12 +3,51 @@ import {
   getActiveTemplateList,
   getIsTemplateInUse,
   getTemplateFormValues,
+  getTemplateTypeLabel,
   getTemplateList,
   getTemplateSurvey,
   getTemplateValues,
+  getTemplatesOfType,
   mergeTemplates,
   validateTemplateName,
 } from './templates.helpers';
+
+// Planar and linear measurement templates share one list, so each orientation's picker filters out its own
+describe('getTemplatesOfType', () => {
+  const planar = {id: 'p', values: {type: 'planar_orientation'}};
+  const tabular = {id: 't', values: {type: 'tabular_orientation'}};
+  const linear = {id: 'l', values: {type: 'linear_orientation'}};
+
+  it('takes tabular templates in with planar ones, for a planar or a tabular picker', () => {
+    expect(getTemplatesOfType([planar, tabular, linear], 'planar_orientation')).toEqual([planar, tabular]);
+    expect(getTemplatesOfType([planar, tabular, linear], 'tabular_orientation')).toEqual([planar, tabular]);
+  });
+
+  it('takes only linear templates for a linear picker', () => {
+    expect(getTemplatesOfType([planar, tabular, linear], 'linear_orientation')).toEqual([linear]);
+  });
+
+  it('keeps every template for a type that is not an orientation', () => {
+    const quartz = {id: 'q', values: {mineral: 'quartz'}};
+    expect(getTemplatesOfType([quartz], 'minerals')).toEqual([quartz]);
+  });
+});
+
+// The picker's buttons and the modal header name the same kind of template, so they read the same
+describe('getTemplateTypeLabel', () => {
+  it('names a measurement template by its orientation, tabular as planar', () => {
+    expect(getTemplateTypeLabel('tabular_orientation', {})).toBe('Planar');
+    expect(getTemplateTypeLabel('linear_orientation', {})).toBe('Linear');
+  });
+
+  it('names an igneous rock template by its class', () => {
+    expect(getTemplateTypeLabel('plutonic', {}, true)).toBe('Plutonic Rock');
+  });
+
+  it('names any other template by its page', () => {
+    expect(getTemplateTypeLabel('minerals', {label_singular: 'Mineral'})).toBe('Mineral');
+  });
+});
 
 // A template's values are copied into every feature made from it, so what would be wrong shared by them all, or
 // what the compass supplies, never goes in one

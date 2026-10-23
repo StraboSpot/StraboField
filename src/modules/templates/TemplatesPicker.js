@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import NoteTemplateForm from './NoteTemplateForm';
 import {MEASUREMENT_TEMPLATE_KEY} from './templates.constants';
@@ -13,10 +13,12 @@ import {
   getPlanarTemplates,
   getTemplateFormValues,
   getTemplateList,
+  getTemplateTypeLabel,
+  getTemplatesOfType,
 } from './templates.helpers';
 import useTemplates from './useTemplates';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, toTitleCase} from '../../shared/helpers';
+import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import buttonsStyles from '../../shared/ui/buttons/buttons.styles';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
@@ -33,7 +35,7 @@ import useLeavePage from '../notebook-panel/useLeavePage';
 import FeatureDetail from '../page/FeatureDetail';
 import {MODALS, PET_PAGES, SED_PAGES} from '../page/page.constants';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
-import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
+import {deletedTemplate, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
 // The template being edited asks about its unsaved changes through a gate of its own, not the notebook page's:
 // closing it leaves the page or modal it was opened from still open. A parent modal the templates fill passes
@@ -53,6 +55,7 @@ const TemplatesPicker = ({
   const dispatch = useDispatch();
   const activeModal = useSelector(state => state.home.activeModal);
   const templates = useSelector(state => state.project.project?.templates);
+  const store = useStore();
 
   const templateGate = useLeavePage({isForSpot: false});
   const {saveTemplateValues} = useTemplates();
@@ -79,11 +82,9 @@ const TemplatesPicker = ({
         : page.notebook_modal_key ? page.notebook_modal_key
           : activeModal;
   }
-  // What the templates being picked from are called: a measurement's by its orientation, the rest by their page
-  const templateKindLabel = templateType === MEASUREMENT_KEYS.PLANAR ? 'Planar'
-    : templateType === MEASUREMENT_KEYS.LINEAR ? 'Linear'
-      : activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS ? toTitleCase(templateKey) + ' Rock'
-        : page.label_singular || toTitleCase(page.label).slice(0, -1) || 'Unknown';
+  const isIgneousRock = activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS;
+  // The type shown in the list, or before the list is opened, the key's own
+  const templateTypeLabel = getTemplateTypeLabel(templateType || templateKey, page, isIgneousRock);
 
   /* Side Effects */
 
@@ -95,8 +96,8 @@ const TemplatesPicker = ({
   }, [templates, templateKey, typeKey]);
 
   useEffect(() => {
-    setTemplatesHeaderTitle?.(isShowForm ? `Edit ${templateKindLabel} Template` : `${templateKindLabel} Templates`);
-  }, [isShowForm, templateKindLabel]);
+    setTemplatesHeaderTitle?.(isShowForm ? `Edit ${templateTypeLabel} Template` : `${templateTypeLabel} Templates`);
+  }, [isShowForm, templateTypeLabel]);
 
   /* Logic Helpers */
 
@@ -105,22 +106,25 @@ const TemplatesPicker = ({
     closeTemplates();
   };
 
+  // Clears the templates of this type only: planar and linear measurement templates share one active list
   const clearTemplate = () => {
-    if (templateType === MEASUREMENT_KEYS.PLANAR) {
-      const activeLinearTemplates = getLinearTemplates(activeTemplatesForKey);
-      dispatch(setActiveTemplates({key: templateKey, templates: activeLinearTemplates}));
-    }
-    else if (templateType === MEASUREMENT_KEYS.LINEAR) {
-      const activePlanarTabularTemplates = getPlanarTemplates(activeTemplatesForKey);
-      dispatch(setActiveTemplates({key: templateKey, templates: activePlanarTabularTemplates}));
-    }
-    else dispatch(setActiveTemplates({key: templateKey, templates: []}));
+    const otherActiveTemplates = isPlanarType(templateType) ? getLinearTemplates(activeTemplatesForKey)
+      : templateType === MEASUREMENT_KEYS.LINEAR ? getPlanarTemplates(activeTemplatesForKey)
+        : [];
+    dispatch(setActiveTemplates({key: templateKey, templates: otherActiveTemplates}));
     closeTemplates();
   };
 
+  // Templates stay switched on only while one is selected to apply, as after a delete. Read from the store, as a
+  // selection changed just before closing hasn't reached this render.
   const closeTemplates = () => {
     setIsShowForm(false);
     setIsShowTemplates(false);
+    const storedTemplates = store.getState().project.project?.templates;
+    if (getIsTemplateInUse(storedTemplates, templateKey)
+      && isEmpty(getActiveTemplateList(storedTemplates, templateKey))) {
+      dispatch(setUseTemplate({key: templateKey, bool: false}));
+    }
   };
 
   const createNewTemplate = () => {
@@ -131,10 +135,10 @@ const TemplatesPicker = ({
     else openTemplateForm({values: {}});
   };
 
+  // Drops only this template from the active ones, as deleting from the main menu does
   const deleteTemplate = (template) => {
-    clearTemplate();
-    const updatedTemplates = templatesForKey.filter(t => t.id !== template.id);
-    dispatch(addedTemplates({key: templateKey, templates: updatedTemplates}));
+    dispatch(deletedTemplate({key: templateKey, template: template}));
+    closeTemplates();
   };
 
   const deleteTemplateConfirm = () => {
@@ -201,7 +205,7 @@ const TemplatesPicker = ({
     return (
       <MeasurementDetail
         closeDetailView={() => setIsShowForm(false)}
-        deleteTemplate={deleteTemplateConfirm}
+        deleteTemplate={selectedTemplate.id ? deleteTemplateConfirm : undefined}
         saveTemplate={saveTemplate}
         selectedAttitudes={[values]}
       />
@@ -215,7 +219,7 @@ const TemplatesPicker = ({
     return (
       <FeatureDetail
         closeDetailView={() => setIsShowForm(false)}
-        deleteTemplate={deleteTemplateConfirm}
+        deleteTemplate={selectedTemplate.id ? deleteTemplateConfirm : undefined}
         groupKey={groupKey}
         page={page}
         saveTemplate={saveTemplate}
@@ -228,6 +232,7 @@ const TemplatesPicker = ({
     return (
       <NoteTemplateForm
         closeForm={() => setIsShowForm(false)}
+        deleteTemplate={selectedTemplate.id ? deleteTemplateConfirm : undefined}
         initialValues={selectedTemplate.values}
         saveTemplate={saveTemplate}
       />
@@ -277,17 +282,8 @@ const TemplatesPicker = ({
   };
 
   const renderTemplateSelection = (type) => {
-    let activeTemplates = activeTemplatesForKey;
-    let label = page.label_singular || toTitleCase(page.label).slice(0, -1) || 'Unknown';
-    if (isPlanarType(type)) {
-      activeTemplates = getPlanarTemplates(activeTemplatesForKey);
-      label = 'Planar';
-    }
-    else if (type === MEASUREMENT_KEYS.LINEAR) {
-      activeTemplates = getLinearTemplates(activeTemplatesForKey);
-      label = 'Linear';
-    }
-    else if (activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS) label = toTitleCase(type);
+    const activeTemplates = getTemplatesOfType(activeTemplatesForKey, type);
+    const label = getTemplateTypeLabel(type, page, isIgneousRock);
 
     const title = templateKey === MEASUREMENT_TEMPLATE_KEY ? 'Select ' + label + ' Template'
       : 'Select ' + label + ' Template(s)';
@@ -332,9 +328,8 @@ const TemplatesPicker = ({
   };
 
   const renderTemplatesList = () => {
-    const relevantTemplates = templateType === MEASUREMENT_KEYS.PLANAR ? getPlanarTemplates(templatesForKey)
-      : templateType === MEASUREMENT_KEYS.LINEAR ? getLinearTemplates(templatesForKey)
-        : templatesForKey;
+    const relevantTemplates = getTemplatesOfType(templatesForKey, templateType);
+    const selectedTemplates = getTemplatesOfType(activeTemplatesForKey, templateType);
 
     return (
       <>
@@ -347,8 +342,13 @@ const TemplatesPicker = ({
           renderItem={({item}) => renderTemplateListItem(item)}
         />
         <ClearButton onPress={closeTemplates} title={'Done'}/>
-        {!isEmpty(relevantTemplates) && <ClearButton onPress={clearTemplate} title={'Clear Selected Template'}/>}
-        <ClearButton onPress={createNewTemplate} title={'Define New ' + templateKindLabel + ' Template'}/>
+        {!isEmpty(selectedTemplates) && (
+          <ClearButton
+            onPress={clearTemplate}
+            title={selectedTemplates.length > 1 ? 'Clear Selected Templates' : 'Clear Selected Template'}
+          />
+        )}
+        <ClearButton onPress={createNewTemplate} title={'Define New ' + templateTypeLabel + ' Template'}/>
       </>
     );
   };

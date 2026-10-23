@@ -8,13 +8,15 @@ import {TEMPLATE_FIELD_LABELS, TEMPLATE_NAME_FIELD} from './templates.constants'
 import {validateTemplateName} from './templates.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FormikWrapper from '../form/FormikWrapper';
 import TextInputField from '../form/inputs/TextInputField';
 import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 
 // A notes template's form, as TemplatesPicker shows it. Asks the gate TemplatesPicker provides before Cancel leaves.
-const NoteTemplateForm = ({closeForm, initialValues, saveTemplate}) => {
+// deleteTemplate is given once the template has been saved.
+const NoteTemplateForm = ({closeForm, deleteTemplate, initialValues, saveTemplate}) => {
   /* Data Hooks */
 
   const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
@@ -73,6 +75,7 @@ const NoteTemplateForm = ({closeForm, initialValues, saveTemplate}) => {
           </ListItem.Content>
         </ListItem>
       </FormikWrapper>
+      {deleteTemplate && <DeleteButton onPress={deleteTemplate} title={'Delete Notes Template'}/>}
     </ScrollView>
   );
 };

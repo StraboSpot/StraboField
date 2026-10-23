@@ -544,7 +544,8 @@ const MeasurementDetail = ({
                 <View>
                   {!isEmpty(formName) && renderFormFields()}
                 </View>
-                {selectedAttributes.length === 1 && !isReadOnly && (
+                {/* A template can be deleted once saved, when TemplatesPicker hands over deleteTemplate */}
+                {(isTemplate ? !!deleteTemplate : selectedAttributes.length === 1) && !isReadOnly && (
                   <DeleteButton
                     onPress={() => isTemplate ? deleteTemplate() : confirmDeleteMeasurement()}
                     title={isTemplate ? 'Delete Measurement Template' : 'Delete Measurement'}

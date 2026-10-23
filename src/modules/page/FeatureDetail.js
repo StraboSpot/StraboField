@@ -455,7 +455,8 @@ const FeatureDetail = ({
             </>
           )}
         </FormikWrapper>
-        {!isReadOnly && (
+        {/* A template can be deleted once saved, when TemplatesPicker hands over deleteTemplate */}
+        {!isReadOnly && (!isTemplate || !!deleteTemplate) && (
           <DeleteButton
             onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
             title={'Delete ' + title + (isTemplate ? ' Template' : '')}
