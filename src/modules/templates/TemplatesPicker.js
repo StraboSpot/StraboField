@@ -62,12 +62,9 @@ const TemplatesPicker = ({
 
   /* Local State */
 
-  const [activeTemplatesForKey, setActiveTemplatesForKey] = useState([]);
   const [isShowForm, setIsShowForm] = useState(false);
-  const [isTemplateInUse, setIsTemplateInUse] = useState(false);
   // The template open in the form, its values already holding its name for the form to edit
   const [selectedTemplate, setSelectedTemplate] = useState({values: {}});
-  const [templatesForKey, setTemplatesForKey] = useState([]);
   const [templateType, setTemplateType] = useState(null);
 
   /* Derived Variables */
@@ -82,18 +79,14 @@ const TemplatesPicker = ({
         : page.notebook_modal_key ? page.notebook_modal_key
           : activeModal;
   }
+  const activeTemplatesForKey = getActiveTemplateList(templates, templateKey) || [];
+  const isTemplateInUse = !!getIsTemplateInUse(templates, templateKey);
+  const templatesForKey = getTemplateList(templates, templateKey) || [];
   const isIgneousRock = activeModal === MODAL_KEYS.NOTEBOOK.ROCK_TYPE_IGNEOUS;
   // The type shown in the list, or before the list is opened, the key's own
   const templateTypeLabel = getTemplateTypeLabel(templateType || templateKey, page, isIgneousRock);
 
   /* Side Effects */
-
-  useEffect(() => {
-    console.log('UE TemplatesPicker [templates, templateKey, typeKey]', templates, templateKey, typeKey);
-    setIsTemplateInUse(getIsTemplateInUse(templates, templateKey) || false);
-    setTemplatesForKey(getTemplateList(templates, templateKey) || []);
-    setActiveTemplatesForKey(getActiveTemplateList(templates, templateKey) || []);
-  }, [templates, templateKey, typeKey]);
 
   useEffect(() => {
     setTemplatesHeaderTitle?.(isShowForm ? `Edit ${templateTypeLabel} Template` : `${templateTypeLabel} Templates`);
@@ -159,27 +152,26 @@ const TemplatesPicker = ({
     setIsShowForm(true);
   };
 
+  const openTemplates = (type) => {
+    setTemplateType(type);
+    setIsShowTemplates(true);
+  };
+
   // The form holds Save until the template is named
   const saveTemplate = (values) => {
     saveTemplateValues(templateKey, selectedTemplate, values);
     closeTemplates();
   };
 
-  const setAsTemplate = (template) => {
-    const activeTemplatesForKeyCopy = !isEmpty(activeTemplatesForKey)
-      ? JSON.parse(JSON.stringify(activeTemplatesForKey)) : [];
-    const foundTemplate = activeTemplatesForKeyCopy.find(t => t.id === template.id);
-    if (foundTemplate) {
-      const templatesUpdated = activeTemplatesForKeyCopy.filter(t => t.id !== template.id);
-      dispatch(setActiveTemplates({key: templateKey, templates: templatesUpdated}));
-    }
-    else dispatch(setActiveTemplates({key: templateKey, templates: [...activeTemplatesForKeyCopy, template]}));
+  const toggleActiveTemplate = (template) => {
+    const isActive = activeTemplatesForKey.some(t => t.id === template.id);
+    dispatch(setActiveTemplates({
+      key: templateKey,
+      templates: isActive ? activeTemplatesForKey.filter(t => t.id !== template.id) : [...activeTemplatesForKey, template],
+    }));
   };
 
-  const toggleUseTemplateSwitch = (value) => {
-    setIsTemplateInUse(value);
-    dispatch(setUseTemplate({key: templateKey, bool: value}));
-  };
+  const toggleUseTemplateSwitch = value => dispatch(setUseTemplate({key: templateKey, bool: value}));
 
   if (registerCloseTemplates) registerCloseTemplates.current = askAndCloseTemplates;
 
@@ -259,11 +251,11 @@ const TemplatesPicker = ({
       <View>
         <ListItem
           containerStyle={commonStyles.listItem}
-          onPress={() => setAsTemplate(template)}
+          onPress={() => toggleActiveTemplate(template)}
         >
           <ListItem.CheckBox
             checked={isActive}
-            onPress={() => setAsTemplate(template)}
+            onPress={() => toggleActiveTemplate(template)}
           />
           <ListItem.Content>
             <ListItem.Title style={commonStyles.listItemTitle}>
@@ -292,13 +284,7 @@ const TemplatesPicker = ({
       <View>
         {isEmpty(activeTemplates) ? (
           <ListItem containerStyle={{padding: 0, width: '100%', justifyContent: 'center'}}>
-            <ClearButton
-              onPress={() => {
-                setIsShowTemplates(true);
-                setTemplateType(type);
-              }}
-              title={title}
-            />
+            <ClearButton onPress={() => openTemplates(type)} title={title}/>
           </ListItem>
         ) : (
           <FlatList
@@ -312,13 +298,7 @@ const TemplatesPicker = ({
                     {item.name}
                   </ListItem.Title>
                 </ListItem.Content>
-                <ClearButton
-                  onPress={() => {
-                    setIsShowTemplates(true);
-                    setTemplateType(type);
-                  }}
-                  title={'Change'}
-                />
+                <ClearButton onPress={() => openTemplates(type)} title={'Change'}/>
               </ListItem>
             }
           />

@@ -21,6 +21,17 @@ const TemplatesOverflowMenuModal = ({
 
   const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
 
+  /* Derived Variables */
+
+  // A read only project can only have its templates backed up
+  const menuItems = [
+    ...(isReadOnlyProject ? [] : [
+      {onPress: onAddPress, title: 'Create New Template'},
+      {onPress: onLoadPress, title: Platform.OS === 'ios' ? 'Load Templates' : 'Import Templates'},
+    ]),
+    {onPress: onBackupPress, title: Platform.OS === 'ios' ? 'Backup Templates' : 'Export Templates'},
+  ];
+
   /* View */
 
   return (
@@ -34,41 +45,19 @@ const TemplatesOverflowMenuModal = ({
       showCancelButton={false}
       showCloseButton={SMALL_SCREEN}
     >
-      {!isReadOnlyProject && (
+      {menuItems.map(({onPress, title}, i) => (
         <ListItem
-          bottomDivider
+          bottomDivider={i < menuItems.length - 1}
           containerStyle={commonStyles.listItem}
+          key={title}
           onPress={() => {
-            onAddPress();
+            onPress();
             closeMenu();
           }}
         >
-          <ListItem.Title style={commonStyles.listItemTitle}>{'Create New Template'}</ListItem.Title>
+          <ListItem.Title style={commonStyles.listItemTitle}>{title}</ListItem.Title>
         </ListItem>
-      )}
-      {!isReadOnlyProject && (
-        <ListItem
-          bottomDivider
-          containerStyle={commonStyles.listItem}
-          onPress={() => {
-            onLoadPress();
-            closeMenu();
-          }}
-        >
-          <ListItem.Title
-            style={commonStyles.listItemTitle}>{Platform.OS === 'ios' ? 'Load Templates' : 'Import Templates'}</ListItem.Title>
-        </ListItem>
-      )}
-      <ListItem
-        containerStyle={commonStyles.listItem}
-        onPress={() => {
-          onBackupPress();
-          closeMenu();
-        }}
-      >
-        <ListItem.Title
-          style={commonStyles.listItemTitle}>{Platform.OS === 'ios' ? 'Backup Templates' : 'Export Templates'}</ListItem.Title>
-      </ListItem>
+      ))}
     </ModalWrapper>
   );
 };

@@ -2,10 +2,8 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {TEMPLATE_NAME_FIELD} from './templates.constants';
 import {getActiveTemplateList, getTemplateList, getTemplateValues} from './templates.helpers';
-import forms from '../../assets/forms';
-import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
+import {getNewUUID, isEmpty} from '../../shared/helpers';
 import useForm from '../form/useForm';
-import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 import {addedTemplates, setActiveTemplates, setUseTemplate} from '../project/projects.slice';
 
 const useTemplates = () => {
@@ -17,34 +15,6 @@ const useTemplates = () => {
   const {submitAndShowErrors} = useForm();
 
   /* Exported Functions */
-
-  const getNewTemplatesList = () => {
-    // console.log('forms', forms);
-    let templateForms = Object.entries(forms).reduce((acc, [categoryKey, formsInCategory]) => {
-      if (categoryKey === 'measurement' || categoryKey === 'pet') {
-        const addTemplateForms = Object.keys(formsInCategory).reduce((acc2, key) => {
-          if (key !== 'reactions') return [...acc2, key];
-          else return acc2;
-        }, []);
-        return [...acc, {title: categoryKey, data: addTemplateForms}];
-      }
-      else return acc;
-    }, []);
-    templateForms = [...templateForms, {title: 'notes', data: ['notes']}];
-    return templateForms;
-  };
-
-  const getTemplateTitle = (key) => {
-    if (key === 'alteration_or') return 'Alteration, Ore Rock';
-    else if (key === 'fault') return 'Fault & Shear Zone Rock';
-    else if (key === 'plutonic' || key === 'volcanic' || key === 'metamorphic') {
-      return toTitleCase(key.replace('_', ' ')) + ' Rock';
-    }
-    else if (key === 'minerals') return 'Mineral';
-    else if (key === MEASUREMENT_KEYS.TABULAR) return 'Tabular Zone Orientation';
-    else if (key === 'pet') return 'Rocks & Minerals';
-    else if (key) return toTitleCase(key.replaceAll('_', ' ').trim());
-  };
 
   // Saves the form on screen as a template. The half TemplatesPicker also needs is in saveTemplateValues.
   const saveTemplate = async (formCurrent, templateKey, selectedTemplate) => {
@@ -81,8 +51,6 @@ const useTemplates = () => {
   };
 
   return {
-    getNewTemplatesList,
-    getTemplateTitle,
     saveTemplate,
     saveTemplateValues,
   };

@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 
+import {useSelector} from 'react-redux';
+
 import BackupTemplatesModal from './BackupTemplatesModal';
 import LoadTemplatesModal from './LoadTemplatesModal';
-import NewTemplateSectionList from './NewTemplateSectionList';
 import TemplateDetail from './TemplateDetail';
+import {getNewTemplateSections, getSavedTemplateSections, getTemplateTitle} from './templates.helpers';
+import TemplateSectionList from './TemplateSectionList';
 import TemplatesOverflowMenuModal from './TemplatesOverflowMenuModal';
-import TemplatesSectionList from './TemplatesSectionList';
-import useTemplates from './useTemplates';
 import {isEmpty} from '../../shared/helpers';
 import AddButton from '../../shared/ui/buttons/AddButton';
 import UnsavedChangesModal from '../../shared/ui/modals/UnsavedChangesModal';
@@ -20,8 +21,9 @@ import useLeavePage from '../notebook-panel/useLeavePage';
 const Templates = () => {
   /* Data Hooks */
 
+  const templates = useSelector(state => state.project.project?.templates);
+
   const templateGate = useLeavePage({isForSpot: false});
-  const {getTemplateTitle} = useTemplates();
 
   /* Local State */
 
@@ -41,12 +43,11 @@ const Templates = () => {
 
   const handleCreateNewTemplatePressed = () => setIsNewTemplateListVisible(true);
 
-  const handleNewTemplatePressed = (templateTypePressed, section) => {
+  // The item names a kind of template by its form key, which for a measurement is also the template's type
+  const handleNewTemplatePressed = ({id: formKey}, section) => {
     setIsNewTemplateListVisible(false);
-    setTemplateType(templateTypePressed);
-    let newTemplate = {values: {}};
-    if (section.title === 'measurement') newTemplate.values.type = templateTypePressed;
-    setTemplateVisible(newTemplate);
+    setTemplateType(formKey);
+    setTemplateVisible({values: section.title === 'measurement' ? {type: formKey} : {}});
   };
 
   const handleTemplatePressed = (templatePressed, section) => {
@@ -71,7 +72,7 @@ const Templates = () => {
           headerTitle={'Create New Template'}
           title={'Templates'}
         />
-        <NewTemplateSectionList handleNewTemplatePressed={handleNewTemplatePressed}/>
+        <TemplateSectionList onItemPressed={handleNewTemplatePressed} sections={getNewTemplateSections()}/>
       </>
     );
   };
@@ -94,7 +95,11 @@ const Templates = () => {
       <>
         <MainMenuPanelHeader onOverflowMenuPress={() => setIsOverflowMenuVisible(true)}/>
         <AddButton onPress={handleCreateNewTemplatePressed} title={'Create New Template'}/>
-        <TemplatesSectionList handleTemplatePressed={handleTemplatePressed}/>
+        <TemplateSectionList
+          emptyText={'No Templates Found'}
+          onItemPressed={handleTemplatePressed}
+          sections={getSavedTemplateSections(templates)}
+        />
       </>
     );
   };

@@ -4,6 +4,7 @@ import {
   TEMPLATE_EXCLUDED_FIELDS,
   TEMPLATE_NAME_FIELD,
 } from './templates.constants';
+import forms from '../../assets/forms';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {MEASUREMENT_KEYS} from '../measurements/measurements.constants';
 import {isPlanarType} from '../measurements/measurements.helpers';
@@ -69,8 +70,34 @@ export const getIsTemplateInUse = (templates, key) => getTemplateField(templates
 export const getLinearTemplates = templatesToFilter => templatesToFilter.filter(
   t => t.values?.type === MEASUREMENT_KEYS.LINEAR || t.type === MEASUREMENT_KEYS.LINEAR);
 
+// The kinds of template that can be made, in sections for the main menu's list: each a form key, named for the list
+export const getNewTemplateSections = () => {
+  const toItems = keys => keys.map(key => ({id: key, name: getTemplateTitle(key)}));
+  return [
+    {title: 'measurement', data: toItems(Object.keys(forms.measurement))},
+    {title: 'notes', data: toItems(['notes'])},
+    {title: 'pet', data: toItems(Object.keys(forms.pet).filter(key => key !== 'reactions'))},
+  ];
+};
+
 export const getPlanarTemplates = templatesToFilter => templatesToFilter.filter(
   t => isPlanarType(t.values?.type) || t.type === MEASUREMENT_KEYS.PLANAR);
+
+// The project's templates in sections for the main menu's list, each section and the templates in it sorted by name.
+// Measurements are the one key whose templates are not all of a kind - planar, tabular and linear share a bucket and
+// are told apart by type - so they get a section each rather than one for the key.
+export const getSavedTemplateSections = (templates) => {
+  const sections = getTemplateKeys(templates).flatMap((key) => {
+    const templatesForKey = getTemplateList(templates, key);
+    if (isEmpty(templatesForKey)) return [];
+    if (key !== MEASUREMENT_TEMPLATE_KEY) return [{title: key, data: templatesForKey}];
+    const types = [...new Set(templatesForKey.map(t => t.values.type))];
+    return types.map(type => ({title: type, data: templatesForKey.filter(t => t.values.type === type)}));
+  });
+  // Sorted as copies: a section's data is the stored template list itself, which the store has frozen
+  return sections.map(section => ({...section, data: [...section.data].sort((a, b) => a.name.localeCompare(b.name))}))
+    .sort((a, b) => a.title.localeCompare(b.title));
+};
 
 // What a template's form starts from: its values, with its name beside them to be edited in the same form
 export const getTemplateFormValues = template => ({...template.values, [TEMPLATE_NAME_FIELD]: template.name});
@@ -81,6 +108,17 @@ export const getTemplateKeys = templates => Object.keys(templates || {}).filter(
   key => key !== MEASUREMENT_FIELD_NAMES.active && key !== MEASUREMENT_FIELD_NAMES.isInUse);
 
 export const getTemplateList = (templates, key) => getTemplateField(templates, key, 'templates');
+
+// A template key or type as the main menu names it
+export const getTemplateTitle = (key) => {
+  if (key === 'alteration_or') return 'Alteration, Ore Rock';
+  else if (key === 'fault') return 'Fault & Shear Zone Rock';
+  else if (key === 'plutonic' || key === 'volcanic' || key === 'metamorphic') return toTitleCase(key) + ' Rock';
+  else if (key === 'minerals') return 'Mineral';
+  else if (key === MEASUREMENT_KEYS.TABULAR) return 'Tabular Zone Orientation';
+  else if (key === 'pet') return 'Rocks & Minerals';
+  else if (key) return toTitleCase(key.replaceAll('_', ' ').trim());
+};
 
 // A feature survey as a template's form shows it, without the fields a template never holds
 export const getTemplateSurvey = survey => survey.filter(field => !TEMPLATE_EXCLUDED_FIELDS.includes(field.name));
