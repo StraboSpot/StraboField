@@ -78,7 +78,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.SAMPLES}));
     }
     const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
-      || getAllRelevantPages(spot.properties?.isSample).some(p => p.key === pageVisible)
+      || getAllRelevantPages().some(p => p.key === pageVisible)
       || SUBPAGES.some(p => p.key === pageVisible);
     if (!isRelevantPage) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     // A selected sample belongs to the Spot and page it was picked on, and isSample above reads it, so leaving it
