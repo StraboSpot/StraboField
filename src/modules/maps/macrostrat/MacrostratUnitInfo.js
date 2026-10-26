@@ -4,7 +4,7 @@ import {Linking, ScrollView, Text, View} from 'react-native';
 import {Card} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
 
-import macrostratOverlayStyles from './macrostratOverlay.styles';
+import macrostratOverlayStyles from './macrostratUnitInfo.styles';
 import useServerRequests from '../../../services/network/useServerRequests';
 import {isEmpty} from '../../../shared/helpers';
 import {SMALL_SCREEN} from '../../../shared/styles.constants';
@@ -13,11 +13,11 @@ import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import CloseButton from '../../../shared/ui/buttons/CloseButton';
 import {getUtmDisplayString} from '../maps.helpers';
 
-const MacrostratOverlay = ({
-                             isVisible,
-                             closeModal,
-                             location,
-                           }) => {
+const MacrostratUnitInfo = ({
+                              isVisible,
+                              closeModal,
+                              location,
+                            }) => {
   /* Data Hooks */
 
   const isUtmDisplay = useSelector(state => state.user.is_utm_display);
@@ -196,4 +196,4 @@ const MacrostratOverlay = ({
   );
 };
 
-export default MacrostratOverlay;
+export default MacrostratUnitInfo;

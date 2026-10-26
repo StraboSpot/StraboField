@@ -12,7 +12,7 @@ import VertexActionsOverlay from './editing/VertexActionsOverlay';
 import useMapFeatures from './features/useMapFeatures';
 import useMapFeaturesCalculated from './features/useMapFeaturesCalculated';
 import useMapPressEvents from './interactions/useMapPressEvents';
-import MacrostratOverlay from './macrostrat/MacrostratOverlay';
+import MacrostratUnitInfo from './macrostrat/MacrostratUnitInfo';
 import Map from './Map';
 import {DEFAULT_GEOM_VIEW_SHARE, SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
 import {setSpotsInMapExtentIds} from './maps.slice';
@@ -570,7 +570,7 @@ const MapContainer = forwardRef(({
 
       {/* Modals */}
       {currentBasemap?.source === 'macrostrat' && isOnline && (
-        <MacrostratOverlay
+        <MacrostratUnitInfo
           closeModal={() => setIsShowMacrostratOverlay(false)}
           isVisible={isShowMacrostratOverlay}
           location={location}
