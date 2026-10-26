@@ -27,6 +27,7 @@ const useMapPressEvents = ({
                              mapMode,
                              mapRef,
                              measureFeatures,
+                             onCancel,
                              setDistance,
                              setDrawFeaturesNew,
                              setIsShowMacrostratOverlay,
@@ -123,7 +124,8 @@ const useMapPressEvents = ({
   //     - None -> select the strat section's own Spot if in one, otherwise deselect.
   //   EDIT -> a vertex under the press is a vertex gesture (editSpot); otherwise switch to another Spot
   //     under the press (picker if several), deselect on empty space, or do nothing if only the edited
-  //     Spot is under the press with no vertex.
+  //     Spot is under the press with no vertex. A Spot given its first geometry by Set in Current View has
+  //     none stored, and a press off it cancels the edit, as Cancel does.
   const handleMapPress = async (e) => {
     if (isDragIntervalMode && stratSection && mapMode === MAP_MODES.INTERVAL_DRAG) {
       const [x, y] = getScreenPoint(e);
@@ -200,7 +202,9 @@ const useMapPressEvents = ({
           const editingSpotId = store.getState().spot.selectedSpot?.properties?.id;
           const otherSpots = isEditingSpot ? spotsAtPress.filter(spot => spot.properties.id !== editingSpotId)
             : spotsAtPress;
-          if (otherSpots.length > 1) {
+          const isNewGeometry = isEditingSpot && !store.getState().spot.spots[editingSpotId]?.geometry;
+          if (isNewGeometry && (otherSpots.length > 0 || spotsAtPress.length === 0)) await onCancel();
+          else if (otherSpots.length > 1) {
             setSpotsAtPress(otherSpots);
             setSpotsAtPressAction({type: 'switch'});
             setIsShowSpotsAtPressModal(true);

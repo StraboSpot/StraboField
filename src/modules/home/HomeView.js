@@ -41,6 +41,7 @@ const HomeView = forwardRef(({
     <>
       <MapContainer
         mapMode={mapMode}
+        onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}
         ref={mapComponentRef}
         selectingMode={selectingMode}

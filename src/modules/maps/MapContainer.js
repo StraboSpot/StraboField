@@ -26,13 +26,12 @@ import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty} from '../../shared/helpers';
 import {openedMessageModal} from '../home/home.slice';
 import useImageSize from '../images/useImageSize';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {isStratInterval} from '../spots/spots.helpers';
-import {editedOrCreatedSpot} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
 const MapContainer = forwardRef(({
                                    mapMode,
+                                   onCancel,
                                    onEndDrawPressed,
                                    selectingMode,
                                    setDistance,
@@ -122,6 +121,7 @@ const MapContainer = forwardRef(({
     mapMode,
     mapRef,
     measureFeatures,
+    onCancel,
     setDistance,
     setDrawFeaturesNew,
     setIsShowMacrostratOverlay,
@@ -323,11 +323,10 @@ const MapContainer = forwardRef(({
     }
     const defaultFeature = getDefaultFeature(defaultGeomType, centerCoords, await getVisibleSpan());
     const selectedSpotCopy = getSpotWithGeomOnCurrentMap(defaultFeature);
-    dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpotCopy.properties.id]));
-    dispatch(editedOrCreatedSpot(selectedSpotCopy));
 
-    // Set new geometry ready for editing, set the active vertex to first index of the geometry.
-    startEditing(selectedSpotCopy, turf.explode(selectedSpotCopy).features[0], 0, setMapModeToEdit);
+    // Set new geometry ready for editing, set the active vertex to first index of the geometry. Only the edit's Save
+    // writes it, so Cancel leaves the Spot without geometry.
+    startEditing(selectedSpotCopy, turf.explode(selectedSpotCopy).features[0], 0, setMapModeToEdit, true);
   };
 
   const endMapMeasurement = () => {
