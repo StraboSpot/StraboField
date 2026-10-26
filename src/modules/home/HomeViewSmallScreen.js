@@ -14,6 +14,7 @@ import useDeviceOrientation from '../../services/device/useDeviceOrientation';
 import * as themes from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
+import MacrostratUnitInfo from '../maps/macrostrat/MacrostratUnitInfo';
 import MapContainer from '../maps/MapContainer';
 import {MapEditContext} from '../maps/MapEditContext';
 import {MAP_MODES} from '../maps/maps.constants';
@@ -218,6 +219,9 @@ const HomeViewSmallScreen = forwardRef(({
                     zoomToCustomMap={bbox => mapComponentRef?.current?.zoomToCustomMap(bbox)}
                   />
                 </View>
+
+                {/* After the buttons so it covers them */}
+                <MacrostratUnitInfo/>
 
                 <OfflineMapPreviewBanner/>
                 <VersionCheckLabel/>

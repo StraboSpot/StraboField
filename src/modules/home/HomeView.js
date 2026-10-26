@@ -2,8 +2,10 @@ import React, {forwardRef} from 'react';
 import {Animated} from 'react-native';
 
 import DeviceInfo from './DeviceInfo';
+import homeStyles from './home.styles';
 import LeftSideButtons from './LeftSideButtons';
 import RightSideButtons from './RightSideButtons';
+import MacrostratUnitInfo from '../maps/macrostrat/MacrostratUnitInfo';
 import MapContainer from '../maps/MapContainer';
 import OfflineMapPreviewBanner from '../maps/offline-maps/OfflineMapPreviewBanner';
 import notebookStyles from '../notebook-panel/notebook.styles';
@@ -76,6 +78,11 @@ const HomeView = forwardRef(({
         toggleMapMenu={toggleMapMenu}
         zoomToCustomMap={bbox => mapComponentRef?.current?.zoomToCustomMap(bbox)}
       />
+
+      {/* Drawn after the buttons and before the notebook, and slides aside with the buttons when the notebook opens */}
+      <Animated.View pointerEvents={'box-none'} style={[homeStyles.macrostratUnitInfoLayer, animateRightSide]}>
+        <MacrostratUnitInfo/>
+      </Animated.View>
 
       <Animated.View style={[notebookStyles.notebookDrawer, animateNotebookDrawer]}>
         <NotebookPanel

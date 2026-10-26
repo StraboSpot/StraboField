@@ -31,8 +31,8 @@ const useMapPressEvents = ({
                              measureFeatures,
                              setDistance,
                              setDrawFeaturesNew,
-                             setIsShowMacrostratOverlay,
                              setIsShowSpotsAtPressModal,
+                             setMacrostratLocation,
                              setMapModeToEdit,
                              setMeasureFeatures,
                              setSpotsAtPress,
@@ -60,7 +60,6 @@ const useMapPressEvents = ({
 
   /* Local State */
 
-  const [location, setLocation] = useState({coords: [0, 0], zoom: 16});
   // What the picker does with the tapped Spot ('select' | 'edit' | 'switch'); holds long-press coords for 'edit'.
   const [spotsAtPressAction, setSpotsAtPressAction] = useState(null);
 
@@ -120,7 +119,7 @@ const useMapPressEvents = ({
   //   MEASURE -> add the point to the measurement.
   //   DRAW -> add a draw feature (freehand line/polygon are handled on release, not here).
   //   VIEW -> select/deselect the Spot under the press:
-  //     - Macrostrat basemap -> open the geology overlay and select a Spot (random when several overlap).
+  //     - Macrostrat basemap -> show the geologic unit info and select a Spot (random when several overlap).
   //     - Several overlap -> show the picker so the user chooses which to select.
   //     - Exactly one -> select it.
   //     - None -> select the strat section's own Spot if in one, otherwise deselect.
@@ -164,11 +163,10 @@ const useMapPressEvents = ({
         // Spot directly under the press selects, not a nearby one).
         const spotsFound = await getSpotsAtPress(screenPointX, screenPointY, isMacrostratBasemap);
         if (isMacrostratBasemap) {
-          setIsShowMacrostratOverlay(true);
           const currentZoom = await mapRef.current.getZoom();
-          setLocation(
+          setMacrostratLocation(
             {coords: (Platform.OS !== 'web' ? e.geometry?.coordinates : Object.values(e.lngLat)), zoom: currentZoom});
-          // Skip the picker (it would stack over the overlay); pick at random so repeated taps can cycle.
+          // Skip the picker (it would stack over the unit info); pick at random so repeated taps can cycle.
           if (spotsFound.length >= 1) {
             dispatch(setSelectedSpot(spotsFound[Math.floor(Math.random() * spotsFound.length)]));
           }
@@ -315,7 +313,6 @@ const useMapPressEvents = ({
     handleMapPress,
     handleSpotAtPressSelected,
     isSpotsAtPressForEdit: spotsAtPressAction?.type === 'edit' || spotsAtPressAction?.type === 'switch',
-    location,
     startIntervalDrag,
   };
 };

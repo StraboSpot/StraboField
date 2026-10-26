@@ -1,4 +1,4 @@
-import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState} from 'react';
+import React, {forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useRef, useState} from 'react';
 import {Platform, View} from 'react-native';
 
 import * as turf from '@turf/turf';
@@ -12,7 +12,7 @@ import VertexActionsOverlay from './editing/VertexActionsOverlay';
 import useMapFeatures from './features/useMapFeatures';
 import useMapFeaturesCalculated from './features/useMapFeaturesCalculated';
 import useMapPressEvents from './interactions/useMapPressEvents';
-import MacrostratUnitInfo from './macrostrat/MacrostratUnitInfo';
+import {MacrostratContext} from './macrostrat/MacrostratContext';
 import Map from './Map';
 import {DEFAULT_GEOM_VIEW_SHARE, SPOTS_EXTENT_ZOOM_DELAY, ZOOM} from './maps.constants';
 import {setSpotsInMapExtentIds} from './maps.slice';
@@ -100,7 +100,7 @@ const MapContainer = forwardRef(({
     setVertexActionValues: setVertexActionValues,
   });
   const {getCurrentLocation} = useMapLocation();
-  const [isShowMacrostratOverlay, setIsShowMacrostratOverlay] = useState(false);
+  const {macrostratLocation, setMacrostratLocation} = useContext(MacrostratContext);
   const [isShowSpotsAtPressModal, setIsShowSpotsAtPressModal] = useState(false);
   const [measureFeatures, setMeasureFeatures] = useState([]);
   const [spotsAtPress, setSpotsAtPress] = useState([]);
@@ -109,7 +109,6 @@ const MapContainer = forwardRef(({
     handleMapPress,
     handleSpotAtPressSelected,
     isSpotsAtPressForEdit,
-    location,
     startIntervalDrag,
   } = useMapPressEvents({
     clearSelectedSpots,
@@ -122,8 +121,8 @@ const MapContainer = forwardRef(({
     measureFeatures,
     setDistance,
     setDrawFeaturesNew,
-    setIsShowMacrostratOverlay,
     setIsShowSpotsAtPressModal,
+    setMacrostratLocation,
     setMapModeToEdit,
     setMeasureFeatures,
     setSpotsAtPress,
@@ -211,7 +210,7 @@ const MapContainer = forwardRef(({
   useEffect(() => {
     // console.log('UE MapContainer [currentBasemap]');
     if (isEmpty(currentBasemap)) setBasemap().catch(err => console.warn('Error setting a default basemap:', err));
-    if (currentBasemap?.source !== 'macrostrat') setIsShowMacrostratOverlay(false);
+    if (currentBasemap?.source !== 'macrostrat') setMacrostratLocation(undefined);
   }, [currentBasemap]);
 
   // Whenever a strat section becomes the current map, make sure every dataset holding one of its intervals
@@ -552,8 +551,8 @@ const MapContainer = forwardRef(({
           editFeatureVertex={editFeatureVertex}
           handleMapLongPress={handleMapLongPress}
           handleMapPress={handleMapPress}
-          isShowMacrostratOverlay={isShowMacrostratOverlay}
-          location={location}
+          isShowMacrostratUnitInfo={!!macrostratLocation}
+          location={macrostratLocation}
           mapMode={mapMode}
           mapRef={mapRef}
           measureFeatures={measureFeatures}
@@ -569,13 +568,6 @@ const MapContainer = forwardRef(({
       )}
 
       {/* Modals */}
-      {currentBasemap?.source === 'macrostrat' && isOnline && (
-        <MacrostratUnitInfo
-          closeModal={() => setIsShowMacrostratOverlay(false)}
-          isVisible={isShowMacrostratOverlay}
-          location={location}
-        />
-      )}
       {/* Added View to fix issue with overlays moving off-screen after initial press ToDo: Check on this */}
       <View>
         {showSetInCurrentViewModal && (
