@@ -31,7 +31,6 @@ import useSpots from '../spots/useSpots';
 
 const MapContainer = forwardRef(({
                                    mapMode,
-                                   onCancel,
                                    onEndDrawPressed,
                                    selectingMode,
                                    setDistance,
@@ -121,7 +120,6 @@ const MapContainer = forwardRef(({
     mapMode,
     mapRef,
     measureFeatures,
-    onCancel,
     setDistance,
     setDrawFeaturesNew,
     setIsShowMacrostratOverlay,

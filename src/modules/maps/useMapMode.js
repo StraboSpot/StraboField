@@ -15,7 +15,7 @@ import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpots, restoredIntervalDragSnapshot} from '../spots/spots.slice';
 
 // The map mode, and ending a map edit or interval drag before anything else changes a Spot. HomeContainer calls this
-// once and passes it down, so the notebook and main menu openers can end them themselves.
+// once and provides the gate through MapEditContext, so whatever has to end an edit first can do it itself.
 const useMapMode = ({mapComponentRef}) => {
   /* Data Hooks */
 

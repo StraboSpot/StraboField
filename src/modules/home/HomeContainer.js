@@ -15,6 +15,7 @@ import {isEmpty} from '../../shared/helpers';
 import UnsavedChangesModal from '../../shared/ui/modals/UnsavedChangesModal';
 import MainMenuPanel from '../main-menu-panel/MainMenuPanel';
 import settingPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
+import {MapEditContext} from '../maps/MapEditContext';
 import useMapMode from '../maps/useMapMode';
 import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import useLeavePage from '../notebook-panel/useLeavePage';
@@ -78,52 +79,51 @@ const HomeContainer = ({navigation, route}) => {
 
   return (
     <LeavePageContext.Provider value={leavePage}>
-      <Animated.View style={[homeStyles.container, animateTextInputs]}>
-        <Home
-          animateLeftSide={animateLeftSide}
-          animateNotebookDrawer={animateNotebookDrawer}
-          animateRightSide={animateRightSide}
-          closeMainMenuPanel={closeMainMenuPanel}
-          closeNotebookPanel={closeNotebookPanel}
-          confirmEndMapEditing={confirmEndMapEditing}
-          endMapEditing={endMapEditing}
-          isMapEditing={isMapEditing}
-          mapMode={mapMode}
-          openMainMenuPanel={openMainMenuPanel}
-          openNotebookPanel={openNotebookPanel}
-          openSpotInNotebook={openSpotInNotebook}
-          ref={mapComponentRef}
-          setMapMode={setMapMode}
-          zoomToCurrentLocation={zoomToCurrentLocation}
-        />
-        <ModalsContainer
-          closeMainMenuPanel={closeMainMenuPanel}
-          closeNotebookPanel={closeNotebookPanel}
-          openMainMenuPanel={openMainMenuPanel}
-          openNotebookPanel={openNotebookPanel}
-          openSpotInNotebook={openSpotInNotebook}
-          ref={mapComponentRef}
-          zoomToCurrentLocation={zoomToCurrentLocation}
-        />
-        {!isProjectLoadSelectionModalVisible && (
-          <Animated.View style={[settingPanelStyles.settingsDrawer, animateMainMenuDrawer]}>
-            <MainMenuPanel
-              closeMainMenuPanel={closeMainMenuPanel}
-              closeNotebookPanel={closeNotebookPanel}
-              navigation={navigation}
-              openNotebookPanel={openNotebookPanel}
-              openSpotInNotebook={openSpotInNotebook}
-              ref={mapComponentRef}
-            />
-          </Animated.View>
-        )}
-        <UnsavedChangesModal
-          {...endPromptProps}
-          headerTitle={'Unsaved Map Edits'}
-          message={'Your map edits haven\'t been saved.'}
-        />
-        <UnsavedChangesModal {...leavePage.leavePromptProps} headerTitle={'Unsaved Changes'}/>
-      </Animated.View>
+      <MapEditContext.Provider value={{confirmEndMapEditing, endMapEditing, isMapEditing}}>
+        <Animated.View style={[homeStyles.container, animateTextInputs]}>
+          <Home
+            animateLeftSide={animateLeftSide}
+            animateNotebookDrawer={animateNotebookDrawer}
+            animateRightSide={animateRightSide}
+            closeMainMenuPanel={closeMainMenuPanel}
+            closeNotebookPanel={closeNotebookPanel}
+            mapMode={mapMode}
+            openMainMenuPanel={openMainMenuPanel}
+            openNotebookPanel={openNotebookPanel}
+            openSpotInNotebook={openSpotInNotebook}
+            ref={mapComponentRef}
+            setMapMode={setMapMode}
+            zoomToCurrentLocation={zoomToCurrentLocation}
+          />
+          <ModalsContainer
+            closeMainMenuPanel={closeMainMenuPanel}
+            closeNotebookPanel={closeNotebookPanel}
+            openMainMenuPanel={openMainMenuPanel}
+            openNotebookPanel={openNotebookPanel}
+            openSpotInNotebook={openSpotInNotebook}
+            ref={mapComponentRef}
+            zoomToCurrentLocation={zoomToCurrentLocation}
+          />
+          {!isProjectLoadSelectionModalVisible && (
+            <Animated.View style={[settingPanelStyles.settingsDrawer, animateMainMenuDrawer]}>
+              <MainMenuPanel
+                closeMainMenuPanel={closeMainMenuPanel}
+                closeNotebookPanel={closeNotebookPanel}
+                navigation={navigation}
+                openNotebookPanel={openNotebookPanel}
+                openSpotInNotebook={openSpotInNotebook}
+                ref={mapComponentRef}
+              />
+            </Animated.View>
+          )}
+          <UnsavedChangesModal
+            {...endPromptProps}
+            headerTitle={'Unsaved Map Edits'}
+            message={'Your map edits haven\'t been saved.'}
+          />
+          <UnsavedChangesModal {...leavePage.leavePromptProps} headerTitle={'Unsaved Changes'}/>
+        </Animated.View>
+      </MapEditContext.Provider>
     </LeavePageContext.Provider>
   );
 };

@@ -16,14 +16,12 @@ const HomeView = forwardRef(({
                                animateRightSide,
                                closeMainMenuPanel,
                                closeNotebookPanel,
-                               confirmEndMapEditing,
                                distance,
                                endMeasurement,
                                handleHomeAction,
                                handleHomeActionFromMapMenu,
                                hasDrawTools,
                                isCreateToolsDisabled,
-                               isMapEditing,
                                mapMenus,
                                mapMode,
                                onCancel,
@@ -41,7 +39,6 @@ const HomeView = forwardRef(({
     <>
       <MapContainer
         mapMode={mapMode}
-        onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}
         ref={mapComponentRef}
         selectingMode={selectingMode}
@@ -56,13 +53,11 @@ const HomeView = forwardRef(({
       <RightSideButtons
         animateRightSide={animateRightSide}
         closeNotebookPanel={closeNotebookPanel}
-        confirmEndMapEditing={confirmEndMapEditing}
         distance={distance}
         endMeasurement={endMeasurement}
         handleHomeAction={handleHomeAction}
         hasDrawTools={hasDrawTools}
         isCreateToolsDisabled={isCreateToolsDisabled}
-        isMapEditing={isMapEditing}
         mapMode={mapMode}
         onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}

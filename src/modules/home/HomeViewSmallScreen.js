@@ -15,6 +15,7 @@ import * as themes from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
 import MapContainer from '../maps/MapContainer';
+import {MapEditContext} from '../maps/MapEditContext';
 import {MAP_MODES} from '../maps/maps.constants';
 import {canceledIntervalDrag} from '../maps/maps.slice';
 import OfflineMapPreviewBanner from '../maps/offline-maps/OfflineMapPreviewBanner';
@@ -30,14 +31,12 @@ const Tab = createMaterialTopTabNavigator();
 const HomeViewSmallScreen = forwardRef(({
                                           closeMainMenuPanel,
                                           closeNotebookPanel,
-                                          confirmEndMapEditing,
                                           distance,
                                           endMeasurement,
                                           handleHomeAction,
                                           handleHomeActionFromMapMenu,
                                           hasDrawTools,
                                           isCreateToolsDisabled,
-                                          isMapEditing,
                                           mapMenus,
                                           mapMode,
                                           onCancel,
@@ -58,6 +57,7 @@ const HomeViewSmallScreen = forwardRef(({
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
   const {confirmLeavePage, hasUnsavedPageChanges, isPageChanged} = useContext(LeavePageContext);
+  const {confirmEndMapEditing, isMapEditing} = useContext(MapEditContext);
 
   const [isShowingSpotNavigator, setIsShowingSpotNavigator] = useState(false);
 
@@ -161,7 +161,6 @@ const HomeViewSmallScreen = forwardRef(({
               <>
                 <MapContainer
                   mapMode={mapMode}
-                  onCancel={onCancel}
                   onEndDrawPressed={onEndDrawPressed}
                   ref={mapComponentRef}
                   selectingMode={selectingMode}
@@ -194,11 +193,7 @@ const HomeViewSmallScreen = forwardRef(({
 
                 {!currentImageBasemap && !stratSection && (
                   <View style={homeStyles.shortcutButtons}>
-                    <ShortcutButtons
-                      confirmEndMapEditing={confirmEndMapEditing}
-                      isMapEditing={isMapEditing}
-                      openNotebookPanel={openNotebookPanel}
-                    />
+                    <ShortcutButtons openNotebookPanel={openNotebookPanel}/>
                   </View>
                 )}
 

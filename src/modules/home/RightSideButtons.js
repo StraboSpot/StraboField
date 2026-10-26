@@ -18,13 +18,11 @@ import useSpots from '../spots/useSpots';
 const RightSideButtons = ({
                             animateRightSide,
                             closeNotebookPanel,
-                            confirmEndMapEditing,
                             distance,
                             endMeasurement,
                             handleHomeAction,
                             hasDrawTools,
                             isCreateToolsDisabled,
-                            isMapEditing,
                             mapMode,
                             onCancel,
                             onEndDrawPressed,
@@ -69,11 +67,7 @@ const RightSideButtons = ({
 
       {!currentImageBasemap && !stratSection && (
         <Animated.View style={[homeStyles.shortcutButtons, animateRightSide]}>
-          <ShortcutButtons
-            confirmEndMapEditing={confirmEndMapEditing}
-            isMapEditing={isMapEditing}
-            openNotebookPanel={openNotebookPanel}
-          />
+          <ShortcutButtons openNotebookPanel={openNotebookPanel}/>
         </Animated.View>
       )}
 

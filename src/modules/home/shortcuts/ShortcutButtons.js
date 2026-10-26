@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import IconButton from '../../../shared/ui/buttons/IconButton';
 import DismissibleWarningModal from '../../../shared/ui/modals/DismissibleWarningModal';
 import useImages from '../../images/useImages';
+import {MapEditContext} from '../../maps/MapEditContext';
 import useMapLocation from '../../maps/view/useMapLocation';
 import {LeavePageContext} from '../../notebook-panel/LeavePageContext';
 import {SHORTCUT_MODALS} from '../../page/page.constants';
@@ -19,7 +20,7 @@ import {DISMISSIBLE_WARNING_MESSAGES, DISMISSIBLE_WARNINGS} from '../home.consta
 import {setActiveModal, setLoadingStatus} from '../home.slice';
 import useShortcutSwitches from './useShortcutSwitches';
 
-const ShortcutButtons = ({confirmEndMapEditing, isMapEditing, openNotebookPanel}) => {
+const ShortcutButtons = ({openNotebookPanel}) => {
   console.log('Rendering ShortcutButtons...');
 
   /* Data Hooks */
@@ -31,6 +32,7 @@ const ShortcutButtons = ({confirmEndMapEditing, isMapEditing, openNotebookPanel}
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
+  const {confirmEndMapEditing, isMapEditing} = useContext(MapEditContext);
 
   const {launchCameraFromNotebook} = useImages();
   const {setPointAtCurrentLocation} = useMapLocation();

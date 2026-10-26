@@ -15,6 +15,7 @@ import useAutoSave from '../../services/files/useAutoSave';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {MAP_EDIT_CHOICES} from '../maps/editing/editing.constants';
+import {MapEditContext} from '../maps/MapEditContext';
 import {MAP_MODES} from '../maps/maps.constants';
 import {
   canceledIntervalDrag,
@@ -33,9 +34,6 @@ import useSpots from '../spots/useSpots';
 const useHome = ({
                    closeMainMenuPanel,
                    closeNotebookPanel,
-                   confirmEndMapEditing,
-                   endMapEditing,
-                   isMapEditing,
                    mapComponentRef,
                    mapMode,
                    openNotebookPanel,
@@ -54,6 +52,7 @@ const useHome = ({
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
+  const {confirmEndMapEditing, endMapEditing, isMapEditing} = useContext(MapEditContext);
 
   const store = useStore();
 

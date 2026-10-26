@@ -10,8 +10,10 @@ import useProject from '../../project/useProject';
 import {isStratInterval} from '../../spots/spots.helpers';
 import {setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
+import {MAP_EDIT_CHOICES} from '../editing/editing.constants';
 import useMapFeatures from '../features/useMapFeatures';
 import useMapFeaturesCalculated from '../features/useMapFeaturesCalculated';
+import {MapEditContext} from '../MapEditContext';
 import {MAP_MODES} from '../maps.constants';
 import {convertImagePixelsToLatLong} from '../maps.helpers';
 import {setIntervalDragState} from '../maps.slice';
@@ -27,7 +29,6 @@ const useMapPressEvents = ({
                              mapMode,
                              mapRef,
                              measureFeatures,
-                             onCancel,
                              setDistance,
                              setDrawFeaturesNew,
                              setIsShowMacrostratOverlay,
@@ -47,6 +48,7 @@ const useMapPressEvents = ({
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const stratSection = useSelector(state => state.map.stratSection);
   const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
+  const {endMapEditing} = useContext(MapEditContext);
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
@@ -202,8 +204,9 @@ const useMapPressEvents = ({
           const editingSpotId = store.getState().spot.selectedSpot?.properties?.id;
           const otherSpots = isEditingSpot ? spotsAtPress.filter(spot => spot.properties.id !== editingSpotId)
             : spotsAtPress;
-          const isNewGeometry = isEditingSpot && !store.getState().spot.spots[editingSpotId]?.geometry;
-          if (isNewGeometry && (otherSpots.length > 0 || spotsAtPress.length === 0)) await onCancel();
+          const isOffNewGeometry = isEditingSpot && !store.getState().spot.spots[editingSpotId]?.geometry
+            && (otherSpots.length > 0 || spotsAtPress.length === 0);
+          if (isOffNewGeometry) await endMapEditing(MAP_EDIT_CHOICES.CANCEL);
           else if (otherSpots.length > 1) {
             setSpotsAtPress(otherSpots);
             setSpotsAtPressAction({type: 'switch'});
