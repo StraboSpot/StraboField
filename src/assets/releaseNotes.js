@@ -196,8 +196,10 @@ const RELEASE_NOTES = [
       {
         title: 'Samples & IGSN',
         items: [
-          {text: 'Steadier SESAR: improved login and token handling for IGSN registration', commit: '340bbda00'},
-          {text: 'Safer saves: Save is disabled when SESAR registration can\'t go through', commit: 'eed4069c7'},
+          {
+            text: 'IGSNs from strabospot.org: IGSNs now come from your strabospot.org account, so the app no longer signs in to or registers with SESAR',
+            commit: '83c1a2953',
+          },
           {
             text: 'Correct sample location: a sample from an image-basemap Spot gets a real-world location',
             commit: 'c8bf57cce',
