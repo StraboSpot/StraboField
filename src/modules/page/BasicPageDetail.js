@@ -7,7 +7,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {resolveLabelOnSave} from './featureLabels.helpers';
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
-import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty, isEqual, toTitleCase} from '../../shared/helpers';
 import {RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
@@ -24,8 +23,7 @@ import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
 import {setMineralFieldValue} from '../petrology/minerals/minerals.helpers';
 import usePetrology from '../petrology/usePetrology';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {isTokenExpired} from '../samples/igsn/igsn.helpers';
-import IGSNModal from '../samples/igsn/IGSNModal';
+import {SAMPLE_IGSN_KEY} from '../samples/samples.constants';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
 import {getRequiredLithologyKeys} from '../sed/sed.helpers';
 import useSed from '../sed/useSed';
@@ -58,8 +56,6 @@ const BasicPageDetail = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {isInternetReachable} = useSelector(state => state.connections.isOnline);
-  const {encoded_login, sesar} = useSelector(state => state.user);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel, getLabels, showErrors, submitAndShowErrors, validateForm} = useForm();
@@ -67,7 +63,6 @@ const BasicPageDetail = ({
   const {deleteSedFeature, saveSedBedFeature, saveSedFeature, setSedFieldValue} = useSed();
   const {checkSampleName} = useSpots();
   const {deleteFeatureTags} = useTags();
-  const {getOrcidToken} = useServerRequests();
   const toast = useToast();
 
   /* Local State */
@@ -77,15 +72,10 @@ const BasicPageDetail = ({
   // afterwards must not ask about them again, and the page can unmount in the same render pass as the save, so
   // the form ref may still be holding what it looked like beforehand.
   const savedValuesRef = useRef(null);
-  // Set once edits to a sample on SESAR are discarded from Cancel, so leaving does not go on to ask about them
-  const isDiscardedRef = useRef(false);
-  const [igsnFormValues, setIgsnFormValues] = useState(null);
   const [initialValues, setInitialValues] = useState(selectedFeature);
   const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [isFormInvalid, setIsFormInvalid] = useState(false);
-  const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
-  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
 
   /* Derived Variables */
 
@@ -97,22 +87,8 @@ const BasicPageDetail = ({
     else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
   }
   const isTemplate = saveTemplate;
-  // A sample already registered with SESAR is updated there as well as here, so it cannot be saved offline
-  const isRegisteredSampleOffline = !!selectedFeature.isOnMySesar && !!selectedFeature.Sample_IGSN
-    && !isInternetReachable;
-  // Registering a sample with SESAR needs credentials to do it with, and a user code to register it under unless
-  // it is already on SESAR and reachable to be updated in place
-  const isSesarRegistrationBlocked = isIGSNChecked && (!sesar.sesarToken.access
-    || (isEmpty(sesar.selectedUserCode) && !(selectedFeature.isOnMySesar && isInternetReachable)));
-  // Every reason the save itself is refused, held at the button rather than failing once it is pressed
-  const isSaveDisabled = isRegisteredSampleOffline || isSesarRegistrationBlocked;
-  // An unchanged sample has nothing to save, and saving one with an IGSN would only send the same data to SESAR again
+  // An unchanged sample has nothing to save
   const isSampleUnchanged = pageKey === PAGE_KEYS.SAMPLES && !isTemplate && !isFormDirty;
-  // Saving a sample already on SESAR updates it there, which needs a SESAR session: one was never made, was dropped
-  // after a failed refresh, or can no longer be refreshed. The sign-in otherwise lives in the IGSN modal, which only
-  // Save opens, so Save becomes the sign-in. An access token that has merely expired is refreshed on save instead.
-  const isSesarSignInNeeded = !!selectedFeature.isOnMySesar && !!selectedFeature.Sample_IGSN && isInternetReachable
-    && (!sesar?.sesarToken?.access || isTokenExpired(sesar.sesarToken.refresh));
   // Pages whose form fills one orientation field in from another name the pairs it uses
   const orientationFields = page.key === PAGE_KEYS.THREE_D_STRUCTURES ? THREE_D_STRUCTURE_ORIENTATION_FIELDS
     : page.key === PAGE_KEYS.EARTHQUAKES ? EARTHQUAKE_ORIENTATION_FIELDS
@@ -146,12 +122,6 @@ const BasicPageDetail = ({
 
   /* Event Handlers */
 
-  const onSampleSaved = async (formCurrent) => {
-    console.log('Saving Sample To SESAR', formRef.current?.values);
-    await saveFeature(formCurrent);
-    closeDetailView();
-  };
-
   const onSubmitForm = (values, {resetForm}) => {
     console.log('Submitting form...', values);
     setInitialValues(values);
@@ -161,42 +131,10 @@ const BasicPageDetail = ({
 
   /* Logic Helpers */
 
-  const cancelForm = async () => {
-    // A sample on SESAR can only be saved through Save, which updates SESAR too (see saveForm). Ask here, while the
-    // page is still open, so the edits can be kept and saved properly; leaving would only be able to drop them.
-    if (hasUnsavedChanges() && isOnSesar(formRef.current.values)) {
-      alert('Unsaved Changes',
-        'This sample has an IGSN, so changes must be saved with Save, which also updates SESAR. Discard your changes?',
-        [{
-          text: 'Keep Editing',
-          style: 'cancel',
-        }, {
-          text: 'Discard',
-          style: 'destructive',
-          onPress: () => {
-            isDiscardedRef.current = true;
-            closeDetailView();
-          },
-        }],
-        {cancelable: false},
-      );
-      return;
-    }
-    closeDetailView();
-  };
-
   // Runs as the page unmounts, from the closure of its first render, so it reads the form rather than props/state
   const confirmLeavePage = () => {
     if (hasUnsavedChanges()) {
       const formCurrent = formRef.current;
-      // Saving a sample on SESAR opens the IGSN modal to update it there, and that modal is part of this page, which
-      // is going away. Saving here would change the sample locally only, leaving SESAR out of step.
-      if (isOnSesar(formCurrent.values)) {
-        alert('Changes Not Saved',
-          'This sample has an IGSN, so changes can only be saved with Save, which also updates SESAR. Your changes '
-          + 'were not saved.');
-        return;
-      }
       alert('Unsaved Changes',
         'Would you like to save your data before continuing?',
         [{
@@ -268,15 +206,7 @@ const BasicPageDetail = ({
     return getRequiredLithologyKeys(values, spot);
   };
 
-  const getIsDisabled = (fieldName) => {
-    if (isReadOnly) return true;
-    else {
-      return selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN
-        ? isInternetReachable
-          ? fieldName === 'Sample_IGSN' : true
-        : false;
-    }
-  };
+  const getIsDisabled = fieldName => isReadOnly || fieldName === SAMPLE_IGSN_KEY;
 
   // Fields a feature requires beyond its survey are checked with it, so they hold Save the same way
   const validateFeature = (formName, values) => {
@@ -289,12 +219,9 @@ const BasicPageDetail = ({
       (acc, key) => (isEmpty(values[key]) ? {...acc, [key]: 'Required'} : acc), {...siblingErrors, ...errors});
   };
 
-  // Changes typed into the form that neither a save, a caller taking the values, nor a discard has dealt with yet
-  const hasUnsavedChanges = () => !isTemplate && !isDiscardedRef.current && !!formRef.current?.dirty
+  // Changes typed into the form that neither a save nor a caller taking the values has dealt with yet
+  const hasUnsavedChanges = () => !isTemplate && !!formRef.current?.dirty
     && !isEqual(formRef.current.values, savedValuesRef.current);
-
-  // Saved through the IGSN modal so SESAR is updated too, as in saveForm
-  const isOnSesar = values => !!values?.Sample_IGSN && !!values?.isOnMySesar;
 
   const saveButtonOnPress = () => {
     isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
@@ -354,10 +281,6 @@ const BasicPageDetail = ({
   const saveForm = async (formCurrent, isLeavingPage) => {
     try {
       console.log('Saving form...', formCurrent);
-      if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
-        await updateIGSNAndShowModal(formCurrent);
-        return;
-      }
       let errors;
       if (groupKey === 'pet') {
         errors = await savePetFeature(pageKey, spot, formRef.current || formCurrent, isLeavingPage,
@@ -390,22 +313,6 @@ const BasicPageDetail = ({
     // all of them. Each feature is labeled for itself as it is created instead.
     const {label, ...templateValues} = formValues;
     saveTemplate(templateValues);
-  };
-
-  // The ORCID redirect comes back to the IGSN modal mounted below, which stores the SESAR tokens; Save then returns.
-  const signIntoSesar = async () => {
-    if (!encoded_login) {
-      alert('Sign in to StraboSpot', 'Please sign in to your StraboSpot account before connecting to MySESAR.');
-      return;
-    }
-    await getOrcidToken();
-  };
-
-  const updateIGSNAndShowModal = async (formCurrent) => {
-    const values = {...formCurrent.values};
-    await saveFeature(formCurrent);
-    setIgsnFormValues(values);
-    setIsIGSNModalVisible(true);
   };
 
   // Expose the values to a parent-owned button that carries this form's edits somewhere (see NotebookFooter)
@@ -468,34 +375,14 @@ const BasicPageDetail = ({
       <View style={{flex: 1}}>
         {(isTemplate || !isEmpty(selectedFeature)) && (
           <>
-            <PageHeader hideBackButton={!isReadOnly} onPressBack={cancelForm} pageTitle={title + ' Detail'}/>
+            <PageHeader hideBackButton={!isReadOnly} onPressBack={closeDetailView} pageTitle={title + ' Detail'}/>
             {PageTabsComponent && PageTabsComponent}
             {!isReadOnly && (
               <>
-                {isRegisteredSampleOffline && (
-                  <View>
-                    <Text style={{
-                      color: RED,
-                      fontSize: 16,
-                      fontWeight: '500',
-                      padding: 10,
-                      textAlign: 'center',
-                    }}>
-                      This sample has an IGSN assigned and must be updated with SESAR. Please save changes when device
-                      is online.
-                    </Text>
-                  </View>
-                )}
-                {isSesarSignInNeeded && (
-                  <Text style={{color: RED, fontSize: 16, fontWeight: '500', padding: 10, textAlign: 'center'}}>
-                    This sample has an IGSN, so changes are also saved to SESAR. Please sign in to SESAR to save.
-                  </Text>
-                )}
                 <SaveAndCancelButtons
-                  cancel={cancelForm}
-                  getIsDisabled={!isSesarSignInNeeded && (isFormInvalid || isSaveDisabled || isSampleUnchanged)}
-                  save={isSesarSignInNeeded ? signIntoSesar : saveButtonOnPress}
-                  title={isSesarSignInNeeded ? 'Sign in to SESAR' : undefined}
+                  cancel={closeDetailView}
+                  getIsDisabled={isFormInvalid || isSampleUnchanged}
+                  save={saveButtonOnPress}
                 />
               </>
             )}
@@ -505,15 +392,6 @@ const BasicPageDetail = ({
             </FormFlatList>
           </>
         )}
-        <IGSNModal
-          isVisible={isIGSNModalVisible}
-          onIGSNUpdated={closeDetailView}
-          onModalCancel={() => setIsIGSNModalVisible(false)}
-          onSampleSaved={onSampleSaved}
-          ref={formRef}
-          sampleValues={igsnFormValues}
-        />
-
         {/*Modal when deleting a sample with an IGSN attached*/}
         <ModalWrapper
           actionTitle={'Delete'}

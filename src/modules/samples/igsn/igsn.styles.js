@@ -7,14 +7,32 @@ const igsnStyles = StyleSheet.create({
     height: 20,
     width: 20,
   },
-  IGSNLogoSmall: {
-    height: 20,
-    width: 20,
+  contentContainer: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
   },
-  mySesarUpdateDisclaimer: {
+  fieldRow: {
+    alignItems: 'center',
+    borderBottomColor: themes.LIST_BORDER_COLOR,
+    borderBottomWidth: 0.5,
+    flexDirection: 'row',
+  },
+  fieldValueText: {
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontSize: themes.MEDIUM_TEXT_SIZE,
+    fontWeight: '400',
+  },
+  labelColumn: {
+    flex: 1.5, // Controls the width of the left side
+  },
+  labelText: {
     fontSize: themes.MEDIUM_TEXT_SIZE,
     fontWeight: 'bold',
-    textAlign: 'center',
+    padding: 5,
+  },
+  valueColumn: {
+    flex: 2, // Controls the width of the right side
+    paddingLeft: 10,
   },
 });
 

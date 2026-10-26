@@ -1,37 +1,28 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Pressable, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import IGSNModal from './igsn/IGSNModal';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import useForm from '../form/useForm';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import useProject from '../project/useProject';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const SampleDetailOverview = ({openMainMenuPanel}) => {
+const SampleDetailOverview = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel, getSurvey} = useForm();
-  const {isSpotInReadOnlyDataset} = useProject();
-
-  /* Local State */
-
-  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
 
   /* Derived Variables */
 
   const sampleValues = spot.properties?.samples?.[0];
   const sampleIGSN = sampleValues?.Sample_IGSN;
-  // Viewing an existing IGSN is fine read-only; getting one would register and change the sample
-  const isGetIGSNHidden = !sampleIGSN && isSpotInReadOnlyDataset(spot.properties?.id);
 
   let sampleDetail = JSON.parse(JSON.stringify(sampleValues ?? {}));
   delete sampleDetail.id;
@@ -56,10 +47,7 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
     dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
   };
 
-  const onViewIGSNPressed = () => {
-    if (sampleIGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
-    else setIsIGSNModalVisible(true);
-  };
+  const onViewIGSNPressed = () => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
 
   /* Logic Helpers */
 
@@ -98,26 +86,14 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
             View More Detail
           </Text>
         </Pressable>
-        {!isGetIGSNHidden && (
+        {!!sampleIGSN && (
           <Pressable onPress={onViewIGSNPressed}>
             <Text style={[commonStyles.listItemTitle, {color: PRIMARY_ACCENT_COLOR, paddingTop: 5}]}>
-              {sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}
+              View IGSN Data
             </Text>
           </Pressable>
         )}
       </View>
-      <IGSNModal
-        isVisible={isIGSNModalVisible}
-        onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
-        onModalCancel={() => setIsIGSNModalVisible(false)}
-        openLoginPage={() => {
-          setIsIGSNModalVisible(false);
-          setTimeout(() => {
-            openMainMenuPanel();
-          }, 300);
-        }}
-        sampleValues={sampleValues}
-      />
     </View>
   );
 };
