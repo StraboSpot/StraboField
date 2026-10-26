@@ -53,9 +53,9 @@ const Form = ({
 
   const survey = surveyFragment || getSurvey(formName);
   // A choice on one tab can make a field on another irrelevant, so clearing sees every tab's fields. This
-  // survey's own definition wins where both define a field: the composition tab shows volcaniclastic_type
-  // whatever the lithology is, the lithology tab only for a volcaniclastic one, and each has to go on meaning
-  // what it says while you are editing it
+  // survey's own definition wins where both define a field, so it goes on meaning what it says while you are
+  // editing it. Keep a shared field's rule the same on every tab: a save keeps only what the shown tab's survey
+  // calls relevant, so a looser rule on one tab lets in a value the other tab's save then drops.
   const unseenSiblingFields = (siblingSurvey || []).filter(
     siblingField => !survey.some(field => field.name === siblingField.name));
   const clearingSurvey = [...survey, ...unseenSiblingFields];
