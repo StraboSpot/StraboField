@@ -1,8 +1,10 @@
 import React from 'react';
 import {Pressable, Text, View} from 'react-native';
 
+import {Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {SAMPLE_IGSN_KEY} from './samples.constants';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
@@ -15,6 +17,7 @@ const SampleDetailOverview = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const igsnSpotIdsToUpload = useSelector(state => state.project.igsnSpotIdsToUpload);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel, getSurvey} = useForm();
@@ -22,7 +25,8 @@ const SampleDetailOverview = () => {
   /* Derived Variables */
 
   const sampleValues = spot.properties?.samples?.[0];
-  const sampleIGSN = sampleValues?.Sample_IGSN;
+  const sampleIGSN = sampleValues?.[SAMPLE_IGSN_KEY];
+  const isIGSNUpdatePending = !!sampleIGSN && igsnSpotIdsToUpload.includes(spot.properties.id);
 
   let sampleDetail = JSON.parse(JSON.stringify(sampleValues ?? {}));
   delete sampleDetail.id;
@@ -66,6 +70,18 @@ const SampleDetailOverview = () => {
   return (
     <View style={{padding: 10, gap: 5, flex: 1, flexDirection: 'column'}}>
       {Object.entries(sampleDetail).slice(0, 10).map(([key, value]) => {
+        // Saved changes not uploaded yet, so strabospot.org has not updated the IGSN record from them
+        if (key === SAMPLE_IGSN_KEY && isIGSNUpdatePending) {
+          return (
+            <View key={key} style={{alignItems: 'center', flexDirection: 'row', gap: 5}}>
+              <Icon color={PRIMARY_ACCENT_COLOR} name={'cloud-upload-outline'} size={20} type={'ionicon'}/>
+              <Text style={[commonStyles.listItemTitle, {paddingVertical: 2}]}>
+                <Text style={{fontWeight: 'bold'}}>{getLabel(key, formName)}: </Text>
+                {value}
+              </Text>
+            </View>
+          );
+        }
         return (
           <Text key={key} style={[commonStyles.listItemTitle, {paddingVertical: 2}]}>
             <Text style={{fontWeight: 'bold'}}>{getLabel(key, formName)}: </Text>

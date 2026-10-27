@@ -10,6 +10,7 @@ import {stripMapboxTokenFromProject} from '../../modules/maps/custom-maps/custom
 import {
   addedProjectFromServer,
   deletedSpotIdFromDataset,
+  removedIGSNSpotIdsToUpload,
   setIsImageTransferring,
 } from '../../modules/project/projects.slice';
 import useProject from '../../modules/project/useProject';
@@ -94,6 +95,13 @@ const useUpload = () => {
         console.log(dataset.name + ': Uploading Spots...', spotCollection);
         setUploadStatusMessage(`Uploading ${dataset.name} spots...`);
         await updateDatasetSpots(dataset.id, spotCollection);
+        // A Spot edited again while it was going up still has changes the server has not seen
+        const liveSpots = store.getState().spot.spots;
+        const uploadedSpotIds = datasetSpots
+          .filter(spot => liveSpots[spot.properties.id]?.properties.modified_timestamp
+            === spot.properties.modified_timestamp)
+          .map(spot => spot.properties.id);
+        dispatch(removedIGSNSpotIdsToUpload(uploadedSpotIds));
         setUploadStatusMessage(`Finished uploading ${dataset.name} spots.`);
       }
     }

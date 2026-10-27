@@ -1,6 +1,7 @@
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react';
 import {Platform, Text, View} from 'react-native';
 
+import {Icon} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -8,7 +9,7 @@ import {resolveLabelOnSave} from './featureLabels.helpers';
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty, isEqual, toTitleCase} from '../../shared/helpers';
-import {RED} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -22,8 +23,9 @@ import useForm from '../form/useForm';
 import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
 import {setMineralFieldValue} from '../petrology/minerals/minerals.helpers';
 import usePetrology from '../petrology/usePetrology';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {addedIGSNSpotIdToUpload, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {SAMPLE_IGSN_KEY} from '../samples/samples.constants';
+import sampleStyles from '../samples/samples.styles';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
 import {getRequiredLithologyKeys} from '../sed/sed.helpers';
 import useSed from '../sed/useSed';
@@ -89,6 +91,8 @@ const BasicPageDetail = ({
   const isTemplate = saveTemplate;
   // An unchanged sample has nothing to save
   const isSampleUnchanged = pageKey === PAGE_KEYS.SAMPLES && !isTemplate && !isFormDirty;
+  // strabospot.org keeps a sample's IGSN record up to date from what is uploaded, so saving here changes it too
+  const hasIGSN = pageKey === PAGE_KEYS.SAMPLES && !isTemplate && !!selectedFeature[SAMPLE_IGSN_KEY];
   // Pages whose form fills one orientation field in from another name the pairs it uses
   const orientationFields = page.key === PAGE_KEYS.THREE_D_STRUCTURES ? THREE_D_STRUCTURE_ORIENTATION_FIELDS
     : page.key === PAGE_KEYS.EARTHQUAKES ? EARTHQUAKE_ORIENTATION_FIELDS
@@ -233,8 +237,10 @@ const BasicPageDetail = ({
       // page.key rather than pageKey: a deprecated fabric is stored with the 3D structures but is still titled
       // as a fabric
       const editedFeatureData = await resolveLabelOnSave(
-        {pageKey: page.key, previousFeature: selectedFeature, values: values, getLabel: getLabel,
-          getLabels: getLabels});
+        {
+          pageKey: page.key, previousFeature: selectedFeature, values: values, getLabel: getLabel,
+          getLabels: getLabels,
+        });
       console.log('Saving', page.label, 'data', editedFeatureData, 'to Spot', pageData);
       let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
       const i = editedPageData.findIndex(f => f.id === editedFeatureData.id);
@@ -243,6 +249,9 @@ const BasicPageDetail = ({
       const spotId = spot.properties.id;
       dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
+      if (page.key === PAGE_KEYS.SAMPLES && editedFeatureData[SAMPLE_IGSN_KEY] && Platform.OS !== 'web') {
+        dispatch(addedIGSNSpotIdToUpload(spotId));
+      }
 
       if (page.key === PAGE_KEYS.SAMPLES && editedFeatureData.sample_id_name) {
         if (spot.properties.isSample && spot.properties.name !== editedFeatureData.sample_id_name) {
@@ -384,6 +393,15 @@ const BasicPageDetail = ({
                   getIsDisabled={isFormInvalid || isSampleUnchanged}
                   save={saveButtonOnPress}
                 />
+                {hasIGSN && isFormDirty && (
+                  <View style={sampleStyles.infoCallout}>
+                    <Icon color={PRIMARY_ACCENT_COLOR} name={'information-circle-outline'} size={22} type={'ionicon'}/>
+                    <Text style={sampleStyles.infoCalloutText}>
+                      This sample has an IGSN. Its IGSN record will be updated with the changes you save when the
+                      project is uploaded to your StraboSpot account.
+                    </Text>
+                  </View>
+                )}
               </>
             )}
             {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon'}*/}

@@ -41,6 +41,9 @@ const initialProjectState = {
   datasets: {},
   deviceBackUpDirectoryExists: false,
   downloadsDirectory: false, //Android Only
+  // Spots holding a sample with an IGSN whose saved changes have not been uploaded yet, so strabospot.org has not
+  // updated the IGSN record from them. Native only: a web save is an upload.
+  igsnSpotIdsToUpload: [],
   isImageTransferring: false,
   isMultipleFeaturesTaggingEnabled: false,
   isTestingMode: false,
@@ -73,6 +76,9 @@ const projectSlice = createSlice({
     },
     addedDatasets(state, action) {
       state.datasets = action.payload;
+    },
+    addedIGSNSpotIdToUpload(state, action) {
+      if (!state.igsnSpotIdsToUpload.includes(action.payload)) state.igsnSpotIdsToUpload.push(action.payload);
     },
     addedNewSpotIdsToDataset(state, action) {
       const {datasetId, spotIds} = action.payload;
@@ -268,6 +274,9 @@ const projectSlice = createSlice({
     removedChangedImageIds(state, action) {
       state.changedImageIds = state.changedImageIds.filter(id => !action.payload.includes(id));
     },
+    removedIGSNSpotIdsToUpload(state, action) {
+      state.igsnSpotIdsToUpload = state.igsnSpotIdsToUpload.filter(id => !action.payload.includes(id));
+    },
     resetProjectState() {
       return initialProjectState;
     },
@@ -380,6 +389,7 @@ export const {
   addedDataset,
   addedDatasetFromServer,
   addedDatasets,
+  addedIGSNSpotIdToUpload,
   addedNewSpotIdsToDataset,
   addedNewSpotIdToDataset,
   addedProject,
@@ -400,6 +410,7 @@ export const {
   doesDownloadsDirectoryExist,
   movedSpotIdBetweenDatasets,
   removedChangedImageIds,
+  removedIGSNSpotIdsToUpload,
   resetProjectState,
   restoredSpotReferences,
   setActiveDatasets,
