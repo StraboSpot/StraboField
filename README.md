@@ -61,7 +61,6 @@ This is a [**React Native**](https://reactnative.dev) project (iOS, Android, and
 
       {
        "mapbox_access_token": "Your Mapbox public access token",
-       "orcid_client_id": "Your ORCID public client id",
        "Error_reporting_DSN": "Optional Sentry DSN or other error reporting service"
       }
 
@@ -70,7 +69,6 @@ This is a [**React Native**](https://reactnative.dev) project (iOS, Android, and
 
       {
        "sentry_organization_auth_token": "Sentry org auth token (used by npm run setup-sentry / upload-sourcemaps)",
-       "orcid_client_secret": "ORCID client secret",
        "android_keystore": "Android keystore password",
       }
 

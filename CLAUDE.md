@@ -99,10 +99,10 @@ npm run remove:packages    # clean node_modules + iOS Pods
 **Required config files** (project root, gitignored):
 
 - `env.json` — app **runtime** keys, bundled into the app so **public keys only**:
-  `{"mapbox_access_token": "...", "orcid_client_id": "...", "Error_reporting_DSN": "..."}`. Anything imported under
+  `{"mapbox_access_token": "...", "Error_reporting_DSN": "..."}`. Anything imported under
   `src/` gets inlined into the web/Metro bundles, so never put secrets here.
 - `secrets.json` — **build-time** secrets, read only by `scripts/` (never imported under `src/`, so never bundled):
-  `sentry_organization_auth_token`, `orcid_client_secret`, `android_keystore`, `rockd_access_token`.
+  `sentry_organization_auth_token`, `android_keystore`, `rockd_access_token`.
 - `dev-test-logins.js` — `export const USERNAME_TEST / PASSWORD_TEST`
 
 **Two helper scripts to know:**

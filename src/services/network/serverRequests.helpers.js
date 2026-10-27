@@ -104,7 +104,7 @@ const handleError = async (response, auth) => {
 const isMarkupBody = (response, text) => response.headers.get('content-type')?.includes('html')
   || text.trimStart().startsWith('<');
 
-// strabospot.org, or the custom server while it is switched on. Third parties (SESAR, Macrostrat) and the tile
+// strabospot.org, or the custom server while it is switched on. Third parties (Macrostrat) and the tile
 // server are left out.
 const isStraboApiUrl = (url) => {
   const {endpoint, isSelected} = store.getState().connections.databaseEndpoint;
@@ -203,19 +203,6 @@ export const handleResponse = async (response, auth) => {
   // request nor the cause.
   const {isJson, json, text} = await readJsonBody(response);
   return isJson ? json : Promise.reject(describeUnreadableBody(response, text));
-};
-
-// Like postRequest with custom headers: the body is sent as given and the raw response is returned.
-export const patchRequest = async (url, body, auth, customHeaders = {}, timeout = DEFAULT_TIMEOUT) => {
-  try {
-    console.log('PATCH', url, body, auth, customHeaders, timeout);
-    return await timeoutPromise(fetch(url, {method: 'PATCH', headers: buildHeaders(url, auth, customHeaders), body}),
-      timeout);
-  }
-  catch (err) {
-    console.error(`Error PATCH: ${url}`, err);
-    throw err;
-  }
 };
 
 export const postFormDataRequest = async (url, formData, auth) => {

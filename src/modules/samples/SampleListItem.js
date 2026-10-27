@@ -1,11 +1,10 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import IGSNLogo from './igsn/IGSNLogo';
-import IGSNModal from './igsn/IGSNModal';
 import {getSampleMetadata, getSampleTitle} from './samples.helpers';
 import sampleStyles from './samples.styles';
 import commonStyles from '../../shared/common.styles';
@@ -23,7 +22,6 @@ const SampleListItem = ({
                           isCheckedList,
                           isItemChecked,
                           isShowAvatar,
-                          isShowIGSN,
                           isShowSubtitle,
                           onChecked,
                           onPress,
@@ -41,21 +39,12 @@ const SampleListItem = ({
   /* Derived Variables */
 
   const isReadOnly = !canPickReadOnly && isSpotReadOnly(parentSpot);
-  // A rich sample is a Spot of its own, which can sit in a different dataset to its parent
-  const isSampleReadOnly = isReadOnly || (!!sample.properties?.isSample && isSpotReadOnly(sample));
   const sampleMetadata = getSampleMetadata(sample);
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 
-  /* Local State */
-
-  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
-
   /* Event Handlers */
 
-  const handleIGSNButtonPressed = () => {
-    if (sampleMetadata.Sample_IGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
-    else setIsIGSNModalVisible(true);
-  };
+  const handleIGSNButtonPressed = () => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
 
   // A caller with its own onChecked takes the press instead of the tag write, and gets the parent Spot too
   // since a legacy sample carries no id of its own that means anything outside it
@@ -68,7 +57,6 @@ const SampleListItem = ({
   /* View */
 
   return (
-    <>
     <ListItem
       containerStyle={commonStyles.listItem}
       key={'SampleListItem' + sampleMetadata.id}
@@ -92,13 +80,9 @@ const SampleListItem = ({
             </ListItem.Subtitle>
           )}
         </View>
-        {/* Viewing an existing IGSN is fine read-only; getting one would register and change the sample */}
-        {(sampleMetadata.Sample_IGSN || (isShowIGSN && !isSampleReadOnly)) && (
+        {!!sampleMetadata.Sample_IGSN && (
           <View>
-            <IGSNLogo
-              item={sampleMetadata}
-              onIGSNButtonPressed={handleIGSNButtonPressed}
-            />
+            <IGSNLogo onIGSNButtonPressed={handleIGSNButtonPressed}/>
           </View>
         )}
       </ListItem.Content>
@@ -115,13 +99,6 @@ const SampleListItem = ({
         </>
       )}
     </ListItem>
-    <IGSNModal
-      isVisible={isIGSNModalVisible}
-      onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN))}
-      onModalCancel={() => setIsIGSNModalVisible(false)}
-      sampleValues={sampleMetadata}
-    />
-    </>
   );
 };
 

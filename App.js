@@ -71,15 +71,6 @@ NetInfo.configure({
 });
 
 
-const linking = Platform.OS !== 'web' && {
-  prefixes: ['strabofield://'], // Custom URL scheme
-  config: {
-    screens: {
-      HomeScreen: 'orcid_id/:orcidToken', // Default screen
-    },
-  },
-};
-
 // persistor.purge(); // Use this to clear persistStore completely
 
 const renderErrorFallback = props => <AppErrorFallback {...props}/>;
@@ -111,7 +102,7 @@ const App = () => {
                 <ConnectionStatus/>
                 <ProfileSyncListener/>
                 <MacrostratAuthRedirectHandler/>
-                <NavigationContainer linking={linking}>
+                <NavigationContainer>
                   <Routes/>
                 </NavigationContainer>
                 {/*</Sentry.TouchEventBoundary>*/}

@@ -6,6 +6,7 @@ import {ButtonGroup} from '@rn-vui/base';
 import {
   SAMPLE_FIRST_KEYS,
   SAMPLE_FORM_NAME,
+  SAMPLE_IGSN_KEY,
   SAMPLE_INPLACENESS_KEY,
   SAMPLE_ORIENTED_KEY,
   SAMPLE_TYPE_KEY,
@@ -86,7 +87,12 @@ const SampleModalForm = ({
   );
 
   const renderSubform = formProps => (
-    <Form {...formProps} formName={SAMPLE_FORM_NAME} surveyFragment={getRelevantFields(survey, choicesViewKey)}/>
+    <Form
+      {...formProps}
+      formName={SAMPLE_FORM_NAME}
+      getIsDisabled={fieldName => fieldName === SAMPLE_IGSN_KEY}
+      surveyFragment={getRelevantFields(survey, choicesViewKey)}
+    />
   );
 
   /* View */

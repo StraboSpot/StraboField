@@ -1,37 +1,32 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Pressable, Text, View} from 'react-native';
 
+import {Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import IGSNModal from './igsn/IGSNModal';
+import {SAMPLE_IGSN_KEY} from './samples.constants';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import useForm from '../form/useForm';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import useProject from '../project/useProject';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
-const SampleDetailOverview = ({openMainMenuPanel}) => {
+const SampleDetailOverview = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const igsnSpotIdsToUpload = useSelector(state => state.project.igsnSpotIdsToUpload);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {getLabel, getSurvey} = useForm();
-  const {isSpotInReadOnlyDataset} = useProject();
-
-  /* Local State */
-
-  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
 
   /* Derived Variables */
 
   const sampleValues = spot.properties?.samples?.[0];
-  const sampleIGSN = sampleValues?.Sample_IGSN;
-  // Viewing an existing IGSN is fine read-only; getting one would register and change the sample
-  const isGetIGSNHidden = !sampleIGSN && isSpotInReadOnlyDataset(spot.properties?.id);
+  const sampleIGSN = sampleValues?.[SAMPLE_IGSN_KEY];
+  const isIGSNUpdatePending = !!sampleIGSN && igsnSpotIdsToUpload.includes(spot.properties.id);
 
   let sampleDetail = JSON.parse(JSON.stringify(sampleValues ?? {}));
   delete sampleDetail.id;
@@ -56,10 +51,7 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
     dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
   };
 
-  const onViewIGSNPressed = () => {
-    if (sampleIGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
-    else setIsIGSNModalVisible(true);
-  };
+  const onViewIGSNPressed = () => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
 
   /* Logic Helpers */
 
@@ -78,6 +70,18 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
   return (
     <View style={{padding: 10, gap: 5, flex: 1, flexDirection: 'column'}}>
       {Object.entries(sampleDetail).slice(0, 10).map(([key, value]) => {
+        // Saved changes not uploaded yet, so strabospot.org has not updated the IGSN record from them
+        if (key === SAMPLE_IGSN_KEY && isIGSNUpdatePending) {
+          return (
+            <View key={key} style={{alignItems: 'center', flexDirection: 'row', gap: 5}}>
+              <Icon color={PRIMARY_ACCENT_COLOR} name={'cloud-upload-outline'} size={20} type={'ionicon'}/>
+              <Text style={[commonStyles.listItemTitle, {paddingVertical: 2}]}>
+                <Text style={{fontWeight: 'bold'}}>{getLabel(key, formName)}: </Text>
+                {value}
+              </Text>
+            </View>
+          );
+        }
         return (
           <Text key={key} style={[commonStyles.listItemTitle, {paddingVertical: 2}]}>
             <Text style={{fontWeight: 'bold'}}>{getLabel(key, formName)}: </Text>
@@ -98,26 +102,14 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
             View More Detail
           </Text>
         </Pressable>
-        {!isGetIGSNHidden && (
+        {!!sampleIGSN && (
           <Pressable onPress={onViewIGSNPressed}>
             <Text style={[commonStyles.listItemTitle, {color: PRIMARY_ACCENT_COLOR, paddingTop: 5}]}>
-              {sampleIGSN ? 'View IGSN Data' : 'Get IGSN'}
+              View IGSN Data
             </Text>
           </Pressable>
         )}
       </View>
-      <IGSNModal
-        isVisible={isIGSNModalVisible}
-        onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
-        onModalCancel={() => setIsIGSNModalVisible(false)}
-        openLoginPage={() => {
-          setIsIGSNModalVisible(false);
-          setTimeout(() => {
-            openMainMenuPanel();
-          }, 300);
-        }}
-        sampleValues={sampleValues}
-      />
     </View>
   );
 };
