@@ -22,14 +22,12 @@ bundle exec pod install
 # 1. env.json at project root (app runtime keys — bundled into the app, public keys only):
 {
   "mapbox_access_token": "Your Mapbox public access token",
-  "orcid_client_id": "Your ORCID public client id",
   "Error_reporting_DSN": "Optional Sentry DSN"
 }
 
 # 2. secrets.json at project root (build-time secrets — gitignored, read only by scripts/, never bundled):
 {
   "sentry_organization_auth_token": "Sentry org auth token (used by setup-sentry / upload-sourcemaps)",
-  "orcid_client_secret": "ORCID client secret",
   "android_keystore": "Android keystore password",
   "rockd_access_token": "Rockd access token"
 }
