@@ -2,17 +2,16 @@ import React from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import IGSNLogo from './igsn/IGSNLogo';
 import {getSampleMetadata, getSampleTitle} from './samples.helpers';
 import sampleStyles from './samples.styles';
+import useSamples from './useSamples';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
 import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import CheckboxList from '../../shared/ui/CheckboxList';
-import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS} from '../page/pageKeys.constants';
 import SpotDataIcons from '../spots/SpotDataIcons';
 import useSpots from '../spots/useSpots';
 import useTags from '../tags/useTags';
@@ -22,6 +21,7 @@ const SampleListItem = ({
                           isCheckedList,
                           isItemChecked,
                           isShowAvatar,
+                          isShowIGSN,
                           isShowSubtitle,
                           onChecked,
                           onPress,
@@ -30,21 +30,23 @@ const SampleListItem = ({
                         }) => {
   /* Data Hooks */
 
-  const dispatch = useDispatch();
   const selectedTag = useSelector(state => state.project.selectedTag);
 
+  const {openSamplePage} = useSamples();
   const {getSampleSpotIconSource, isSpotReadOnly} = useSpots();
   const {addRemoveSpotFromTag} = useTags();
 
   /* Derived Variables */
 
   const isReadOnly = !canPickReadOnly && isSpotReadOnly(parentSpot);
+  // A rich sample is a Spot of its own, which can sit in a different dataset to its parent
+  const isSampleReadOnly = isReadOnly || (!!sample.properties?.isSample && isSpotReadOnly(sample));
   const sampleMetadata = getSampleMetadata(sample);
   const oriented = sampleMetadata.oriented_sample === 'yes' ? 'Oriented' : 'Unoriented';
 
   /* Event Handlers */
 
-  const handleIGSNButtonPressed = () => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
+  const handleIGSNButtonPressed = () => openSamplePage(sampleMetadata.id);
 
   // A caller with its own onChecked takes the press instead of the tag write, and gets the parent Spot too
   // since a legacy sample carries no id of its own that means anything outside it
@@ -80,9 +82,10 @@ const SampleListItem = ({
             </ListItem.Subtitle>
           )}
         </View>
-        {!!sampleMetadata.Sample_IGSN && (
+        {/* Viewing an existing IGSN is fine read-only; getting one would change the sample */}
+        {(sampleMetadata.Sample_IGSN || (isShowIGSN && !isSampleReadOnly)) && (
           <View>
-            <IGSNLogo onIGSNButtonPressed={handleIGSNButtonPressed}/>
+            <IGSNLogo hasIGSN={!!sampleMetadata.Sample_IGSN} onIGSNButtonPressed={handleIGSNButtonPressed}/>
           </View>
         )}
       </ListItem.Content>

@@ -1,6 +1,7 @@
 import {StyleSheet} from 'react-native';
 
 import {
+  PRIMARY_ACCENT_COLOR,
   PRIMARY_ACCENT_COLOR_FADED_20,
   PRIMARY_TEXT_COLOR,
   SMALL_TEXT_SIZE,
@@ -15,6 +16,10 @@ const sampleStyles = StyleSheet.create({
     gap: 8,
     margin: 10,
     padding: 12,
+  },
+  infoCalloutLink: {
+    color: PRIMARY_ACCENT_COLOR,
+    textDecorationLine: 'underline',
   },
   infoCalloutText: {
     color: PRIMARY_TEXT_COLOR,

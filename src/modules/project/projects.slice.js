@@ -41,15 +41,15 @@ const initialProjectState = {
   datasets: {},
   deviceBackUpDirectoryExists: false,
   downloadsDirectory: false, //Android Only
-  // Spots holding a sample with an IGSN whose saved changes have not been uploaded yet, so strabospot.org has not
-  // updated the IGSN record from them. Native only: a web save is an upload.
-  igsnSpotIdsToUpload: [],
   isImageTransferring: false,
   isMultipleFeaturesTaggingEnabled: false,
   isTestingMode: false,
   project: {},
   projectTransferProgress: 0,
   readOnlyDatasetsIds: [],
+  // Sample Spots saved since the last upload, so strabospot.org does not have them as they are on the device yet.
+  // Native only: a web save is an upload.
+  sampleSpotIdsToUpload: [],
   selectedTag: {},
   targetDatasetId: undefined,
 };
@@ -76,9 +76,6 @@ const projectSlice = createSlice({
     },
     addedDatasets(state, action) {
       state.datasets = action.payload;
-    },
-    addedIGSNSpotIdToUpload(state, action) {
-      if (!state.igsnSpotIdsToUpload.includes(action.payload)) state.igsnSpotIdsToUpload.push(action.payload);
     },
     addedNewSpotIdsToDataset(state, action) {
       const {datasetId, spotIds} = action.payload;
@@ -126,6 +123,9 @@ const projectSlice = createSlice({
         return updatedReport;
       });
       state.project.modified_timestamp = Date.now();
+    },
+    addedSampleSpotIdToUpload(state, action) {
+      if (!state.sampleSpotIdsToUpload.includes(action.payload)) state.sampleSpotIdsToUpload.push(action.payload);
     },
     addedSpotToTags(state, action) {
       const {spotId, tagIds} = action.payload;
@@ -274,8 +274,8 @@ const projectSlice = createSlice({
     removedChangedImageIds(state, action) {
       state.changedImageIds = state.changedImageIds.filter(id => !action.payload.includes(id));
     },
-    removedIGSNSpotIdsToUpload(state, action) {
-      state.igsnSpotIdsToUpload = state.igsnSpotIdsToUpload.filter(id => !action.payload.includes(id));
+    removedSampleSpotIdsToUpload(state, action) {
+      state.sampleSpotIdsToUpload = state.sampleSpotIdsToUpload.filter(id => !action.payload.includes(id));
     },
     resetProjectState() {
       return initialProjectState;
@@ -389,13 +389,13 @@ export const {
   addedDataset,
   addedDatasetFromServer,
   addedDatasets,
-  addedIGSNSpotIdToUpload,
   addedNewSpotIdsToDataset,
   addedNewSpotIdToDataset,
   addedProject,
   addedProjectDescription,
   addedProjectFromServer,
   addedRemovedTagIdOnReport,
+  addedSampleSpotIdToUpload,
   addedSpotToTags,
   addedTagToSelectedSpot,
   addedTemplates,
@@ -410,7 +410,7 @@ export const {
   doesDownloadsDirectoryExist,
   movedSpotIdBetweenDatasets,
   removedChangedImageIds,
-  removedIGSNSpotIdsToUpload,
+  removedSampleSpotIdsToUpload,
   resetProjectState,
   restoredSpotReferences,
   setActiveDatasets,

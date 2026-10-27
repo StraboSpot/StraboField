@@ -10,7 +10,7 @@ import {stripMapboxTokenFromProject} from '../../modules/maps/custom-maps/custom
 import {
   addedProjectFromServer,
   deletedSpotIdFromDataset,
-  removedIGSNSpotIdsToUpload,
+  removedSampleSpotIdsToUpload,
   setIsImageTransferring,
 } from '../../modules/project/projects.slice';
 import useProject from '../../modules/project/useProject';
@@ -101,7 +101,7 @@ const useUpload = () => {
           .filter(spot => liveSpots[spot.properties.id]?.properties.modified_timestamp
             === spot.properties.modified_timestamp)
           .map(spot => spot.properties.id);
-        dispatch(removedIGSNSpotIdsToUpload(uploadedSpotIds));
+        dispatch(removedSampleSpotIdsToUpload(uploadedSpotIds));
         setUploadStatusMessage(`Finished uploading ${dataset.name} spots.`);
       }
     }
