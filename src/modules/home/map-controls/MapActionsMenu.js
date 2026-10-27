@@ -1,0 +1,132 @@
+import React from 'react';
+import {FlatList, Platform} from 'react-native';
+
+import {ListItem} from '@rn-vui/base';
+import {useSelector} from 'react-redux';
+
+import commonStyles from '../../../shared/common.styles';
+import {SMALL_SCREEN} from '../../../shared/styles.constants';
+import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
+import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
+import overlayStyles from '../../../shared/ui/modals/overlay.styles';
+import useSpots from '../../spots/useSpots';
+import {HOME_ACTIONS, MAP_ACTIONS_MENU_ITEMS} from '../home.constants';
+
+const MapActionsMenu = ({
+                          onPress,
+                          onTouchOutside,
+                          visible,
+                        }) => {
+  /* Data Hooks */
+
+  const currentBasemap = useSelector(state => state.map.currentBasemap);
+  const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
+  const isScaleBarMetric = useSelector(state => state.map.isScaleBarMetric);
+  const isTestingMode = useSelector(state => state.project.isTestingMode);
+  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project.project);
+  const stratSection = useSelector(state => state.map.stratSection);
+
+  const {isCurrentMapReadOnly} = useSpots();
+
+  /* Derived Variables */
+
+  const isReadOnlyMap = isCurrentMapReadOnly();
+
+  /* Logic Helpers */
+
+  const isItemVisible = (item) => {
+    const isIOS = Platform.OS === 'ios';
+    const isWeb = Platform.OS === 'web';
+    const hasValidConnection = isConnected && (isInternetReachable || currentBasemap?.source);
+    const isSaveMapVisible = item.key === HOME_ACTIONS.SAVE_MAP && !isWeb && hasValidConnection;
+    const isStereonetVisible = item.key === HOME_ACTIONS.STEREONET && (isIOS || isWeb);
+    const isStratSectionVisible = item.key === HOME_ACTIONS.STRAT_SECTION && stratSection;
+    const isSelectSpotsVisible = item.key === HOME_ACTIONS.SELECT_SPOTS && isTestingMode;
+    const isMapMeasurementVisible = item.key === HOME_ACTIONS.MAP_MEASUREMENT && !stratSection && !currentImageBasemap;
+    // Tagging and memos write to the Spots they touch, so they go with the rest of the editing - all of it
+    // on a read only project, and tagging alone on a read only map
+    const isReadOnlyHiddenAction = (isReadOnlyProject
+        && [HOME_ACTIONS.ADD_TAG, HOME_ACTIONS.ADD_TO_REPORT].includes(item.key))
+      || (isReadOnlyMap && item.key === HOME_ACTIONS.ADD_TAG);
+    const isToggleScaleBarUnitsVisible = item.key === HOME_ACTIONS.TOGGLE_SCALE_BAR_UNITS && !stratSection
+      && !currentImageBasemap;
+
+    const otherKeysToHide = new Set([HOME_ACTIONS.SAVE_MAP, HOME_ACTIONS.STEREONET, HOME_ACTIONS.STRAT_SECTION,
+      HOME_ACTIONS.SELECT_SPOTS, HOME_ACTIONS.MAP_MEASUREMENT, HOME_ACTIONS.TOGGLE_SCALE_BAR_UNITS]);
+    const isDefaultVisible = !otherKeysToHide.has(item.key);
+
+    return !isReadOnlyHiddenAction && (
+      isSaveMapVisible
+      || isStereonetVisible
+      || isStratSectionVisible
+      || isSelectSpotsVisible
+      || isMapMeasurementVisible
+      || isToggleScaleBarUnitsVisible
+      || isDefaultVisible
+    );
+  };
+
+  const getItemTitle = (item) => {
+    if (item.key === HOME_ACTIONS.TOGGLE_SCALE_BAR_UNITS) {
+      return `Switch Scale Bar to ${isScaleBarMetric ? 'Imperial' : 'Metric'}`;
+    }
+    return item.title;
+  };
+
+  const mapActionItem = item => (
+    <ListItem
+      containerStyle={[
+        commonStyles.listItem,
+        SMALL_SCREEN && {
+          minHeight: 50,
+          paddingHorizontal: 20,
+          paddingVertical: 15,
+        },
+      ]}
+      key={item.key}
+      onPress={() => onPress(item.key)}
+    >
+      <ListItem.Title style={[
+        commonStyles.listItemTitle,
+        SMALL_SCREEN && {
+          fontSize: 16,
+          fontWeight: '500',
+        },
+      ]}>
+        {getItemTitle(item)}
+      </ListItem.Title>
+    </ListItem>
+  );
+
+  /* View */
+
+  return (
+    <ModalWrapper
+      closeModal={onTouchOutside}
+      fullscreen={SMALL_SCREEN}
+      headerTitle={'Map Actions'}
+      isVisible={visible}
+      onBackdropPress={onTouchOutside}
+      overlayStyleOverride={{...overlayStyles.overlayMapMenuPosition, height: 'auto'}}
+      showActionButton={false}
+      showCancelButton={false}
+      showCloseButton={SMALL_SCREEN}
+    >
+      <FlatList
+        ItemSeparatorComponent={FlatListItemSeparator}
+        contentContainerStyle={{
+          alignItems: 'center',
+          paddingVertical: SMALL_SCREEN ? 20 : 0,
+          flexGrow: SMALL_SCREEN ? 1 : 0,
+        }}
+        data={MAP_ACTIONS_MENU_ITEMS.filter(isItemVisible)}
+        key={'mapActions'}
+        renderItem={({item}) => mapActionItem(item)}
+        style={{width: '100%'}}
+      />
+    </ModalWrapper>
+  );
+};
+
+export default MapActionsMenu;

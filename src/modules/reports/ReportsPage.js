@@ -7,7 +7,7 @@ import {getReportsAtSpot} from './reports.helpers';
 import ReportsList from './ReportsList';
 import commonStyles from '../../shared/common.styles';
 import AddButton from '../../shared/ui/buttons/AddButton';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import PageHeader from '../page/PageHeader';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
@@ -31,7 +31,7 @@ const ReportsPage = ({page}) => {
 
   const addReport = () => {
     dispatch(setModalValues({spots: [spot.properties.id]}));
-    dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
+    dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
   };
 
   /* View */

@@ -1,4 +1,4 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import {FlatList, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
@@ -9,9 +9,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import AddImageOverlayModal from './AddImageOverlayModal';
 import useSed from './useSed';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty, isEqual} from '../../shared/helpers';
+import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
 import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
@@ -24,7 +23,7 @@ import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
 import {setLoadingStatus} from '../home/home.slice';
 import {setStratSection} from '../maps/maps.slice';
-import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
@@ -35,40 +34,39 @@ const StratSectionPage = ({isReadOnly, page}) => {
 
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {confirmLeavePage, goToNotebookPage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const navigation = useNavigation();
   const {saveSedFeature, toggleStratSection} = useSed();
   const toast = useToast();
 
+  const stratSectionRef = useRef(null);
+  const {markSaved, setIsFormDirty} = useUnsavedFormChanges({
+    formRef: stratSectionRef,
+    getMessage: () => 'Your strat section settings haven\'t been saved.',
+    save: () => saveStratSection(),
+  });
+
   /* Local State */
 
   const stratSection = spot.properties?.sed?.strat_section || {};
-  const savedValuesRef = useRef(stratSection);
-  const stratSectionRef = useRef(null);
 
   const [selectedImage, setSelectedImage] = useState(undefined);
 
-  /* Side Effects */
+  /* Event Handlers */
 
-  useLayoutEffect(() => {
-    return () => confirmLeavePage();
-  }, []);
+  // On a phone the section shows on the Map tab, which closes this page
+  const onViewStratSectionPress = async () => {
+    if (SMALL_SCREEN && hasUnsavedPageChanges() && !await confirmLeavePage()) return;
+    dispatch(setLoadingStatus({view: 'home', bool: true}));
+    if (SMALL_SCREEN) navigation.navigate('HomeScreen', {screen: 'Map'});
+    setTimeout(() => {
+      dispatch(setStratSection(stratSection));
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
+    }, 500);
+  };
 
   /* Logic Helpers */
-
-  const confirmLeavePage = () => {
-    const formCurrent = stratSectionRef.current;
-    if (formCurrent?.dirty && !isEqual(formCurrent.values, savedValuesRef.current)) {
-      alert('Unsaved Changes',
-        'Would you like to save your data before continuing?',
-        [
-          {text: 'No', style: 'cancel'},
-          {text: 'Yes', onPress: () => saveStratSection(formCurrent)},
-        ],
-        {cancelable: false},
-      );
-    }
-  };
 
   const getImageLabel = (id) => {
     const index = spot.properties.images.findIndex(i => id === i.id);
@@ -76,14 +74,17 @@ const StratSectionPage = ({isReadOnly, page}) => {
     return image && image.title ? image.title : 'Untitled ' + (index + 1);
   };
 
+  // Resolves whether the settings were saved. A refusal has already alerted about the field it stopped on.
   const saveStratSection = async (formCurrent = stratSectionRef.current) => {
     try {
       await saveSedFeature(page.key, spot, formCurrent);
-      savedValuesRef.current = {...formCurrent.values};
+      markSaved();
       toast.show('Strat Section Settings saved', {type: 'success'});
+      return true;
     }
     catch (err) {
       console.error('Error saving strat section', err);
+      return false;
     }
   };
 
@@ -137,13 +138,14 @@ const StratSectionPage = ({isReadOnly, page}) => {
           initialValues={stratSection}
           innerRef={stratSectionRef}
           onReset={() => console.log('Resetting form...')}
+          setIsFormDirty={setIsFormDirty}
           validateOnChange={false}
         >
           {formProps => (
             <>
               {!isReadOnly && (
                 <SaveAndCancelButtons
-                  cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+                  cancel={() => goToNotebookPage(PAGE_KEYS.OVERVIEW)}
                   save={() => saveStratSection(formProps)}
                 />
               )}
@@ -168,14 +170,7 @@ const StratSectionPage = ({isReadOnly, page}) => {
                 <ListItem
                   containerStyle={commonStyles.listItem}
                   key={'strat_section'}
-                  onPress={() => {
-                    dispatch(setLoadingStatus({view: 'home', bool: true}));
-                    if (SMALL_SCREEN) navigation.navigate('HomeScreen', {screen: 'Map'});
-                    setTimeout(() => {
-                      dispatch(setStratSection(stratSection));
-                      dispatch(setLoadingStatus({view: 'home', bool: false}));
-                    }, 500);
-                  }}
+                  onPress={onViewStratSectionPress}
                 >
                   <AvatarWrapper
                     size={20}

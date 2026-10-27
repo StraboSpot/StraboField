@@ -16,11 +16,11 @@ import IssuesAndRequests from '../help/issues-and-requests/IssuesAndRequests';
 import ImageGallery from '../images/ImageGallery';
 import CustomMapDetails from '../maps/custom-maps/CustomMapDetails';
 import ManageCustomMaps from '../maps/custom-maps/ManageCustomMaps';
-import ImageBasemapsList from '../maps/ImageBasemapsList';
-import ManageOfflineMapsMenu from '../maps/offline-maps/ManageOfflineMaps';
+import ImageBasemaps from '../maps/ImageBasemaps';
+import ManageOfflineMaps from '../maps/offline-maps/ManageOfflineMaps';
 import OfflineMapDetails from '../maps/offline-maps/OfflineMapDetails';
-import StratSectionsList from '../maps/strat-section/StratSectionsList';
-import MicroProjectsList from '../micro/MicroProjectsList';
+import StratSections from '../maps/strat-section/StratSections';
+import MicroProjects from '../micro/MicroProjects';
 import AddingNewSpots from '../preferences/AddingNewSpots';
 import AdvancedOptions from '../preferences/AdvancedOptions';
 import BackupProject from '../project/backup/BackupProject';
@@ -36,7 +36,7 @@ import OpenProject from '../project/load/OpenProject';
 import NamingConventions from '../project/NamingConventions';
 import ProjectDescription from '../project/ProjectDescription';
 import StraboFieldProjects from '../project/StraboFieldProjects';
-import ReportsMenu from '../reports/ReportsMenu';
+import Reports from '../reports/Reports';
 import Samples from '../samples/Samples';
 import SpotsList from '../spots/SpotsList';
 import AddRemoveTagFeatures from '../tags/AddRemoveTagFeatures';
@@ -149,7 +149,7 @@ const MainMenuPanel = forwardRef(({
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.REPORTS:
-        return <ReportsMenu/>;
+        return <Reports/>;
       case MAIN_MENU_ITEMS.PROJECT_DATA.TAGS:
         return (
           <Tags
@@ -166,7 +166,7 @@ const MainMenuPanel = forwardRef(({
           />
         );
       case MAIN_MENU_ITEMS.PROJECT_DATA.STRAT_SECTIONS :
-        return <StratSectionsList closeManMenuPanel={closeMainMenuPanel} openDatasetsPage={openDatasetsPage}/>;
+        return <StratSections closeManMenuPanel={closeMainMenuPanel} openDatasetsPage={openDatasetsPage}/>;
       case MAIN_MENU_ITEMS.PROJECT_DATA.DAILY_NOTES:
         return <DailyNotes/>;
 
@@ -179,10 +179,10 @@ const MainMenuPanel = forwardRef(({
           />
         );
       case MAIN_MENU_ITEMS.MAPS.IMAGE_BASEMAPS :
-        return <ImageBasemapsList closeManMenuPanel={closeMainMenuPanel} openDatasetsPage={openDatasetsPage}/>;
+        return <ImageBasemaps closeManMenuPanel={closeMainMenuPanel} openDatasetsPage={openDatasetsPage}/>;
       case MAIN_MENU_ITEMS.MAPS.MANAGE_OFFLINE_MAPS:
         return (
-          <ManageOfflineMapsMenu
+          <ManageOfflineMaps
             closeMainMenuPanel={closeMainMenuPanel}
             zoomToOfflineMapTiles={mapComponentRef?.current?.zoomToOfflineMapTiles}
           />
@@ -194,7 +194,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS:
         return <StraboFieldProjects/>;
       case MAIN_MENU_ITEMS.ACCOUNT.STRABOMICRO_PROJECTS:
-        return <MicroProjectsList/>;
+        return <MicroProjects/>;
       case MAIN_MENU_ITEMS.ACCOUNT.USER_CONVENTIONS:
         return <UserConventions/>;
 

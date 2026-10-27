@@ -1,25 +1,27 @@
-import React, {forwardRef, useEffect, useState} from 'react';
+import React, {forwardRef, useContext, useEffect, useState} from 'react';
 import {Platform, View} from 'react-native';
 
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {Button, Header, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import ActionButtonsSmallScreen from './buttons/ActionButtonsSmallScreen';
-import MainMenuButton from './buttons/MainMenuButton';
-import ShortcutButtons from './buttons/ShortcutButtons';
-import {NAVIGATION_OPTIONS} from './home.constants';
-import {setModalVisible} from './home.slice';
+import ActionButtonsSmallScreen from './ActionButtonsSmallScreen';
+import {HOME_ACTIONS, NAVIGATION_OPTIONS} from './home.constants';
 import homeStyles from './home.styles';
+import MainMenuButton from './MainMenuButton';
+import ShortcutButtons from './shortcuts/ShortcutButtons';
+import useDeviceOrientation from '../../services/device/useDeviceOrientation';
 import * as themes from '../../shared/styles.constants';
 import IconButton from '../../shared/ui/buttons/IconButton';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import useDeviceOrientation from '../home/useDeviceOrientation';
+import MacrostratUnitInfo from '../maps/macrostrat/MacrostratUnitInfo';
 import MapContainer from '../maps/MapContainer';
+import {MapEditContext} from '../maps/MapEditContext';
+import {MAP_MODES} from '../maps/maps.constants';
 import {canceledIntervalDrag} from '../maps/maps.slice';
 import OfflineMapPreviewBanner from '../maps/offline-maps/OfflineMapPreviewBanner';
+import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import NotebookPanel from '../notebook-panel/NotebookPanel';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
 import BackupStatusIcons from '../project/backup/BackupStatusIcons';
 import SpotNavigator from '../spots/SpotNavigator';
 import useSpots from '../spots/useSpots';
@@ -28,15 +30,15 @@ import VersionCheckLabel from '../version-check/VersionCheckLabel';
 const Tab = createMaterialTopTabNavigator();
 
 const HomeViewSmallScreen = forwardRef(({
-                                          clickHandler,
                                           closeMainMenuPanel,
                                           closeNotebookPanel,
-                                          dialogClickHandler,
-                                          dialogs,
                                           distance,
                                           endMeasurement,
+                                          handleHomeAction,
+                                          handleHomeActionFromMapMenu,
                                           hasDrawTools,
                                           isCreateToolsDisabled,
+                                          mapMenus,
                                           mapMode,
                                           onCancel,
                                           onEndDrawPressed,
@@ -46,7 +48,7 @@ const HomeViewSmallScreen = forwardRef(({
                                           selectingMode,
                                           setDistance,
                                           setMapModeToEdit,
-                                          toggleDialog,
+                                          toggleMapMenu,
                                         }, mapComponentRef) => {
   console.log('Rendering HomeViewSmallScreen...');
 
@@ -55,6 +57,8 @@ const HomeViewSmallScreen = forwardRef(({
   const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const stratSection = useSelector(state => state.map.stratSection);
+  const {confirmLeavePage, hasUnsavedPageChanges, isPageChanged} = useContext(LeavePageContext);
+  const {confirmEndMapEditing, isMapEditing} = useContext(MapEditContext);
 
   const [isShowingSpotNavigator, setIsShowingSpotNavigator] = useState(false);
 
@@ -73,7 +77,10 @@ const HomeViewSmallScreen = forwardRef(({
     openSpotInNotebook(spot, notebookPage, attributes);
   };
 
-  const toggleSpotNavigator = () => {
+  // The navigator takes the place of the map, so a map edit ends first, and of the Notebook, so its page is asked about
+  const toggleSpotNavigator = async () => {
+    if (isMapEditing() && !await confirmEndMapEditing()) return;
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
     dispatch(canceledIntervalDrag());
     closeNotebookPanel();
     setIsShowingSpotNavigator(s => !s);
@@ -103,6 +110,9 @@ const HomeViewSmallScreen = forwardRef(({
         }
         centerContainerStyle={{justifyContent: 'center'}}
         edges={'top'}
+        // Skips Header's own <StatusBar> (it doesn't hide the bar): iOS sets the status bar natively, and RN's
+        // StatusBar module red-boxes there now that the appearance is view-controller-based.
+        hideStatusBar={Platform.OS === 'ios'}
         leftComponent={isShowingSpotNavigator && !isNotebookPanelVisible ? (
           <Icon
             color={themes.PRIMARY_TEXT_COLOR}
@@ -124,6 +134,9 @@ const HomeViewSmallScreen = forwardRef(({
         <Tab.Navigator
           screenListeners={{focus: () => dispatch(canceledIntervalDrag())}}
           screenOptions={{
+            // A swipe can't wait for an answer, so it is off while there is one to give: a map edit or interval drag
+            // to end before the Notebook shows, or a notebook page's unsaved changes before the Map does
+            swipeEnabled: mapMode !== MAP_MODES.EDIT && mapMode !== MAP_MODES.INTERVAL_DRAG && !isPageChanged,
             tabBarIndicatorContainerStyle: {backgroundColor: themes.SECONDARY_BACKGROUND_COLOR},
             tabBarIndicatorStyle: {backgroundColor: themes.BLACK, height: 5},
             tabBarItemStyle: {padding: 0},
@@ -132,6 +145,14 @@ const HomeViewSmallScreen = forwardRef(({
           }}
         >
           <Tab.Screen
+            // Showing the Map closes the Notebook and the page on it
+            listeners={({navigation}) => ({
+              tabPress: async (e) => {
+                if (!hasUnsavedPageChanges()) return;
+                e.preventDefault();
+                if (await confirmLeavePage()) navigation.navigate('Map');
+              },
+            })}
             name={'Map'}
             options={{
               ...NAVIGATION_OPTIONS,
@@ -153,14 +174,14 @@ const HomeViewSmallScreen = forwardRef(({
 
                 {currentImageBasemap && (
                   <IconButton
-                    onPress={() => clickHandler('closeImageBasemap')}
+                    onPress={() => handleHomeAction(HOME_ACTIONS.CLOSE_IMAGE_BASEMAP)}
                     source={require('../../assets/icons/Close.png')}
                     style={homeStyles.closeButtonSmallScreen}
                   />
                 )}
                 {stratSection && (
                   <IconButton
-                    onPress={() => clickHandler('closeStratSection')}
+                    onPress={() => handleHomeAction(HOME_ACTIONS.CLOSE_STRAT_SECTION)}
                     source={require('../../assets/icons/Close.png')}
                     style={homeStyles.closeButtonSmallScreen}
                   />
@@ -168,10 +189,7 @@ const HomeViewSmallScreen = forwardRef(({
 
                 {stratSection && !isCurrentMapReadOnly() && !isCreateToolsDisabled && (
                   <IconButton
-                    onPress={() => {
-                      dispatch(canceledIntervalDrag());
-                      dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_INTERVAL}));
-                    }}
+                    onPress={() => handleHomeAction(HOME_ACTIONS.ADD_INTERVAL)}
                     source={require('../../assets/icons/AddIntervalButton.png')}
                     style={homeStyles.addIntervalButton}
                   />
@@ -189,28 +207,42 @@ const HomeViewSmallScreen = forwardRef(({
                       : homeStyles.actionButtonsSmallScreenContainerLandscape]}
                 >
                   <ActionButtonsSmallScreen
-                    clickHandler={clickHandler}
-                    dialogClickHandler={dialogClickHandler}
-                    dialogs={dialogs}
                     distance={distance}
                     endMeasurement={endMeasurement}
+                    handleHomeAction={handleHomeAction}
+                    handleHomeActionFromMapMenu={handleHomeActionFromMapMenu}
                     hasDrawTools={hasDrawTools}
+                    mapMenus={mapMenus}
                     mapMode={mapMode}
                     onCancel={onCancel}
                     onEndDrawPressed={onEndDrawPressed}
                     openMainMenuPanel={openMainMenuPanel}
                     selectingMode={selectingMode}
-                    toggleDialog={toggleDialog}
+                    toggleMapMenu={toggleMapMenu}
                     zoomToCustomMap={bbox => mapComponentRef?.current?.zoomToCustomMap(bbox)}
                   />
                 </View>
+
+                {/* After the buttons so it covers them */}
+                <MacrostratUnitInfo/>
 
                 <OfflineMapPreviewBanner/>
                 <VersionCheckLabel/>
               </>
             }
           </Tab.Screen>
-          <Tab.Screen name={'Notebook'} options={NAVIGATION_OPTIONS}>
+          <Tab.Screen
+            // While editing, the tab opens the notebook through openNotebookPanel, which ends the edit first
+            listeners={{
+              tabPress: (e) => {
+                if (!isMapEditing()) return;
+                e.preventDefault();
+                openNotebookPanel();
+              },
+            }}
+            name={'Notebook'}
+            options={NAVIGATION_OPTIONS}
+          >
             {() =>
               <NotebookPanel
                 closeNotebookPanel={closeNotebookPanel}

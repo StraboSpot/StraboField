@@ -40,6 +40,7 @@ const MorePagesMenu = ({
   // The first section has no header, so there is nothing to fold it away with
   const isSectionShown = (title, sectionIndex) => sectionIndex === 0 || !morePagesSectionsCollapsed.includes(title);
 
+  // Unsaved changes on the page being left were asked about as this menu opened (NotebookFooter)
   const switchPage = (key) => {
     dispatch(setNotebookPageVisible(key));
     closeMorePagesMenu();

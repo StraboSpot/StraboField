@@ -21,8 +21,8 @@ const initialHomeState = {
   },
   messageModal: {isVisible: false, message: '', title: ''},
   modalValues: {},
-  modalVisible: null,
-  // The next modal to show once the current one has finished dismissing (iOS two-phase switch). See setModalVisible.
+  activeModal: null,
+  // The next modal to show once the current one has finished dismissing (iOS two-phase switch). See setActiveModal.
   pendingModal: null,
   hiddenWarnings: {},
   isBackupModalVisible: false,
@@ -134,24 +134,24 @@ const homeSlice = createSlice({
     // single commit runs a present and a dismiss concurrently, which trips UIViewControllerHierarchyInconsistency
     // (a fatal crash, Sentry STRABOSPOT-2-6JN) or silently drops the incoming modal. Two-phase it on iOS: dismiss the
     // current modal now and stash the next key in pendingModal, then let applyPendingModal show it once the dismiss
-    // transition has finished (driven centrally in OverlaysContainer, with ModalWrapper's onDismiss as a fast path).
+    // transition has finished (driven centrally in ModalsContainer, with ModalWrapper's onDismiss as a fast path).
     // Other platforms have no such race, so they swap directly.
-    setModalVisible(state, action) {
+    setActiveModal(state, action) {
       const next = action.payload.modal;
-      if (Platform.OS === 'ios' && next && state.modalVisible && next !== state.modalVisible) {
+      if (Platform.OS === 'ios' && next && state.activeModal && next !== state.activeModal) {
         state.pendingModal = next;
-        state.modalVisible = null;
+        state.activeModal = null;
       }
       else {
         state.pendingModal = null;
-        state.modalVisible = next;
+        state.activeModal = next;
       }
     },
     // Show the modal queued by a two-phase switch, once the outgoing modal has dismissed. A no-op when nothing is
     // queued, so it is safe to fire from both the transition timer and onDismiss.
     applyPendingModal(state) {
       if (state.pendingModal == null) return;
-      state.modalVisible = state.pendingModal;
+      state.activeModal = state.pendingModal;
       state.pendingModal = null;
     },
     setShortcutSwitchPositions(state, action) {
@@ -197,7 +197,7 @@ export const {
   setLoadingStatus,
   setMapImportProgress,
   setModalValues,
-  setModalVisible,
+  setActiveModal,
   setShortcutSwitchPositions,
   setStatusMessageModalTitle,
 } = homeSlice.actions;

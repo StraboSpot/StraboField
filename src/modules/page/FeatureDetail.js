@@ -1,0 +1,496 @@
+import React, {useContext, useEffect, useRef, useState} from 'react';
+import {Linking, Platform, Text, View} from 'react-native';
+
+import {Icon} from '@rn-vui/base';
+import {useToast} from 'react-native-toast-notifications';
+import {useDispatch, useSelector} from 'react-redux';
+
+import {resolveLabelOnSave} from './featureLabels.helpers';
+import PageHeader from './PageHeader';
+import {PAGE_KEYS} from './pageKeys.constants';
+import {isEmpty, toTitleCase} from '../../shared/helpers';
+import {PRIMARY_ACCENT_COLOR, RED} from '../../shared/styles.constants';
+import alert from '../../shared/ui/alert';
+import DeleteButton from '../../shared/ui/buttons/DeleteButton';
+import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
+import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import {setOrientationFieldValue} from '../compass/compass.helpers';
+import Form from '../form/Form';
+import FormFlatList from '../form/FormFlatList';
+import FormikWrapper from '../form/FormikWrapper';
+import useForm from '../form/useForm';
+import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
+import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
+import {setMineralFieldValue} from '../petrology/minerals/minerals.helpers';
+import usePetrology from '../petrology/usePetrology';
+import {addedSampleSpotIdToUpload, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {SAMPLE_IGSN_KEY, SAMPLES_PAGE_URL} from '../samples/samples.constants';
+import sampleStyles from '../samples/samples.styles';
+import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
+import {getRequiredLithologyKeys, hasOtherLithologyTabData} from '../sed/sed.helpers';
+import SedRockLithologyNote from '../sed/SedRockLithologyNote';
+import useSed from '../sed/useSed';
+import {deselectedAttributes, editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
+import useSpots from '../spots/useSpots';
+import useTags from '../tags/useTags';
+import TemplateNameField from '../templates/TemplateNameField';
+import {TEMPLATE_FIELD_LABELS} from '../templates/templates.constants';
+import {getTemplateSurvey, validateTemplateName} from '../templates/templates.helpers';
+import {THREE_D_STRUCTURE_ORIENTATION_FIELDS} from '../three-d-structures/threeDStructures.constants';
+import {messages} from './ui/Messages';
+
+// Formik's dirty flag only exists inside the form, and Save is drawn outside it, so pass it up as it changes
+const FormDirtyReporter = ({dirty, setIsFormDirty}) => {
+  useEffect(() => setIsFormDirty(dirty), [dirty]);
+  return null;
+};
+
+const FeatureDetail = ({
+                           PageTabsComponent,
+                           closeDetailView,
+                           deleteTemplate,
+                           groupKey = 'general',
+                           isReadOnly,
+                           page,
+                           registerGetValues,
+                           registerSaveChanges,
+                           saveTemplate,
+                           selectedFeature,
+                           // Reports the fields in error up to a tabbed page, so it can mark the tab holding one
+                           setInvalidFields,
+                           siblingSurvey,
+                           // Shown in place of the form, for a tab with something else to show. The form stays
+                           // mounted, hidden, so what is typed in it is still there on coming back to its tab.
+                           tabContent,
+                         }) => {
+  /* Data Hooks */
+
+  const dispatch = useDispatch();
+  const {isOwner} = useSelector(state => state.project.project);
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
+  const spot = useSelector(state => state.spot.selectedSpot);
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
+
+  const {getLabel, getLabels, getSurvey, showErrors, submitAndShowErrors, validateForm} = useForm();
+  const {deletePetFeature, savePetFeature} = usePetrology();
+  const {deleteSedFeature, saveSedBedFeature, saveSedFeature, setSedFieldValue} = useSed();
+  const {checkSampleName} = useSpots();
+  const {deleteFeatureTags} = useTags();
+  const toast = useToast();
+
+  // Save on the way out is this page's Save, held for the same reasons, so a value that needs fixing keeps the page
+  // open to fix it. A template (saveTemplate given) registers with TemplatesPicker's gate instead.
+  const formRef = useRef(null);
+  const {
+    hasUnsavedChanges,
+    isFormDirty,
+    isFormInvalid,
+    markSaved,
+    setIsFormDirty,
+    setIsFormInvalid,
+  } = useUnsavedFormChanges({
+    formRef: formRef,
+    getMessage: () => `Your changes to this ${title}${saveTemplate ? ' template' : ''} haven't been saved.`,
+    onDiscard: closeDetailView,
+    save: () => (saveTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current)),
+  });
+
+  /* Local State */
+
+  // The selection as this view last showed it, which is all it may drop as it closes
+  const selectedAttributesRef = useRef(selectedAttributes);
+  selectedAttributesRef.current = selectedAttributes;
+
+  const [initialValues, setInitialValues] = useState(selectedFeature);
+  const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
+
+  /* Derived Variables */
+
+  const pageKey = page.key === PAGE_KEYS.FABRICS && selectedFeature.type === 'fabric' ? '_3d_structures'
+    : page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : page.key;
+  let pageData = pageKey === PAGE_KEYS.NOTES ? {} : [];
+  if (spot && spot.properties) {
+    if (spot.properties[groupKey] && spot.properties[groupKey][pageKey]) pageData = spot.properties[groupKey][pageKey];
+    else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
+  }
+  const isTemplate = saveTemplate;
+  // A feature with nothing changed has nothing to save
+  const isFeatureUnchanged = !isFormDirty;
+  // An upload brings a sample's changes to strabospot.org but not to SESAR, which the user sends it to from there
+  const hasIGSN = pageKey === PAGE_KEYS.SAMPLES && !isTemplate && !!selectedFeature[SAMPLE_IGSN_KEY];
+  // Only the project owner may change a sample with an IGSN
+  const isNonOwnerRegisteredSample = hasIGSN && isOwner === false;
+  // Pages whose form fills one orientation field in from another name the pairs it uses
+  const orientationFields = page.key === PAGE_KEYS.THREE_D_STRUCTURES ? THREE_D_STRUCTURE_ORIENTATION_FIELDS
+    : page.key === PAGE_KEYS.EARTHQUAKES ? EARTHQUAKE_ORIENTATION_FIELDS
+      : undefined;
+  const title = groupKey === 'pet' && pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS
+  && !selectedFeature.rock_type && selectedFeature.igneous_rock_class
+    ? toTitleCase(selectedFeature.igneous_rock_class.replace('_', ' ') + ' Rock')
+    : page.label_singular || toTitleCase(page.label).slice(0, -1);
+
+  /* Side Effects */
+
+  useEffect(() => {
+    console.log('UE FeatureDetail []');
+    setInitialValues(selectedFeature);
+    return () => {
+      if (registerGetValues) registerGetValues.current = null;
+      if (registerSaveChanges) registerSaveChanges.current = null;
+      dispatch(deselectedAttributes(selectedAttributesRef.current));
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log('UE FeatureDetail [selectedFeature]', selectedFeature);
+    setInitialValues(selectedFeature);
+    if (!isTemplate && isEmpty(selectedFeature)) closeDetailView();
+  }, [selectedFeature]);
+
+  /* Event Handlers */
+
+  const onSubmitForm = (values, {resetForm}) => {
+    console.log('Submitting form...', values);
+    setInitialValues(values);
+    resetForm({values});
+    console.log('Reset form...');
+  };
+
+  /* Logic Helpers */
+
+  const cancelForm = async () => {
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
+    closeDetailView();
+  };
+
+  const deleteFeature = () => {
+    if (groupKey === 'pet') deletePetFeature(pageKey, spot, selectedFeature);
+    else if (groupKey === 'sed') {
+      // A sed delete can be refused - an interval cannot be left without a lithology - and then nothing else happens
+      if (!deleteSedFeature(pageKey, spot, selectedFeature)) return;
+    }
+    else {
+      let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
+      editedPageData = editedPageData.filter(f => f.id !== selectedFeature.id);
+      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
+      dispatch(editedSpotProperties({field: pageKey, value: editedPageData}));
+    }
+    deleteFeatureTags([selectedFeature]);
+    dispatch(setSelectedAttributes([]));
+    closeDetailView();
+  };
+
+  const deleteFeatureConfirm = () => {
+    if (pageKey === PAGE_KEYS.SAMPLES && selectedFeature.isOnMySesar) {
+      setIsDeleteOverlayVisible(true);
+    }
+    else {
+      alert('Delete ' + title,
+        'Are you sure you would like to delete this ' + title + '?',
+        [
+          {
+            text: 'No',
+            style: 'cancel',
+          },
+          {
+            text: 'Yes',
+            onPress: () => deleteFeature(),
+          },
+        ],
+        {cancelable: false},
+      );
+    }
+  };
+
+  const getFormName = () => {
+    let formName = [groupKey, pageKey];
+    if (groupKey === 'pet' && selectedFeature.rock_type) formName = ['pet_deprecated', pageKey];
+    else if (groupKey === 'pet' && pageKey === 'igneous') formName = [groupKey, selectedFeature.igneous_rock_class];
+    else if (pageKey === '_3d_structures' || pageKey === 'fabrics') formName = [pageKey, selectedFeature.type];
+    else if (page.subkey) formName = [pageKey, page.subkey];
+    console.log('Rendering form:', formName[0] + '.' + formName[1]);
+    return formName;
+  };
+
+  // A lithology in an interval mapped on a strat section has to answer fields its survey marks optional, which a
+  // survey rule cannot express because it turns on the Spot rather than the form. The lithology is one record
+  // across its tabs, so all of them hold Save until it is complete, while each tab marks the fields it shows.
+  const getRequiredFields = (values) => {
+    if (groupKey !== 'sed' || !Object.values(LITHOLOGY_SUBPAGES).includes(pageKey)) return [];
+    return getRequiredLithologyKeys(values, spot);
+  };
+
+  const getIsDisabled = fieldName => isReadOnly || fieldName === SAMPLE_IGSN_KEY;
+
+  // Fields a feature requires beyond its survey are checked with it, so they hold Save the same way
+  const validateFeature = (formName, values) => {
+    const {errors} = validateForm({formName: formName, values: values});
+    // Every tab edits the same record, so a field left unanswered on another tab holds Save just as one here
+    // does, and SubpageTabs marks the tab holding it. Errors only - what a save writes is still cleaned by the
+    // survey of the tab being shown, which is also the reading that wins for a field both tabs define.
+    const siblingErrors = siblingSurvey ? validateForm({survey: siblingSurvey, values: values}).errors : {};
+    const templateErrors = isTemplate ? validateTemplateName(values) : {};
+    return getRequiredFields(values).reduce((acc, key) => (isEmpty(values[key]) ? {...acc, [key]: 'Required'} : acc),
+      {...siblingErrors, ...errors, ...templateErrors});
+  };
+
+  const saveButtonOnPress = () => {
+    isTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current);
+  };
+
+  const saveFeature = async (formCurrent) => {
+    try {
+      const {errors, values} = await submitAndShowErrors(formRef.current || formCurrent);
+      // page.key rather than pageKey: a deprecated fabric is stored with the 3D structures but is still titled
+      // as a fabric
+      const editedFeatureData = resolveLabelOnSave(
+        {pageKey: page.key, previousFeature: selectedFeature, values: values, getLabel: getLabel,
+          getLabels: getLabels});
+      console.log('Saving', page.label, 'data', editedFeatureData, 'to Spot', pageData);
+      let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
+      const i = editedPageData.findIndex(f => f.id === editedFeatureData.id);
+      if (i === -1) editedPageData.push(editedFeatureData);
+      else editedPageData.splice(i, 1, editedFeatureData);
+      const spotId = spot.properties.id;
+      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
+      dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
+      if (page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web') dispatch(addedSampleSpotIdToUpload(spotId));
+
+      if (page.key === PAGE_KEYS.SAMPLES && editedFeatureData.sample_id_name) {
+        if (spot.properties.isSample && spot.properties.name !== editedFeatureData.sample_id_name) {
+          dispatch(editedSpotProperties({field: 'name', value: editedFeatureData.sample_id_name, spotId: spotId}));
+        }
+        await checkSampleName(editedFeatureData.sample_id_name);
+      }
+      // Reported up so the caller can tell a full save from a partial one
+      return errors;
+    }
+    catch (err) {
+      console.error('Error saving', pageKey, err);
+      throw err;
+    }
+  };
+
+  // The values the open form would save, for a caller that is about to write them somewhere itself. The samples
+  // footer converts a sample to a rich sample while this form is open (NotebookFooter) and puts these values in
+  // the new sample. They are deliberately not written to this Spot on the way: the conversion replaces the
+  // sample here with nothing but its id a moment later, so saving first only adds a write that is immediately
+  // undone - and on web every write is an upload, of a Spot that is already about to change again.
+  // Refuses the same way a save would, alerting and throwing, so a caller cannot carry a bad value forward.
+  const getOpenFeatureValues = async () => {
+    const formCurrent = formRef.current;
+    if (isReadOnly || isTemplate || !formCurrent?.dirty) return undefined;
+    const errors = await formCurrent.validateForm();
+    const values = showErrors({...formCurrent, errors: errors});
+    // Marks these values as dealt with, so leaving the page does not go on to ask about them
+    markSaved();
+    return values;
+  };
+
+  // Resolves whether the changes were saved
+  const saveForm = async (formCurrent) => {
+    try {
+      console.log('Saving form...', formCurrent);
+      if (isNonOwnerRegisteredSample) {
+        toast.show('Only the project owner may update a sample with an IGSN', {type: 'warning'});
+        return false;
+      }
+      let errors;
+      if (groupKey === 'pet') {
+        errors = await savePetFeature(pageKey, spot, formRef.current || formCurrent, selectedFeature);
+      }
+      else if (groupKey === 'sed' && pageKey === 'bedding') {
+        errors = await saveSedBedFeature(pageKey, spot, formRef.current || formCurrent, selectedFeature);
+      }
+      else if (groupKey === 'sed') {
+        errors = await saveSedFeature(pageKey, spot, formRef.current || formCurrent, undefined, selectedFeature);
+      }
+      else errors = await saveFeature(formCurrent);
+      markSaved();
+      // A value already invalid when the form opened is rolled back and the rest saved, so don't claim a full save
+      if (Platform.OS !== 'web' && isEmpty(errors)) toast.show('Changes Saved', {type: 'success'});
+      closeDetailView();
+      console.log('Done');
+      return true;
+    }
+    catch (err) {
+      toast.show('Error Saving Changes', {type: 'danger'});
+      console.error('ERROR saving form', err);
+      return false;
+    }
+  };
+
+  // Save the open form in place for a parent-owned action that needs the stored record up to date before it goes on
+  // (see NotebookMenu's Link Sample), resolving whether it was saved
+  const saveOpenChanges = async () => {
+    const formCurrent = formRef.current;
+    try {
+      await saveFeature(formCurrent);
+      markSaved();
+      return true;
+    }
+    catch (err) {
+      // The form refused the values and has said why, so nothing was saved
+      console.error('Open changes not saved', err);
+      return false;
+    }
+  };
+
+  // Always resolves true for the gate, which already holds Save while the form has errors
+  const saveTemplateForm = async (formCurrent) => {
+    const {values: formValues} = await submitAndShowErrors(formRef.current || formCurrent);
+    markSaved();
+    saveTemplate(formValues);
+    return true;
+  };
+
+  // Expose the values to a parent-owned button that carries this form's edits somewhere (see NotebookFooter)
+  if (registerGetValues) registerGetValues.current = getOpenFeatureValues;
+  if (registerSaveChanges && !isReadOnly) {
+    registerSaveChanges.current = {getHasUnsavedChanges: hasUnsavedChanges, saveChanges: saveOpenChanges};
+  }
+
+  /* Render Functions */
+
+  const renderFormFields = () => {
+    const formName = getFormName();
+    return (
+      <View style={{flex: 1}}>
+        <FormikWrapper
+          enableReinitialize={true}
+          fieldLabels={isTemplate ? TEMPLATE_FIELD_LABELS : undefined}
+          formName={formName}
+          initialValues={initialValues}
+          innerRef={formRef}
+          onReset={() => console.log('Resetting form...')}
+          onSubmit={onSubmitForm}
+          setInvalidFields={setInvalidFields}
+          setIsFormDirty={setIsFormDirty}
+          setIsFormInvalid={setIsFormInvalid}
+          validate={values => validateFeature(formName, values)}
+        >
+          {formProps => (
+            <>
+              <FormDirtyReporter dirty={formProps.dirty} setIsFormDirty={setIsFormDirty}/>
+              {isTemplate && <TemplateNameField/>}
+              <Form
+                {...formProps}
+                formName={formName}
+                getIsDisabled={getIsDisabled}
+                isReadOnly={isReadOnly}
+                requiredFields={getRequiredFields(formProps.values)}
+                setFieldValueOverride={page.key === PAGE_KEYS.MINERALS
+                  ? ((name, value) => setMineralFieldValue(formRef.current, name, value))
+                  : page.key === LITHOLOGY_SUBPAGES.LITHOLOGY
+                    ? ((name, value) => setSedFieldValue(formRef.current, name, value))
+                    : undefined}
+                setNumberFieldValueOverride={orientationFields
+                  ? ((name, value) => setOrientationFieldValue(formRef.current, name, value,
+                    {orientationFields: orientationFields}))
+                  : undefined}
+                siblingSurvey={siblingSurvey}
+                surveyFragment={isTemplate ? getTemplateSurvey(getSurvey(formName)) : undefined}
+              />
+            </>
+          )}
+        </FormikWrapper>
+        {/* A template can be deleted once saved, when TemplatesPicker hands over deleteTemplate */}
+        {!isReadOnly && (!isTemplate || !!deleteTemplate) && (
+          <DeleteButton
+            onPress={() => isTemplate ? deleteTemplate() : deleteFeatureConfirm()}
+            title={'Delete ' + title + (isTemplate ? ' Template' : '')}
+          />
+        )}
+      </View>
+    );
+  };
+
+  /* View */
+
+  return (
+    <>
+      <View style={{flex: 1}}>
+        {(isTemplate || !isEmpty(selectedFeature)) && (
+          <>
+            {/* A tab showing its own content hides Save and Cancel, so it is left by the back button. A template is
+             edited in a modal whose header already names it. */}
+            {!isTemplate && (
+              <PageHeader
+                hideBackButton={!isReadOnly && !tabContent}
+                onPressBack={cancelForm}
+                pageTitle={title + ' Detail'}
+              />
+            )}
+            {PageTabsComponent && PageTabsComponent}
+            {tabContent}
+            {!isReadOnly && !tabContent && (
+              <>
+                <SaveAndCancelButtons
+                  cancel={cancelForm}
+                  getIsDisabled={isFormInvalid || isFeatureUnchanged || isNonOwnerRegisteredSample}
+                  save={saveButtonOnPress}
+                />
+                {isNonOwnerRegisteredSample && (
+                  <Text style={{color: RED, paddingBottom: 10, paddingHorizontal: 10, textAlign: 'center'}}>
+                    Only the project owner may update a sample with an IGSN
+                  </Text>
+                )}
+                {hasIGSN && isFormDirty && !isNonOwnerRegisteredSample && (
+                  <View style={sampleStyles.infoCallout}>
+                    <Icon color={PRIMARY_ACCENT_COLOR} name={'information-circle-outline'} size={22} type={'ionicon'}/>
+                    <Text style={sampleStyles.infoCalloutText}>
+                      This sample has an IGSN. Uploading the project saves your changes to StraboSpot, but SESAR is
+                      not updated automatically. After uploading, send the sample to SESAR from the{' '}
+                      <Text onPress={() => Linking.openURL(SAMPLES_PAGE_URL)} style={sampleStyles.infoCalloutLink}>
+                        Samples page
+                      </Text>
+                      {' '}{'>'} IGSNs on strabospot.org.
+                    </Text>
+                  </View>
+                )}
+              </>
+            )}
+            {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon'}*/}
+            {page.key === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY && !isTemplate
+              && hasOtherLithologyTabData(selectedFeature) && (
+              <SedRockLithologyNote lithology={selectedFeature}/>
+            )}
+            <View style={tabContent ? {display: 'none'} : {flex: 1}}>
+              <FormFlatList contentContainerStyle={{paddingBottom: 200}}>
+                {renderFormFields()}
+              </FormFlatList>
+            </View>
+          </>
+        )}
+        {/*Modal when deleting a sample with an IGSN attached*/}
+        <ModalWrapper
+          actionTitle={'Delete'}
+          headerTitle={'Delete Sample'}
+          isVisible={isDeleteOverlayVisible}
+          onActionPressed={deleteFeature}
+          onCancelPress={() => setIsDeleteOverlayVisible(false)}
+          overlayStyleOverride={{height: '40%'}}
+        >
+          <View style={{
+            flex: 1,
+            paddingVertical: 10,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'yellow',
+          }}>
+            <Text style={{...overlayStyles.titleText, color: RED}}>WARNING!</Text>
+            <Text style={{...overlayStyles.titleText, color: RED}}>{messages.delete.title}</Text>
+          </View>
+          <View style={{flex: 4, justifyContent: 'center', alignItems: 'center'}}>
+            <Text
+              style={{...overlayStyles.statusMessageText, fontSize: 16, fontWeight: '500'}}>{messages.delete.message}
+            </Text>
+          </View>
+        </ModalWrapper>
+      </View>
+    </>
+  );
+};
+
+export default FeatureDetail;

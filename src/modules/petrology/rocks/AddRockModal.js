@@ -21,11 +21,11 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import Form from '../../form/Form';
 import FormikWrapper from '../../form/FormikWrapper';
 import useForm from '../../form/useForm';
-import {setModalValues, setModalVisible} from '../../home/home.slice';
+import {setActiveModal, setModalValues} from '../../home/home.slice';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import useSed from '../../sed/useSed';
 import {getActiveTemplateList, getIsTemplateInUse} from '../../templates/templates.helpers';
-import TemplatesNotebook from '../../templates/TemplatesNotebook';
+import TemplatesPicker from '../../templates/TemplatesPicker';
 import usePetrology from '../usePetrology';
 
 const AddRockModal = ({modalKey}) => {
@@ -42,6 +42,7 @@ const AddRockModal = ({modalKey}) => {
 
   /* Local State */
 
+  const closeTemplatesRef = useRef(null);
   const formRef = useRef(null);
 
   const [choices, setChoices] = useState({});
@@ -51,6 +52,7 @@ const AddRockModal = ({modalKey}) => {
   const [rockKey, setRockKey] = useState(null);
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
   const [survey, setSurvey] = useState({});
+  const [templatesHeaderTitle, setTemplatesHeaderTitle] = useState(null);
 
   /* Derived Variables */
 
@@ -96,8 +98,8 @@ const AddRockModal = ({modalKey}) => {
 
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
-    else if (isShowTemplates) setIsShowTemplates(false);
-    else dispatch(setModalVisible({modal: null}));
+    else if (isShowTemplates) closeTemplatesRef.current();
+    else dispatch(setActiveModal({modal: null}));
   };
 
   const onIgneousRockTypePress = (i) => {
@@ -170,6 +172,7 @@ const AddRockModal = ({modalKey}) => {
       <ModalWrapper
         buttonTitleRight={choicesViewKey ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseModalPressed}
+        headerTitle={isShowTemplates ? templatesHeaderTitle : undefined}
         onActionPressed={saveRock}
         showActionButton={!isShowTemplates && !choicesViewKey}
         showCancelButton={false}
@@ -187,10 +190,12 @@ const AddRockModal = ({modalKey}) => {
           />
         )}
         {!choicesViewKey && (
-          <TemplatesNotebook
+          <TemplatesPicker
             isShowTemplates={isShowTemplates}
+            registerCloseTemplates={closeTemplatesRef}
             rockKey={rockKey}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}
+            setTemplatesHeaderTitle={setTemplatesHeaderTitle}
           />
         )}
         {!isShowTemplates && renderAddRock()}

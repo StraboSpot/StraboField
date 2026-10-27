@@ -1,3 +1,5 @@
+import {Linking, Platform} from 'react-native';
+
 import * as turf from '@turf/turf';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
@@ -10,11 +12,17 @@ import {
   getUnlinkedSample,
   isSampleStub,
 } from './samples.helpers';
+import {SAMPLES_PATHS} from '../../services/network/urls.constants';
 import {isEmpty} from '../../shared/helpers';
+import alert from '../../shared/ui/alert';
 import {hasValidCoords} from '../maps/maps.helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {addedNewSpotIdToDataset, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {
+  addedNewSpotIdToDataset,
+  addedSampleSpotIdToUpload,
+  updatedModifiedTimestampsBySpotsIds,
+} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {isOnGeoMap} from '../spots/spots.helpers';
 import {
@@ -32,6 +40,8 @@ const useSamples = () => {
   const dispatch = useDispatch();
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
+  const sampleSpotIdsToUpload = useSelector(state => state.project.sampleSpotIdsToUpload);
+  const straboUserId = useSelector(state => state.user?.straboUserId);
 
   const {getTargetDatasetFromId} = useProject();
   const {deleteSpot, getRootSpotGeoCoords} = useSpots();
@@ -110,6 +120,7 @@ const useSamples = () => {
     console.log('Creating new Enriched Sample:', newEnrichedSample);
     dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newEnrichedSample.properties.id}));
     dispatch(editedOrCreatedSpot(newEnrichedSample));
+    if (Platform.OS !== 'web') dispatch(addedSampleSpotIdToUpload(newEnrichedSample.properties.id));
 
     // Modify current sample in Spot object to only have id of new Sample Spot
     let editedSample = {id: selectedSample.id};
@@ -193,6 +204,20 @@ const useSamples = () => {
     }
   };
 
+  const openUploadedSamplePage = sampleId => Linking.openURL(`${SAMPLES_PATHS.WEB_SAMPLE}${straboUserId}/${sampleId}`);
+
+  // IGSNs are minted and sent to SESAR on strabospot.org, which can only work from what has been uploaded there.
+  // A guest has no account to upload to.
+  const openSamplePage = (sampleId, startUpload) => {
+    if (!straboUserId || sampleSpotIdsToUpload.includes(sampleId)) {
+      alert('Upload Project First',
+        'This sample, or its latest changes, is not on your StraboSpot account yet. Upload the project to your '
+        + 'account first.',
+        [{text: 'Not Now', style: 'cancel'}, {text: 'Upload', onPress: startUpload}]);
+    }
+    else openUploadedSamplePage(sampleId);
+  };
+
   return {
     createRichSample,
     deleteRichSample,
@@ -200,6 +225,8 @@ const useSamples = () => {
     getSelectedSampleGeometry,
     linkSample,
     unlinkSample,
+    openSamplePage,
+    openUploadedSamplePage,
   };
 };
 

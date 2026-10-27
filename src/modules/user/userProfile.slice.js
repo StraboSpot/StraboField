@@ -23,15 +23,6 @@ const initialUserState = {
 
   measurement_convention: 'strike_dip',
   name: null,
-  orcidToken: null,
-  sesar: {
-    selectedUserCode: null,
-    userCodes: [],
-    sesarToken: {
-      access: '',
-      refresh: '',
-    },
-  },
   straboUserId: null,
 };
 
@@ -49,9 +40,6 @@ const userProfileSlice = createSlice({
     resetUserState() {
       return initialUserState;
     },
-    setInitialSesarState(state) {
-      state.sesar = initialUserState.sesar;
-    },
     addedCheckedInSpotId(state, action) {
       if (!state.macrostrat.checkedInSpotIds.includes(action.payload)) {
         state.macrostrat.checkedInSpotIds.push(action.payload);
@@ -60,17 +48,6 @@ const userProfileSlice = createSlice({
     setMacrostratToken(state, action) {
       state.macrostrat.token = action.payload.token;
       state.macrostrat.expires = action.payload.expires;
-    },
-    setSelectedUserCode(state, action) {
-      state.sesar.selectedUserCode = action.payload;
-    },
-    setSesarToken(state, action) {
-      const {access, refresh} = action.payload;
-      state.sesar.sesarToken.access = access;
-      state.sesar.sesarToken.refresh = refresh;
-    },
-    setSesarUserCodes(state, action) {
-      state.sesar.userCodes = action.payload;
     },
     setUserData(state, action) {
       Object.assign(state, {...state, ...action.payload});
@@ -86,12 +63,7 @@ export const {
   login,
   logout,
   resetUserState,
-  setInitialSesarState,
   setMacrostratToken,
-  setOrcidToken,
-  setSelectedUserCode,
-  setSesarToken,
-  setSesarUserCodes,
   setUserData,
   updatedKey,
 } = userProfileSlice.actions;

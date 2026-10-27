@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Platform, Text, TextInput, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
@@ -13,6 +13,7 @@ import {POSITIVE_COLOR, WARNING_COLOR} from '../../../shared/styles.constants';
 import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import DeleteConformationDialogBox from '../../../shared/ui/modals/DeleteConformationDialogBox';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
+import TextInput from '../../../shared/ui/TextInput';
 import formStyles from '../../form/form.styles';
 import FormFlatList from '../../form/FormFlatList';
 import FormikWrapper from '../../form/FormikWrapper';

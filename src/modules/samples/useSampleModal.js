@@ -8,7 +8,7 @@ import useSamples from './useSamples';
 import {getNewId, isEmpty, numToLetter, sleep, toError} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import useForm from '../form/useForm';
-import {setLoadingStatus, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setLoadingStatus} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
@@ -20,7 +20,7 @@ const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCur
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const modalVisible = useSelector(state => state.home.modalVisible);
+  const activeModal = useSelector(state => state.home.activeModal);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const spot = useSelector(state => state.spot.selectedSpot);
 
@@ -57,7 +57,7 @@ const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCur
   useEffect(() => {
     console.log('UE SampleModal [spot]', spot);
     if (preferences.prepend_spot_name_sample_name && !spot.properties?.isSample) {
-      const spotName = modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE || !spot
+      const spotName = activeModal === MODAL_KEYS.SHORTCUTS.SAMPLE || !spot
         ? getNewSpotName()
         : spot?.properties?.name;
       setNamePrefix(spotName + initialNamePrefix);
@@ -82,12 +82,12 @@ const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCur
 
   /* Internal Functions */
 
-  const closeModal = () => dispatch(setModalVisible({modal: null}));
+  const closeModal = () => dispatch(setActiveModal({modal: null}));
 
   /* Exported Functions */
 
   const confirmCloseModal = () => {
-    if (formRef.current?.dirty && modalVisible !== MODAL_KEYS.SHORTCUTS.SAMPLE) {
+    if (formRef.current?.dirty && activeModal !== MODAL_KEYS.SHORTCUTS.SAMPLE) {
       setCurrentForm(formRef.current);
       setIsWarningModalVisible(true);
     }
@@ -119,7 +119,7 @@ const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCur
         id: newId,
       };
 
-      if (modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
+      if (activeModal === MODAL_KEYS.SHORTCUTS.SAMPLE) {
         const pointSetAtCurrentLocation = await setPointAtCurrentLocation();
         pointSetAtCurrentLocation.properties.samples = [newSample];
         console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
@@ -134,7 +134,7 @@ const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCur
         if (Platform.OS !== 'web') toast.show('Sample Saved!', {duration: 2000, placement: 'top', type: 'success'});
       }
       else {
-        dispatch(setModalVisible({modal: null}));
+        dispatch(setActiveModal({modal: null}));
         createRichSample(spot, newSample, sampleImages);
         dispatch(updatedProject({
           field: 'preferences',

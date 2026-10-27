@@ -7,7 +7,7 @@ import {getReportsAtSpot, getReportsToList} from './reports.helpers';
 import ReportsListItem from './ReportsListItem';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
@@ -29,7 +29,7 @@ const ReportsOverview = ({page}) => {
 
   const onReportPressed = (report) => {
     dispatch(setModalValues(report));
-    dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
+    dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
   };
 
   /* View */

@@ -72,15 +72,6 @@ NetInfo.configure({
 });
 
 
-const linking = Platform.OS !== 'web' && {
-  prefixes: ['strabofield://'], // Custom URL scheme
-  config: {
-    screens: {
-      HomeScreen: 'orcid_id/:orcidToken', // Default screen
-    },
-  },
-};
-
 // persistor.purge(); // Use this to clear persistStore completely
 
 const renderErrorFallback = props => <AppErrorFallback {...props}/>;
@@ -113,11 +104,13 @@ const App = () => {
             <ToastWrapper>
               <PersistGate loading={null} onBeforeLift={onBeforeLift} persistor={persistor}>
                 {/*<Sentry.TouchEventBoundary>*/}
-                {!SMALL_SCREEN && <StatusBar hidden/>}
+                {/* iOS sets the status bar natively (RootViewController in AppDelegate.swift); <StatusBar> there is a
+                    red-box error since the appearance is view-controller-based. */}
+                {Platform.OS !== 'ios' && !SMALL_SCREEN && <StatusBar hidden/>}
                 <ConnectionStatus/>
                 <ProfileSyncListener/>
                 <MacrostratAuthRedirectHandler/>
-                <NavigationContainer linking={linking}>
+                <NavigationContainer>
                   <Routes/>
                 </NavigationContainer>
                 {/*</Sentry.TouchEventBoundary>*/}

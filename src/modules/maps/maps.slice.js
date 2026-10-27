@@ -31,6 +31,10 @@ const initialMapsState = {
   isShowSamplesOn: false,
   mapSymbols: [],
   selectedCustomMapToEdit: {},
+  snapping: {
+    isOn: false,
+    pixelTolerance: 15, // screen points within which a new or moved vertex snaps to a Spot
+  },
   spotsInMapExtentIds: [],
   stratSection: undefined,
   tagTypeForColor: undefined,
@@ -156,6 +160,9 @@ const mapsSlice = createSlice({
       // console.log('Set Map Symbols', action.payload);
       state.mapSymbols = action.payload;
     },
+    setSnapping(state, action) {
+      state.snapping = {...state.snapping, ...action.payload};
+    },
     setSpotsInMapExtentIds(state, action) {
       state.spotsInMapExtentIds = action.payload;
     },
@@ -220,6 +227,7 @@ export const {
   setIsShowSamplesOn,
   setLabelTypeOn,
   setMapSymbols,
+  setSnapping,
   setSpotsInMapExtentIds,
   setStratSection,
   setTagTypeForColor,

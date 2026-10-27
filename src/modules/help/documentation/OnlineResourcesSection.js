@@ -3,7 +3,7 @@ import {View} from 'react-native';
 
 import {STRABO_APIS} from '../../../services/network/urls.constants';
 import {BLUE} from '../../../shared/styles.constants';
-import UrlLinkButton from '../../../shared/ui/buttons/UrlLinkButton';
+import URLLinkButton from '../../../shared/ui/buttons/URLLinkButton';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 
 const links = [
@@ -25,7 +25,7 @@ const links = [
 
 const OnlineResourcesSection = () => {
   const renderLinkButton = item => (
-    <UrlLinkButton
+    <URLLinkButton
       color={item.color}
       icon={item.icon}
       key={item.id}

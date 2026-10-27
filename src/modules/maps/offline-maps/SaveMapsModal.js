@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, Text, useWindowDimensions, View} from 'react-native';
+import {ActivityIndicator, Platform, Text, useWindowDimensions, View} from 'react-native';
 
+import {Picker} from '@react-native-picker/picker';
 import MultiSelect from 'react-native-multiple-select';
 import ProgressBar from 'react-native-progress/Bar';
 import {useDispatch, useSelector} from 'react-redux';
@@ -33,19 +34,18 @@ const contentContainerStyle = {paddingHorizontal: 20, paddingVertical: 10};
 const dropdownFieldStyle = {...formStyles.fieldValue, marginBottom: 15, paddingBottom: 0};
 // fieldLabel centers itself, which suits the forms' label row but not a label standing alone above a field
 const dropdownLabelStyle = {...formStyles.fieldLabel, alignSelf: 'flex-start'};
+// The only map there is to save, shown in the same underlined field as the dropdown's value
+const mapNameStyle = {color: themes.PRIMARY_TEXT_COLOR, fontSize: themes.PRIMARY_TEXT_SIZE, paddingBottom: 5};
 // Supporting detail under the dropdowns, kept quieter than the choices themselves
 const noteStyle = {color: themes.DARKGREY, fontSize: themes.SMALL_TEXT_SIZE, paddingBottom: 5};
 const warningStyle = {...noteStyle, color: themes.WARNING_COLOR};
+// Set apart from the notes above it, which are about this download rather than what is already on the device
+const savedTilesNoteStyle = {...noteStyle, paddingTop: 15};
 // The space zoomToCustomMap leaves on each side of a map it frames
 const FRAME_PADDING = 100;
 // Past this a download is flagged as large: at a typical 20-50 KB a tile, that is a few hundred megabytes
 const LARGE_DOWNLOAD_TILE_COUNT = 10000;
-const mapNameStyle = {
-  fontSize: themes.MEDIUM_TEXT_SIZE,
-  fontWeight: 'bold',
-  paddingBottom: 15,
-  textAlign: 'center',
-};
+const ZOOM_LABEL = 'Max Zoom Level';
 
 const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
   // console.log('Rendering SaveMapsModal...');
@@ -360,14 +360,36 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
           <View>
             {showMainMenu && (
               <View>
-                {/* Named here rather than in the modal's title, which now says what the modal does: with a map
-                    to choose, a title naming one of them reads as a heading over a choice it has pre-made. */}
-                {savableMaps.length === 1 && <Text style={mapNameStyle}>{mapToSaveName}</Text>}
-                {/* Only worth asking when an overlay is drawn over the basemap, since otherwise there is only
-                    one map it could mean */}
+                {/* A dropdown only when an overlay is drawn over the basemap, but laid out as the same field
+                 either way so the modal looks alike with one map or several */}
                 {savableMaps.length > 1
-                  && renderDropdown('Map', mapChoices, mapToSaveId, value => setMapToSaveId(value), 'a map')}
-                {renderDropdown('Max Zoom', getZoomChoices(), downloadZoom, value => updatePicker(value), 'a zoom level')}
+                  ? renderDropdown('Map', mapChoices, mapToSaveId, value => setMapToSaveId(value), 'a map')
+                  : (
+                    <View>
+                      <Text style={dropdownLabelStyle}>Map</Text>
+                      <View style={dropdownFieldStyle}>
+                        <Text style={mapNameStyle}>{mapToSaveName}</Text>
+                      </View>
+                    </View>
+                  )}
+                {/* The native picker on iOS is an inline wheel, so a zoom level is one flick instead of opening,
+                 scrolling and closing a list (#1019). Android's is a dropdown taking the same taps as the forms'
+                 one, so it gets theirs. */}
+                {Platform.OS === 'ios' ? (
+                  <View>
+                    <Text style={dropdownLabelStyle}>{ZOOM_LABEL}</Text>
+                    <Picker
+                      itemStyle={{color: themes.BLACK}}
+                      onValueChange={value => updatePicker(value)}
+                      selectedValue={downloadZoom}
+                    >
+                      {getZoomChoices().map(choice => (
+                        <Picker.Item key={choice.value} label={choice.label} value={choice.value}/>
+                      ))}
+                    </Picker>
+                  </View>
+                ) : renderDropdown(ZOOM_LABEL, getZoomChoices(), downloadZoom, value => updatePicker(value),
+                  'a zoom level')}
                 <Text style={noteStyle}>
                   {mapToSaveWhole ? 'Saves the whole map' : 'Saves the area shown on the map'}, down to the zoom level
                   picked above.
@@ -379,9 +401,9 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
                   </Text>
                 )}
                 {/* Downloading again adds to what is already there - moveTile keeps the tiles it finds and
-                    fetches only the rest - so a map's saved area is extended by framing more of it and saving. */}
+                 fetches only the rest - so a map's saved area is extended by framing more of it and saving. */}
                 {savedTileCount > 0 && (
-                  <Text style={noteStyle}>
+                  <Text style={savedTilesNoteStyle}>
                     {savedTileCount.toLocaleString()} tiles of this map are already on this device. Saving again
                     adds to them, so you can extend a saved area.
                   </Text>

@@ -18,7 +18,7 @@ const AppErrorFallback = ({eventId, resetError}) => (
   <View style={styles.container}>
     <Text style={styles.title}>Something went wrong</Text>
     <Text style={styles.message}>
-      The app ran into an error, and it has been reported to the developers. Your saved data is safe.
+      The app ran into an error, and it has been reported to the StraboSpot team. Your saved data is safe.
     </Text>
     <Pressable
       accessibilityRole={'button'}

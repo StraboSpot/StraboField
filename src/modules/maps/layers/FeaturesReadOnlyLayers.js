@@ -5,7 +5,7 @@ import * as turf from '@turf/turf';
 
 import useMapSymbology from '../symbology/useMapSymbology';
 
-const FeaturesNotSelectedLayers = ({features}) => {
+const FeaturesReadOnlyLayers = ({features}) => {
   /* Data Hooks */
 
   const {getMapSymbology} = useMapSymbology();
@@ -36,7 +36,7 @@ const FeaturesNotSelectedLayers = ({features}) => {
       {/* Read Only Point */}
       <MapboxGL.CircleLayer
         filter={['==', ['geometry-type'], 'Point']}
-        id={'pointLayerEditReadOnly'}
+        id={'pointLayerReadOnly'}
         minZoomLevel={1}
         style={getMapSymbology().pointCircleReadOnly}
       />
@@ -44,4 +44,4 @@ const FeaturesNotSelectedLayers = ({features}) => {
   );
 };
 
-export default FeaturesNotSelectedLayers;
+export default FeaturesReadOnlyLayers;

@@ -9,34 +9,11 @@
       "name": "end"
     },
     {
-      "type": "acknowledge",
-      "name": "trace_feature",
-      "label": "Trace Feature",
-      "required": "false"
-    },
-    {
-      "type": "select_one wb5nf41",
-      "name": "trace_quality",
-      "label": "Trace Quality",
-      "hint": "Quality of trace? Known, approximate, inferred, concealed, questioned",
-      "required": "false",
-      "relevant": "${trace_feature} != ''",
-      "appearance": "horizontal"
-    },
-    {
-      "type": "text",
-      "name": "other_trace_quality",
-      "label": "Other Trace Quality",
-      "required": "false",
-      "relevant": "${trace_quality} = 'other'"
-    },
-    {
       "type": "select_one pl5yo85",
       "name": "trace_type",
       "label": "Trace Type",
       "hint": "contact (unconformity), structure (fault), geomorphic, anthropogenic, other",
-      "required": "true",
-      "relevant": "${trace_feature} != ''"
+      "required": "false"
     },
     {
       "type": "select_one lx9ax28",
@@ -287,11 +264,27 @@
       "relevant": "${trace_character} = 'other'"
     },
     {
+      "type": "select_one wb5nf41",
+      "name": "trace_quality",
+      "label": "Trace Quality",
+      "hint": "Quality of trace? Known, approximate, inferred, concealed, questioned",
+      "required": "false",
+      "relevant": "${trace_type} != ''",
+      "appearance": "horizontal"
+    },
+    {
+      "type": "text",
+      "name": "other_trace_quality",
+      "label": "Other Trace Quality",
+      "required": "false",
+      "relevant": "${trace_quality} = 'other'"
+    },
+    {
       "type": "text",
       "name": "tace_notes",
       "label": "Notes",
       "required": "false",
-      "relevant": "${trace_feature} != ''",
+      "relevant": "${trace_type} != ''",
       "appearance": "multiline"
     },
     {

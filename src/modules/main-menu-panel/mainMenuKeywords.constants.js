@@ -98,7 +98,7 @@ export const MENU_KEYWORDS = {
   APP_SETTINGS: [
     {
       key: MAIN_MENU_ITEMS.APP_SETTINGS.ADDING_NEW_SPOTS,
-      keywords: ['shortcuts'],
+      keywords: ['shortcuts', 'snap', 'snapping'],
     },
     {
       key: MAIN_MENU_ITEMS.APP_SETTINGS.ADVANCED_OPTIONS,

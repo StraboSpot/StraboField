@@ -347,6 +347,20 @@ describe('template reducers', () => {
       });
     });
 
+    it('keeps the other active templates, and templates on, when one of several is deleted', () => {
+      const state = getState({
+        measurementTemplates: [planar, linear],
+        activeMeasurementTemplates: [planar, linear],
+        useMeasurementTemplates: true,
+      });
+      const {project} = projectReducer(state, deletedTemplate({key: MEASUREMENT_TEMPLATE_KEY, template: planar}));
+      expect(project.templates).toEqual({
+        measurementTemplates: [linear],
+        activeMeasurementTemplates: [linear],
+        useMeasurementTemplates: true,
+      });
+    });
+
     it('takes the active list and the in-use flag with the last template', () => {
       const state = getState({
         measurementTemplates: [planar],

@@ -1,0 +1,69 @@
+import React, {useState} from 'react';
+import {FlatList} from 'react-native';
+
+import {useDispatch, useSelector} from 'react-redux';
+
+import TagDetailModal from './detail/TagDetailModal';
+import FeatureTagsAtSpotList from './FeatureTagsAtSpotList';
+import TagsAtSpotList from './TagsAtSpotList';
+import SectionDivider from '../../shared/ui/SectionDivider';
+import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
+import {setActiveModal} from '../home/home.slice';
+import PageHeader from '../page/PageHeader';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
+import {addedTagToSelectedSpot} from '../project/projects.slice';
+
+const TagsPage = ({isReadOnly, isSample, openMainMenuPanel, page}) => {
+  /* Data Hooks */
+
+  const dispatch = useDispatch();
+  const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
+
+  /* Local State */
+
+  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+
+  /* Derived Variables */
+  const firstDividerText = page.key === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Units'
+    : isSample ? 'Sample Tags' : 'Spot Tags';
+  const pageVisible = pagesStack.slice(-1)[0];
+
+  /* Logic Helpers */
+
+  const closeTagDetailModal = () => {
+    setIsDetailModalVisible(false);
+    dispatch(addedTagToSelectedSpot(false));
+  };
+
+  /* View */
+
+  return (
+    <>
+      <PageHeader pageTitle={page.label}/>
+      <FlatList
+        ListFooterComponent={pageVisible !== PAGE_KEYS.GEOLOGIC_UNITS && (
+          <>
+            <SectionDivider dividerText={'Feature Tags'}/>
+            <FeatureTagsAtSpotList openMainMenuPanel={openMainMenuPanel} page={page}/>
+          </>
+        )}
+        ListHeaderComponent={
+          <>
+            {isReadOnly ? <SectionDivider dividerText={firstDividerText}/>
+              : (
+                <SectionDividerWithRightButton
+                  buttonTitle={'Assign/Remove'}
+                  dividerText={firstDividerText}
+                  onPress={() => dispatch(setActiveModal({modal: pageVisible}))}
+                />
+              )}
+            <TagsAtSpotList openMainMenuPanel={openMainMenuPanel} page={page}/>
+          </>
+        }
+      />
+      {isDetailModalVisible && <TagDetailModal closeModal={closeTagDetailModal}/>}
+    </>
+  );
+};
+
+export default TagsPage;

@@ -1,0 +1,75 @@
+import React from 'react';
+import {View} from 'react-native';
+
+import DrawActionButtons from './drawing/DrawActionButtons';
+import DrawInfo from './drawing/DrawInfo';
+import homeStyles from './home.styles';
+import MapActionButtons from './map-controls/MapActionButtons';
+import UserLocationButton from './map-controls/UserLocationButton';
+import MapControlsContainer from '../maps/controls/MapControlsContainer';
+
+const ActionButtonsSmallScreen = ({
+                                    distance,
+                                    onCancel,
+                                    endMeasurement,
+                                    handleHomeAction,
+                                    handleHomeActionFromMapMenu,
+                                    hasDrawTools,
+                                    mapMenus,
+                                    mapMode,
+                                    onEndDrawPressed,
+                                    openMainMenuPanel,
+                                    selectingMode,
+                                    toggleMapMenu,
+                                    zoomToCustomMap,
+                                  }) => {
+  /* View */
+
+  // Everything above the Mapbox attribution in one column: the map actions along the bottom, the scale bar
+  // and zoom above them on the left, the geolocate button above those, and DrawInfo opposite on the right.
+  // The order holds whatever the target dataset is and whichever tools are showing.
+  return (
+    <View style={homeStyles.actionButtonsSmallScreenStack}>
+      <View style={homeStyles.mapReadoutsRow}>
+        <View style={homeStyles.mapReadoutsSmallScreen}>
+          <UserLocationButton handleHomeAction={handleHomeAction}/>
+          <MapControlsContainer/>
+        </View>
+
+        <View style={homeStyles.drawInfoSmallScreen}>
+          <DrawInfo
+            distance={distance}
+            endMeasurement={endMeasurement}
+            handleHomeAction={handleHomeAction}
+            mapMode={mapMode}
+            onCancel={onCancel}
+            onEndDrawPressed={onEndDrawPressed}
+            selectingMode={selectingMode}
+          />
+        </View>
+      </View>
+
+      <View style={homeStyles.mapActionsPillRow}>
+        <View style={homeStyles.mapActionsPill}>
+          <View style={homeStyles.smallScreenMapActionButtons}>
+            <MapActionButtons
+              handleHomeActionFromMapMenu={handleHomeActionFromMapMenu}
+              mapMenus={mapMenus}
+              toggleMapMenu={toggleMapMenu}
+              zoomToCustomMap={zoomToCustomMap}
+            />
+          </View>
+          {hasDrawTools && (
+            <DrawActionButtons
+              handleHomeAction={handleHomeAction}
+              mapMode={mapMode}
+              openMainMenuPanel={openMainMenuPanel}
+            />
+          )}
+        </View>
+      </View>
+    </View>
+  );
+};
+
+export default ActionButtonsSmallScreen;

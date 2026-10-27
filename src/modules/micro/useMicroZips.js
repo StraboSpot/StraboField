@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import useDevice from '../../services/device/useDevice';
 import {APP_DIRECTORIES} from '../../services/files/directories.constants';
+import {getDeviceIdHeader} from '../../services/network/serverRequests.helpers';
 import {MICRO_PATHS, STRABO_APIS} from '../../services/network/urls.constants';
 import {toError} from '../../shared/helpers';
 import {addedStatusMessage, removedLastStatusMessage} from '../home/home.slice';
@@ -64,6 +65,7 @@ const useMicroZips = () => {
         headers: {
           'Authorization': 'Basic ' + user.encoded_login,
           'Content-Type': 'application/json',
+          ...getDeviceIdHeader(downloadZipURL),
         },
         fromUrl: downloadZipURL,
         toFile: APP_DIRECTORIES.MICRO_ZIPS + projectId + '.zip',

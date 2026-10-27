@@ -1,9 +1,11 @@
 import React, {forwardRef} from 'react';
 import {Animated} from 'react-native';
 
-import LeftSideButtons from './buttons/LeftSideButtons';
-import RightSideButtons from './buttons/RightSideButtons';
 import DeviceInfo from './DeviceInfo';
+import homeStyles from './home.styles';
+import LeftSideButtons from './LeftSideButtons';
+import RightSideButtons from './RightSideButtons';
+import MacrostratUnitInfo from '../maps/macrostrat/MacrostratUnitInfo';
 import MapContainer from '../maps/MapContainer';
 import OfflineMapPreviewBanner from '../maps/offline-maps/OfflineMapPreviewBanner';
 import notebookStyles from '../notebook-panel/notebook.styles';
@@ -14,15 +16,15 @@ const HomeView = forwardRef(({
                                animateLeftSide,
                                animateNotebookDrawer,
                                animateRightSide,
-                               clickHandler,
                                closeMainMenuPanel,
                                closeNotebookPanel,
-                               dialogClickHandler,
-                               dialogs,
                                distance,
                                endMeasurement,
+                               handleHomeAction,
+                               handleHomeActionFromMapMenu,
                                hasDrawTools,
                                isCreateToolsDisabled,
+                               mapMenus,
                                mapMode,
                                onCancel,
                                onEndDrawPressed,
@@ -31,7 +33,7 @@ const HomeView = forwardRef(({
                                selectingMode,
                                setDistance,
                                setMapModeToEdit,
-                               toggleDialog,
+                               toggleMapMenu,
                              }, mapComponentRef) => {
   console.log('Rendering HomeView...');
 
@@ -52,10 +54,10 @@ const HomeView = forwardRef(({
 
       <RightSideButtons
         animateRightSide={animateRightSide}
-        clickHandler={clickHandler}
         closeNotebookPanel={closeNotebookPanel}
         distance={distance}
         endMeasurement={endMeasurement}
+        handleHomeAction={handleHomeAction}
         hasDrawTools={hasDrawTools}
         isCreateToolsDisabled={isCreateToolsDisabled}
         mapMode={mapMode}
@@ -68,14 +70,19 @@ const HomeView = forwardRef(({
 
       <LeftSideButtons
         animateLeftSide={animateLeftSide}
-        clickHandler={clickHandler}
         closeMainMenuPanel={closeMainMenuPanel}
-        dialogClickHandler={dialogClickHandler}
-        dialogs={dialogs}
+        handleHomeAction={handleHomeAction}
+        handleHomeActionFromMapMenu={handleHomeActionFromMapMenu}
+        mapMenus={mapMenus}
         openMainMenuPanel={openMainMenuPanel}
-        toggleDialog={toggleDialog}
+        toggleMapMenu={toggleMapMenu}
         zoomToCustomMap={bbox => mapComponentRef?.current?.zoomToCustomMap(bbox)}
       />
+
+      {/* Drawn after the buttons and before the notebook, and slides aside with the buttons when the notebook opens */}
+      <Animated.View pointerEvents={'box-none'} style={[homeStyles.macrostratUnitInfoLayer, animateRightSide]}>
+        <MacrostratUnitInfo/>
+      </Animated.View>
 
       <Animated.View style={[notebookStyles.notebookDrawer, animateNotebookDrawer]}>
         <NotebookPanel

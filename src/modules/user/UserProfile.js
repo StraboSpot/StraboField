@@ -150,7 +150,7 @@ const UserProfile = () => {
       // A save that kept only some of the fields has already been alerted about, so don't announce it as a save
       const isFullSave = isEmpty(errors);
       const newValues = JSON.parse(JSON.stringify(formValues));
-      const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
+      const {email, encoded_login, image, isAuthenticated, macrostrat, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
       if (isConnectionAvailable) {
         await uploadProfile(userValuesToUpdate);

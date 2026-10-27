@@ -99,10 +99,10 @@ npm run remove:packages    # clean node_modules + iOS Pods
 **Required config files** (project root, gitignored):
 
 - `env.json` — app **runtime** keys, bundled into the app so **public keys only**:
-  `{"mapbox_access_token": "...", "orcid_client_id": "...", "Error_reporting_DSN": "..."}`. Anything imported under
+  `{"mapbox_access_token": "...", "Error_reporting_DSN": "..."}`. Anything imported under
   `src/` gets inlined into the web/Metro bundles, so never put secrets here.
 - `secrets.json` — **build-time** secrets, read only by `scripts/` (never imported under `src/`, so never bundled):
-  `sentry_organization_auth_token`, `orcid_client_secret`, `android_keystore`, `rockd_access_token`.
+  `sentry_organization_auth_token`, `android_keystore`, `rockd_access_token`.
 - `dev-test-logins.js` — `export const USERNAME_TEST / PASSWORD_TEST`
 
 **Two helper scripts to know:**
@@ -118,6 +118,7 @@ npm run remove:packages    # clean node_modules + iOS Pods
 - **Nesting** — parent/child spot hierarchy via `properties.nesting`.
 - **Feature type** — the category/schema a spot's measurements follow.
 - **Tag** — cross-cutting label linking spots (lives in projects.slice).
+- **Memo** — what the UI calls a report; code and data (`project.reports`) say report.
 
 ## Why It's Built This Way
 
@@ -158,7 +159,7 @@ rc merge) — see [RELEASE.md](RELEASE.md)**, or print them with `npm run start-
 backend via REST. Entry points: `index.js` (mobile), `index.web.js` (web). Web bundles via `webpack.config.js`; mobile
 via `metro.config.js`.
 
-- **Feature modules** — **42 self-contained feature modules** under `/src/modules/`, each with UI components, a
+- **Feature modules** — **43 self-contained feature modules** under `/src/modules/`, each with UI components, a
   `.slice.js` Redux slice, `use[Feature].js` hooks, constants, and `.web.js` platform overrides. Core: `spots/` (the
   central data model), `maps/`, `compass/`, `project/`, `form/` (dynamic form engine), `notebook-panel/`.
 - **State** — Redux Toolkit, 10 slices (`spots`, `projects` (largest), `maps`, `offlineMaps`, `userProfile`, `compass`,

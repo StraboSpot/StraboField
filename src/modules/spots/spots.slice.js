@@ -1,4 +1,4 @@
-import {createSlice, current} from '@reduxjs/toolkit';
+import {createSlice, current, original} from '@reduxjs/toolkit';
 
 import {getUniqueTitle, isEmpty} from '../../shared/helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
@@ -60,6 +60,11 @@ const spotSlice = createSlice({
       state.selectedSpot = {};
       state.spots = remainingSpotsObj;
       state.recentViews = state.recentViews.filter(id => !spotIds.includes(id));
+    },
+    // Drops the selection only if it is still the one given, not one the next page has made since - even of the same
+    // feature. original(state), because the draft hands back a stand-in that never matches the dispatched array.
+    deselectedAttributes(state, action) {
+      if (original(state).selectedAttributes === action.payload) state.selectedAttributes = [];
     },
     editedOrCreatedSpot(state, action) {
       const modifiedSpot = {
@@ -151,6 +156,8 @@ const spotSlice = createSlice({
       const {field, value, spotId = state.selectedSpot?.properties?.id} = action.payload;
       if (spotId) {
         const spotToEdit = state.spots[spotId];
+        // A Spot can be selected before it is saved, e.g. the new half of a line split during map editing
+        if (!spotToEdit) return;
         if (isEmpty(value)) delete spotToEdit.properties[field];
         else spotToEdit.properties[field] = value;
         spotToEdit.properties.modified_timestamp = Date.now();
@@ -212,6 +219,7 @@ export const {
   clearedSpots,
   deletedSpot,
   deletedSpots,
+  deselectedAttributes,
   editedOrCreatedSpot,
   editedOrCreatedSpots,
   editedSpotImage,

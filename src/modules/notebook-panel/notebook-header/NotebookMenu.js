@@ -3,7 +3,6 @@ import {FlatList, Text} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {ListItem} from '@rn-vui/base';
-import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import RockdModal from '../../../services/data-intergration/macrostrat/RockdModal';
@@ -18,7 +17,6 @@ import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import useSamples from '../../samples/useSamples';
 import useSpots from '../../spots/useSpots';
-import {setInitialSesarState} from '../../user/userProfile.slice';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
 
@@ -38,10 +36,8 @@ const NotebookMenu = ({
   const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
-  const {sesarToken} = useSelector(state => state.user.sesar);
 
   const navigation = useNavigation();
-  const toast = useToast();
   const {deleteRichSample} = useSamples();
   const {checkIsSafeDelete, copySpot, deleteSpot, isSpotOnReadOnlyMap, isStratInterval} = useSpots();
   const {deleteInterval} = useStratSection();
@@ -63,15 +59,15 @@ const NotebookMenu = ({
     {key: 'metadata', title: 'Show Metadata'},
     {key: 'nesting', title: 'Show Nesting'},
     ...(!isSample ? [{key: 'rockd', title: 'Send Spot to Rockd'}] : []),
-    ...(isSample && !isEmpty(sesarToken?.access) ? [{key: 'resetSesar', title: 'Reset SESAR Credentials'}] : []),
     ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
   ];
 
   /* Event Handlers */
 
+  // Unsaved changes on the page on screen were asked about as this menu opened (NotebookHeader)
   const onPress = (key) => {
     if (key === 'copy') {
-      copySpot().catch(err => console.error('Error copying Spot!', err));
+      copySpot(spot).catch(err => console.error('Error copying Spot!', err));
       dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     }
     else if (key === 'zoom') {
@@ -89,10 +85,6 @@ const NotebookMenu = ({
     else if (key === 'rockd') {
       closeNotebookMenu();
       setIsRockdModalVisible(true);
-    }
-    else if (key === 'resetSesar') {
-      dispatch(setInitialSesarState());
-      toast.show('Sesar credentials have been reset', {type: 'success'});
     }
     else closeNotebookPanel();
     closeNotebookMenu();

@@ -32,7 +32,7 @@
       "type": "text",
       "name": "Sample_IGSN",
       "label": "Sample IGSN ",
-      "hint": "Use the IGSN or International Generic Sample Number.  These are unique identifiers given out at igsn.org or obtained under you project at strabospot.org.",
+      "hint": "The IGSN or International Generic Sample Number. IGSNs are obtained from your account at strabospot.org.",
       "required": "false"
     },
     {

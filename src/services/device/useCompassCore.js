@@ -150,9 +150,9 @@ const useCompassCore = () => {
   // Returns {declination, source}; source is null (declination null) only in the disabled case.
   const fetchDeclination = async () => {
     // 1. Live GPS. Stay silent when location is blocked/unavailable - we have fallbacks and shouldn't nag a
-    // GPS-less device on every compass open.
+    // GPS-less device on every compass open. Any recent fix will do: declination barely changes over kilometers.
     try {
-      const {longitude, latitude} = await getCurrentLocation({showBlockedAlert: false});
+      const {longitude, latitude} = await getCurrentLocation({showBlockedAlert: false, waitForAccurateFix: false});
       const declination = declinationAtCoords([longitude, latitude]);
       magneticDeclination.current = declination;
       recordDeclinationToProject(declination); // seed the project reference while it is still empty

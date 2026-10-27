@@ -10,6 +10,7 @@ import {PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import TextInput from '../../shared/ui/TextInput';
 import formStyles from '../form/form.styles';
 import useMapLocation from '../maps/view/useMapLocation';
 
@@ -73,6 +74,7 @@ const GenerateRandomSpots = () => {
           showCloseButton
         >
           <Input
+            InputComponent={TextInput}
             containerStyle={styles.inputContainer}
             defaultValue={numRandomSpots}
             inputStyle={formStyles.fieldValue}

@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {useContext, useState} from 'react';
 import {Text, View} from 'react-native';
 
 import {Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {MODAL_KEYS, PAGE_KEYS} from './pageKeys.constants';
+import {PAGE_KEYS} from './pageKeys.constants';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {
@@ -15,10 +15,10 @@ import {
 } from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
-import {setModalVisible} from '../home/home.slice';
 import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
-import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
+import AddTagsModal from '../tags/AddTagsModal';
 
 const PageHeader = ({
                       hideBackButton,
@@ -34,6 +34,11 @@ const PageHeader = ({
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {goToNotebookPage} = useContext(LeavePageContext);
+
+  /* Local State */
+
+  const [isFeatureTagsModalVisible, setIsFeatureTagsModalVisible] = useState(false);
 
   /* Derived Variables */
 
@@ -41,14 +46,14 @@ const PageHeader = ({
 
   /* Logic Helpers */
 
-  const returnToOverview = () => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+  const returnToOverview = () => goToNotebookPage(PAGE_KEYS.OVERVIEW);
 
   const selectTagsForFeatures = () => {
     if (isEmpty(selectedFeaturesForTagging)) {
       alert('No Features!', 'No features have been selected.');
       dispatch(setMultipleFeaturesTaggingEnabled(false));
     }
-    else dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.FEATURE_TAGS}));
+    else setIsFeatureTagsModalVisible(true);
   };
 
   const toggleFeaturesTagButton = () => {
@@ -115,6 +120,13 @@ const PageHeader = ({
             title={'Choose Tags to Apply'}
           />
         </View>
+      )}
+      {isFeatureTagsModalVisible && (
+        <AddTagsModal
+          closeModal={() => setIsFeatureTagsModalVisible(false)}
+          headerTitle={'Add Feature Tags'}
+          isFeatureLevelTagging
+        />
       )}
     </>
   );

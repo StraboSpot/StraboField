@@ -7,7 +7,7 @@ import {getReportsToList} from './reports.helpers';
 import ReportsListItem from './ReportsListItem';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
 const ReportsList = ({checkedItems, isCheckedList, isPreSorted, onChecked, reportsSubset}) => {
@@ -31,7 +31,7 @@ const ReportsList = ({checkedItems, isCheckedList, isPreSorted, onChecked, repor
 
   const onShowReport = (report) => {
     dispatch(setModalValues(report));
-    dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
+    dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.REPORTS}));
   };
 
   /* View */

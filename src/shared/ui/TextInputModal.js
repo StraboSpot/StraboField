@@ -6,6 +6,7 @@ import {Input} from '@rn-vui/base';
 import * as themes from '../styles.constants';
 import ModalWrapper from './modals/ModalWrapper';
 import overlayStyles from './modals/overlay.styles';
+import TextInput from './TextInput';
 
 const TextInputModal = ({
                           autoCapitalize,
@@ -44,6 +45,7 @@ const TextInputModal = ({
       <View>
         {textAboveInput}
         <Input
+          InputComponent={TextInput}
           autoCapitalize={autoCapitalize || 'none'}
           // enterKeyHint={'done'}
           errorMessage={errorMessage}

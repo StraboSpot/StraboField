@@ -1,11 +1,12 @@
 import React from 'react';
-import {Platform, Text, TextInput} from 'react-native';
+import {Platform, Text} from 'react-native';
 
 import {useField, useFormikContext} from 'formik';
 
 import FieldLabel from './FieldLabel';
 import {isEmpty} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
+import TextInput from '../../../shared/ui/TextInput';
 import formStyles from '../form.styles';
 
 const NumberInputField = ({

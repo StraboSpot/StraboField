@@ -4,9 +4,9 @@ import {View} from 'react-native';
 import RNSketchCanvas from '@StraboSpot/react-native-sketch-canvas';
 import {useDispatch} from 'react-redux';
 
+import useDeviceOrientation from '../../services/device/useDeviceOrientation';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
-import useDeviceOrientation from '../home/useDeviceOrientation';
 import {setFreehandFeatureCoords} from '../maps/maps.slice';
 
 let freehandFeatureCoords = [];

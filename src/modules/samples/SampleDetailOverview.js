@@ -1,30 +1,34 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import IGSNModal from './igsn/IGSNModal';
 import LinkedSampleCard from './LinkedSampleCard';
 import LinkSampleModal from './LinkSampleModal';
 import SampleActionButton from './SampleActionButton';
+import {SAMPLE_IGSN_KEY} from './samples.constants';
 import sampleStyles from './samples.styles';
 import useLinkSampleAction from './useLinkSampleAction';
+import useSamples from './useSamples';
 import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import useForm from '../form/useForm';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
+import UploadModal from '../project/backup/UploadModal';
+import useBackupUpload from '../project/backup/useBackupUpload';
 import {setSelectedAttributes} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
-const SampleDetailOverview = ({openMainMenuPanel}) => {
+const SampleDetailOverview = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const isOwner = useSelector(state => state.project.project?.isOwner);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {closeUploadModal, isUploadAutoStart, isUploadModalVisible, startUploadFromStatus} = useBackupUpload();
   const {getLabel, getSurvey} = useForm();
   const {
     closeLinkSampleModal,
@@ -33,16 +37,13 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
     isLinked,
     linkOrUnlinkSample,
   } = useLinkSampleAction();
+  const {openSamplePage, openUploadedSamplePage} = useSamples();
   const {isSpotReadOnly} = useSpots();
-
-  /* Local State */
-
-  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
 
   /* Derived Variables */
 
   const sampleValues = spot.properties?.samples?.[0];
-  const sampleIGSN = sampleValues?.Sample_IGSN;
+  const sampleIGSN = sampleValues?.[SAMPLE_IGSN_KEY];
   const isReadOnly = isSpotReadOnly(spot);
   // Anyone may view an existing IGSN, but getting one registers and changes the sample, which only the project
   // owner may do and only when the Spot is not read only
@@ -80,10 +81,7 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
     ]);
   };
 
-  const onViewIGSNPressed = () => {
-    if (sampleIGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
-    else setIsIGSNModalVisible(true);
-  };
+  const onIGSNPressed = () => openSamplePage(spot.properties.id, startUploadFromStatus);
 
   /* Logic Helpers */
 
@@ -121,9 +119,10 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
         />
         {!isGetIGSNHidden && (
           <SampleActionButton
-            accessibilityHint={sampleIGSN ? 'Shows the sample\'s IGSN record' : 'Registers the sample for an IGSN'}
+            accessibilityHint={sampleIGSN ? 'Opens the sample\'s IGSN on strabospot.org'
+              : 'Opens the sample on strabospot.org to get an IGSN'}
             iconName={sampleIGSN ? 'barcode-outline' : 'add-circle-outline'}
-            onPress={onViewIGSNPressed}
+            onPress={onIGSNPressed}
             title={sampleIGSN ? 'IGSN Data' : 'Get IGSN'}
           />
         )}
@@ -141,17 +140,12 @@ const SampleDetailOverview = ({openMainMenuPanel}) => {
       {!isReadOnly && isLinkOrUnlinkDisabled && (
         <Text style={sampleStyles.offlineNote}>Linking a sample needs an internet connection</Text>
       )}
-      <IGSNModal
-        isVisible={isIGSNModalVisible}
-        onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
-        onModalCancel={() => setIsIGSNModalVisible(false)}
-        openLoginPage={() => {
-          setIsIGSNModalVisible(false);
-          setTimeout(() => {
-            openMainMenuPanel();
-          }, 300);
-        }}
-        sampleValues={sampleValues}
+      <UploadModal
+        afterUploadActionTitle={sampleIGSN ? 'View IGSN' : 'Get IGSN'}
+        autoStart={isUploadAutoStart}
+        closeModal={closeUploadModal}
+        isVisible={isUploadModalVisible}
+        onAfterUploadActionPressed={() => openUploadedSamplePage(spot.properties.id)}
       />
       <LinkSampleModal
         closeModal={closeLinkSampleModal}
