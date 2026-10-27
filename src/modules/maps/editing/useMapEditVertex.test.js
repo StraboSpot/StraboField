@@ -14,6 +14,7 @@ jest.mock('../useMap', () => () => ({isDrawMode: () => false}));
 jest.mock('../view/useMapCoords', () => () => ({}));
 jest.mock('../features/useMapFeatures', () => () => ({getAllMappedSpots: () => []}));
 jest.mock('../../project/useProject', () => () => ({isSpotInReadOnlyDataset: () => false}));
+jest.mock('./useMapSnap', () => () => ({snapCoord: (screenPoint, coord) => coord}));
 
 const renderHook = () => {
   let resolvePointInView;

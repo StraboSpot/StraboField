@@ -15,6 +15,8 @@ const SPOT_LAYERS = ['pointLayerNotSelected', 'lineLayerNotSelected', 'lineLayer
   'lineLayerNotSelectedDashed', 'lineLayerNotSelectedDotDashed', 'polygonLayerNotSelected',
   'polygonLayerWithPatternNotSelected', 'lineLayerSelected', 'lineLayerSelectedDotted',
   'lineLayerSelectedDashed', 'lineLayerSelectedDotDashed', 'polygonLayerSelected', 'polygonLayerWithPatternSelected'];
+// Edit mode draws Spots in read-only datasets on these instead, which exist only while it draws any
+const READ_ONLY_SPOT_LAYERS = ['pointLayerReadOnly', 'lineLayerReadOnly', 'polygonLayerReadOnly'];
 
 const useMapFeaturesCalculated = (mapRef) => {
   /* Data Hooks */
@@ -71,9 +73,11 @@ const useMapFeaturesCalculated = (mapRef) => {
 
   // Get all rendered features within the press box for the given layers. r sets the box padding
   // (r near 0 requires a press directly on the feature; the default gives a comfortable tolerance).
+  // Layers not on the map are skipped on web, where naming one makes the whole query return nothing.
   const getFeaturesInBBox = async ([x, y], layers, r = PRESS_BOX_PADDING) => {
     const bbox = getBBoxPaddedInPixels([x, y], r);
-    const nearFeaturesCollection = Platform.OS === 'web' ? mapRef.current.queryRenderedFeatures(bbox, {layers: layers})
+    const nearFeaturesCollection = Platform.OS === 'web'
+      ? mapRef.current.queryRenderedFeatures(bbox, {layers: layers.filter(layer => mapRef.current.getLayer(layer))})
       : await mapRef.current.queryRenderedFeaturesInRect(bbox, null, layers);
     const nearFeatures = Platform.OS === 'web' ? nearFeaturesCollection : nearFeaturesCollection.features;
     if (nearFeatures?.length > 0) console.log('Near features:', nearFeatures);
@@ -203,13 +207,21 @@ const useMapFeaturesCalculated = (mapRef) => {
   // disambiguate - vs getSpotAtPress (one random Spot) or getSpotsInBoundingBox (adds nested children).
   // isPreciseHit shrinks the box so only a Spot directly under the press matches (e.g. Macrostrat).
   const getSpotsAtPress = async (screenPointX, screenPointY, isPreciseHit = false) => {
-    const nearFeatures = await getFeaturesInBBox([screenPointX, screenPointY], SPOT_LAYERS,
+    const spotsAtPress = await getSpotsNearPress(screenPointX, screenPointY,
       isPreciseHit ? PRESS_BOX_PADDING_PRECISE : PRESS_BOX_PADDING);
-    // queryRenderedFeatures returns the same Spot multiple times (across layers and tile seams), so dedupe.
-    const spotsIds = [...new Set(nearFeatures.map(feature => feature?.properties?.id).filter(id => id != null))];
-    const spotsAtPress = getSpotsByIds(spotsIds).filter(isSpotOnCurrentMap);
     console.log('Got Spots at press:', spotsAtPress);
     return spotsAtPress;
+  };
+
+  // Get every Spot drawn within r screen points of the press, deduped and scoped to the current map. Returns the
+  // stored Spots: the rendered features are clipped at tile seams and simplified. isIncludingReadOnly adds the
+  // read-only layers.
+  const getSpotsNearPress = async (screenPointX, screenPointY, r, isIncludingReadOnly = false) => {
+    const layers = isIncludingReadOnly ? [...SPOT_LAYERS, ...READ_ONLY_SPOT_LAYERS] : SPOT_LAYERS;
+    const nearFeatures = await getFeaturesInBBox([screenPointX, screenPointY], layers, r);
+    // queryRenderedFeatures returns the same Spot multiple times (across layers and tile seams), so dedupe.
+    const spotsIds = [...new Set(nearFeatures.map(feature => feature?.properties?.id).filter(id => id != null))];
+    return getSpotsByIds(spotsIds).filter(isSpotOnCurrentMap);
   };
 
   // This method is required when the draw features at press returns empty
@@ -237,6 +249,7 @@ const useMapFeaturesCalculated = (mapRef) => {
     getSpotAtPress,
     getSpotsAtPress,
     getSpotsInBoundingBox,
+    getSpotsNearPress,
     identifyClosestVertexOnSpotPress,
   };
 };

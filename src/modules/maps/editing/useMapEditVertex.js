@@ -17,6 +17,7 @@ import {
   getFeatureWithNewVertex,
   splitLineAtVertex,
 } from './editing.helpers';
+import useMapSnap from './useMapSnap';
 import {clearedVertexes, setVertexStartCoords} from '../maps.slice';
 import useMap from '../useMap';
 import useMapCoords from '../view/useMapCoords';
@@ -42,6 +43,7 @@ const useMapEditVertex = ({
   const {isDrawMode} = useMap();
   const {convertFeatureGeometryToImagePixels, convertImagePixelsToLatLong} = useMapCoords();
   const {getAllMappedSpots} = useMapFeatures();
+  const {snapCoord} = useMapSnap(mapRef);
   const {getDatasetIdFromSpotId, isSpotInReadOnlyDataset} = useProject();
 
   /* Local State */
@@ -329,8 +331,9 @@ const useMapEditVertex = ({
 
   const moveVertex = async () => {
     try { // on imagebasemap, if spot is not point, conversion happens in editSpotCoordinates.
-      const newVertexCoords = Platform.OS === 'web' ? mapRef.current.unproject(vertexEndCoords).toArray()
+      const droppedVertexCoords = Platform.OS === 'web' ? mapRef.current.unproject(vertexEndCoords).toArray()
         : await mapRef.current.getCoordinateFromView(vertexEndCoords);
+      const newVertexCoords = await snapCoord(vertexEndCoords, droppedVertexCoords, spotEditing, spotsEdited);
       if ((currentImageBasemap || stratSection) && spotEditing && turf.getType(spotEditing) === 'Point') {
         const vertexCoordinates = proj4(GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION,
           [newVertexCoords[0], newVertexCoords[1]]);

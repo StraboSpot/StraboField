@@ -186,7 +186,7 @@ const useMapPressEvents = ({
         else clearSelectedSpots();
       }
       // Draw a feature
-      else if (isDrawMode(mapMode)) setDrawFeaturesNew(e);
+      else if (isDrawMode(mapMode)) await setDrawFeaturesNew(e, getScreenPoint(e));
       // Edit a Spot
       else if (mapMode === MAP_MODES.EDIT) {
         const [screenPointX, screenPointY] = getScreenPoint(e);

@@ -36,7 +36,7 @@ const FeaturesReadOnlyLayers = ({features}) => {
       {/* Read Only Point */}
       <MapboxGL.CircleLayer
         filter={['==', ['geometry-type'], 'Point']}
-        id={'pointLayerEditReadOnly'}
+        id={'pointLayerReadOnly'}
         minZoomLevel={1}
         style={getMapSymbology().pointCircleReadOnly}
       />
