@@ -12,6 +12,8 @@ import commonStyles from '../../shared/common.styles';
 import {truncateText} from '../../shared/helpers';
 import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import CheckboxList from '../../shared/ui/CheckboxList';
+import UploadModal from '../project/backup/UploadModal';
+import useBackupUpload from '../project/backup/useBackupUpload';
 import SpotDataIcons from '../spots/SpotDataIcons';
 import useSpots from '../spots/useSpots';
 import useTags from '../tags/useTags';
@@ -32,7 +34,8 @@ const SampleListItem = ({
 
   const selectedTag = useSelector(state => state.project.selectedTag);
 
-  const {openSamplePage} = useSamples();
+  const {closeUploadModal, isUploadAutoStart, isUploadModalVisible, startUploadFromStatus} = useBackupUpload();
+  const {openSamplePage, openUploadedSamplePage} = useSamples();
   const {getSampleSpotIconSource, isSpotReadOnly} = useSpots();
   const {addRemoveSpotFromTag} = useTags();
 
@@ -46,7 +49,7 @@ const SampleListItem = ({
 
   /* Event Handlers */
 
-  const handleIGSNButtonPressed = () => openSamplePage(sampleMetadata.id);
+  const handleIGSNButtonPressed = () => openSamplePage(sampleMetadata.id, startUploadFromStatus);
 
   // A caller with its own onChecked takes the press instead of the tag write, and gets the parent Spot too
   // since a legacy sample carries no id of its own that means anything outside it
@@ -59,6 +62,7 @@ const SampleListItem = ({
   /* View */
 
   return (
+    <>
     <ListItem
       containerStyle={commonStyles.listItem}
       key={'SampleListItem' + sampleMetadata.id}
@@ -102,6 +106,17 @@ const SampleListItem = ({
         </>
       )}
     </ListItem>
+    {/* Mounted only while showing so a long list doesn't carry an upload modal per row */}
+    {isUploadModalVisible && (
+      <UploadModal
+        afterUploadActionTitle={sampleMetadata.Sample_IGSN ? 'View IGSN' : 'Get IGSN'}
+        autoStart={isUploadAutoStart}
+        closeModal={closeUploadModal}
+        isVisible={isUploadModalVisible}
+        onAfterUploadActionPressed={() => openUploadedSamplePage(sampleMetadata.id)}
+      />
+    )}
+    </>
   );
 };
 

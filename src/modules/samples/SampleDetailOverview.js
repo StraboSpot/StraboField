@@ -11,6 +11,8 @@ import {PRIMARY_ACCENT_COLOR} from '../../shared/styles.constants';
 import useForm from '../form/useForm';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
+import UploadModal from '../project/backup/UploadModal';
+import useBackupUpload from '../project/backup/useBackupUpload';
 import useProject from '../project/useProject';
 import {setSelectedAttributes} from '../spots/spots.slice';
 
@@ -20,9 +22,10 @@ const SampleDetailOverview = () => {
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {closeUploadModal, isUploadAutoStart, isUploadModalVisible, startUploadFromStatus} = useBackupUpload();
   const {getLabel, getSurvey} = useForm();
   const {isSpotInReadOnlyDataset} = useProject();
-  const {openSamplePage} = useSamples();
+  const {openSamplePage, openUploadedSamplePage} = useSamples();
 
   /* Derived Variables */
 
@@ -54,7 +57,7 @@ const SampleDetailOverview = () => {
     dispatch(setNotebookPageVisible(PAGE_KEYS.SAMPLES));
   };
 
-  const onIGSNPressed = () => openSamplePage(spot.properties.id);
+  const onIGSNPressed = () => openSamplePage(spot.properties.id, startUploadFromStatus);
 
   /* Logic Helpers */
 
@@ -101,6 +104,13 @@ const SampleDetailOverview = () => {
           </Pressable>
         )}
       </View>
+      <UploadModal
+        afterUploadActionTitle={sampleIGSN ? 'View IGSN' : 'Get IGSN'}
+        autoStart={isUploadAutoStart}
+        closeModal={closeUploadModal}
+        isVisible={isUploadModalVisible}
+        onAfterUploadActionPressed={() => openUploadedSamplePage(spot.properties.id)}
+      />
     </View>
   );
 };

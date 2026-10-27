@@ -123,21 +123,25 @@ const useSamples = () => {
     }
   };
 
+  const openUploadedSamplePage = sampleId => Linking.openURL(`${SAMPLE_PAGE_BASE_URL}/${straboUserId}/${sampleId}`);
+
   // IGSNs are minted and sent to SESAR on strabospot.org, which can only work from what has been uploaded there.
   // A guest has no account to upload to.
-  const openSamplePage = (sampleId) => {
+  const openSamplePage = (sampleId, startUpload) => {
     if (!straboUserId || sampleSpotIdsToUpload.includes(sampleId)) {
       alert('Upload Project First',
         'This sample, or its latest changes, is not on your StraboSpot account yet. Upload the project to your '
-        + 'account first, then try again.');
+        + 'account first.',
+        [{text: 'Not Now', style: 'cancel'}, {text: 'Upload', onPress: startUpload}]);
     }
-    else Linking.openURL(`${SAMPLE_PAGE_BASE_URL}/${straboUserId}/${sampleId}`);
+    else openUploadedSamplePage(sampleId);
   };
 
   return {
     createRichSample,
     deleteRichSample,
     openSamplePage,
+    openUploadedSamplePage,
   };
 };
 
