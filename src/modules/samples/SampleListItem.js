@@ -1,21 +1,21 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import IGSNLogo from './igsn/IGSNLogo';
-import IGSNModal from './igsn/IGSNModal';
 import {getSampleMetadata, getSampleTitle} from './samples.helpers';
 import sampleStyles from './samples.styles';
+import useSamples from './useSamples';
 import useStraboSampleWebPage from './useStraboSampleWebPage';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty, truncateText} from '../../shared/helpers';
 import {BLACK, SAMPLES_COLOR} from '../../shared/styles.constants';
 import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import CheckboxList from '../../shared/ui/CheckboxList';
-import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {PAGE_KEYS} from '../page/pageKeys.constants';
+import UploadModal from '../project/backup/UploadModal';
+import useBackupUpload from '../project/backup/useBackupUpload';
 import SpotDataIcons from '../spots/SpotDataIcons';
 import useSpots from '../spots/useSpots';
 import useTags from '../tags/useTags';
@@ -35,9 +35,10 @@ const SampleListItem = ({
                         }) => {
   /* Data Hooks */
 
-  const dispatch = useDispatch();
   const selectedTag = useSelector(state => state.project.selectedTag);
 
+  const {closeUploadModal, isUploadAutoStart, isUploadModalVisible, startUploadFromStatus} = useBackupUpload();
+  const {openSamplePage, openUploadedSamplePage} = useSamples();
   const {getSampleSpotIconSource, isSpotReadOnly} = useSpots();
   const {getStraboSampleUrl, openStraboSampleWebPage} = useStraboSampleWebPage();
   const {addRemoveSpotFromTag} = useTags();
@@ -53,20 +54,13 @@ const SampleListItem = ({
   const isLinked = !isEmpty(sampleMetadata.strabosamples_id);
   const sampleUrl = getStraboSampleUrl(sampleMetadata.strabosamples_id);
 
-  /* Local State */
-
-  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
-
   /* Event Handlers */
 
   // The server knows the link by the Spot holding the sample: its own Spot, or the parent it is kept on
   const handleLinkIconPressed = () => openStraboSampleWebPage(sampleMetadata.strabosamples_id,
     sample.properties?.isSample ? sample.properties.id : parentSpot.properties.id);
 
-  const handleIGSNButtonPressed = () => {
-    if (sampleMetadata.Sample_IGSN) dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN));
-    else setIsIGSNModalVisible(true);
-  };
+  const handleIGSNButtonPressed = () => openSamplePage(sampleMetadata.id, startUploadFromStatus);
 
   // A caller with its own onChecked takes the press instead of the tag write, and gets the parent Spot too
   // since a legacy sample carries no id of its own that means anything outside it
@@ -117,12 +111,9 @@ const SampleListItem = ({
                 type={'ionicon'}
               />
             )}
-            {/* Viewing an existing IGSN is fine read-only; getting one would register and change the sample */}
+            {/* Viewing an existing IGSN is fine read-only; getting one would change the sample */}
             {(sampleMetadata.Sample_IGSN || (isShowIGSN && !isSampleReadOnly)) && (
-              <IGSNLogo
-                item={sampleMetadata}
-                onIGSNButtonPressed={handleIGSNButtonPressed}
-              />
+              <IGSNLogo hasIGSN={!!sampleMetadata.Sample_IGSN} onIGSNButtonPressed={handleIGSNButtonPressed}/>
             )}
           </View>
         </ListItem.Content>
@@ -139,12 +130,16 @@ const SampleListItem = ({
           </>
         )}
       </ListItem>
-      <IGSNModal
-        isVisible={isIGSNModalVisible}
-        onIGSNUpdated={() => dispatch(setNotebookPageVisible(PAGE_KEYS.IGSN))}
-        onModalCancel={() => setIsIGSNModalVisible(false)}
-        sampleValues={sampleMetadata}
-      />
+      {/* Mounted only while showing so a long list doesn't carry an upload modal per row */}
+      {isUploadModalVisible && (
+        <UploadModal
+          afterUploadActionTitle={sampleMetadata.Sample_IGSN ? 'View IGSN' : 'Get IGSN'}
+          autoStart={isUploadAutoStart}
+          closeModal={closeUploadModal}
+          isVisible={isUploadModalVisible}
+          onAfterUploadActionPressed={() => openUploadedSamplePage(sampleMetadata.id)}
+        />
+      )}
     </>
   );
 };

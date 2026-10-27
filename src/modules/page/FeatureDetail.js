@@ -1,15 +1,15 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
-import {Platform, Text, View} from 'react-native';
+import {Linking, Platform, Text, View} from 'react-native';
 
+import {Icon} from '@rn-vui/base';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {resolveLabelOnSave} from './featureLabels.helpers';
 import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
-import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty, toTitleCase} from '../../shared/helpers';
-import {RED} from '../../shared/styles.constants';
+import {PRIMARY_ACCENT_COLOR, RED} from '../../shared/styles.constants';
 import alert from '../../shared/ui/alert';
 import DeleteButton from '../../shared/ui/buttons/DeleteButton';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
@@ -24,9 +24,9 @@ import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
 import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {setMineralFieldValue} from '../petrology/minerals/minerals.helpers';
 import usePetrology from '../petrology/usePetrology';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {isTokenExpired} from '../samples/igsn/igsn.helpers';
-import IGSNModal from '../samples/igsn/IGSNModal';
+import {addedSampleSpotIdToUpload, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {SAMPLE_IGSN_KEY, SAMPLES_PAGE_URL} from '../samples/samples.constants';
+import sampleStyles from '../samples/samples.styles';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
 import {getRequiredLithologyKeys, hasOtherLithologyTabData} from '../sed/sed.helpers';
 import SedRockLithologyNote from '../sed/SedRockLithologyNote';
@@ -67,8 +67,6 @@ const FeatureDetail = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const {isInternetReachable} = useSelector(state => state.connections.isOnline);
-  const {encoded_login, sesar} = useSelector(state => state.user);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
   const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
@@ -78,7 +76,6 @@ const FeatureDetail = ({
   const {deleteSedFeature, saveSedBedFeature, saveSedFeature, setSedFieldValue} = useSed();
   const {checkSampleName} = useSpots();
   const {deleteFeatureTags} = useTags();
-  const {getOrcidToken} = useServerRequests();
   const toast = useToast();
 
   // Save on the way out is this page's Save, held for the same reasons, so a value that needs fixing keeps the page
@@ -94,7 +91,6 @@ const FeatureDetail = ({
   } = useUnsavedFormChanges({
     formRef: formRef,
     getMessage: () => `Your changes to this ${title}${saveTemplate ? ' template' : ''} haven't been saved.`,
-    getSaveHeldReason: () => sesarSaveHeldReason,
     onDiscard: closeDetailView,
     save: () => (saveTemplate ? saveTemplateForm(formRef.current) : saveForm(formRef.current)),
   });
@@ -105,11 +101,8 @@ const FeatureDetail = ({
   const selectedAttributesRef = useRef(selectedAttributes);
   selectedAttributesRef.current = selectedAttributes;
 
-  const [igsnFormValues, setIgsnFormValues] = useState(null);
   const [initialValues, setInitialValues] = useState(selectedFeature);
   const [isDeleteOverlayVisible, setIsDeleteOverlayVisible] = useState(false);
-  const [isIGSNChecked, setIsIGSNChecked] = useState(selectedFeature.isOnMySesar || false);
-  const [isIGSNModalVisible, setIsIGSNModalVisible] = useState(false);
 
   /* Derived Variables */
 
@@ -121,31 +114,10 @@ const FeatureDetail = ({
     else if (spot.properties[pageKey]) pageData = spot.properties[pageKey];
   }
   const isTemplate = saveTemplate;
-  // A sample already registered with SESAR is updated there as well as here, so it cannot be saved offline
-  const isRegisteredSampleOffline = !!selectedFeature.isOnMySesar && !!selectedFeature.Sample_IGSN
-    && !isInternetReachable;
-  // Registering a sample with SESAR needs credentials to do it with, and a user code to register it under unless
-  // it is already on SESAR and reachable to be updated in place
-  const isSesarRegistrationBlocked = isIGSNChecked && (!sesar.sesarToken.access
-    || (isEmpty(sesar.selectedUserCode) && !(selectedFeature.isOnMySesar && isInternetReachable)));
-  // A feature with nothing changed has nothing to save, and saving a sample with an IGSN would send the same data
-  // to SESAR again
+  // A feature with nothing changed has nothing to save
   const isFeatureUnchanged = !isFormDirty;
-  // Every reason the save itself is refused, held at the button rather than failing once it is pressed
-  const isSaveDisabled = isRegisteredSampleOffline || isSesarRegistrationBlocked || isFeatureUnchanged;
-  // Saving a sample already on SESAR updates it there, which needs a SESAR session: one was never made, was dropped
-  // after a failed refresh, or can no longer be refreshed. The sign-in otherwise lives in the IGSN modal, which only
-  // Save opens, so Save becomes the sign-in. An access token that has merely expired is refreshed on save instead.
-  const isSesarSignInNeeded = !!selectedFeature.isOnMySesar && !!selectedFeature.Sample_IGSN && isInternetReachable
-    && (!sesar?.sesarToken?.access || isTokenExpired(sesar.sesarToken.refresh));
-  // Why SESAR holds Save, shown on the page and in the unsaved changes prompt, whose Save is held the same way
-  const sesarSaveHeldReason = isRegisteredSampleOffline
-    ? 'This sample has an IGSN assigned and must be updated with SESAR. Please save changes when device is online.'
-    : isSesarSignInNeeded
-      ? 'This sample has an IGSN, so changes are also saved to SESAR. Please sign in to SESAR to save.'
-      : isSesarRegistrationBlocked
-        ? 'Registering this sample with SESAR needs a SESAR sign-in and a user code. Please sign in to SESAR to save.'
-        : undefined;
+  // An upload brings a sample's changes to strabospot.org but not to SESAR, which the user sends it to from there
+  const hasIGSN = pageKey === PAGE_KEYS.SAMPLES && !isTemplate && !!selectedFeature[SAMPLE_IGSN_KEY];
   // Pages whose form fills one orientation field in from another name the pairs it uses
   const orientationFields = page.key === PAGE_KEYS.THREE_D_STRUCTURES ? THREE_D_STRUCTURE_ORIENTATION_FIELDS
     : page.key === PAGE_KEYS.EARTHQUAKES ? EARTHQUAKE_ORIENTATION_FIELDS
@@ -174,12 +146,6 @@ const FeatureDetail = ({
   }, [selectedFeature]);
 
   /* Event Handlers */
-
-  const onSampleSaved = async (formCurrent) => {
-    console.log('Saving Sample To SESAR', formRef.current?.values);
-    await saveFeature(formCurrent);
-    closeDetailView();
-  };
 
   const onSubmitForm = (values, {resetForm}) => {
     console.log('Submitting form...', values);
@@ -252,15 +218,7 @@ const FeatureDetail = ({
     return getRequiredLithologyKeys(values, spot);
   };
 
-  const getIsDisabled = (fieldName) => {
-    if (isReadOnly) return true;
-    else {
-      return selectedFeature.isOnMySesar && selectedFeature.Sample_IGSN
-        ? isInternetReachable
-          ? fieldName === 'Sample_IGSN' : true
-        : false;
-    }
-  };
+  const getIsDisabled = fieldName => isReadOnly || fieldName === SAMPLE_IGSN_KEY;
 
   // Fields a feature requires beyond its survey are checked with it, so they hold Save the same way
   const validateFeature = (formName, values) => {
@@ -294,6 +252,7 @@ const FeatureDetail = ({
       const spotId = spot.properties.id;
       dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
+      if (page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web') dispatch(addedSampleSpotIdToUpload(spotId));
 
       if (page.key === PAGE_KEYS.SAMPLES && editedFeatureData.sample_id_name) {
         if (spot.properties.isSample && spot.properties.name !== editedFeatureData.sample_id_name) {
@@ -326,14 +285,10 @@ const FeatureDetail = ({
     return values;
   };
 
-  // Resolves whether the changes were saved. A sample on SESAR is not yet: the IGSN modal opens to finish it.
+  // Resolves whether the changes were saved
   const saveForm = async (formCurrent) => {
     try {
       console.log('Saving form...', formCurrent);
-      if (formCurrent?.values.Sample_IGSN && formCurrent?.values.isOnMySesar) {
-        await updateIGSNAndShowModal(formCurrent);
-        return false;
-      }
       let errors;
       if (groupKey === 'pet') {
         errors = await savePetFeature(pageKey, spot, formRef.current || formCurrent, selectedFeature);
@@ -360,15 +315,9 @@ const FeatureDetail = ({
   };
 
   // Save the open form in place for a parent-owned action that needs the stored record up to date before it goes on
-  // (see NotebookMenu's Link Sample), resolving whether it was saved. A sample registered with SESAR is left for its
-  // own Save, which updates SESAR as well and opens a modal of its own to do it.
+  // (see NotebookMenu's Link Sample), resolving whether it was saved
   const saveOpenChanges = async () => {
     const formCurrent = formRef.current;
-    if (formCurrent.values.Sample_IGSN && formCurrent.values.isOnMySesar) {
-      alert('Save Sample First', 'This sample is registered with SESAR, so its changes have to be saved with the'
-        + ' Save button, which updates SESAR too. Save them there and then link the sample.');
-      return false;
-    }
     try {
       await saveFeature(formCurrent);
       markSaved();
@@ -387,22 +336,6 @@ const FeatureDetail = ({
     markSaved();
     saveTemplate(formValues);
     return true;
-  };
-
-  // The ORCID redirect comes back to the IGSN modal mounted below, which stores the SESAR tokens; Save then returns.
-  const signIntoSesar = async () => {
-    if (!encoded_login) {
-      alert('Sign in to StraboSpot', 'Please sign in to your StraboSpot account before connecting to MySESAR.');
-      return;
-    }
-    await getOrcidToken();
-  };
-
-  const updateIGSNAndShowModal = async (formCurrent) => {
-    const values = {...formCurrent.values};
-    await saveFeature(formCurrent);
-    setIgsnFormValues(values);
-    setIsIGSNModalVisible(true);
   };
 
   // Expose the values to a parent-owned button that carries this form's edits somewhere (see NotebookFooter)
@@ -486,17 +419,24 @@ const FeatureDetail = ({
             {tabContent}
             {!isReadOnly && !tabContent && (
               <>
-                {!!sesarSaveHeldReason && (
-                  <Text style={{color: RED, fontSize: 16, fontWeight: '500', padding: 10, textAlign: 'center'}}>
-                    {sesarSaveHeldReason}
-                  </Text>
-                )}
                 <SaveAndCancelButtons
                   cancel={cancelForm}
-                  getIsDisabled={!isSesarSignInNeeded && (isFormInvalid || isSaveDisabled)}
-                  save={isSesarSignInNeeded ? signIntoSesar : saveButtonOnPress}
-                  title={isSesarSignInNeeded ? 'Sign in to SESAR' : undefined}
+                  getIsDisabled={isFormInvalid || isFeatureUnchanged}
+                  save={saveButtonOnPress}
                 />
+                {hasIGSN && isFormDirty && (
+                  <View style={sampleStyles.infoCallout}>
+                    <Icon color={PRIMARY_ACCENT_COLOR} name={'information-circle-outline'} size={22} type={'ionicon'}/>
+                    <Text style={sampleStyles.infoCalloutText}>
+                      This sample has an IGSN. Uploading the project saves your changes to StraboSpot, but SESAR is
+                      not updated automatically. After uploading, send the sample to SESAR from the{' '}
+                      <Text onPress={() => Linking.openURL(SAMPLES_PAGE_URL)} style={sampleStyles.infoCalloutLink}>
+                        Samples page
+                      </Text>
+                      {' '}{'>'} IGSNs on strabospot.org.
+                    </Text>
+                  </View>
+                )}
               </>
             )}
             {/*{page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web' && !isReadOnly && spot.geometry.type !== 'Polygon'}*/}
@@ -511,15 +451,6 @@ const FeatureDetail = ({
             </View>
           </>
         )}
-        <IGSNModal
-          isVisible={isIGSNModalVisible}
-          onIGSNUpdated={closeDetailView}
-          onModalCancel={() => setIsIGSNModalVisible(false)}
-          onSampleSaved={onSampleSaved}
-          ref={formRef}
-          sampleValues={igsnFormValues}
-        />
-
         {/*Modal when deleting a sample with an IGSN attached*/}
         <ModalWrapper
           actionTitle={'Delete'}

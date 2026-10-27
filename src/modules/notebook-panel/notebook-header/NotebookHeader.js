@@ -51,7 +51,7 @@ const NotebookHeader = ({
   const navigation = useNavigation();
   const store = useStore();
   const {getLabel} = useForm();
-  const {getCurrentLocation} = useMapLocation();
+  const {getCurrentLocation, showLocationError} = useMapLocation();
   const {
     checkSpotName,
     getReadOnlyReason,
@@ -188,8 +188,15 @@ const NotebookHeader = ({
   // on it, and saving that page changes the Spot, so the Spot is read after the answer.
   const setToCurrentLocation = async () => {
     if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
+    let currentLocation;
+    try {
+      currentLocation = await getCurrentLocation();
+    }
+    catch (err) {
+      showLocationError(err);
+      return;
+    }
     let editedSpot = JSON.parse(JSON.stringify(store.getState().spot.selectedSpot));
-    const currentLocation = await getCurrentLocation();
     editedSpot.geometry = turf.point([currentLocation.longitude, currentLocation.latitude]).geometry;
     delete editedSpot.properties.image_basemap;
     delete editedSpot.properties.lat;

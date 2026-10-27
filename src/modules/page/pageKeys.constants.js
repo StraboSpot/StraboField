@@ -7,7 +7,6 @@ export const PAGE_KEYS = {
   FOSSILS: 'fossils',
   GEOGRAPHY: 'geography',
   GEOLOGIC_UNITS: 'geologic_unit',
-  IGSN: 'igsn',
   IMAGES: 'images',
   INTERPRETATIONS: 'interpretations',
   INTERVAL: 'interval',

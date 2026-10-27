@@ -69,8 +69,12 @@ const ImportProjectFromZip = ({goBackToMain, openMainMenuPanel}) => {
     }
   };
 
+  // A picked zip is copied into the app before it can be unzipped, which takes a while for a large one, so the
+  // spinner holds the Unzip button back until there is a project to unzip
   const getZippedProject = async () => {
+    setIsLoading(true);
     const res = await getExternalProjectData();
+    setIsLoading(false);
     if (isEmpty(res)) {
       if (isProjectLoadSelectionModalVisible) goBackToMain();
       else dispatch(setSidePanelVisible({bool: false}));

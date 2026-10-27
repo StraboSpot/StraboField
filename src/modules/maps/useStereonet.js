@@ -2,7 +2,8 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {STEREONET_HEADERS} from './maps.constants';
 import copyToClipboard from '../../shared/copyToClipboard';
-import {getTimeAndDateFromModifiedTimestamp} from '../../shared/helpers';
+import {getTimeAndDateFromModifiedTimestamp, toTitleCase} from '../../shared/helpers';
+import useForm from '../form/useForm';
 import {openedMessageModal} from '../home/home.slice';
 import {FIRST_ORDER_CLASS_FIELDS, SECOND_ORDER_CLASS_FIELDS} from '../measurements/measurements.constants';
 
@@ -12,10 +13,15 @@ const useStereonet = () => {
   const dispatch = useDispatch();
   const userName = useSelector(state => state.user?.name);
 
+  const {getLabel} = useForm();
+
   /* Internal Functions */
 
   // Report the copy result in the app's own modal rather than a native/browser alert.
   const showResultModal = (title, message) => dispatch(openedMessageModal({message, title}));
+
+  // Measurement label for a stored choice name, or '' if there's no value
+  const getMeasurementChoiceLabel = name => (name ? getLabel(name, ['measurement']) : '');
 
   /* Exported Functions */
 
@@ -59,12 +65,12 @@ const useStereonet = () => {
         const type = od.type === 'linear_orientation' ? 'L' : 'P';
         const featureTypeField = FIRST_ORDER_CLASS_FIELDS.find(firstOrderClassField => od[firstOrderClassField]);
         const planeDetailField = SECOND_ORDER_CLASS_FIELDS.find(secondOrderClassField => od[secondOrderClassField]);
-        const featureType = od[featureTypeField] || '';
+        const featureType = toTitleCase(getMeasurementChoiceLabel(od[featureTypeField]));
         const notes = od.notes || '';
         const quality = od.quality || 5;
         const planeThickness = od.thickness || 0;
         const planeLength = od.length || 0;
-        const planeDetail = od[planeDetailField] || '';
+        const planeDetail = getMeasurementChoiceLabel(od[planeDetailField]);
         const planeAddlDetail = '';
         const unixTimestamp = od.unix_timestamp ? (od.unix_timestamp) / 1000 : Date.parse(spot.properties.time) / 1000;
         const modifiedTimestamp = od.modified_timestamp ? od.modified_timestamp / 1000 : spot.properties.modified_timestamp / 1000; // Converting into seconds from milliseconds

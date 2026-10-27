@@ -12,12 +12,16 @@ import {applyPendingModal, setActiveModal} from '../../../modules/home/home.slic
 import {SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
 import {isEmpty} from '../../helpers';
-import {MODAL_WIDTH, SMALL_SCREEN} from '../../styles.constants';
+import {MODAL_WIDTH, SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../styles.constants';
 import AvatarWrapper from '../avatars/AvatarWrapper';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
 // Body fills a fullscreen/small-screen modal; shrinks-to-content (and scrolls past the cap) in a
 // max-height-capped centered modal.
+// Every orientation the app allows (Info.plist). iOS crashes presenting a modal that shares no orientation with the
+// app, and the app can be locked to any of them - the compass restores whatever lock was there before, which on an
+// iPad can be upside-down portrait, and 'portrait' alone does not include that.
+const SUPPORTED_ORIENTATIONS = ['portrait', 'portrait-upside-down', 'landscape'];
 const FILL_FLEX = {flex: 1};
 const CONTENT_SIZED_FLEX = {flexShrink: 1};
 
@@ -263,11 +267,18 @@ const ModalWrapper = ({
         onDismiss={handleDismiss}
         onRequestClose={handleRequestClose}
         statusBarTranslucent
-        supportedOrientations={['portrait', 'landscape']}
+        supportedOrientations={SUPPORTED_ORIENTATIONS}
         visible={isVisible}
       >
         <GestureHandlerRootView style={{flex: 1}}>
-          <View style={[overlayStyles.overlayContainerFullScreen, {paddingBottom: fullscreenPaddingBottom}]}>
+          {/* A fullscreen iOS Modal ignores the safe area, and the fixed 50pt offset is shorter than the
+              Dynamic Island inset, so clear whichever is taller. */}
+          <View
+            style={[overlayStyles.overlayContainerFullScreen, {
+              paddingBottom: fullscreenPaddingBottom,
+              paddingTop: Math.max(insets.top, SMALL_SCREEN_STATUS_BAR_OFFSET),
+            }]}
+          >
             {renderModalContent()}
           </View>
         </GestureHandlerRootView>
@@ -297,7 +308,7 @@ const ModalWrapper = ({
       animationType={'fade'}
       onDismiss={handleDismiss}
       onRequestClose={handleRequestClose}
-      supportedOrientations={['portrait', 'landscape']}
+      supportedOrientations={SUPPORTED_ORIENTATIONS}
       transparent
       visible={isVisible}
     >

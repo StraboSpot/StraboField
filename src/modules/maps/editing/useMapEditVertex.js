@@ -19,7 +19,6 @@ import {
 } from './editing.helpers';
 import useMapSnap from './useMapSnap';
 import {clearedVertexes, setVertexStartCoords} from '../maps.slice';
-import useMap from '../useMap';
 import useMapCoords from '../view/useMapCoords';
 
 // Owns the in-progress edit session: which Spot/vertex is being edited, the exploded draw-vertex overlay it
@@ -40,7 +39,6 @@ const useMapEditVertex = ({
   const stratSection = useSelector(state => state.map.stratSection);
   const vertexEndCoords = useSelector(state => state.map.vertexEndCoords);
 
-  const {isDrawMode} = useMap();
   const {convertFeatureGeometryToImagePixels, convertImagePixelsToLatLong} = useMapCoords();
   const {getAllMappedSpots} = useMapFeatures();
   const {snapCoord} = useMapSnap(mapRef);
@@ -67,8 +65,10 @@ const useMapEditVertex = ({
 
   useEffect(() => {
     // console.log('UE useMapEditVertex [mapMode, spotEditing]');
-    // Lock the map while drawing or editing a Spot; EDIT with nothing selected stays movable for panning.
-    setAllowMapViewMove(!(isDrawMode(mapMode) || (mapMode === MAP_MODES.EDIT && !isEmpty(spotEditing))));
+    // Lock the map while freehand drawing (one-finger strokes would pan it) or editing a Spot. Tap-based draw modes
+    // (point, line, polygon, measure) stay movable; EDIT with nothing selected stays movable for panning.
+    const isFreehandDraw = mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON || mapMode === MAP_MODES.DRAW.FREEHANDLINE;
+    setAllowMapViewMove(!(isFreehandDraw || (mapMode === MAP_MODES.EDIT && !isEmpty(spotEditing))));
   }, [mapMode, spotEditing]);
 
   useEffect(() => {

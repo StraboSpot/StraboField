@@ -12,7 +12,7 @@ import useMapLocation from '../maps/view/useMapLocation';
 const GeoFieldInputs = ({formRef, isReadOnly}) => {
   /* Data Hooks */
 
-  const {getCurrentLocation} = useMapLocation();
+  const {getCurrentLocation, showLocationError} = useMapLocation();
 
   /* Local State */
 
@@ -25,6 +25,10 @@ const GeoFieldInputs = ({formRef, isReadOnly}) => {
     setIsGettingLocation(true);
     try {
       currentLocation = await getCurrentLocation();
+    }
+    catch (err) {
+      showLocationError(err);
+      return;
     }
     finally {
       setIsGettingLocation(false);

@@ -5,7 +5,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useSamples from './useSamples';
-import {getNewId, isEmpty, numToLetter, sleep} from '../../shared/helpers';
+import {getNewId, isEmpty, numToLetter, sleep, toError} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import useForm from '../form/useForm';
 import {setActiveModal, setLoadingStatus} from '../home/home.slice';
@@ -166,9 +166,10 @@ const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCur
       setIsLoading(false);
       console.error('Error saving Sample', err);
       dispatch(setLoadingStatus({bool: false, view: 'home'}));
+      const errorMessage = `Error Saving Sample! \n${toError(err).message}`;
       const errorOptions = {duration: 2000, type: 'danger'};
-      if (SMALL_SCREEN) toastRef.current?.show(`Error Saving Sample! \n${err}`, errorOptions);
-      else toast.show(`Error Saving Sample! \n${err}`, errorOptions);
+      if (SMALL_SCREEN) toastRef.current?.show(errorMessage, errorOptions);
+      else toast.show(errorMessage, errorOptions);
     }
   };
 

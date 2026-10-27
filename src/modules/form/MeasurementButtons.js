@@ -92,7 +92,7 @@ const MeasurementButtons = ({
           <Button
             buttonStyle={[formStyles.formButtonSmall, {
               backgroundColor: isGroupEmpty(field) ? SECONDARY_BACKGROUND_COLOR : PRIMARY_ACCENT_COLOR,
-              height: 60,
+              minHeight: 60,
               padding: 1,
             }]}
             containerStyle={{flex: 1, padding: 2}}

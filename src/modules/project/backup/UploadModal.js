@@ -20,7 +20,7 @@ import {updatedProjectTransferProgress} from '../../connections/connections.slic
 import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.slice';
 import {setIsImageTransferring} from '../projects.slice';
 
-const UploadModal = ({autoStart, closeModal, isVisible}) => {
+const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, onAfterUploadActionPressed}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -55,6 +55,11 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
   const [uploadImageSuccess, setUploadImageSuccess] = useState(false);
   const [uploadState, setUploadState] = useState('not started');
 
+  /* Derived Variables */
+
+  // A caller can offer a next step once everything is up, e.g. going on to the uploaded sample on strabospot.org
+  const isAfterUploadActionShown = uploadState === 'complete' && !!onAfterUploadActionPressed;
+
   /* Side Effects */
 
   useEffect(() => {
@@ -72,7 +77,11 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
   /* Event Handlers */
 
   const handleActionPressed = async () => {
-    if (uploadState === 'not started') await initiateUpload();
+    if (isAfterUploadActionShown) {
+      handleClosePress();
+      onAfterUploadActionPressed();
+    }
+    else if (uploadState === 'not started') await initiateUpload();
     else if (uploadState === 'complete' || uploadState === 'error') handleClosePress();
   };
 
@@ -289,7 +298,9 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
 
   return (
     <ModalWrapper
-      actionTitle={uploadState === 'complete' || uploadState === 'error' ? 'OK' : 'Upload'}
+      actionTitle={isAfterUploadActionShown ? afterUploadActionTitle
+        : uploadState === 'complete' || uploadState === 'error' ? 'OK' : 'Upload'}
+      cancelTitle={isAfterUploadActionShown ? 'OK' : undefined}
       closeModal={handleClosePress}
       headerTitle={modalTitle}
       isLoading={uploadState === 'uploading'}
@@ -298,7 +309,7 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
       onCancelPress={handleClosePress}
       overlayStyleOverride={{height: 'auto'}}
       showActionButton={uploadState === 'not started' || uploadState === 'error' || uploadState === 'complete'}
-      showCancelButton={uploadState === 'not started'}
+      showCancelButton={uploadState === 'not started' || isAfterUploadActionShown}
       showCloseButton
     >
       {uploadState === 'not started' ? renderInitialUploadView()

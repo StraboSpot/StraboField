@@ -194,8 +194,8 @@ const useHome = ({
         if (!isEditModeUnavailable) mapComponentRef.current?.startEditingMode();
         break;
       case HOME_ACTIONS.TOGGLE_USER_LOCATION:
-        if (value) zoomToCurrentLocation().catch(console.error);
         mapComponentRef.current?.toggleUserLocation(value);
+        if (value) return zoomToCurrentLocation();
         break;
       case HOME_ACTIONS.CLOSE_IMAGE_BASEMAP:
         const spotWithThisImageBasemap = getRootSpot(currentImageBasemap?.id);

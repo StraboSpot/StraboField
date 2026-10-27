@@ -28,12 +28,17 @@ const migrations = {
       },
     },
   }),
+  // IGSNs are minted on strabospot.org now, so the app no longer keeps SESAR credentials
+  2: (state) => {
+    const {orcidToken, sesar, ...user} = state.user ?? {};
+    return {...state, user: user};
+  },
 };
 
 // Redux Persist
 export const persistConfig = {
   key: 'root',
-  version: 1,
+  version: 2,
   storage: AsyncStorage,
   blacklist: [
     'compass',
@@ -204,7 +209,7 @@ const store = configureStore({
 let persistor = persistStore(store);
 
 // Expose the store on global in dev so it can be inspected/dispatched from the debugger console
-// (e.g. store.dispatch(...) to inject a test SESAR token). No-op in release builds.
+// (e.g. store.dispatch(...)). No-op in release builds.
 if (__DEV__) global.store = store;
 
 export {store, persistor};

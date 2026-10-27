@@ -29,6 +29,7 @@ import {
 import {deepCopyWithNewIds, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {setActiveModal} from '../home/home.slice';
+import {hasValidCoords} from '../maps/maps.helpers';
 import {
   clearedSpotsInMapExtentIds,
   clearedStratSection,
@@ -602,7 +603,7 @@ const useSpots = () => {
         return [rootSpot.properties.lng, rootSpot.properties.lat];
       }
       if (isOnGeoMap(rootSpot)) {
-        if (!rootSpot.geometry) return undefined;
+        if (!hasValidCoords(rootSpot)) return undefined;
         return rootSpot.geometry.type === 'Point' ? rootSpot.geometry.coordinates
           : turf.centroid(rootSpot).geometry.coordinates;
       }
@@ -679,6 +680,8 @@ const useSpots = () => {
       if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
       if (stratSection) dispatch(clearedStratSection());
     }
+    // The Spot holding the map is searched for in every Dataset, and the map is read straight off it, because
+    // a Dataset turned on here is not active in the store until the next render
     else if (isOnImageBasemap(spot)
       && (!currentImageBasemap || currentImageBasemap.id !== spot.properties.image_basemap)) {
       const isThisImageBasemap = imageBasemap => isSameId(imageBasemap.id, spot.properties.image_basemap);

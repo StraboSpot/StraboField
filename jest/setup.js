@@ -35,6 +35,8 @@ jest.mock('@sentry/react-native', () => ({
   setUser: jest.fn(),
   setTag: jest.fn(),
   setContext: jest.fn(),
+  // The render-error half of the real GlobalErrorBoundary; the fatal-error half needs RN's ErrorUtils wiring
+  GlobalErrorBoundary: jest.requireActual('@sentry/react').ErrorBoundary,
 }));
 
 // Remaining native modules with no shipped mock — inert stubs so imports resolve.

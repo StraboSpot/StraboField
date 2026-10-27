@@ -12,7 +12,7 @@ import useMapsOffline from './useMapsOffline';
 import useDevice from '../../../services/device/useDevice';
 import {APP_DIRECTORIES} from '../../../services/files/directories.constants';
 import useServerRequests from '../../../services/network/useServerRequests';
-import {toNumberFixedValue} from '../../../shared/helpers';
+import {toError, toNumberFixedValue} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
@@ -258,10 +258,12 @@ const SaveMapsModal = ({getCurrentZoom, getExtentString, getTileCount}) => {
     }
     catch (err) {
       console.error('Error saving map', err);
-      const editedError = err.toString().replace('Error: Error: Error:', '');
       setIsError(true);
-      setErrorMessage(
-        `${editedError}!\n\n Make sure you are pulling the map from the correct endpoint\n(Home Menu -> Advanced Options -> Custom Database Endpoint).`);
+      const message = toError(err).message.replace(/[.!]*$/, '.');
+      // A wrong endpoint can only be the cause when the user has set one of their own
+      const endpointHint = isSelected ? '\n\nMake sure you are pulling the map from the correct endpoint\n'
+        + '(Home Menu -> Advanced Options -> Custom Database Endpoint).' : '';
+      setErrorMessage(message + endpointHint);
       setShowMainMenu(false);
       setShowLoadingMenu(false);
       setShowLoadingBar(false);

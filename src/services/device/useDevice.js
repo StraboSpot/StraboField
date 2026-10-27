@@ -13,6 +13,7 @@ import {deletedOfflineMap} from '../../modules/maps/offline-maps/offlineMaps.sli
 import {doesBackupDirectoryExist, doesDownloadsDirectoryExist} from '../../modules/project/projects.slice';
 import {toError} from '../../shared/helpers';
 import {APP_DIRECTORIES} from '../files/directories.constants';
+import {getDeviceIdHeader} from '../network/serverRequests.helpers';
 import useServerRequests from '../network/useServerRequests';
 
 const useDevice = () => {
@@ -210,6 +211,7 @@ const useDevice = () => {
       headers: {
         'Authorization': 'Basic ' + encodedLogin,
         'Accept': 'application/json',
+        ...getDeviceIdHeader(profileImageURL),
       },
     }).promise.then(async (res) => {
         console.log('RNFS Download Profile Image Response:', res);

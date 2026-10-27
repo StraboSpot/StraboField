@@ -1,20 +1,38 @@
 import {Platform} from 'react-native';
 
 import * as turf from '@turf/turf';
+import DeviceInfo from 'react-native-device-info';
 import Geolocation from 'react-native-geolocation-service';
+import {useToast} from 'react-native-toast-notifications';
 import {useDispatch} from 'react-redux';
 
 import usePermissions from '../../../services/device/usePermissions';
+import {toError} from '../../../shared/helpers';
 import {setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
+import {LOCATION_ACCURACY_TARGET, LOCATION_SETTLE_TIME, LOCATION_TIMEOUT} from '../maps.constants';
+import {getMoreAccuratePosition, isFreshPosition} from './view.helpers';
+
+const LOCATION_PERMISSION_NOT_GRANTED = 'Location permission not granted';
+
+// Both the browser and the native geolocation report a refused permission as code 1
+const getLocationError = error => new Error(error.code === 1 ? LOCATION_PERMISSION_NOT_GRANTED
+  : 'Error getting current location: ' + (error.message || 'Unknown Error'));
+
+let pendingLocationRequestsCount = 0;
+
+// A request can put up a system dialog (the permission prompt, or Android's one to turn on location services) that
+// takes the app out of the foreground. While one is pending, that isn't the user leaving the app.
+export const isLocationRequestPending = () => pendingLocationRequestsCount > 0;
 
 const useMapLocation = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
 
-  const {hasLocationPermission} = usePermissions();
+  const {hasLocationPermission, isLocationPermissionGranted} = usePermissions();
   const {createRandomSpots, createSpot} = useSpots();
+  const toast = useToast();
 
   /* Exported Functions */
 
@@ -26,7 +44,9 @@ const useMapLocation = () => {
 
   // Get the current location from the device and set it in the state. Pass {showBlockedAlert: false} when the
   // caller has its own fallback for a missing fix and shouldn't surface the Settings alert (declination resolution).
-  const getCurrentLocation = async ({showBlockedAlert = true} = {}) => {
+  // Pass {waitForAccurateFix: false} when any recent fix will do (checking location works, declination), to skip
+  // waiting for the GPS to reach the accuracy needed to place a Spot.
+  const getCurrentLocation = async ({showBlockedAlert = true, waitForAccurateFix = true} = {}) => {
     if (Platform.OS === 'web') {
       return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
@@ -36,18 +56,30 @@ const useMapLocation = () => {
           },
           (error) => {
             console.error(error);
-            reject('Error getting current location: ' + (error.message ? error.message : 'Unknown Error'));
+            reject(getLocationError(error));
           },
           {timeout: 30000, maximumAge: 10000, enableHighAccuracy: true},
         );
       });
     }
 
-    // Native (iOS + Android): verify permission up front so a denial shows the
-    // Settings alert from usePermissions rather than failing silently in the geolocation call.
-    const permissionGranted = await hasLocationPermission({showBlockedAlert});
-    if (!permissionGranted) throw new Error('Location permission not granted');
+    pendingLocationRequestsCount++;
+    try {
+      // Native (iOS + Android): verify permission up front so a denial shows the
+      // Settings alert from usePermissions rather than failing silently in the geolocation call.
+      const permissionGranted = await hasLocationPermission({showBlockedAlert});
+      if (!permissionGranted) throw new Error(LOCATION_PERMISSION_NOT_GRANTED);
 
+      return await (waitForAccurateFix ? watchForAccurateLocation() : getLatestLocation());
+    }
+    finally {
+      pendingLocationRequestsCount--;
+    }
+  };
+
+  // The most recent fix the device has, taken as is. Quick, but on a cold start it can be a cached or
+  // cell/Wi-Fi fix far from the user, so it isn't good enough to place a Spot (issue #1012).
+  const getLatestLocation = () => {
     const geolocationOptions = {
       enableHighAccuracy: true,
       forceRequestLocation: true,
@@ -63,11 +95,27 @@ const useMapLocation = () => {
         },
         (error) => {
           console.error(error);
-          reject('Error getting current location: ' + (error.message ? error.message : 'Unknown Error'));
+          reject(getLocationError(error));
         },
         geolocationOptions,
       );
     });
+  };
+
+  // Instant when location services are on and permission is granted. Otherwise it asks, which offers to turn them on
+  // or grant permission, and says why if the location still can't be found. Web can't check without asking, so it
+  // leaves that to the lookup that follows.
+  const isLocationAvailable = async () => {
+    if (Platform.OS === 'web') return true;
+    if (await DeviceInfo.isLocationEnabled() && await isLocationPermissionGranted()) return true;
+    try {
+      await getCurrentLocation({waitForAccurateFix: false});
+      return true;
+    }
+    catch (err) {
+      showLocationError(err);
+      return false;
+    }
   };
 
   // Create a point feature at the current location
@@ -82,10 +130,76 @@ const useMapLocation = () => {
     return JSON.parse(JSON.stringify(newSpot));
   };
 
+  // Watch the GPS rather than taking the first fix, which on a cold start is often a cached or cell/Wi-Fi fix far
+  // from the user (issue #1012). Take the first fresh fix within the accuracy target, else the most accurate fix
+  // once the settle time has passed.
+  const watchForAccurateLocation = () => {
+    const geolocationOptions = {
+      distanceFilter: 0,
+      enableHighAccuracy: true,
+      fastestInterval: 500,
+      forceRequestLocation: true,
+      interval: 1000,
+      showLocationDialog: true,
+    };
+    return new Promise((resolve, reject) => {
+      const requestStartTime = Date.now();
+      let bestPosition;
+      let isDone = false;
+      let isSettled = false;
+      let watchId;
+
+      // Clear the watch and timers exactly once, so a stale watch id can't clear a later request's watch
+      const finish = (callback, value) => {
+        if (isDone) return;
+        isDone = true;
+        clearTimeout(settleTimer);
+        clearTimeout(timeoutTimer);
+        Geolocation.clearWatch(watchId);
+        callback(value);
+      };
+
+      const resolveWithBestPosition = () => {
+        console.log('Got location', bestPosition.coords);
+        finish(resolve, bestPosition.coords);
+      };
+
+      const settleTimer = setTimeout(() => {
+        isSettled = true;
+        if (bestPosition) resolveWithBestPosition();
+      }, LOCATION_SETTLE_TIME);
+
+      const timeoutTimer = setTimeout(() => {
+        finish(reject, new Error('Error getting current location: Timed out waiting for a GPS fix'));
+      }, LOCATION_TIMEOUT);
+
+      watchId = Geolocation.watchPosition(
+        (position) => {
+          if (!isFreshPosition(position, requestStartTime)) return;
+          bestPosition = getMoreAccuratePosition(bestPosition, position);
+          if (isSettled || bestPosition.coords.accuracy <= LOCATION_ACCURACY_TARGET) resolveWithBestPosition();
+        },
+        (error) => {
+          console.error(error);
+          if (!bestPosition) finish(reject, getLocationError(error));
+        },
+        geolocationOptions,
+      );
+    });
+  };
+
+  // Silent when permission was refused: the user has just said no or been shown the Settings alert
+  const showLocationError = (err) => {
+    const {message} = toError(err);
+    if (message !== LOCATION_PERMISSION_NOT_GRANTED) toast.show(message, {type: 'danger'});
+  };
+
   return {
     generateRandomsSpotsAroundCurrentLocation,
     getCurrentLocation,
+    isLocationAvailable,
     setPointAtCurrentLocation,
+    showLocationError,
   };
 };
 

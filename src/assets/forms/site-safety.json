@@ -190,7 +190,7 @@
     {
       "type": "text",
       "name": "breifing_notes",
-      "label": "Breifing Notes",
+      "label": "Briefing Notes",
       "required": "false",
       "appearance": "multiline"
     }

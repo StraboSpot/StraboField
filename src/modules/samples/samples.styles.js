@@ -59,6 +59,10 @@ const sampleStyles = StyleSheet.create({
   infoCalloutEmphasis: {
     fontWeight: TEXT_WEIGHT_700,
   },
+  infoCalloutLink: {
+    color: PRIMARY_ACCENT_COLOR,
+    textDecorationLine: 'underline',
+  },
   infoCalloutText: {
     color: PRIMARY_TEXT_COLOR,
     flex: 1,

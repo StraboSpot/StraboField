@@ -47,7 +47,9 @@ const DrawActionButtons = ({handleHomeAction, mapMode, openMainMenuPanel}) => {
   /* View */
 
   // Whether this row appears at all is useHome's hasDrawTools, since the layout around it has to know too.
-  // What is left here is which of the tools to show, which is the row's own business.
+  // What is left here is which of the tools to show, which is the row's own business. Without a target the
+  // row holds a hint in place of the draw tools, so the user can tell why they are missing, and tapping it
+  // opens the Datasets page where the target is chosen.
   return (
     <View style={[homeStyles.drawToolsContainer, SMALL_SCREEN && homeStyles.smallScreenDrawActionButtons]}>
       {/* Having no target is allowed, so this says why the tools are missing rather than forcing a choice */}

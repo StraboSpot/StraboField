@@ -36,7 +36,6 @@ import ReportModal from '../reports/ReportModal';
 import ReportsListModal from '../reports/ReportsListModal';
 import ReportsOverview from '../reports/ReportsOverview';
 import ReportsPage from '../reports/ReportsPage';
-import IGSNPage from '../samples/igsn/IGSNPage';
 import SampleModal from '../samples/SampleModal';
 import SamplesOverview from '../samples/SamplesOverview';
 import SamplesPage from '../samples/SamplesPage';
@@ -216,11 +215,6 @@ export const SUBPAGES = [
     key: PAGE_KEYS.GEOGRAPHY,
     label: 'Geography',
     page_component: () => GeographyPage,
-  },
-  {
-    key: PAGE_KEYS.IGSN,
-    label: 'IGSN',
-    page_component: () => IGSNPage,
   },
   {
     key: PAGE_KEYS.NESTING,
