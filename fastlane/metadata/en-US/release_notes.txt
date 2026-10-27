@@ -1,3 +1,10 @@
+SAMPLES & IGSN
+• IGSNs from strabospot.org: IGSNs now come from your strabospot.org account, so the app no longer signs in to or registers with SESAR
+• IGSNs on strabospot.org: View IGSN and Get IGSN open the sample's own page on strabospot.org
+• Upload first: a sample not yet on your account offers to upload the project, then opens its page when the upload is done
+• IGSN edits reminder: editing a sample that has an IGSN reminds you to upload so strabospot.org can update it
+• Correct sample location: a sample from an image-basemap Spot gets a real-world location
+
 FORMS & VALIDATION
 • Live form validation: errors show as you type and Save stays disabled until they're fixed
 • Find the problem field: the tab holding an unanswered field is marked so you know where to look
@@ -21,7 +28,6 @@ LOCATION
 MEASUREMENTS
 • Bulk strike/dip: calculate missing strikes and dip directions for every record that holds a plane
 • Steadier validation: planar+linear and 3D-structure measurements are checked and hinted more reliably
-• Steady compass for lineations: trend and plunge are always taken along the top of the screen, which now stays in portrait while the compass is open, instead of sometimes reading 90° or 180° off depending on how the device was held. The live strike/dip and trend/plunge are shown under the compass
 
 TAGS
 • Memos on tags: add, remove, count, and list a tag's memos from its detail page
@@ -47,11 +53,6 @@ LISTS & DATASETS
 
 READ-ONLY DATASETS
 • Read-only everywhere: read-only status now carries through image basemaps, strat sections, and forms
-
-STRAT SECTIONS
-• Image overlays: set up, save, and draw image overlays under a strat section in the right order
-• Open with intervals: opening a section activates the datasets holding its intervals
-• Hidden datasets: opening a strat section or image basemap whose Spot is in a dataset that's off turns that dataset on
 
 Full notes: https://github.com/StraboSpot/StraboField/releases/tag/v2.32.0
 
