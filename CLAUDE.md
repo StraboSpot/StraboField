@@ -246,7 +246,7 @@ suffixes; `.web.js` for web overrides.
 ## Dependencies
 
 - React 19.2.3 + React Native 0.84.1
-- Redux Toolkit 2.12.0 + Redux Persist 6.0.0
+- Redux Toolkit 2.13.0 + Redux Persist 6.0.0
 - React Navigation 7.x
 - Mapbox Maps (@rnmapbox/maps 10.3.1 for native, mapbox-gl 2.x for web)
 - Formik 2.4.9 - Form management
