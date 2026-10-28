@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*'
+      # Cut markers from `npm run cut-rc` are not releases.
+      - '!v*-rc'
 
 jobs:
   release:
