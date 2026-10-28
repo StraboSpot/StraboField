@@ -190,6 +190,14 @@ const RELEASE_NOTES = [
             text: 'Map filter for Spots: filter Spots by whether they\'re on the geographic map or not mapped',
             commit: '7cddc4a4d',
           },
+          {
+            text: 'Edited Spots stay put: editing a Spot on the map no longer also adds it to the target dataset, so it can\'t vanish from its own dataset after an upload',
+            commit: '422b1382f',
+          },
+          {
+            text: 'Fix Spots in two datasets: on the Metadata page, tap a dataset to move a Spot listed in several datasets into just that one',
+            commit: '116d6a0e6',
+          },
         ],
       },
       {

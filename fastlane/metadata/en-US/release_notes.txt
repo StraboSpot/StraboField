@@ -50,9 +50,8 @@ LISTS & DATASETS
 • Remembered sort: each list keeps its sort order and reverse sort, applied before the first paint
 • Active dataset names: lists name the active datasets at the top, with a shortcut to open Datasets
 • Map filter for Spots: filter Spots by whether they're on the geographic map or not mapped
-
-READ-ONLY DATASETS
-• Read-only everywhere: read-only status now carries through image basemaps, strat sections, and forms
+• Edited Spots stay put: editing a Spot on the map no longer also adds it to the target dataset, so it can't vanish from its own dataset after an upload
+• Fix Spots in two datasets: on the Metadata page, tap a dataset to move a Spot listed in several datasets into just that one
 
 Full notes: https://github.com/StraboSpot/StraboField/releases/tag/v2.32.0
 
