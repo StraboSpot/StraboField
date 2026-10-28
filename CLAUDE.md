@@ -22,7 +22,8 @@ Guidance for Claude Code when working in this repository.
   `RNMBXImageQueue`, applied via `patches/@rnmapbox+maps+10.3.1.patch`. Rename the patch when upgrading Mapbox.
 - **Releases: tag on `master` after merge, with a `v` prefix** (e.g. `v2.29.1`) — never tag on the rc branch, never
   hand-write the changelog. See [Release Process](#release-process-rc--master).
-- **Package manager is Yarn 4.13.0** (install with `yarn`); npm-script names below run fine via `npm run` or `yarn`.
+- **Package manager is Yarn 4** (exact version pinned by `packageManager` in `package.json`; install with `yarn`);
+  npm-script names below run fine via `npm run` or `yarn`.
 - **Ids: UUIDs inside `spot.properties`, numbers only for the server's keys** — never lengthen `getNewId`'s output
   and never do arithmetic on an id. Samples are the one exception: a sample id is also a Spot id, so it stays
   numeric. See the Ids paragraph under [Architecture](#architecture).
