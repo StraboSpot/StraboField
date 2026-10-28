@@ -5,6 +5,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {SAMPLE_PAGE_BASE_URL} from './samples.constants';
+import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {hasValidCoords} from '../maps/maps.helpers';
@@ -19,14 +20,17 @@ import useProject from '../project/useProject';
 import {isOnGeoMap} from '../spots/spots.helpers';
 import {clearedSelectedSpots, editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
+import {setUserData} from '../user/userProfile.slice';
 
 const useSamples = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const encodedLogin = useSelector(state => state.user?.encoded_login);
   const sampleSpotIdsToUpload = useSelector(state => state.project.sampleSpotIdsToUpload);
   const straboUserId = useSelector(state => state.user?.straboUserId);
 
+  const {getProfile} = useServerRequests();
   const {getTargetDatasetFromId} = useProject();
   const {deleteSpot, getRootSpotGeoCoords} = useSpots();
   const toast = useToast();
@@ -123,18 +127,40 @@ const useSamples = () => {
     }
   };
 
-  const openUploadedSamplePage = sampleId => Linking.openURL(`${SAMPLE_PAGE_BASE_URL}/${straboUserId}/${sampleId}`);
+  const openUploadedSamplePage = (sampleId, userId = straboUserId) => (
+    Linking.openURL(`${SAMPLE_PAGE_BASE_URL}/${userId}/${sampleId}`));
+
+  // The user id arrives with the profile, which is only downloaded at sign-in, so a sign-in from before the server
+  // sent it has none. Fetch it rather than make them sign in again.
+  const getStraboUserId = async () => {
+    if (straboUserId) return straboUserId;
+    try {
+      const {straboUserId: fetchedId} = await getProfile(encodedLogin) ?? {};
+      if (fetchedId) dispatch(setUserData({straboUserId: fetchedId}));
+      return fetchedId;
+    }
+    catch (err) {
+      console.error('Error getting the StraboSpot user id', err);
+    }
+  };
 
   // IGSNs are minted and sent to SESAR on strabospot.org, which can only work from what has been uploaded there.
-  // A guest has no account to upload to.
-  const openSamplePage = (sampleId, startUpload) => {
-    if (!straboUserId || sampleSpotIdsToUpload.includes(sampleId)) {
+  // A guest has no account to upload to. A legacy sample is saved, and so uploaded, as part of its parent Spot, so
+  // pass that Spot's id as uploadSpotId.
+  const openSamplePage = async (sampleId, startUpload, uploadSpotId = sampleId) => {
+    if (!encodedLogin || sampleSpotIdsToUpload.includes(uploadSpotId)) {
       alert('Upload Project First',
         'This sample, or its latest changes, is not on your StraboSpot account yet. Upload the project to your '
         + 'account first.',
         [{text: 'Not Now', style: 'cancel'}, {text: 'Upload', onPress: startUpload}]);
+      return;
     }
-    else openUploadedSamplePage(sampleId);
+    const userId = await getStraboUserId();
+    if (userId) openUploadedSamplePage(sampleId, userId);
+    else {
+      alert('Sample Page Unavailable',
+        'Your StraboSpot account details could not be loaded. Check your connection and try again.');
+    }
   };
 
   return {

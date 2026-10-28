@@ -49,7 +49,8 @@ const SampleListItem = ({
 
   /* Event Handlers */
 
-  const handleIGSNButtonPressed = () => openSamplePage(sampleMetadata.id, startUploadFromStatus);
+  const handleIGSNButtonPressed = () => openSamplePage(sampleMetadata.id, startUploadFromStatus,
+    sample.properties?.isSample ? sample.properties.id : parentSpot?.properties?.id);
 
   // A caller with its own onChecked takes the press instead of the tag write, and gets the parent Spot too
   // since a legacy sample carries no id of its own that means anything outside it
