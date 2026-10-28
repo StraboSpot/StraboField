@@ -205,7 +205,8 @@ const useDownload = () => {
       console.log('Finished Downloading Project Properties.', projectResponse);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Finished Downloading Project Properties'));
-      if (projectResponse.reports && !isEmpty(projectResponse.reports)) {
+      // Web shows memo images from the server and has no device storage to save them to
+      if (Platform.OS !== 'web' && projectResponse.reports && !isEmpty(projectResponse.reports)) {
         await downloadReportImages(projectResponse.reports);
       }
     }
