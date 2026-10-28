@@ -5,6 +5,7 @@ import {Base64} from 'js-base64';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDownload from '../../services/files/useDownload';
+import {isAuthenticationError} from '../../services/network/serverRequests.helpers';
 import {isEmpty} from '../../shared/helpers';
 import useResetState from '../../store/useResetState';
 import {openedMessageModal, setIsProjectLoadSelectionModalVisible, setLoadingStatus} from '../home/home.slice';
@@ -48,7 +49,8 @@ const useSignIn = () => {
     }
     catch (err) {
       console.error('Log In Error:', err);
-      Sentry.captureException(err);
+      // A wrong email or password is the user's to fix, not an app failure
+      if (!isAuthenticationError(err)) Sentry.captureException(err);
       if (Platform.OS !== 'web') {
         dispatch(setLoadingStatus({view: 'home', bool: false}));
         const errMsg = err.message || 'Credentials entered are incorrect. Please try again.';

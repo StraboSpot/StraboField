@@ -1,13 +1,12 @@
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useContext, useLayoutEffect, useRef} from 'react';
 import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {isEqual} from '../../shared/helpers';
-import alert from '../../shared/ui/alert';
 import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import Form from '../form/Form';
 import FormikWrapper from '../form/FormikWrapper';
+import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
@@ -22,18 +21,16 @@ const IntervalPage = ({isReadOnly, page}) => {
 
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {goToNotebookPage} = useContext(LeavePageContext);
 
   const {saveSedFeature} = useSed();
 
-  /* Local State */
-
   const intervalRef = useRef(null);
-  // The values already saved, so leaving straight afterwards does not ask about them again. The form's own
-  // dirty flag is not enough on its own: the page can unmount in the same render pass as the save, leaving
-  // this ref holding the form as it was before it.
-  const savedValuesRef = useRef(null);
-
-  const [isFormInvalid, setIsFormInvalid] = useState(false);
+  const {isFormInvalid, markSaved, setIsFormDirty, setIsFormInvalid} = useUnsavedFormChanges({
+    formRef: intervalRef,
+    getMessage: () => 'Your changes to this interval haven\'t been saved.',
+    save: () => saveInterval(intervalRef.current),
+  });
 
   /* Derived Variables */
 
@@ -54,30 +51,28 @@ const IntervalPage = ({isReadOnly, page}) => {
       dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     }
-    return () => confirmLeavePage();
   }, []);
 
   /* Logic Helpers */
 
-  const confirmLeavePage = () => {
-    if (intervalRef.current?.dirty && !isEqual(intervalRef.current.values, savedValuesRef.current)) {
-      const formCurrent = intervalRef.current;
-      alert('Unsaved Changes',
-        'Would you like to save your interval before continuing?',
-        [
-          {text: 'No', style: 'cancel'},
-          {text: 'Yes', onPress: () => saveInterval(formCurrent)},
-        ],
-        {cancelable: false},
-      );
+  const cancelFormAndGo = () => goToNotebookPage(PAGE_KEYS.OVERVIEW);
+
+  // Resolves whether the interval was saved. A refusal has already alerted about the field it stopped on.
+  const saveInterval = async (formCurrent) => {
+    try {
+      await saveSedFeature(page.key, spot, formCurrent);
+      markSaved();
+      await formCurrent.resetForm();
+      return true;
+    }
+    catch (err) {
+      console.error('Error saving interval', err);
+      return false;
     }
   };
 
-  const saveInterval = async (formCurrent) => {
-    await saveSedFeature(page.key, spot, formCurrent);
-    savedValuesRef.current = {...formCurrent.values};
-    await formCurrent.resetForm();
-    dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+  const saveIntervalAndGo = async () => {
+    if (await saveInterval(intervalRef.current)) dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
   };
 
   /* View */
@@ -87,9 +82,9 @@ const IntervalPage = ({isReadOnly, page}) => {
       <PageHeader hideBackButton={!isReadOnly} pageTitle={page.label}/>
       {!isReadOnly && (
         <SaveAndCancelButtons
-          cancel={() => dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW))}
+          cancel={cancelFormAndGo}
           getIsDisabled={isFormInvalid}
-          save={() => saveInterval(intervalRef.current)}
+          save={saveIntervalAndGo}
         />
       )}
       <FormikWrapper
@@ -98,6 +93,7 @@ const IntervalPage = ({isReadOnly, page}) => {
         initialValues={{...interval, character}}
         innerRef={intervalRef}
         onReset={() => console.log('Resetting form...')}
+        setIsFormDirty={setIsFormDirty}
         setIsFormInvalid={setIsFormInvalid}
       >
         {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}

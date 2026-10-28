@@ -27,7 +27,7 @@ import MainButtons from '../form/MainButtons';
 import MeasurementButtons from '../form/MeasurementButtons';
 import MeasurementModal from '../form/MeasurementModal';
 import useForm from '../form/useForm';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
@@ -75,7 +75,7 @@ const AddEarthquakeModal = () => {
 
   /* Logic Helpers */
 
-  const closeModal = () => dispatch(setModalVisible({modal: null}));
+  const closeModal = () => dispatch(setActiveModal({modal: null}));
 
   const saveEarthquake = async () => {
     try {

@@ -8,7 +8,7 @@ const DEFAULT_SIZE = 100;
 
 // Stands in for the Lottie animations on web, driven by the same `type` the native component takes. Every type
 // other than the two terminal ones represents work in progress, so it spins.
-const LottieAnimation = ({animationStyle, type}) => {
+const LottieAnimations = ({animationStyle, type}) => {
   /* Derived Variables */
 
   const isError = type === 'error';
@@ -35,4 +35,4 @@ const LottieAnimation = ({animationStyle, type}) => {
   );
 };
 
-export default LottieAnimation;
+export default LottieAnimations;

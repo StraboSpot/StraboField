@@ -8,16 +8,20 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import ModalWrapperHeader from './ModalWrapperHeader';
 import overlayStyles from './overlay.styles';
-import {applyPendingModal} from '../../../modules/home/home.slice';
+import {applyPendingModal, setActiveModal} from '../../../modules/home/home.slice';
 import {SHORTCUT_MODALS} from '../../../modules/page/page.constants';
 import commonStyles from '../../common.styles';
 import {isEmpty} from '../../helpers';
-import {MODAL_WIDTH, SMALL_SCREEN} from '../../styles.constants';
+import {MODAL_WIDTH, SMALL_SCREEN, SMALL_SCREEN_STATUS_BAR_OFFSET} from '../../styles.constants';
 import AvatarWrapper from '../avatars/AvatarWrapper';
 import ModalSaveAndCancelButtons from '../modals/ModalSaveAndCancelButtons';
 
 // Body fills a fullscreen/small-screen modal; shrinks-to-content (and scrolls past the cap) in a
 // max-height-capped centered modal.
+// Every orientation the app allows (Info.plist). iOS crashes presenting a modal that shares no orientation with the
+// app, and the app can be locked to any of them - the compass restores whatever lock was there before, which on an
+// iPad can be upside-down portrait, and 'portrait' alone does not include that.
+const SUPPORTED_ORIENTATIONS = ['portrait', 'portrait-upside-down', 'landscape'];
 const FILL_FLEX = {flex: 1};
 const CONTENT_SIZED_FLEX = {flexShrink: 1};
 
@@ -33,6 +37,7 @@ const ModalWrapper = ({
                         cancelTitle,
                         children,
                         closeModal,
+                        deleteTitle,
                         disabled,
                         doesRenderAsView,
                         fullscreen,
@@ -63,7 +68,7 @@ const ModalWrapper = ({
 
   const footerShortcutModal = useSelector((state) => {
     if (isEmpty(state.spot.selectedSpot) || !isEmpty(state.spot.selectedAttributes)) return null;
-    return SHORTCUT_MODALS.find(m => m.key === state.home.modalVisible && m.notebook_modal_key) ?? null;
+    return SHORTCUT_MODALS.find(m => m.key === state.home.activeModal && m.notebook_modal_key) ?? null;
   });
 
   const {height: windowHeight} = useWindowDimensions();
@@ -81,6 +86,10 @@ const ModalWrapper = ({
   // only hides the UI while it keeps running — so leaving mid-action invites duplicate or racing operations.
   const canDismiss = !isLoading;
   const isCloseButtonShown = canDismiss && (showCloseButton || showCancelButton !== false);
+  // What Close and Android back do. A modal shown through ActiveModal passes no handler of its own and closes by
+  // clearing the active modal, unless it shows no Close button and so is meant to stay open until answered.
+  const close = closeModal || onCancelPress
+    || (isCloseButtonShown ? () => dispatch(setActiveModal({modal: null})) : undefined);
 
   // Clear whichever obstruction is taller: the keyboard when one is open, otherwise the navigation bar. Android
   // 15+ forces edge-to-edge, so a fullscreen modal draws behind the navigation bar and its footer buttons become
@@ -108,11 +117,11 @@ const ModalWrapper = ({
   // Android's back button and back gesture both land here; without it the modal ignores them entirely. Callers
   // must clear `isLoading` on every path (a `finally`), or the modal has no exit at all while it is set.
   const handleRequestClose = () => {
-    if (canDismiss) (onBackdropPress || closeModal || onCancelPress)?.();
+    if (canDismiss) (onBackdropPress || close)?.();
   };
 
-  // Fast path for the iOS two-phase modal switch (see setModalVisible): when this modal finishes dismissing, show any
-  // modal queued behind it. Fires on iOS only, and no-ops when nothing is queued; the OverlaysContainer timer is the
+  // Fast path for the iOS two-phase modal switch (see setActiveModal): when this modal finishes dismissing, show any
+  // modal queued behind it. Fires on iOS only, and no-ops when nothing is queued; the ModalsContainer timer is the
   // guaranteed fallback for modals that unmount without delivering onDismiss.
   const handleDismiss = () => {
     dispatch(applyPendingModal());
@@ -179,7 +188,7 @@ const ModalWrapper = ({
     <>
       <ModalWrapperHeader
         buttonTitleRight={buttonTitleRight}
-        closeModal={closeModal || onCancelPress}
+        closeModal={close}
         headerImage={headerImage}
         headerTitle={headerTitle}
         imageStyle={imageStyle}
@@ -205,6 +214,7 @@ const ModalWrapper = ({
       <ModalSaveAndCancelButtons
         actionTitle={actionTitle}
         cancelTitle={cancelTitle}
+        deleteTitle={deleteTitle}
         disabled={disabled}
         isLoading={isLoading}
         onActionPressed={onActionPressed}
@@ -226,7 +236,7 @@ const ModalWrapper = ({
         <View style={[overlayStyles.overlayContainerFullScreen, viewOverlayStyles.fullscreenOverlay]}>
           <ModalWrapperHeader
             buttonTitleRight={buttonTitleRight}
-            closeModal={closeModal || onCancelPress}
+            closeModal={close}
             headerImage={headerImage}
             headerTitle={headerTitle}
             imageStyle={imageStyle}
@@ -257,11 +267,18 @@ const ModalWrapper = ({
         onDismiss={handleDismiss}
         onRequestClose={handleRequestClose}
         statusBarTranslucent
-        supportedOrientations={['portrait', 'landscape']}
+        supportedOrientations={SUPPORTED_ORIENTATIONS}
         visible={isVisible}
       >
         <GestureHandlerRootView style={{flex: 1}}>
-          <View style={[overlayStyles.overlayContainerFullScreen, {paddingBottom: fullscreenPaddingBottom}]}>
+          {/* A fullscreen iOS Modal ignores the safe area, and the fixed 50pt offset is shorter than the
+              Dynamic Island inset, so clear whichever is taller. */}
+          <View
+            style={[overlayStyles.overlayContainerFullScreen, {
+              paddingBottom: fullscreenPaddingBottom,
+              paddingTop: Math.max(insets.top, SMALL_SCREEN_STATUS_BAR_OFFSET),
+            }]}
+          >
             {renderModalContent()}
           </View>
         </GestureHandlerRootView>
@@ -291,7 +308,7 @@ const ModalWrapper = ({
       animationType={'fade'}
       onDismiss={handleDismiss}
       onRequestClose={handleRequestClose}
-      supportedOrientations={['portrait', 'landscape']}
+      supportedOrientations={SUPPORTED_ORIENTATIONS}
       transparent
       visible={isVisible}
     >

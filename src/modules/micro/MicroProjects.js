@@ -1,0 +1,235 @@
+import React, {useEffect, useState} from 'react';
+import {FlatList, Platform, View} from 'react-native';
+
+import {Icon, ListItem} from '@rn-vui/base';
+import moment from 'moment/moment';
+import {useSelector} from 'react-redux';
+
+import MicroProjectPDFOverlay from './MicroProjectPDFOverlay';
+import MicroProjectsStatusOverlay from './MicroProjectsStatusOverlay';
+import useMicro from './useMicro';
+import useMicroZips from './useMicroZips';
+import useDevice from '../../services/device/useDevice';
+import commonStyles from '../../shared/common.styles';
+import {isEmpty} from '../../shared/helpers';
+import {LIGHTGREY, MEDIUMGREY, PRIMARY_ACCENT_COLOR, PRIMARY_BACKGROUND_COLOR} from '../../shared/styles.constants';
+import URLLinkButton from '../../shared/ui/buttons/URLLinkButton';
+import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
+import ListEmptyText from '../../shared/ui/ListEmptyText';
+import Loading from '../../shared/ui/Loading';
+import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
+
+const MicroProjects = () => {
+  /* Data Hooks */
+
+  const {isConnected, isInternetReachable} = useSelector(state => state.connections.isOnline);
+  const userData = useSelector(state => state.user);
+
+  const {doesMicroProjectPDFExist, getSavedMicroProjectModifiedTimestamp} = useDevice();
+  const {getAllLocalMicroProjects, getAllServerMicroProjects, getMicroProjectPDFDoc} = useMicro();
+  const {
+    clearStatus,
+    downloadZip,
+    isLoadingWave,
+    percentDone,
+    projectName,
+    showComplete,
+    showLoadingBar,
+  } = useMicroZips();
+
+  /* Local State */
+
+  const [doc, setDoc] = useState('');
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isError, setIsError] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [projectsArr, setProjectsArr] = useState([]);
+  const [projectsExistsArr, setProjectsExistsArr] = useState([]);
+  const [projectsUpdateAvailableArr, setProjectsUpdateAvailableArr] = useState([]);
+  const [visible, setVisible] = useState(false);
+
+  /* Side Effects */
+
+  useEffect(() => {
+    console.log('UE MicroProjects');
+    return () => {
+      closeStatusOverlay();
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log('UE MicroProjects [showComplete, isConnected, isInternetReachable]');
+    // deleteFromDevice(APP_DIRECTORIES.MICRO);  // Delete Micro folder (for testing)
+    getAllMicroProjects().then(() => console.log('Got StraboMico Projects'));
+  }, [showComplete, isConnected, isInternetReachable]);
+
+  /* Logic Helpers */
+
+  const checkForMicroProject = async (item, i) => {
+    if (!projectsExistsArr[i] || (isInternetReachable && projectsUpdateAvailableArr[i])) {
+      console.log('Need to download project');
+      try {
+        await downloadZip(item.id, item.name);
+      }
+      catch (err) {
+        clearStatus();
+        setIsError(true);
+        setErrorMessage(err.message);
+      }
+    }
+    else {
+      console.log('PDF available');
+      setDoc(getMicroProjectPDFDoc(item.id, item.name));
+      setVisible(true);
+    }
+  };
+
+  const closeStatusOverlay = () => {
+    setIsError(false);
+    setErrorMessage(null);
+    clearStatus();
+  };
+
+  const getAllMicroProjects = async () => {
+    // await deleteFromDevice(APP_DIRECTORIES.MICRO);   // Just needed for testing
+
+    let projectsResponse;
+    setLoading(true);
+    try {
+      if (isInternetReachable) {
+        projectsResponse = await getAllServerMicroProjects();
+        if (!projectsResponse || !projectsResponse.projects) setErrorMessage('Error Getting StraboMicro Projects');
+        else if (isEmpty(projectsResponse.projects)) setErrorMessage('No StraboMico Projects');
+        else {
+          setIsError(false);
+          console.log('List of Projects on Server:', projectsResponse);
+          setProjectsArr(projectsResponse);
+          if (Platform.OS !== 'web') {
+            let projectsExistsArrTemp = [];
+            let projectsExistsUpdateAvailableTemp = [];
+            await Promise.all(projectsResponse.projects.map(async (project, i) => {
+              const exists = await doesMicroProjectPDFExist(project.id);
+              projectsExistsArrTemp[i] = exists;
+              if (exists) {
+                const modifiedTimestamp = await getSavedMicroProjectModifiedTimestamp(project.id);
+                if (modifiedTimestamp && project.modifiedtimestamp > modifiedTimestamp) {
+                  projectsExistsUpdateAvailableTemp[i] = true;
+                }
+                else projectsExistsUpdateAvailableTemp[i] = false;
+              }
+            }));
+            setProjectsExistsArr(projectsExistsArrTemp);
+            setProjectsUpdateAvailableArr(projectsExistsUpdateAvailableTemp);
+          }
+        }
+      }
+      else {
+        projectsResponse = await getAllLocalMicroProjects();
+        if (!projectsResponse || !projectsResponse.projects) setErrorMessage('No Offline StraboMicro Projects Found');
+        else {
+          setIsError(false);
+          console.log('List of Projects on Device:', projectsResponse);
+          setProjectsArr(projectsResponse);
+          setProjectsExistsArr(Array(projectsResponse.projects.length).fill(true));
+        }
+      }
+    }
+    catch (err) {
+      console.error('Error getting StraboMicro projects', err);
+      setIsError(true);
+      setErrorMessage('Error Getting StraboMicro Projects');
+    }
+    finally {
+      setLoading(false);
+    }
+  };
+
+  /* Render Functions */
+
+  const renderMicroProjectItem = (item, i) => {
+    const modifiedTimeAndDate = moment.unix(item.modifiedtimestamp / 1000).format('MMM Do YYYY, h:mm a');
+    return (
+      <ListItem
+        containerStyle={commonStyles.listItem}
+        disabled={!isConnected && !projectsExistsArr[i]}
+        disabledStyle={{backgroundColor: LIGHTGREY}}
+        key={item.id}
+        onPress={() => checkForMicroProject(item, i)}
+      >
+        <ListItem.Content>
+          <ListItem.Title style={commonStyles.listItemTitle}>{item.name}</ListItem.Title>
+          {modifiedTimeAndDate && modifiedTimeAndDate !== 'Invalid date' && (
+            <ListItem.Subtitle style={commonStyles.listItemSubtitle}>Updated: {modifiedTimeAndDate}</ListItem.Subtitle>
+          )}
+        </ListItem.Content>
+        {isInternetReachable && projectsUpdateAvailableArr[i] ? (
+            <Icon
+              color={MEDIUMGREY}
+              name={'sync'}
+              size={20}
+              type={'material-community'}
+            />
+          )
+          : projectsExistsArr[i] ? <ListItem.Chevron/> : (
+            <Icon
+              color={MEDIUMGREY}
+              name={'download-circle-outline'}
+              size={20}
+              type={'material-community'}
+            />
+          )}
+      </ListItem>
+    );
+  };
+
+  const renderMicroProjects = () => {
+    if (!isEmpty(userData)) {
+      return (
+        <View style={{flex: 1}}>
+          {!isInternetReachable && (
+            <ConnectionRequiredMessage actionText={'download StraboMicro projects'} isInternetRequired/>
+          )}
+          <FlatList
+            ItemSeparatorComponent={FlatListItemSeparator}
+            ListEmptyComponent={<ListEmptyText text={errorMessage}/>}
+            data={projectsArr.projects}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({item, index}) => renderMicroProjectItem(item, index)}/>
+        </View>
+      );
+    }
+  };
+
+  /* View */
+
+  return (
+    <View style={{flex: 1}}>
+      <Loading isLoading={loading} style={{backgroundColor: PRIMARY_BACKGROUND_COLOR}}/>
+      {Platform.OS === 'web' && (
+        <URLLinkButton
+          color={PRIMARY_ACCENT_COLOR}
+          icon={'globe-outline'}
+          key={'micro-link'}
+          title={'Go To My StraboMicro Data'}
+          url={'https://strabospot.org/my_micro_data'}
+        />
+      )}
+      {renderMicroProjects()}
+
+      {/* Modals */}
+      <MicroProjectsStatusOverlay
+        closeStatusOverlay={closeStatusOverlay}
+        errorMessage={errorMessage}
+        isError={isError}
+        isLoadingWave={isLoadingWave}
+        percentDone={percentDone}
+        projectName={projectName}
+        showComplete={showComplete}
+        showLoadingBar={showLoadingBar}
+      />
+      <MicroProjectPDFOverlay doc={doc} setVisible={setVisible} visible={visible}/>
+    </View>
+  );
+};
+
+export default MicroProjects;

@@ -11,6 +11,7 @@ const WarningModal = ({
                         children,
                         closeModal,
                         confirmText,
+                        isContentSized,
                         isVisible,
                         onCancelPress,
                         onConfirmPress,
@@ -31,6 +32,7 @@ const WarningModal = ({
       cancelTitle={cancelTitle || 'Cancel'}
       closeModal={closeModal}
       headerTitle={title || 'Warning!'}
+      isContentSized={isContentSized}
       isVisible={isVisible}
       onActionPressed={onConfirmPress}
       onCancelPress={onCancelPress}

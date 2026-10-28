@@ -1,0 +1,94 @@
+import {useSelector} from 'react-redux';
+
+import {DRAW_ACTION_IMAGES} from './drawActionButtons.constants';
+import {SMALL_SCREEN} from '../../../shared/styles.constants';
+import {MAP_MODES} from '../../maps/maps.constants';
+import {HOME_ACTIONS} from '../home.constants';
+
+const useDrawActionButtons = ({handleHomeAction, mapMode}) => {
+  /* Data Hooks */
+
+  const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
+  const drawGeometries = useSelector(state => state.map.drawGeometries);
+  const stratSection = useSelector(state => state.map.stratSection);
+
+  /* Exported Functions */
+
+  const getImageSource = (type) => {
+    if (type === MAP_MODES.INTERVAL_DRAG) {
+      return mapMode === MAP_MODES.INTERVAL_DRAG
+        ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.INTERVAL_DRAG.ICON_PRESSED : DRAW_ACTION_IMAGES.INTERVAL_DRAG.BUTTON_PRESSED
+        : SMALL_SCREEN ? DRAW_ACTION_IMAGES.INTERVAL_DRAG.ICON : DRAW_ACTION_IMAGES.INTERVAL_DRAG.BUTTON;
+    }
+    if (type === MAP_MODES.EDIT) {
+      return mapMode === MAP_MODES.EDIT
+        ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.EDIT.ICON_PRESSED : DRAW_ACTION_IMAGES.EDIT.BUTTON_PRESSED
+        : SMALL_SCREEN ? DRAW_ACTION_IMAGES.EDIT.ICON : DRAW_ACTION_IMAGES.EDIT.BUTTON;
+    }
+    switch (drawGeometries[type]) {
+      case MAP_MODES.DRAW.POINT:
+        return mapMode === MAP_MODES.DRAW.POINT
+          ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.POINT.ICON_PRESSED : DRAW_ACTION_IMAGES.POINT.BUTTON_PRESSED
+          : SMALL_SCREEN ? DRAW_ACTION_IMAGES.POINT.ICON : DRAW_ACTION_IMAGES.POINT.BUTTON;
+      case MAP_MODES.DRAW.POINTLOCATION:
+        return mapMode === MAP_MODES.DRAW.POINTLOCATION
+          ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.POINT.LOCATION_ICON_PRESSED : DRAW_ACTION_IMAGES.POINT.LOCATION_BUTTON_PRESSED
+          : SMALL_SCREEN ? DRAW_ACTION_IMAGES.POINT.LOCATION_ICON : DRAW_ACTION_IMAGES.POINT.LOCATION_BUTTON;
+      case MAP_MODES.DRAW.LINE:
+        return mapMode === MAP_MODES.DRAW.LINE
+          ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.LINE.ICON_PRESSED : DRAW_ACTION_IMAGES.LINE.BUTTON_PRESSED
+          : SMALL_SCREEN ? DRAW_ACTION_IMAGES.LINE.ICON : DRAW_ACTION_IMAGES.LINE.BUTTON;
+      case MAP_MODES.DRAW.FREEHANDLINE:
+        return mapMode === MAP_MODES.DRAW.FREEHANDLINE
+          ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.LINE.FREEHAND_ICON_PRESSED : DRAW_ACTION_IMAGES.LINE.FREEHAND_BUTTON_PRESSED
+          : SMALL_SCREEN ? DRAW_ACTION_IMAGES.LINE.FREEHAND_ICON : DRAW_ACTION_IMAGES.LINE.FREEHAND_BUTTON;
+      case MAP_MODES.DRAW.POLYGON:
+        return mapMode === MAP_MODES.DRAW.POLYGON
+          ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.POLYGON.ICON_PRESSED : DRAW_ACTION_IMAGES.POLYGON.BUTTON_PRESSED
+          : SMALL_SCREEN ? DRAW_ACTION_IMAGES.POLYGON.ICON : DRAW_ACTION_IMAGES.POLYGON.BUTTON;
+      case MAP_MODES.DRAW.FREEHANDPOLYGON:
+        return mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON
+          ? SMALL_SCREEN ? DRAW_ACTION_IMAGES.POLYGON.FREEHAND_ICON_PRESSED : DRAW_ACTION_IMAGES.POLYGON.FREEHAND_BUTTON_PRESSED
+          : SMALL_SCREEN ? DRAW_ACTION_IMAGES.POLYGON.FREEHAND_ICON : DRAW_ACTION_IMAGES.POLYGON.FREEHAND_BUTTON;
+    }
+  };
+
+  const handleIntervalDragPressed = () => {
+    if (mapMode === MAP_MODES.INTERVAL_DRAG) handleHomeAction(HOME_ACTIONS.CANCEL_INTERVAL_DRAG);
+    else handleHomeAction(HOME_ACTIONS.START_INTERVAL_DRAG);
+  };
+
+  const handleEditShapePressed = () => {
+    if (mapMode === MAP_MODES.EDIT) handleHomeAction(HOME_ACTIONS.CANCEL_EDITS);
+    else handleHomeAction(HOME_ACTIONS.START_EDITING);
+  };
+
+  const handleLinePressed = () => {
+    if (drawGeometries.line === MAP_MODES.DRAW.LINE) handleHomeAction(MAP_MODES.DRAW.LINE);
+    else handleHomeAction(MAP_MODES.DRAW.FREEHANDLINE);
+  };
+
+  const handlePointPressed = () => {
+    if (currentImageBasemap || stratSection || drawGeometries.point === MAP_MODES.DRAW.POINT) {
+      handleHomeAction(MAP_MODES.DRAW.POINT);
+    }
+    else handleHomeAction(MAP_MODES.DRAW.POINTLOCATION);
+  };
+
+  const handlePolygonPressed = () => {
+    if (drawGeometries.polygon === MAP_MODES.DRAW.POLYGON) handleHomeAction(MAP_MODES.DRAW.POLYGON);
+    else handleHomeAction(MAP_MODES.DRAW.FREEHANDPOLYGON);
+  };
+
+  return {
+    getImageSource,
+    handleEditShapePressed,
+    handleIntervalDragPressed,
+    handleLinePressed,
+    handlePointPressed,
+    handlePolygonPressed,
+    stratSection,
+  };
+};
+
+export default useDrawActionButtons;

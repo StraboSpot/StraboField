@@ -35,9 +35,9 @@ const usePetrology = () => {
     dispatch(editedSpotProperties({field: 'pet', value: editedPetData}));
   };
 
-  const savePetFeature = async (key, spot, formCurrent, isLeavingPage, previousFeature) => {
+  const savePetFeature = async (key, spot, formCurrent, previousFeature) => {
     try {
-      const {errors, values} = await submitAndShowErrors(formCurrent, isLeavingPage);
+      const {errors, values} = await submitAndShowErrors(formCurrent);
       const editedFeatureData = resolveLabelOnSave(
         {pageKey: key, previousFeature: previousFeature, values: values, getLabel: getLabel, getLabels: getLabels});
       console.log('Saving', key, 'data to Spot ...');

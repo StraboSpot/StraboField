@@ -13,43 +13,52 @@ const Home = forwardRef(({
                            animateRightSide,
                            closeMainMenuPanel,
                            closeNotebookPanel,
+                           mapMode,
                            openMainMenuPanel,
                            openNotebookPanel,
                            openSpotInNotebook,
+                           setMapMode,
                            zoomToCurrentLocation,
                          }, mapComponentRef) => {
   console.log('Rendering Home...');
 
   const {
-    clickHandler,
-    dialogClickHandler,
-    dialogs,
     distance,
     endMeasurement,
+    handleHomeAction,
+    handleHomeActionFromMapMenu,
     hasDrawTools,
     isCreateToolsDisabled,
-    mapMode,
+    mapMenus,
     onCancel,
     onEndDrawPressed,
     selectingMode,
     setDistance,
     setMapModeToEdit,
-    toggleDialog,
-  } = useHome({closeMainMenuPanel, mapComponentRef, openNotebookPanel, zoomToCurrentLocation});
+    toggleMapMenu,
+  } = useHome({
+    closeMainMenuPanel,
+    closeNotebookPanel,
+    mapComponentRef,
+    mapMode,
+    openNotebookPanel,
+    setMapMode,
+    zoomToCurrentLocation,
+  });
 
   if (SMALL_SCREEN) {
     return (
       <Animated.View style={[homeStyles.container, animateLeftSide]}>
         <HomeViewSmallScreen
-          clickHandler={clickHandler}
           closeMainMenuPanel={closeMainMenuPanel}
           closeNotebookPanel={closeNotebookPanel}
-          dialogClickHandler={dialogClickHandler}
-          dialogs={dialogs}
           distance={distance}
           endMeasurement={endMeasurement}
+          handleHomeAction={handleHomeAction}
+          handleHomeActionFromMapMenu={handleHomeActionFromMapMenu}
           hasDrawTools={hasDrawTools}
           isCreateToolsDisabled={isCreateToolsDisabled}
+          mapMenus={mapMenus}
           mapMode={mapMode}
           onCancel={onCancel}
           onEndDrawPressed={onEndDrawPressed}
@@ -60,7 +69,7 @@ const Home = forwardRef(({
           selectingMode={selectingMode}
           setDistance={setDistance}
           setMapModeToEdit={setMapModeToEdit}
-          toggleDialog={toggleDialog}
+          toggleMapMenu={toggleMapMenu}
         />
       </Animated.View>
     );
@@ -71,15 +80,15 @@ const Home = forwardRef(({
         animateLeftSide={animateLeftSide}
         animateNotebookDrawer={animateNotebookDrawer}
         animateRightSide={animateRightSide}
-        clickHandler={clickHandler}
         closeMainMenuPanel={closeMainMenuPanel}
         closeNotebookPanel={closeNotebookPanel}
-        dialogClickHandler={dialogClickHandler}
-        dialogs={dialogs}
         distance={distance}
         endMeasurement={endMeasurement}
+        handleHomeAction={handleHomeAction}
+        handleHomeActionFromMapMenu={handleHomeActionFromMapMenu}
         hasDrawTools={hasDrawTools}
         isCreateToolsDisabled={isCreateToolsDisabled}
+        mapMenus={mapMenus}
         mapMode={mapMode}
         onCancel={onCancel}
         onEndDrawPressed={onEndDrawPressed}
@@ -89,7 +98,7 @@ const Home = forwardRef(({
         selectingMode={selectingMode}
         setDistance={setDistance}
         setMapModeToEdit={setMapModeToEdit}
-        toggleDialog={toggleDialog}
+        toggleMapMenu={toggleMapMenu}
       />
     );
   }

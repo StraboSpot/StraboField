@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {KeyboardAvoidingView, Linking, Platform, Pressable, Text, TextInput, View} from 'react-native';
+import {KeyboardAvoidingView, Linking, Platform, Pressable, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -13,6 +13,7 @@ import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import MessageModal from '../../shared/ui/modals/MessageModal';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
+import TextInput from '../../shared/ui/TextInput';
 import {openedMessageModal} from '../home/home.slice';
 import SplashScreen from '../splash-screen/SplashScreen';
 

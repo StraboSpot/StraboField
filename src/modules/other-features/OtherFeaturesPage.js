@@ -1,80 +1,46 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {FlatList, View} from 'react-native';
 
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import OtherFeatureDetail from './OtherFeatureDetail';
 import OtherFeatureItem from './OtherFeatureItem';
-import {getNewUUID, isEmpty} from '../../shared/helpers';
+import {getNewUUID} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import PageHeader from '../page/PageHeader';
-import {setSelectedAttributes} from '../spots/spots.slice';
+import useFeatureDetailView from '../page/useFeatureDetailView';
 
 const OtherFeaturesPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
-  const dispatch = useDispatch();
-  const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
   const otherFeatures = useSelector(state => state.project.project?.other_features);
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  /* Local State */
-
-  const [isFeatureDetailVisible, setIsFeatureDetailVisible] = useState(false);
-  const [selectedFeature, setSelectedFeature] = useState({});
-
-  /* Side Effects */
-
-  useEffect(() => {
-    console.log('UE OtherFeaturesPage []');
-    return () => dispatch(setSelectedAttributes([]));
-  }, []);
-
-  useEffect(() => {
-    console.log('UE OtherFeaturesPage [selectedAttributes, spot]', selectedAttributes, spot);
-    if (isEmpty(selectedAttributes)) setSelectedFeature({});
-    else if (!isMultipleFeaturesTaggingEnabled) {
-      setSelectedFeature(selectedAttributes[0]);
-      setIsFeatureDetailVisible(true);
-    }
-  }, [selectedAttributes, spot]);
+  const {closeDetailView, isDetailView, openDetailView, selectedFeature} = useFeatureDetailView();
 
   /* Logic Helpers */
 
-  const addFeature = () => {
-    setSelectedFeature({id: getNewUUID()});
-    setIsFeatureDetailVisible(true);
-  };
-
-  const editFeature = (feature) => {
-    setSelectedFeature(feature);
-    setIsFeatureDetailVisible(true);
-    // In Redux too, so an edit from elsewhere can hand the open detail view back its updated record
-    dispatch(setSelectedAttributes([feature]));
-  };
+  const addFeature = () => openDetailView({id: getNewUUID()});
 
   /* Render Functions */
 
   const renderFeature = (feature) => {
     return (
-      <OtherFeatureItem editFeature={() => editFeature(feature)} feature={feature}/>
+      <OtherFeatureItem editFeature={() => openDetailView(feature)} feature={feature}/>
     );
   };
 
   const renderFeatureDetail = () => {
     return (
-      <>
-        <OtherFeatureDetail
-          featureTypes={otherFeatures}
-          hideFeatureDetail={() => setIsFeatureDetailVisible(false)}
-          isReadOnly={isReadOnly}
-          page={page}
-          renderFeature={feature => renderFeature(feature)}
-          selectedFeature={selectedFeature}
-        />
-      </>
+      <OtherFeatureDetail
+        featureTypes={otherFeatures}
+        hideFeatureDetail={closeDetailView}
+        isReadOnly={isReadOnly}
+        page={page}
+        renderFeature={feature => renderFeature(feature)}
+        selectedFeature={selectedFeature}
+      />
     );
   };
 
@@ -102,11 +68,7 @@ const OtherFeaturesPage = ({isReadOnly, page}) => {
 
   /* View */
 
-  return (
-    <>
-      {isFeatureDetailVisible ? renderFeatureDetail() : renderFeaturesList()}
-    </>
-  );
+  return isDetailView ? renderFeatureDetail() : renderFeaturesList();
 };
 
 export default OtherFeaturesPage;

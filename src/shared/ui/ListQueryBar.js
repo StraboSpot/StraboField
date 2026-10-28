@@ -15,6 +15,7 @@ import {
   WHITE,
 } from '../styles.constants';
 import PickerOverlay from './modals/PickerOverlay';
+import TextInput from './TextInput';
 
 // Presentational search + filter + sort + reverse bar shared by the Spots and Tags lists. Owns only the
 // picker open/close state; consumers supply the option data, the current values, and the callbacks. The filter,
@@ -66,6 +67,7 @@ const ListQueryBar = ({
     <>
       <View style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5, marginVertical: -5}}>
         <SearchBar
+          InputComponent={TextInput}
           containerStyle={{
             backgroundColor: SECONDARY_BACKGROUND_COLOR,
             borderBottomColor: 'transparent',

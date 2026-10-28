@@ -13,6 +13,7 @@ import * as themes from '../../shared/styles.constants';
 import {RED} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../shared/ui/modals/overlay.styles';
+import TextInput from '../../shared/ui/TextInput';
 import useResetState from '../../store/useResetState';
 import useIsConnectionAvailable from '../connections/useConnectionStatus';
 
@@ -108,6 +109,7 @@ const DeleteProfileModal = ({email, isDeleteProfileModalVisible, setDeleteProfil
       {!confirmDeleteMessageVisible ? <View>
           {isConnectionAvailable ? deleteModalText : offlineText}
           <Input
+            InputComponent={TextInput}
             autoCapitalize={'none'}
             errorMessage={errorMessage}
             inputContainerStyle={overlayStyles.inputContainer}

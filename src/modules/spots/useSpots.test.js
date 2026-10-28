@@ -21,7 +21,7 @@ describe('discardSpot', () => {
   const otherSpot = {properties: {id: 1756000000002, name: 'Spot 09'}, type: 'Feature'};
 
   const getPreloadedState = () => ({
-    home: {hiddenWarnings: {}, loading: {home: false}, modalVisible: null},
+    home: {hiddenWarnings: {}, loading: {home: false}, activeModal: null},
     map: {currentImageBasemap: undefined, spotsInMapExtentIds: [], stratSection: undefined},
     project: {
       activeDatasetsIds: [12],

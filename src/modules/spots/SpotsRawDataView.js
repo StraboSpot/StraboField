@@ -3,7 +3,7 @@ import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 
 import JsonTreeModal from '../../shared/ui/modals/JsonTreeModal';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 
 const SpotsRawDataView = () => {
   /* Data Hooks */
@@ -19,7 +19,7 @@ const SpotsRawDataView = () => {
   /* Logic Helpers */
 
   const closeModal = () => {
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
   };
 
   /* View */

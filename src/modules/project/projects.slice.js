@@ -2,6 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
 import {getNewId, isEmpty, isEqual, isSameId} from '../../shared/helpers';
+import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {
   deleteTemplateKey,
   getActiveTemplateList,
@@ -47,6 +48,9 @@ const initialProjectState = {
   project: {},
   projectTransferProgress: 0,
   readOnlyDatasetsIds: [],
+  // Sample Spots saved since the last upload, so strabospot.org does not have them as they are on the device yet.
+  // Native only: a web save is an upload.
+  sampleSpotIdsToUpload: [],
   selectedTag: {},
   targetDatasetId: undefined,
 };
@@ -120,6 +124,9 @@ const projectSlice = createSlice({
         return updatedReport;
       });
       state.project.modified_timestamp = Date.now();
+    },
+    addedSampleSpotIdToUpload(state, action) {
+      if (!state.sampleSpotIdsToUpload.includes(action.payload)) state.sampleSpotIdsToUpload.push(action.payload);
     },
     addedSpotToTags(state, action) {
       const {spotId, tagIds} = action.payload;
@@ -268,6 +275,9 @@ const projectSlice = createSlice({
     removedChangedImageIds(state, action) {
       state.changedImageIds = state.changedImageIds.filter(id => !action.payload.includes(id));
     },
+    removedSampleSpotIdsToUpload(state, action) {
+      state.sampleSpotIdsToUpload = state.sampleSpotIdsToUpload.filter(id => !action.payload.includes(id));
+    },
     resetProjectState() {
       return initialProjectState;
     },
@@ -372,6 +382,13 @@ const projectSlice = createSlice({
       state.project.modified_timestamp = Date.now();
     },
   },
+  extraReducers: (builder) => {
+    // Tagging several features is something done on one page, so leaving the page ends it - here rather than in an
+    // effect, which would run only after the next page had already read it and skipped the feature it was opened to
+    builder.addCase(setNotebookPageVisible, (state) => {
+      state.isMultipleFeaturesTaggingEnabled = false;
+    });
+  },
 });
 
 export const {
@@ -386,6 +403,7 @@ export const {
   addedProjectDescription,
   addedProjectFromServer,
   addedRemovedTagIdOnReport,
+  addedSampleSpotIdToUpload,
   addedSpotToTags,
   addedTagToSelectedSpot,
   addedTemplates,
@@ -400,6 +418,7 @@ export const {
   doesDownloadsDirectoryExist,
   movedSpotIdBetweenDatasets,
   removedChangedImageIds,
+  removedSampleSpotIdsToUpload,
   resetProjectState,
   restoredSpotReferences,
   setActiveDatasets,

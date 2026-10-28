@@ -3,6 +3,7 @@ import {FlatList} from 'react-native';
 
 import DrawGeometryToggles from './DrawGeometryToggles';
 import ShortcutsList from './ShortcutsList';
+import SnapToSpots from './SnapToSpots';
 
 const AddingNewSpots = () => {
   return (
@@ -11,6 +12,7 @@ const AddingNewSpots = () => {
         <>
           <ShortcutsList/>
           <DrawGeometryToggles/>
+          <SnapToSpots/>
         </>
       }
     />

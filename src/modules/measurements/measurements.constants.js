@@ -7,6 +7,13 @@ export const MEASUREMENT_KEYS = {
   PLANAR_LINEAR: 'planar_linear',
 };
 
+// A measurement's orientation named on its own, as a template of it is
+export const MEASUREMENT_TYPE_LABELS = {
+  [MEASUREMENT_KEYS.PLANAR]: 'Planar',
+  [MEASUREMENT_KEYS.LINEAR]: 'Linear',
+  [MEASUREMENT_KEYS.TABULAR]: 'Tabular Zone',
+};
+
 export const MEASUREMENT_TYPES = [
   {
     key: MEASUREMENT_KEYS.PLANAR,

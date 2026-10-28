@@ -11,22 +11,23 @@ import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import FormikWrapper from '../../form/FormikWrapper';
 import SelectInputField from '../../form/inputs/SelectInputField';
 import useForm from '../../form/useForm';
-import {setModalVisible} from '../../home/home.slice';
-import BasicListItem from '../../page/BasicListItem';
-import BasicPageDetail from '../../page/BasicPageDetail';
+import {setActiveModal} from '../../home/home.slice';
+import FeatureDetail from '../../page/FeatureDetail';
 import {getFeatureTitle} from '../../page/featureLabels.helpers';
+import FeatureListItem from '../../page/FeatureListItem';
 import PageHeader from '../../page/PageHeader';
+import useFeatureDetailView from '../../page/useFeatureDetailView';
 import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
-import {editedSpotProperties, setSelectedAttributes} from '../../spots/spots.slice';
+import {editedSpotProperties} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 
 const MineralsPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {closeDetailView, isDetailView, openDetailView, selectedFeature} = useFeatureDetailView();
   const {getLabel, getLabels} = useForm();
   const {getSpotById, getSpotsWithKey} = useSpots();
 
@@ -34,31 +35,19 @@ const MineralsPage = ({isReadOnly, page}) => {
 
   const preFormRef = useRef(null);
 
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selectedMineral, setSelectedMineral] = useState({});
   const [spotsWithMinerals, setSpotsWithMinerals] = useState([]);
 
   /* Side Effects */
 
   useEffect(() => {
-    console.log('UE MineralsPage []');
-    return () => dispatch(setSelectedAttributes([]));
-  }, []);
-
-  useEffect(() => {
-    console.log('UE MineralsPage [selectedAttributes, spot]', selectedAttributes, spot);
-    if (isEmpty(selectedAttributes)) setSelectedMineral({});
-    else {
-      setSelectedMineral(selectedAttributes[0]);
-      setIsDetailView(true);
-    }
+    console.log('UE MineralsPage [spot]', spot);
     getSpotsWithMinerals();
-  }, [selectedAttributes, spot]);
+  }, [spot]);
 
   /* Logic Helpers */
 
   const addMineral = () => {
-    dispatch(setModalVisible({modal: page.key}));
+    dispatch(setActiveModal({modal: page.key}));
   };
 
   const copyMineralData = (spotId) => {
@@ -77,14 +66,6 @@ const MineralsPage = ({isReadOnly, page}) => {
       dispatch(editedSpotProperties({field: 'pet', value: updatedPet}));
       preFormRef.current.resetForm();
     }
-  };
-
-  const editMineral = (mineral) => {
-    setIsDetailView(true);
-    setSelectedMineral(mineral);
-    // In Redux too, so an edit from elsewhere can hand the open detail view back its updated record
-    dispatch(setSelectedAttributes([mineral]));
-    dispatch(setModalVisible({modal: null}));
   };
 
   const getSpotsWithMinerals = () => {
@@ -115,12 +96,12 @@ const MineralsPage = ({isReadOnly, page}) => {
 
   const renderMineralDetail = () => {
     return (
-      <BasicPageDetail
-        closeDetailView={() => setIsDetailView(false)}
+      <FeatureDetail
+        closeDetailView={closeDetailView}
         groupKey={'pet'}
         isReadOnly={isReadOnly}
         page={page}
-        selectedFeature={selectedMineral}
+        selectedFeature={selectedFeature}
       />
     );
   };
@@ -140,7 +121,7 @@ const MineralsPage = ({isReadOnly, page}) => {
         }
         data={mineralDataSorted}
         keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-        renderItem={({item}) => <BasicListItem editItem={editMineral} item={item} page={page}/>}
+        renderItem={({item}) => <FeatureListItem editItem={openDetailView} item={item} page={page}/>}
       />
     );
   };

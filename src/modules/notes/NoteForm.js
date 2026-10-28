@@ -9,7 +9,15 @@ import FormFlatList from '../form/FormFlatList';
 import FormikWrapper from '../form/FormikWrapper';
 import TextInputField from '../form/inputs/TextInputField';
 
-const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full', customHeight, isFillHeight}) => {
+const NoteForm = ({
+                    formRef,
+                    initialNotesValues,
+                    isReadOnly,
+                    appearance = 'full',
+                    customHeight,
+                    isFillHeight,
+                    setIsFormDirty,
+                  }) => {
   /* Derived Variables */
 
   // In the fill layout (Shortcut Notes modal) only auto-focus a brand-new, empty note, so an existing
@@ -24,6 +32,7 @@ const NoteForm = ({formRef, initialNotesValues, isReadOnly, appearance = 'full',
       enableReinitialize={true}
       initialValues={initialNotesValues}
       innerRef={formRef}
+      setIsFormDirty={setIsFormDirty}
     >
       <TextInputField
         appearance={fieldAppearance}

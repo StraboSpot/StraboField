@@ -221,7 +221,8 @@ const useDownload = () => {
     try {
       let neededImagesIds = [];
       await Promise.all(reports.map(async (report) => {
-        await Promise.all(report.images?.map(async (image) => {
+        // Deleting a memo's last image removes its images key rather than leaving an empty list
+        await Promise.all((report.images ?? []).map(async (image) => {
           const doesExist = await doesImageExistOnDevice(image.id);
           if (!doesExist) {
             console.log(image.id + ': Need to download report image.');

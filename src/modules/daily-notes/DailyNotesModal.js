@@ -11,14 +11,13 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import FormikWrapper from '../form/FormikWrapper';
 import DateInputField from '../form/inputs/DateInputField';
 import TextInputField from '../form/inputs/TextInputField';
-import {setModalValues, setModalVisible} from '../home/home.slice';
 import {updatedProject} from '../project/projects.slice';
 
-const DailyNotesModal = () => {
+// dailyNote is the note to edit, or {} to add a new one
+const DailyNotesModal = ({closeModal, dailyNote}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const modalValues = useSelector(state => state.home.modalValues);
   const projectDescription = useSelector(state => state.project.project?.description);
 
   /* Local State */
@@ -27,24 +26,19 @@ const DailyNotesModal = () => {
 
   /* Derived Variables */
 
-  const initialValues = {...modalValues, date: modalValues.date || new Date().toISOString()};
+  // Formik reads these only on mount, and the modal mounts once per note, so a new note keeps the date it opened with
+  const initialValues = {...dailyNote, date: dailyNote.date || new Date().toISOString()};
 
   /* Logic Helpers */
 
-  const close = () => {
-    dispatch(setModalValues({}));
-    dispatch(setModalVisible({modal: null}));
-  };
-
-  const deleteNote = (values) => {
+  const deleteNote = () => {
     const dailyNotes = JSON.parse(JSON.stringify(projectDescription.daily_setup || []));
-    const dailyNotesFiltered = dailyNotes.filter(n => n.date !== values.date);
+    const dailyNotesFiltered = dailyNotes.filter(n => n.date !== dailyNote.date);
     let projectDescriptionUpdated = JSON.parse(JSON.stringify(projectDescription));
     if (isEmpty(dailyNotesFiltered)) delete projectDescriptionUpdated.daily_setup;
     else projectDescriptionUpdated = {...projectDescription, daily_setup: dailyNotesFiltered};
     dispatch(updatedProject({field: 'description', value: projectDescriptionUpdated}));
-    dispatch(setModalValues({}));
-    dispatch(setModalVisible({modal: null}));
+    closeModal();
   };
 
   const deleteNoteConfirm = () => {
@@ -52,7 +46,7 @@ const DailyNotesModal = () => {
       'Are you sure you would like to delete this note?',
       [
         {text: 'No', style: 'cancel'},
-        {text: 'Yes', onPress: () => deleteNote(formRef?.current?.values)},
+        {text: 'Yes', onPress: deleteNote},
       ],
       {cancelable: false},
     );
@@ -64,8 +58,7 @@ const DailyNotesModal = () => {
     const dailyNotesUpdated = [...dailyNotesFiltered, values];
     const projectDescriptionUpdated = {...projectDescription, daily_setup: dailyNotesUpdated};
     dispatch(updatedProject({field: 'description', value: projectDescriptionUpdated}));
-    dispatch(setModalValues({}));
-    dispatch(setModalVisible({modal: null}));
+    closeModal();
   };
 
   /* Render Functions */
@@ -73,14 +66,14 @@ const DailyNotesModal = () => {
   const renderDailyNotesModal = () => {
     return (
       <ModalWrapper
+        headerTitle={'Daily Notes'}
         onActionPressed={() => saveNote(formRef?.current?.values)}
-        onCancelPress={close}
+        onCancelPress={closeModal}
         onDeletePress={deleteNoteConfirm}
         overlayStyleOverride={{height: 'auto'}}
-        showDeleteButton={!isEmpty(projectDescription?.daily_setup)}
+        showDeleteButton={!isEmpty(dailyNote)}
       >
         <FormikWrapper
-          enableReinitialize={true}
           initialValues={initialValues}
           innerRef={formRef}
         >

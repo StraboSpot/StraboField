@@ -15,7 +15,7 @@ import {
   ZOOM_STRAT_SECTION,
 } from '../maps.constants';
 import useMapCoords from './useMapCoords';
-import {isOnGeoMap, isOnImageBasemap, isOnStratSection} from '../maps.helpers';
+import {hasValidCoords, isOnGeoMap, isOnImageBasemap, isOnStratSection} from '../maps.helpers';
 import {setCenter, setZoom} from '../maps.slice';
 
 const STRAT_SECTION_CENTER = [0.001, 0.0007];
@@ -41,7 +41,7 @@ const useMapView = () => {
     if (currentImageBasemap || stratSection) {
       if (((selectedSpot?.properties?.image_basemap && selectedSpot?.properties.image_basemap === currentImageBasemap?.id)
         || (selectedSpot?.properties?.strat_section_id && selectedSpot?.properties.strat_section_id === stratSection?.strat_section_id))
-        && selectedSpot.geometry?.coordinates) {
+        && selectedSpot.geometry?.coordinates && hasValidCoords(selectedSpot)) {
         return proj4(PIXEL_PROJECTION, GEO_LAT_LNG_PROJECTION, turf.centroid(selectedSpot).geometry.coordinates);
       }
       if (currentImageBasemap && currentImageBasemap.width && currentImageBasemap.height) {
@@ -86,9 +86,17 @@ const useMapView = () => {
 
   const zoomToSpotsNow = async (spotsToZoomTo, map, camera) => {
     let southwest, northeast;
+    // A Spot saved with coordinates that are not numbers has nowhere to zoom to, and turf throws on it. Leave it
+    // out, so it doesn't stop a zoom to the rest.
+    const spotsWithoutCoords = spotsToZoomTo.filter(spot => !hasValidCoords(spot));
+    if (!isEmpty(spotsWithoutCoords)) {
+      console.warn('Spots without a usable location to zoom to:', spotsWithoutCoords);
+      spotsToZoomTo = spotsToZoomTo.filter(hasValidCoords);
+    }
     if (spotsToZoomTo.length === 0) {
       console.log('No Spots to Zoom to');
-      toast.show('No Spots to Zoom to');
+      toast.show(isEmpty(spotsWithoutCoords) ? 'No Spots to Zoom to'
+        : 'No usable location to zoom to. Check the coordinates on the Geography page.');
     }
     else if (spotsToZoomTo.every(s => isOnGeoMap(s)) || spotsToZoomTo.every(s => isOnImageBasemap(s))
       || spotsToZoomTo.every(s => isOnStratSection(s))) {

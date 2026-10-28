@@ -1,0 +1,7 @@
+StraboField 2.32.0
+
+• Samples & IGSN: IGSNs from strabospot.org; IGSNs on strabospot.org; Upload first; IGSN edits reminder; Correct sample location
+• Forms & validation: Live form validation; Find the problem field; Auto dip direction; Negative numbers on iOS; Sensible limits
+• Compass: Automatic declination; Declination without GPS; Lineation hint
+• Location: Location button spinner; Location checked first; Clear location errors; Coordinate checks
+• Plus more fixes and improvements

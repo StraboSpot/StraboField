@@ -20,8 +20,8 @@ const TagDetailModal = ({closeModal}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const addTagToSelectedSpot = useSelector(state => state.project.addTagToSelectedSpot);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const selectedTag = useSelector(state => state.project.selectedTag);
 
@@ -42,12 +42,12 @@ const TagDetailModal = ({closeModal}) => {
   // section, so it opens this modal under the 'samples' key. The list that opens this modal always stamps the
   // type on selectedTag, so check that first and fall back to the geologic unit modal keys.
   const isGeologicUnit = selectedTag?.type === TAG_TYPES.GEOLOGIC_UNIT
-    || modalVisible === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
-    || modalVisible === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS;
+    || activeModal === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
+    || activeModal === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS;
 
   let initialValues = {};
   let formName = TAG_FORM_NAMES.TAGS;
-  if (modalVisible) {
+  if (activeModal) {
     if (isGeologicUnit) formName = TAG_FORM_NAMES.GEOLOGIC_UNIT;
     initialValues = {type: isGeologicUnit ? TAG_TYPES.GEOLOGIC_UNIT : TAG_TYPES.CONCEPT};
   }
@@ -122,7 +122,7 @@ const TagDetailModal = ({closeModal}) => {
       onCancelPress={closeModal}
       onDeletePress={confirmDeleteTag}
       overlayStyleOverride={{flex: 1, maxHeight: modalHeight}}
-      showDeleteButton={isEmpty(modalVisible) && !isEmpty(selectedTag?.id)}
+      showDeleteButton={isEmpty(activeModal) && !isEmpty(selectedTag?.id)}
     >
       <FlatList
         ListHeaderComponent={

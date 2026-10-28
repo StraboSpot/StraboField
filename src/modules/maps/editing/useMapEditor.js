@@ -61,6 +61,7 @@ const useMapEditor = ({
     editFeatureVertex,
     extendLineFromEndpoint,
     getEditSession,
+    getSplitLineDatasetId,
     getVertexIndexInSpotToEdit,
     moveVertex,
     setSelectedSpotToEdit,
@@ -80,7 +81,7 @@ const useMapEditor = ({
     setDrawFeatures,
     spotsSelected,
   });
-  const {getTargetDatasetFromId} = useProject();
+  const {getDatasetIdFromSpotId, getTargetDatasetFromId} = useProject();
 
   /* Side Effects */
 
@@ -285,7 +286,12 @@ const useMapEditor = ({
       const spotIds = spotsEdited.map(s => s.properties.id);
       const targetDataset = getTargetDatasetFromId();
       if (!isEmpty(targetDataset)) {
-        dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: spotIds}));
+        // A Spot stays in its dataset even if the target has changed. Only a split line's new half is in none yet, and
+        // it goes in with the line it was split from.
+        spotIds.filter(spotId => !getDatasetIdFromSpotId(spotId)).forEach((newSpotId) => {
+          const datasetId = getSplitLineDatasetId(newSpotId) || targetDataset.id;
+          dispatch(addedNewSpotIdsToDataset({datasetId: datasetId, spotIds: [newSpotId]}));
+        });
         dispatch(updatedModifiedTimestampsBySpotsIds(spotIds));
         dispatch(editedOrCreatedSpots(spotsEdited));
       }
@@ -330,6 +336,7 @@ const useMapEditor = ({
     getEditSession,
     getSpotToEdit,
     handleSelectedVertexLongPress,
+    hasPendingEdits: !isEmpty(spotsEdited),
     isEditingSpot: !isEmpty(spotEditing),
     moveVertex,
     saveEdits,

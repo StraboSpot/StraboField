@@ -10,10 +10,10 @@ import CompassDebug from './CompassDebug';
 import CompassFace from './CompassFace';
 import useCompassSound from './useCompassSound';
 import useCompassCore, {DECLINATION_SOURCE} from '../../services/device/useCompassCore';
+import useDeviceOrientation from '../../services/device/useDeviceOrientation';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import {setModalVisible} from '../home/home.slice';
-import useDeviceOrientation from '../home/useDeviceOrientation';
+import {setActiveModal} from '../home/home.slice';
 import useMeasurements from '../measurements/useMeasurements';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
@@ -26,9 +26,9 @@ const Compass = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const compassMeasurements = useSelector(state => state.compass.measurements);
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const isSample = useSelector(state => state.spot.selectedSpot.properties?.isSample);
 
   const {
@@ -96,7 +96,7 @@ const Compass = ({
   // Create a new measurement on grabbing new compass measurements from shortcut modal
   useEffect(() => {
     console.log('UE Compass [compassMeasurements]', compassMeasurements);
-    if (!isEmpty(compassMeasurements) && modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT) {
+    if (!isEmpty(compassMeasurements) && activeModal === MODAL_KEYS.SHORTCUTS.MEASUREMENT) {
       console.log('New compass measurement recorded in Measurements.', compassMeasurements);
       createNewMeasurement();
       dispatch(setCompassMeasurements({}));
@@ -107,7 +107,7 @@ const Compass = ({
 
   const handleAppStateChange = (state) => {
     if (state === 'background' || state === 'inactive') {
-      dispatch(setModalVisible({modal: null}));
+      dispatch(setActiveModal({modal: null}));
       setShowCompassRawDataView(false);
       unsubscribeFromSensors();
     }
@@ -172,12 +172,12 @@ const Compass = ({
       <>
         {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.PLANAR) && (
           <Text style={compassStyles.liveReadingText}>
-            Strike {formatValue(compassData.strike)}   Dip {formatValue(compassData.dip)}
+            Strike {formatValue(compassData.strike)} Dip {formatValue(compassData.dip)}
           </Text>
         )}
         {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR) && (
           <Text style={compassStyles.liveReadingText}>
-            Trend {formatValue(compassData.trend)}   Plunge {formatValue(compassData.plunge)}
+            Trend {formatValue(compassData.trend)} Plunge {formatValue(compassData.plunge)}
           </Text>
         )}
       </>
@@ -219,10 +219,8 @@ const Compass = ({
           grabMeasurements={grabMeasurements}
         />
         {renderLiveReading()}
-        {/* The screen is locked to portrait and trend is taken along the device's top edge, so a user holding the
-        device sideways (as landscape support used to allow) needs telling which way to point it. */}
         {compassMeasurementTypes.includes(COMPASS_TOGGLE_BUTTONS.LINEAR) && (
-          <Text style={compassStyles.lineationHintText}>Point the top of the screen along the lineation</Text>
+          <Text style={compassStyles.lineationHintText}>Align long side with lineation</Text>
         )}
         {showCompassRawDataView && <CompassDebug compassData={compassData} matrixRotation={matrixRawData?.current}/>}
       </>

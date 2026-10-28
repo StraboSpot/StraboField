@@ -17,7 +17,8 @@ import useForm from './useForm';
 // remains. Leave it off for a form with no validation, or one whose validate is really a change handler, which
 // must not run a second time for every keystroke. setInvalidFields names the fields in error, for a page that
 // has to point at one the form is not showing. setIsFormDirty reports whether the values differ from those the
-// form opened with, so the caller can keep Save from being pressed until there is a change to save.
+// form opened with, so the caller can keep Save from being pressed until there is a change to save. fieldLabels
+// names the fields the form has besides its survey's, which the label dictionary can't, for its error messages.
 
 // Formik's dirty flag, passed up as it changes, since reading it off the form ref does not re-render the caller
 const DirtyStatus = ({dirty, setIsFormDirty}) => {
@@ -25,7 +26,16 @@ const DirtyStatus = ({dirty, setIsFormDirty}) => {
   return null;
 };
 
-const FormikWrapper = ({children, formName, setInvalidFields, setIsFormDirty, setIsFormInvalid, validate, ...props}) => {
+const FormikWrapper = ({
+                        children,
+                        fieldLabels,
+                        formName,
+                        setInvalidFields,
+                        setIsFormDirty,
+                        setIsFormInvalid,
+                        validate,
+                        ...props
+                      }) => {
   /* Data Hooks */
 
   const {validateForm} = useForm();
@@ -39,7 +49,7 @@ const FormikWrapper = ({children, formName, setInvalidFields, setIsFormDirty, se
 
   return (
     <Formik
-      initialStatus={{formName: formName}}
+      initialStatus={{fieldLabels: fieldLabels, formName: formName}}
       onSubmit={values => console.log('Submitting form' + (formName ? ' ' + formName.join('.') : '') + '...', values)}
       validate={validateValues}
       // LiveValidation is the change-time validator when it is on, so Formik's own pass would only repeat it

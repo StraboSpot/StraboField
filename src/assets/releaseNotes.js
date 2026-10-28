@@ -30,6 +30,31 @@ const RELEASE_NOTES = [
     version: '2.32.0',
     groups: [
       {
+        title: 'Samples & IGSN',
+        items: [
+          {
+            text: 'IGSNs from strabospot.org: IGSNs now come from your strabospot.org account, so the app no longer signs in to or registers with SESAR',
+            commit: '83c1a2953',
+          },
+          {
+            text: 'IGSNs on strabospot.org: View IGSN and Get IGSN open the sample\'s own page on strabospot.org',
+            commit: '513ecad96',
+          },
+          {
+            text: 'Upload first: a sample not yet on your account offers to upload the project, then opens its page when the upload is done',
+            commit: '01961165d',
+          },
+          {
+            text: 'IGSN edits reminder: editing a sample that has an IGSN reminds you to upload so strabospot.org can update it',
+            commit: '48be0ae10',
+          },
+          {
+            text: 'Correct sample location: a sample from an image-basemap Spot gets a real-world location',
+            commit: 'c8bf57cce',
+          },
+        ],
+      },
+      {
         title: 'Forms & validation',
         items: [
           {
@@ -48,6 +73,15 @@ const RELEASE_NOTES = [
             text: 'Negative numbers on iOS: type negative values, with a keyboard matched to the field',
             commit: '37f4bd19b',
           },
+          {
+            text: 'Sensible limits: number fields reject impossible values, like negative thicknesses, percentages over 100, or azimuths past 360',
+            commit: '5a11493cb',
+          },
+          {
+            text: 'Number pad on iOS: fields that can\'t be negative open the number pad instead of the full keyboard',
+            commit: '5a11493cb',
+            platforms: ['ios'],
+          },
         ],
       },
       {
@@ -60,6 +94,33 @@ const RELEASE_NOTES = [
           {
             text: 'Declination without GPS: falls back through your project location and nearby Spots to stay corrected, with clearer warnings when it can\'t',
             commit: 'cbf505d88',
+          },
+          {text: 'Lineation hint: "Align long side with lineation" shows for linear measurements', commit: '58372162d'},
+        ],
+      },
+      {
+        title: 'Location',
+        items: [
+          {
+            text: 'Location button spinner: the Geography location button shows a spinner while it waits for a fix',
+            commit: '2d6bb68fa',
+          },
+          {
+            text: 'Location checked first: shortcuts and geolocate check that location is on and allowed before they start, and tell you if it isn\'t',
+            commit: '15a7596b7',
+          },
+          {
+            text: 'Clear location errors: a failed location lookup says why, and shortcuts no longer leave the spinner running',
+            commit: 'fc8402033',
+          },
+          {
+            text: 'Location Services off: a separate message tells you to turn Location Services back on in Settings',
+            commit: '0d228862c',
+            platforms: ['ios'],
+          },
+          {
+            text: 'Coordinate checks: Geography coordinates must be numbers, so a typo can no longer leave a Spot without a location',
+            commit: '166f2feee',
           },
         ],
       },
@@ -85,6 +146,10 @@ const RELEASE_NOTES = [
           },
           {text: 'Cleaner tag counts: a tag\'s counts show as icon chips instead of a legend', commit: '336086e36'},
           {text: 'Sample tagging: only samples that have their own Spot can be tagged', commit: '74bd5d3af'},
+          {
+            text: 'Synced tags stay current: saving a tag after an auto-sync no longer overwrites edits made on another device',
+            commit: 'e87e61904',
+          },
         ],
       },
       {
@@ -104,6 +169,10 @@ const RELEASE_NOTES = [
           {text: 'Feature labels: every feature list shows a label, filled in on save', commit: '0f264290d'},
           {text: 'Full Spots list: see the full Spots list when no Spot is selected', commit: '290258006'},
           {text: 'Collapsible More Pages: the More Pages sections collapse like the main menu\'s', commit: '63286a2b7'},
+          {
+            text: 'Tidier Overview: Sedimentary Rocks is hidden from the Overview when no lithology has rock data',
+            commit: '1e47168a7',
+          },
         ],
       },
       {
@@ -120,6 +189,14 @@ const RELEASE_NOTES = [
           {
             text: 'Map filter for Spots: filter Spots by whether they\'re on the geographic map or not mapped',
             commit: '7cddc4a4d',
+          },
+          {
+            text: 'Edited Spots stay put: editing a Spot on the map no longer also adds it to the target dataset, so it can\'t vanish from its own dataset after an upload',
+            commit: '422b1382f',
+          },
+          {
+            text: 'Fix Spots in two datasets: on the Metadata page, tap a dataset to move a Spot listed in several datasets into just that one',
+            commit: '116d6a0e6',
           },
         ],
       },
@@ -143,16 +220,9 @@ const RELEASE_NOTES = [
             text: 'Open with intervals: opening a section activates the datasets holding its intervals',
             commit: '6252cf94b',
           },
-        ],
-      },
-      {
-        title: 'Samples & IGSN',
-        items: [
-          {text: 'Steadier SESAR: improved login and token handling for IGSN registration', commit: '340bbda00'},
-          {text: 'Safer saves: Save is disabled when SESAR registration can\'t go through', commit: 'eed4069c7'},
           {
-            text: 'Correct sample location: a sample from an image-basemap Spot gets a real-world location',
-            commit: 'c8bf57cce',
+            text: 'Hidden datasets: opening a strat section or image basemap whose Spot is in a dataset that\'s off turns that dataset on',
+            commit: 'fe892bf49',
           },
         ],
       },
@@ -175,12 +245,63 @@ const RELEASE_NOTES = [
           },
           {text: 'Remembered map view: the map view is saved once the camera settles', commit: 'ae29924cc'},
           {text: 'Single name label: a Spot with multiple measurements draws its name label once', commit: '28772ecd6'},
+          {
+            text: 'Reliable offline map saves: a dropped connection, or the phone going to sleep, no longer breaks saving a map',
+            commit: 'e8db6fc14',
+          },
+          {
+            text: 'Zoom to Spot: a Spot without a usable location shows a message instead of an error',
+            commit: '1ddf6c498',
+          },
+        ],
+      },
+      {
+        title: 'Stability',
+        items: [
+          {
+            text: 'Recover instead of closing: if something unexpected goes wrong, the app offers Try Again instead of closing, and your data stays safe',
+            commit: 'bc5e33008',
+          },
+          {text: 'Compass: opening the compass with no Spot selected no longer crashes the app', commit: '8f1a66b31'},
+          {text: 'Renaming images: renaming an image from the Image Gallery no longer crashes the app', commit: '13b5fedd3'},
+          {
+            text: 'Project import: tapping Unzip and Save before a large zip finished copying no longer crashes the app',
+            commit: 'ac0d53859',
+          },
+          {
+            text: 'Geography page: leaving the page while it waits for a location no longer causes errors',
+            commit: 'c93e971b0',
+          },
+          {
+            text: 'iPad orientation: opening a window while the screen is locked upside down no longer crashes the app',
+            commit: '166f2feee',
+            platforms: ['ios'],
+          },
         ],
       },
       {
         title: 'Small touches',
         items: [
           {text: 'Copied Spots: a copied Spot gets its own feature ids', commit: '4bc897794'},
+          {
+            text: 'Imported sed rocks: a StraboSpot 1 sedimentary rock missing an id no longer takes another lithology\'s id',
+            commit: '0e65eaa07',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    version: '2.31.8',
+    groups: [
+      {
+        title: 'Measurements',
+        items: [
+          {
+            text: 'Adjusted Android tablets whose natural top is in landscape',
+            commit: '9e737be',
+            platforms: ['android'],
+          },
         ],
       },
     ],
@@ -329,13 +450,19 @@ const RELEASE_NOTES = [
       {
         title: 'Small touches',
         items: [
-          {text: 'Map editing: Edit goes straight to the selected Spot when it is on the current map', commit: '000aea5a6'},
+          {
+            text: 'Map editing: Edit goes straight to the selected Spot when it is on the current map',
+            commit: '000aea5a6',
+          },
           {
             text: 'Halted collaborations: an owner\'s project shows in the server list again once its collaboration is halted',
             commit: '25ec904b4',
           },
           {text: 'Project screen on tablets: shows as a centered box instead of fullscreen', commit: '7a1c2626b'},
-          {text: 'Profile photo: a camera or gallery error no longer breaks setting a profile photo', commit: '595d86752'},
+          {
+            text: 'Profile photo: a camera or gallery error no longer breaks setting a profile photo',
+            commit: '595d86752',
+          },
           {text: 'StraboField naming: permission prompts and support email now say StraboField', commit: '048edfc6d'},
         ],
       },

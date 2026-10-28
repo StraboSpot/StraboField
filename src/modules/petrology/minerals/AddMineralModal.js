@@ -17,10 +17,10 @@ import Form from '../../form/Form';
 import FormikWrapper from '../../form/FormikWrapper';
 import MainButtons from '../../form/MainButtons';
 import useForm from '../../form/useForm';
-import {setModalValues, setModalVisible} from '../../home/home.slice';
+import {setActiveModal, setModalValues} from '../../home/home.slice';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import {getActiveTemplateList, getIsTemplateInUse} from '../../templates/templates.helpers';
-import TemplatesNotebook from '../../templates/TemplatesNotebook';
+import TemplatesPicker from '../../templates/TemplatesPicker';
 import usePetrology from '../usePetrology';
 
 const {firstKeys, igOrMetKey, igButtonsKeys, metButtonsKeys, lastKeys} = ADD_MINERAL_KEYS;
@@ -37,6 +37,7 @@ const AddMineralModal = () => {
 
   /* Local State */
 
+  const closeTemplatesRef = useRef(null);
   const formRef = useRef(null);
 
   const [choicesViewKey, setChoicesViewKey] = useState(null);
@@ -44,6 +45,7 @@ const AddMineralModal = () => {
   const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isShowTemplates, setIsShowTemplates] = useState(false);
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(null);
+  const [templatesHeaderTitle, setTemplatesHeaderTitle] = useState(null);
 
   /* Derived Variables */
 
@@ -70,9 +72,9 @@ const AddMineralModal = () => {
 
   const onCloseModalPressed = () => {
     if (choicesViewKey) setChoicesViewKey(null);
-    else if (isShowTemplates) setIsShowTemplates(false);
+    else if (isShowTemplates) closeTemplatesRef.current();
     else if (!isEmpty(selectedTypeIndex)) setSelectedTypeIndex(null);
-    else dispatch(setModalVisible({modal: null}));
+    else dispatch(setActiveModal({modal: null}));
   };
 
   const onIgOrMetSelected = (choiceName) => {
@@ -130,7 +132,7 @@ const AddMineralModal = () => {
           <ButtonGroup
             buttonStyle={{padding: 5}}
             buttons={['Look up by Rock Class', 'Look up in Glossary']}
-            containerStyle={{height: 50, borderRadius: 10}}
+            containerStyle={{borderRadius: 10, height: 'auto', minHeight: 50}}
             onPress={onViewTypePress}
             selectedButtonStyle={{backgroundColor: PRIMARY_ACCENT_COLOR}}
             selectedIndex={selectedTypeIndex}
@@ -225,16 +227,19 @@ const AddMineralModal = () => {
       buttonTitleRight={choicesViewKey || !isEmpty(selectedTypeIndex) ? 'Done' : isShowTemplates ? '' : null}
       closeModal={onCloseModalPressed}
       disabled={isFormInvalid}
-      headerTitle={isEmpty(selectedTypeIndex) ? 'Add Mineral Data' : 'Select Mineral'}
+      headerTitle={isShowTemplates ? templatesHeaderTitle : isEmpty(selectedTypeIndex) ? 'Add Mineral Data'
+        : 'Select Mineral'}
       onActionPressed={saveMineral}
       showActionButton={!isShowTemplates && isEmpty(selectedTypeIndex) && !choicesViewKey}
       showCancelButton={false}
       showCloseButton={!areMultipleTemplates}
     >
       {!choicesViewKey && isEmpty(selectedTypeIndex) && (
-        <TemplatesNotebook
+        <TemplatesPicker
           isShowTemplates={isShowTemplates}
+          registerCloseTemplates={closeTemplatesRef}
           setIsShowTemplates={bool => setIsShowTemplates(bool)}
+          setTemplatesHeaderTitle={setTemplatesHeaderTitle}
         />
       )}
       {!isShowTemplates && renderAddMineral()}

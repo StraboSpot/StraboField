@@ -3,6 +3,7 @@ import {
   convertUtmToLatLng,
   getClosestSpotDistanceAndIndex,
   getUtmDisplayString,
+  hasValidCoords,
   parseUtmZone,
 } from './maps.helpers';
 
@@ -127,5 +128,30 @@ describe('parseUtmZone', () => {
     ['13', 'N13', '13X', '', 'abc', undefined, null].forEach((zone) => {
       expect(parseUtmZone(zone)).toBeUndefined();
     });
+  });
+});
+
+describe('hasValidCoords', () => {
+  const feature = geometry => ({geometry, properties: {}, type: 'Feature'});
+
+  it('accepts numeric coordinates in any geometry', () => {
+    expect(hasValidCoords(feature({coordinates: [-75.1, 40], type: 'Point'}))).toBe(true);
+    expect(hasValidCoords(feature({coordinates: [[0, 0], [1, 1]], type: 'LineString'}))).toBe(true);
+    expect(hasValidCoords(feature({coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]], type: 'Polygon'}))).toBe(true);
+  });
+
+  it('rejects coordinates turf cannot measure', () => {
+    // NaN typed into Geography is persisted as null; a string comes from a value saved as typed
+    [[NaN, NaN], [null, null], ['-75.1', '40'], [], [-75.1]].forEach((coordinates) => {
+      expect(hasValidCoords(feature({coordinates, type: 'Point'}))).toBe(false);
+    });
+    expect(hasValidCoords(feature({coordinates: [[0, 0], [null, 1]], type: 'LineString'}))).toBe(false);
+  });
+
+  it('rejects a missing, empty or malformed geometry', () => {
+    expect(hasValidCoords(undefined)).toBe(false);
+    expect(hasValidCoords(feature(undefined))).toBe(false);
+    expect(hasValidCoords(feature({geometries: [], type: 'GeometryCollection'}))).toBe(false);
+    expect(hasValidCoords(feature({coordinates: null, type: 'Point'}))).toBe(false);
   });
 });

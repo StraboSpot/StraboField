@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
@@ -17,6 +17,7 @@ import LinkSampleModal from '../../samples/LinkSampleModal';
 import sampleStyles from '../../samples/samples.styles';
 import useLinkSampleAction from '../../samples/useLinkSampleAction';
 import useSamples from '../../samples/useSamples';
+import {LeavePageContext} from '../LeavePageContext';
 
 const NotebookFooter = ({
                           isReadOnly,
@@ -31,6 +32,7 @@ const NotebookFooter = ({
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
   const pagesState = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const {getAllRelevantPages} = usePage();
   const {createRichSample} = useSamples();
@@ -75,6 +77,12 @@ const NotebookFooter = ({
   const getPageIcon = (key) => {
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
     return notebookPageVisible === key ? page.icon_pressed_src : page.icon_src;
+  };
+
+  // Picking a page there leaves this one, so its changes are asked about as the menu opens
+  const openMorePagesMenu = async () => {
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
+    setIsMorePagesMenuVisible(true);
   };
 
   /* View */
@@ -133,7 +141,7 @@ const NotebookFooter = ({
               />
             ))}
             <ClearButton
-              onPress={() => setIsMorePagesMenuVisible(true)}
+              onPress={openMorePagesMenu}
               title={'MORE'}
               titleProps={{style: {color: BLACK, fontSize: themes.MEDIUM_TEXT_SIZE}}}
             />

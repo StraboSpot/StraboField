@@ -26,6 +26,21 @@ const useForm = () => {
     else return {};
   };
 
+  // A form's errors as lines naming each field by its label, the way the save alerts and the unsaved changes prompt
+  // list them. A field outside the survey is named from the form's own fieldLabels (see FormikWrapper), and one from
+  // another tab of the same record by its own form's label in the category. A subkey'd field is keyed by its path,
+  // e.g. associated_orientation[0].plunge, and is labeled by both halves.
+  const getErrorMessages = (form) => {
+    const [category, name] = form.status?.formName || [];
+    const getFieldLabel = key => form.status?.fieldLabels?.[key] || LABEL_DICTIONARY[category]?.[name]?.[key]
+      || getLabel(key, [category]);
+    return Object.entries(form.errors || {}).map(([key, value]) => {
+      if (!key.includes('[0].')) return getFieldLabel(key) + ': ' + value;
+      const [subkey, fieldName] = key.split('[0].');
+      return getFieldLabel(subkey) + ' ' + getFieldLabel(fieldName) + ': ' + value;
+    });
+  };
+
   // Get the fields relevant to a given group, including the group field itself
   const getGroupFields = (survey, groupKey) => {
     let inGroup = false;
@@ -110,16 +125,11 @@ const useForm = () => {
     // What a save writes is the cleaned values, not the text sitting in the fields
     let formValues = validateForm({formName: formName, values: form.values}).values;
     if (hasErrors(form)) {
-      const errorMessages = Object.entries(errors).map(([key, value]) => {
-        // A subkey'd field is keyed by its path, e.g. associated_orientation[0].plunge. Label it by both halves,
-        // and skip the reversion below, which only reaches top-level fields.
-        if (key.includes('[0].')) {
-          const [subkey, fieldName] = key.split('[0].');
-          return getLabel(subkey, formName) + ' ' + getLabel(fieldName, formName) + ': ' + value;
-        }
+      const errorMessages = getErrorMessages(form);
+      // Each failing field goes back to what it was. A subkey'd field is skipped: this only reaches the top level.
+      Object.keys(errors).filter(key => !key.includes('[0].')).forEach((key) => {
         if (form.initialValues[key]) formValues[key] = form.initialValues[key];
         else delete formValues[key];
-        return getLabel(key, formName) + ': ' + value;
       });
       // A value the user has just typed stops the save so they can fix it - the field is marked and, on most
       // forms, Save is held until it is. A value that was already wrong when the form opened is different: it is
@@ -207,6 +217,7 @@ const useForm = () => {
   return {
     getChoices,
     getChoicesByKey,
+    getErrorMessages,
     getGroupFields,
     getLabel,
     getLabels,

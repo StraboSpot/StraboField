@@ -17,8 +17,8 @@ import {
   getFeatureWithNewVertex,
   splitLineAtVertex,
 } from './editing.helpers';
+import useMapSnap from './useMapSnap';
 import {clearedVertexes, setVertexStartCoords} from '../maps.slice';
-import useMap from '../useMap';
 import useMapCoords from '../view/useMapCoords';
 
 // Owns the in-progress edit session: which Spot/vertex is being edited, the exploded draw-vertex overlay it
@@ -39,10 +39,10 @@ const useMapEditVertex = ({
   const stratSection = useSelector(state => state.map.stratSection);
   const vertexEndCoords = useSelector(state => state.map.vertexEndCoords);
 
-  const {isDrawMode} = useMap();
   const {convertFeatureGeometryToImagePixels, convertImagePixelsToLatLong} = useMapCoords();
   const {getAllMappedSpots} = useMapFeatures();
-  const {isSpotInReadOnlyDataset} = useProject();
+  const {snapCoord} = useMapSnap(mapRef);
+  const {getDatasetIdFromSpotId, isSpotInReadOnlyDataset} = useProject();
 
   /* Local State */
 
@@ -50,6 +50,8 @@ const useMapEditVertex = ({
   // between, and acting anyway leaves the press's vertex markers stranded on the map. A press reads it with
   // getEditSession when it begins and drops its result if it has changed after an await.
   const editSessionRef = useRef(0);
+  // For each new half of a line split in this edit, the dataset of the line it was split from, which Save files it in
+  const splitLineDatasetIdsRef = useRef({});
 
   const [allowMapViewMove, setAllowMapViewMove] = useState(true); // VIEW mode (initial) allows map movement
   const [editFeatureVertex, setEditFeatureVertex] = useState([]);
@@ -63,8 +65,10 @@ const useMapEditVertex = ({
 
   useEffect(() => {
     // console.log('UE useMapEditVertex [mapMode, spotEditing]');
-    // Lock the map while drawing or editing a Spot; EDIT with nothing selected stays movable for panning.
-    setAllowMapViewMove(!(isDrawMode(mapMode) || (mapMode === MAP_MODES.EDIT && !isEmpty(spotEditing))));
+    // Lock the map while freehand drawing (one-finger strokes would pan it) or editing a Spot. Tap-based draw modes
+    // (point, line, polygon, measure) stay movable; EDIT with nothing selected stays movable for panning.
+    const isFreehandDraw = mapMode === MAP_MODES.DRAW.FREEHANDPOLYGON || mapMode === MAP_MODES.DRAW.FREEHANDLINE;
+    setAllowMapViewMove(!(isFreehandDraw || (mapMode === MAP_MODES.EDIT && !isEmpty(spotEditing))));
   }, [mapMode, spotEditing]);
 
   useEffect(() => {
@@ -327,8 +331,9 @@ const useMapEditVertex = ({
 
   const moveVertex = async () => {
     try { // on imagebasemap, if spot is not point, conversion happens in editSpotCoordinates.
-      const newVertexCoords = Platform.OS === 'web' ? mapRef.current.unproject(vertexEndCoords).toArray()
+      const droppedVertexCoords = Platform.OS === 'web' ? mapRef.current.unproject(vertexEndCoords).toArray()
         : await mapRef.current.getCoordinateFromView(vertexEndCoords);
+      const newVertexCoords = await snapCoord(vertexEndCoords, droppedVertexCoords, spotEditing, spotsEdited);
       if ((currentImageBasemap || stratSection) && spotEditing && turf.getType(spotEditing) === 'Point') {
         const vertexCoordinates = proj4(GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION,
           [newVertexCoords[0], newVertexCoords[1]]);
@@ -379,6 +384,7 @@ const useMapEditVertex = ({
   const clearEditing = () => {
     console.log('Clearing editing data...');
     editSessionRef.current += 1;
+    splitLineDatasetIdsRef.current = {};
     clearVertexes();
     setSpotEditing({});
     setSpotsEdited([]);
@@ -444,6 +450,8 @@ const useMapEditVertex = ({
 
   const getEditSession = () => editSessionRef.current;
 
+  const getSplitLineDatasetId = spotId => splitLineDatasetIdsRef.current[spotId];
+
   const splitLine = async (e, spotEditingCopy, spotToEdit, vertexSelected) => {
     console.log('Splitting Line...', e, spotEditingCopy, spotToEdit, vertexSelected);
     let vertexAdded = {};
@@ -479,6 +487,10 @@ const useMapEditVertex = ({
     if (spotEditingCopy.properties.symbology) newLine2.properties.symbology = spotEditingCopy.properties.symbology;
     if (spotEditingCopy.properties.time) newLine2.properties.time = spotEditingCopy.properties.time;
     if (spotEditingCopy.properties.trace) newLine2.properties.trace = spotEditingCopy.properties.trace;
+    // A line that is itself a new half is in no dataset yet, so it passes on the one recorded for it
+    const splitFromId = spotEditingCopy.properties.id;
+    splitLineDatasetIdsRef.current[newLine2.properties.id] = getDatasetIdFromSpotId(splitFromId)
+      || getSplitLineDatasetId(splitFromId);
     console.log('Split Line 1', newLine1);
     console.log('Split Line 2', newLine2);
 
@@ -515,14 +527,15 @@ const useMapEditVertex = ({
     setVertexIndex(splitVertexIndex);
   };
 
-  const startEditing = (spotToEdit, vertexToEditTemp, index, setMapModeToEdit) => {
+  // A Spot given its first geometry (isNewGeometry) starts out edited, so Save writes that geometry and Cancel drops it
+  const startEditing = (spotToEdit, vertexToEditTemp, index, setMapModeToEdit, isNewGeometry) => {
     setMapModeToEdit();
     clearEditing();
     const editableMappedSpots = getEditableSpots(getAllMappedSpots());
     const editableSpotToEdit = isEditableSpot(spotToEdit) ? spotToEdit : {};
     if (isEmpty(editableSpotToEdit)) dispatch(clearedSelectedSpots());
     setSpotEditing(editableSpotToEdit);
-    setSpotsEdited([]);
+    setSpotsEdited(isNewGeometry && !isEmpty(editableSpotToEdit) ? [editableSpotToEdit] : []);
     setSpotsNotEdited(editableMappedSpots);
     !isEmpty(editableSpotToEdit) ? console.log('Set Spot to edit:', editableSpotToEdit)
       : console.log('No Spot selected to edit.');
@@ -552,6 +565,7 @@ const useMapEditVertex = ({
     editFeatureVertex,
     extendLineFromEndpoint,
     getEditSession,
+    getSplitLineDatasetId,
     getVertexIndexInSpotToEdit,
     moveVertex,
     setSelectedSpotToEdit,

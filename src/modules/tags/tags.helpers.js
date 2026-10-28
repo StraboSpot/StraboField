@@ -2,7 +2,7 @@ import {isEmpty} from '../../shared/helpers';
 
 export const filterTagsByTagType = (tags, tagType) => {
   if (isEmpty(tagType)) return tags;
-  return tags.filter(tag => tag.type.toUpperCase().startsWith(tagType.toUpperCase()));
+  return tags.filter(tag => tag.type?.toUpperCase().startsWith(tagType.toUpperCase()));
 };
 
 export const getFeatureLabel = (feature) => {

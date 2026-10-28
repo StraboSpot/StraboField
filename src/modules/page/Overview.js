@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, Image, Linking, Pressable, SectionList, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Image, Linking, Pressable, SectionList, Text, View} from 'react-native';
 
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
@@ -9,28 +9,23 @@ import PageHeader from './PageHeader';
 import {PAGE_KEYS} from './pageKeys.constants';
 import usePage from './usePage';
 import RockdLogo from '../../assets/images/logos/rockd-icon-256.png';
-import {isEmpty, toTitleCase} from '../../shared/helpers';
 import {SMALL_SCREEN, SMALL_TEXT_SIZE, TEXT_WEIGHT_500} from '../../shared/styles.constants';
-import alert from '../../shared/ui/alert';
-import ClearButton from '../../shared/ui/buttons/ClearButton';
-import SaveAndCancelButtons from '../../shared/ui/buttons/SaveAndCancelButtons';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import uiStyles from '../../shared/ui/ui.styles';
-import Form from '../form/Form';
-import FormikWrapper from '../form/FormikWrapper';
-import useForm from '../form/useForm';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import ImageModal from '../images/ImageModal';
 import ImagePropertiesModal from '../images/ImagePropertiesModal';
 import useImages from '../images/useImages';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import notebookStyles from '../notebook-panel/notebook.styles';
 import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import SketchModal from '../sketch/SketchModal';
+import {isLineSpot, isPolygonSpot} from '../spots/spots.helpers';
 import {editedSpotImages, editedSpotProperties} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
+import {getTraceSurfaceFeatureLabel} from '../trace-surface-feature/traceSurfaceFeature.helpers';
+import TraceSurfaceFeatureOverview from '../trace-surface-feature/TraceSurfaceFeatureOverview';
+import TraceSurfaceFeaturePage from '../trace-surface-feature/TraceSurfaceFeaturePage';
 
 const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   /* Data Hooks */
@@ -39,7 +34,6 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   const spot = useSelector(state => state.spot.selectedSpot);
   const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
 
-  const {submitAndShowErrors} = useForm();
   const {deleteImageFromSpot} = useImages();
   const {getPopulatedPagesKeys} = usePage();
   const {getSpotByImageId} = useSpots();
@@ -47,28 +41,30 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
 
   /* Local State */
 
-  const formRef = useRef(null);
-
   const [imageToView, setImageToView] = useState({});
-  const [isFormInvalid, setIsFormInvalid] = useState(false);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [isImagePropertiesModalVisible, setIsImagePropertiesModalVisible] = useState(false);
   const [isSketchModalVisible, setIsSketchModalVisible] = useState(false);
   const [shouldOpenImageProperties, setShouldOpenImageProperties] = useState(false);
   const [sketchImage, setSketchImage] = useState({});
   const [isTraceSurfaceFeatureEdit, setIsTraceSurfaceFeatureEdit] = useState(false);
-  const [isTraceSurfaceFeatureEnabled, setIsTraceSurfaceFeatureEnabled] = useState(false);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
 
   /* Derived Variables */
 
-  const sections = getOverviewSections(getPopulatedPagesKeys(spot), spot.properties?.isSample);
+  // Not a notebook page: it opens a subpage within the Overview, so it has no icon or More Menu listing
+  const traceSurfaceFeatureSection = {key: 'trace_surface_feature', label: getTraceSurfaceFeatureLabel(spot)};
+  const sections = [
+    ...!isSample && (isLineSpot(spot) || isPolygonSpot(spot))
+      ? [{title: traceSurfaceFeatureSection, data: [traceSurfaceFeatureSection]}]
+      : [],
+    ...getOverviewSections(getPopulatedPagesKeys(spot), spot.properties?.isSample),
+  ];
 
   /* Side Effects */
 
   useEffect(() => {
     console.log('UE Overview [spot]', spot);
-    setIsTraceSurfaceFeatureEnabled(!!(spot.properties.trace?.trace_feature || spot.properties.surface_feature));
     setIsTraceSurfaceFeatureEdit(false);
     setIsImageModalVisible(false);
     setIsImagePropertiesModalVisible(false);
@@ -108,65 +104,19 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     setIsSketchModalVisible(true);
   };
 
-  const handleToggleShowTraceSurfaceFeatureForm = () => {
-    if (isTraceSurfaceFeatureEdit) setIsTraceSurfaceFeatureEdit(false);
-    else setIsTraceSurfaceFeatureEdit(true);
-  };
-
-  // What happens after submitting the form is handled in saveFormAndGo since we want to show
-  // an alert message if there are errors but this function won't be called if form is invalid
-  const onSubmitForm = () => {
-    console.log('In onSubmitForm');
-  };
-
   /* Logic Helpers */
-
-  const cancelFormAndGo = () => {
-    setIsTraceSurfaceFeatureEdit(false);
-    if (isTraceSurfaceFeatureEnabled && !spot.properties.trace && !spot.properties.surface_feature) {
-      setIsTraceSurfaceFeatureEnabled(false);
-    }
-  };
 
   const deleteImage = async image => await deleteImageFromSpot(image.id, getSpotByImageId(image.id));
 
   const openPage = (page) => {
     dispatch(setNotebookPageVisible(page.key));
-    if (page.modal) dispatch(setModalVisible({modal: page.modal}));
-    else dispatch(setModalVisible({modal: null}));
+    if (page.modal) dispatch(setActiveModal({modal: page.modal}));
+    else dispatch(setActiveModal({modal: null}));
   };
 
   const openRockdLink = () => {
     const checkinId = spot.properties.rockd_checkin_id;
     Linking.openURL(`https://dev.rockd.org/checkin/${checkinId}`);
-  };
-
-  // Reports whether the save happened. A refusal has already alerted about the field it stopped on, so a caller
-  // stays where it is for that to be fixed rather than carrying on.
-  const saveForm = async () => {
-    try {
-      const {values: formValues} = await submitAndShowErrors(formRef.current);
-      console.log('Saving form data to Spot ...');
-      if (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString') {
-        const traceValues = {...formValues, 'trace_feature': true};
-        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-        dispatch(editedSpotProperties({field: 'trace', value: traceValues}));
-      }
-      else if (spot.geometry.type === 'Polygon' || spot.geometry.type === 'MultiPolygon'
-        || spot.geometry.type === 'GeometryCollection') {
-        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-        dispatch(editedSpotProperties({field: 'surface_feature', value: formValues}));
-      }
-      return true;
-    }
-    catch (err) {
-      console.error('Error submitting form', err);
-      return false;
-    }
-  };
-
-  const saveFormAndGo = async () => {
-    if (await saveForm()) setIsTraceSurfaceFeatureEdit(false);
   };
 
   const saveImagesToSpot = (newImages) => {
@@ -182,46 +132,17 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     dispatch(editedSpotProperties({field: 'images', value: updatedImages}));
   };
 
-  const toggleTraceSurfaceFeature = () => {
-    const continueToggleTraceSurfaceFeature = () => {
-      setIsTraceSurfaceFeatureEnabled(!isTraceSurfaceFeatureEnabled);
-      setIsTraceSurfaceFeatureEdit(!isTraceSurfaceFeatureEnabled);
-
-      // If toggled off remove trace or surface feature
-      if (isTraceSurfaceFeatureEnabled) {
-        let field = 'surface_feature';
-        if (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString') field = 'trace';
-        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-        dispatch(editedSpotProperties({field: field, value: {}}));
-      }
-    };
-
-    if (isTraceSurfaceFeatureEnabled && ((spot.properties.trace
-        && !isEmpty(Object.keys(spot.properties.trace).filter(t => t !== 'trace_feature')))
-      || spot.properties.surface_feature)) {
-      let featureTypeText = spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString'
-        ? 'Trace' : 'Surface';
-      alert('Turn Off ' + featureTypeText + ' Feature Warning',
-        'Turning off ' + featureTypeText.toLowerCase() + ' feature will delete all '
-        + featureTypeText.toLowerCase() + ' feature data. Are you sure you want to continue?',
-        [
-          {text: 'No', style: 'cancel'},
-          {text: 'Yes', onPress: continueToggleTraceSurfaceFeature},
-        ],
-        {cancelable: false},
-      );
-    }
-    else continueToggleTraceSurfaceFeature();
-  };
-
   /* Render Functions */
 
   const renderSectionHeader = (page) => {
     if (page.testing && !isTestingMode) return null;
     else if (spot.properties?.isSample && page.key === PAGE_KEYS.SAMPLES) return null;
     const dividerText = spot.properties.isSample ? 'Sample ' + page.label : page.label;
+    const onPress = page.key === traceSurfaceFeatureSection.key
+      ? () => setIsTraceSurfaceFeatureEdit(true)
+      : () => openPage(page);
     return (
-      <Pressable onPress={() => openPage(page)} style={uiStyles.sectionHeaderBackground}>
+      <Pressable onPress={onPress} style={uiStyles.sectionHeaderBackground}>
         <SectionDivider
           dividerText={dividerText}
           leftIcon={page.icon_src && <Image source={page.icon_src} style={{height: 18, width: 18}}/>}
@@ -266,8 +187,11 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
           ListHeaderComponent={isTestingMode && renderRockdBadge}
           keyExtractor={item => item.key}
           renderItem={({item}) => {
+            if (item.key === traceSurfaceFeatureSection.key) {
+              return <TraceSurfaceFeatureOverview onPress={() => setIsTraceSurfaceFeatureEdit(true)}/>;
+            }
             if (item.testing && !isTestingMode) return null;
-            const SectionOverview = item.overview_component;
+            const SectionOverview = item.overview_component();
             return (
               <SectionOverview
                 isReadOnly={isReadOnly}
@@ -286,70 +210,13 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     );
   };
 
-  const renderTraceSurfaceFeatureForm = () => {
-    const formName = spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')
-      ? ['general', 'trace'] : ['general', 'surface_feature'];
-    const pageTitle = toTitleCase(formName[1].replace('_', ' '));
-    let initialValues = spot.properties.trace || spot.properties.surface_feature || {};
-    if (spot.geometry && (spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')) {
-      initialValues = {...initialValues, 'trace_feature': true};
-    }
-    return (
-      <View style={{flex: 1}}>
-        <PageHeader hideBackButton pageTitle={pageTitle}/>
-        {!isReadOnly && (
-          <SaveAndCancelButtons cancel={cancelFormAndGo} getIsDisabled={isFormInvalid} save={saveFormAndGo}/>
-        )}
-        <FlatList
-          ListHeaderComponent={
-            <FormikWrapper
-              enableReinitialize={true}
-              formName={formName}
-              initialValues={initialValues}
-              innerRef={formRef}
-              onSubmit={onSubmitForm}
-              setIsFormInvalid={setIsFormInvalid}
-            >
-              {formProps => <Form {...formProps} formName={formName} isReadOnly={isReadOnly}/>}
-            </FormikWrapper>
-          }
-        />
-      </View>
-    );
-  };
-
   /* View */
 
   return (
     <View style={{flex: 1}}>
-      {!isSample && spot.geometry && spot.geometry.type && (spot.geometry.type === 'LineString'
-        || spot.geometry.type === 'MultiLineString' || spot.geometry.type === 'Polygon'
-        || spot.geometry.type === 'MultiPolygon' || spot.geometry.type === 'GeometryCollection') && (
-        <View style={notebookStyles.traceSurfaceFeatureContainer}>
-          <View style={notebookStyles.traceSurfaceFeatureToggleContainer}>
-            {(spot.geometry.type === 'LineString' || spot.geometry.type === 'MultiLineString')
-              && <Text style={notebookStyles.traceSurfaceFeatureToggleText}>This is a trace feature</Text>}
-            {(spot.geometry.type === 'Polygon' || spot.geometry.type === 'MultiPolygon'
-                || spot.geometry.type === 'GeometryCollection')
-              && <Text style={notebookStyles.traceSurfaceFeatureToggleText}>This is a surface feature</Text>}
-            <SwitchWrapper
-              disabled={isReadOnly}
-              onValueChange={toggleTraceSurfaceFeature}
-              value={isTraceSurfaceFeatureEnabled}
-            />
-          </View>
-          <View style={{height: 40}}>
-            {(isReadOnly || !isTraceSurfaceFeatureEdit) && (
-              <ClearButton
-                disabled={!isTraceSurfaceFeatureEnabled}
-                onPress={handleToggleShowTraceSurfaceFeatureForm}
-                title={isTraceSurfaceFeatureEdit ? 'Close' : isReadOnly ? 'View' : 'Edit'}
-              />
-            )}
-          </View>
-        </View>
-      )}
-      {isTraceSurfaceFeatureEdit ? renderTraceSurfaceFeatureForm() : renderSections()}
+      {isTraceSurfaceFeatureEdit
+        ? <TraceSurfaceFeaturePage closePage={() => setIsTraceSurfaceFeatureEdit(false)} isReadOnly={isReadOnly}/>
+        : renderSections()}
 
       {/* Modals */}
       <ImageModal

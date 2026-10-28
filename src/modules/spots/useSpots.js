@@ -28,7 +28,8 @@ import {
 } from './spots.slice';
 import {deepCopyWithNewIds, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
+import {hasValidCoords} from '../maps/maps.helpers';
 import {
   clearedSpotsInMapExtentIds,
   clearedStratSection,
@@ -55,13 +56,12 @@ const useSpots = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const recentViews = useSelector(state => state.spot.recentViews);
   const reports = useSelector(state => state.project.project?.reports);
-  const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
   const spotsInMapExtentIds = useSelector(state => state.map.spotsInMapExtentIds);
   const stratSection = useSelector(state => state.map.stratSection);
@@ -251,8 +251,8 @@ const useSpots = () => {
     }
   };
 
-  // Copy Spot to a new Spot omitting specific properties
-  const copySpot = async () => {
+  // Copy a Spot to a new Spot, omitting specific properties
+  const copySpot = async (spotToCopy) => {
     let copiedSpot = {'type': 'Feature'};
     let {
       name,
@@ -269,7 +269,7 @@ const useSpots = () => {
       orientation_data,
       spot_radius,
       ...properties
-    } = selectedSpot.properties;
+    } = spotToCopy.properties;
     copiedSpot.properties = properties;
     // Omit strat_section from copied properties
     if (copiedSpot.properties?.sed?.strat_section) {
@@ -345,7 +345,7 @@ const useSpots = () => {
       if (!(preferences.restart_num_each_nested_spot && (isOnImageBasemap(newSpot) || isOnStratSection(newSpot)))) {
         updatedPreferences = {...preferences, starting_number_for_spot: spotNumber + 1};
       }
-      if (modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
+      if (activeModal === MODAL_KEYS.SHORTCUTS.SAMPLE) {
         updatedPreferences = {
           ...(updatedPreferences || preferences),
           starting_sample_number: (Number(preferences.starting_sample_number) || 1) + 1,
@@ -405,7 +405,7 @@ const useSpots = () => {
     }
 
     spotsToDelete.forEach(spot => removeSpotAndReferences(spot.properties.id));
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
 
     if (undoSnapshot) {
       toast.show(`Deleted ${spotToDelete.properties.isSample ? 'Sample' : 'Spot'} "${spotToDelete.properties.name}"`, {
@@ -603,7 +603,7 @@ const useSpots = () => {
         return [rootSpot.properties.lng, rootSpot.properties.lat];
       }
       if (isOnGeoMap(rootSpot)) {
-        if (!rootSpot.geometry) return undefined;
+        if (!hasValidCoords(rootSpot)) return undefined;
         return rootSpot.geometry.type === 'Point' ? rootSpot.geometry.coordinates
           : turf.centroid(rootSpot).geometry.coordinates;
       }
@@ -680,6 +680,8 @@ const useSpots = () => {
       if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
       if (stratSection) dispatch(clearedStratSection());
     }
+    // The Spot holding the map is searched for in every Dataset, and the map is read straight off it, because
+    // a Dataset turned on here is not active in the store until the next render
     else if (isOnImageBasemap(spot)
       && (!currentImageBasemap || currentImageBasemap.id !== spot.properties.image_basemap)) {
       const isThisImageBasemap = imageBasemap => isSameId(imageBasemap.id, spot.properties.image_basemap);

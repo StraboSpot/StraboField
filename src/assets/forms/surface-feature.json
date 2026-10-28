@@ -27,6 +27,7 @@
       "label": "Surface Feature Quality",
       "hint": "Quality of surface feature? Known, approximate, inferred, concealed, questioned",
       "required": "false",
+      "relevant": "${surface_feature_type} != ''",
       "appearance": "horizontal"
     },
     {
@@ -41,6 +42,7 @@
       "name": "surface_feature_notes",
       "label": "Notes",
       "required": "false",
+      "relevant": "${surface_feature_type} != ''",
       "appearance": "multiline"
     }
   ],

@@ -237,18 +237,18 @@ const useSed = () => {
       + ' (' + columnYUnits + ')';
   };
 
-  const saveSedBedFeature = async (key, spot, formCurrent, isLeavingPage, previousFeature) => {
-    return saveSedFeature(key, spot, formCurrent, isLeavingPage, 'beds', previousFeature);
+  const saveSedBedFeature = async (key, spot, formCurrent, previousFeature) => {
+    return saveSedFeature(key, spot, formCurrent, 'beds', previousFeature);
   };
 
-  const saveSedFeature = async (key, spot, formCurrent, isLeavingPage, subKey, previousFeature) => {
+  const saveSedFeature = async (key, spot, formCurrent, subKey, previousFeature) => {
     let pageKey = key;
     if (Object.values(LITHOLOGY_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.LITHOLOGIES;
     else if (Object.values(STRUCTURE_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.STRUCTURES;
     else if (Object.values(INTERPRETATIONS_SUBPAGES).includes(key)) pageKey = PAGE_KEYS.INTERPRETATIONS;
 
     try {
-      const {errors, values} = await submitAndShowErrors(formCurrent, isLeavingPage);
+      const {errors, values} = await submitAndShowErrors(formCurrent);
       // The shared bedding record is not a row in any list - the beds within it are - so it is not labeled
       const editedFeatureData = pageKey === PAGE_KEYS.BEDDING && !subKey ? values
         : resolveLabelOnSave({pageKey: pageKey, previousFeature: previousFeature, values: values,

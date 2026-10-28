@@ -1,16 +1,19 @@
-import {useState} from 'react';
+import {useContext, useState} from 'react';
 import {PixelRatio, Platform} from 'react-native';
 
 import * as turf from '@turf/turf';
 import {useDispatch, useSelector, useStore} from 'react-redux';
 
 import {isEmpty} from '../../../shared/helpers';
+import {LeavePageContext} from '../../notebook-panel/LeavePageContext';
 import useProject from '../../project/useProject';
 import {isStratInterval} from '../../spots/spots.helpers';
 import {setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
+import {MAP_EDIT_CHOICES} from '../editing/editing.constants';
 import useMapFeatures from '../features/useMapFeatures';
 import useMapFeaturesCalculated from '../features/useMapFeaturesCalculated';
+import {MapEditContext} from '../MapEditContext';
 import {MAP_MODES} from '../maps.constants';
 import {convertImagePixelsToLatLong} from '../maps.helpers';
 import {setIntervalDragState} from '../maps.slice';
@@ -28,8 +31,8 @@ const useMapPressEvents = ({
                              measureFeatures,
                              setDistance,
                              setDrawFeaturesNew,
-                             setIsShowMacrostratOverlay,
                              setIsShowSpotsAtPressModal,
+                             setMacrostratLocation,
                              setMapModeToEdit,
                              setMeasureFeatures,
                              setSpotsAtPress,
@@ -44,6 +47,8 @@ const useMapPressEvents = ({
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isDragIntervalMode = useSelector(state => state.map.isDragIntervalMode);
   const stratSection = useSelector(state => state.map.stratSection);
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
+  const {endMapEditing} = useContext(MapEditContext);
 
   const {isDrawMode} = useMap();
   const {getAllMappedSpots} = useMapFeatures();
@@ -55,7 +60,6 @@ const useMapPressEvents = ({
 
   /* Local State */
 
-  const [location, setLocation] = useState({coords: [0, 0], zoom: 16});
   // What the picker does with the tapped Spot ('select' | 'edit' | 'switch'); holds long-press coords for 'edit'.
   const [spotsAtPressAction, setSpotsAtPressAction] = useState(null);
 
@@ -89,6 +93,8 @@ const useMapPressEvents = ({
 
     if (mapMode === MAP_MODES.VIEW && !isSingleActiveReadOnlyDataset && !isEmpty(getAllMappedSpots())) {
       const spotsToEdit = await getSpotsAtPress(screenPointX, screenPointY);
+      // Editing closes the notebook, so its page is asked about once there is a Spot to edit
+      if (!isEmpty(spotsToEdit) && hasUnsavedPageChanges() && !await confirmLeavePage()) return;
       // Several Spots overlap - let the user pick which to edit.
       if (spotsToEdit.length > 1) {
         setSpotsAtPress(spotsToEdit);
@@ -113,13 +119,14 @@ const useMapPressEvents = ({
   //   MEASURE -> add the point to the measurement.
   //   DRAW -> add a draw feature (freehand line/polygon are handled on release, not here).
   //   VIEW -> select/deselect the Spot under the press:
-  //     - Macrostrat basemap -> open the geology overlay and select a Spot (random when several overlap).
+  //     - Macrostrat basemap -> show the geologic unit info and select a Spot (random when several overlap).
   //     - Several overlap -> show the picker so the user chooses which to select.
   //     - Exactly one -> select it.
   //     - None -> select the strat section's own Spot if in one, otherwise deselect.
   //   EDIT -> a vertex under the press is a vertex gesture (editSpot); otherwise switch to another Spot
   //     under the press (picker if several), deselect on empty space, or do nothing if only the edited
-  //     Spot is under the press with no vertex.
+  //     Spot is under the press with no vertex. A Spot given its first geometry by Set in Current View has
+  //     none stored, and a press off it cancels the edit, as Cancel does.
   const handleMapPress = async (e) => {
     if (isDragIntervalMode && stratSection && mapMode === MAP_MODES.INTERVAL_DRAG) {
       const [x, y] = getScreenPoint(e);
@@ -147,6 +154,8 @@ const useMapPressEvents = ({
     else if (mapMode !== MAP_MODES.DRAW.FREEHANDPOLYGON && mapMode !== MAP_MODES.DRAW.FREEHANDLINE) {
       // Select/Unselect a feature
       if (mapMode === MAP_MODES.VIEW) {
+        // Every press here selects or clears a Spot, which leaves the notebook page on screen
+        if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
         console.log('Selecting or unselect a feature ...');
         const [screenPointX, screenPointY] = getScreenPoint(e);
         const isMacrostratBasemap = currentBasemap?.source === 'macrostrat' && !stratSection && !currentImageBasemap;
@@ -154,11 +163,10 @@ const useMapPressEvents = ({
         // Spot directly under the press selects, not a nearby one).
         const spotsFound = await getSpotsAtPress(screenPointX, screenPointY, isMacrostratBasemap);
         if (isMacrostratBasemap) {
-          setIsShowMacrostratOverlay(true);
           const currentZoom = await mapRef.current.getZoom();
-          setLocation(
+          setMacrostratLocation(
             {coords: (Platform.OS !== 'web' ? e.geometry?.coordinates : Object.values(e.lngLat)), zoom: currentZoom});
-          // Skip the picker (it would stack over the overlay); pick at random so repeated taps can cycle.
+          // Skip the picker (it would stack over the unit info); pick at random so repeated taps can cycle.
           if (spotsFound.length >= 1) {
             dispatch(setSelectedSpot(spotsFound[Math.floor(Math.random() * spotsFound.length)]));
           }
@@ -178,7 +186,7 @@ const useMapPressEvents = ({
         else clearSelectedSpots();
       }
       // Draw a feature
-      else if (isDrawMode(mapMode)) setDrawFeaturesNew(e);
+      else if (isDrawMode(mapMode)) await setDrawFeaturesNew(e, getScreenPoint(e));
       // Edit a Spot
       else if (mapMode === MAP_MODES.EDIT) {
         const [screenPointX, screenPointY] = getScreenPoint(e);
@@ -194,7 +202,10 @@ const useMapPressEvents = ({
           const editingSpotId = store.getState().spot.selectedSpot?.properties?.id;
           const otherSpots = isEditingSpot ? spotsAtPress.filter(spot => spot.properties.id !== editingSpotId)
             : spotsAtPress;
-          if (otherSpots.length > 1) {
+          const isOffNewGeometry = isEditingSpot && !store.getState().spot.spots[editingSpotId]?.geometry
+            && (otherSpots.length > 0 || spotsAtPress.length === 0);
+          if (isOffNewGeometry) await endMapEditing(MAP_EDIT_CHOICES.CANCEL);
+          else if (otherSpots.length > 1) {
             setSpotsAtPress(otherSpots);
             setSpotsAtPressAction({type: 'switch'});
             setIsShowSpotsAtPressModal(true);
@@ -302,7 +313,6 @@ const useMapPressEvents = ({
     handleMapPress,
     handleSpotAtPressSelected,
     isSpotsAtPressForEdit: spotsAtPressAction?.type === 'edit' || spotsAtPressAction?.type === 'switch',
-    location,
     startIntervalDrag,
   };
 };

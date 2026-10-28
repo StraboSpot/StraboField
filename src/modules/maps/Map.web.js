@@ -33,7 +33,7 @@ const Map = ({
                editFeatureVertex,
                handleMapLongPress,
                handleMapPress,
-               isShowMacrostratOverlay,
+               isShowMacrostratUnitInfo,
                location,
                mapMode,
                mapRef,
@@ -162,7 +162,7 @@ const Map = ({
         basemap={basemap}
         drawFeatures={drawFeatures}
         editFeatureVertex={editFeatureVertex}
-        isShowMacrostratOverlay={isShowMacrostratOverlay}
+        isShowMacrostratUnitInfo={isShowMacrostratUnitInfo}
         location={location}
         mapMode={mapMode}
         measureFeatures={measureFeatures}

@@ -2,7 +2,7 @@ import {PixelRatio, Platform} from 'react-native';
 
 import proj4 from 'proj4';
 
-import {GEO_LAT_LNG_PROJECTION, PIXEL_PROJECTION, PRESS_BOX_PADDING} from '../maps.constants';
+import {GEO_LAT_LNG_PROJECTION, LOCATION_MAX_FIX_AGE, PIXEL_PROJECTION, PRESS_BOX_PADDING} from '../maps.constants';
 
 // Get a pixel bounding box with padding around a point pressed on screen. A smaller r tightens the
 // tap tolerance (r near 0 requires a press directly on the feature).
@@ -41,4 +41,15 @@ export const getCoordQuad = (imageBasemapProps, altOrigin) => {
   let coordQuad = [topLeft, topRight, bottomRight, bottomLeft];
   console.log('The coordinates identified for image-basemap :', coordQuad);
   return coordQuad;
+};
+
+// Whether a position fix was taken recently enough, relative to when the location request started, to trust
+export const isFreshPosition = (position, requestStartTime) => (
+  position.timestamp >= requestStartTime - LOCATION_MAX_FIX_AGE
+);
+
+// Pick the more accurate of two position fixes (a smaller accuracy radius is better)
+export const getMoreAccuratePosition = (bestPosition, position) => {
+  if (!bestPosition) return position;
+  return position.coords.accuracy <= bestPosition.coords.accuracy ? position : bestPosition;
 };

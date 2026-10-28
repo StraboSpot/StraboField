@@ -17,7 +17,7 @@ import {openedMessageModal} from '../home/home.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
-const UrlData = ({
+const URLData = ({
                    editable,
                    initializeDelete,
                    spot,
@@ -128,4 +128,4 @@ const UrlData = ({
   );
 };
 
-export default UrlData;
+export default URLData;

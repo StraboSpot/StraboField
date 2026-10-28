@@ -795,7 +795,8 @@
       "name": "volcaniclastic_type",
       "label": "Volcaniclastic Type",
       "required": "false",
-      "read_only": "false"
+      "read_only": "false",
+      "relevant": "${primary_lithology} = 'volcaniclastic'"
     },
     {
       "type": "text",
@@ -940,7 +941,8 @@
       "name": "evaporite_type",
       "label": "Evaporite Type",
       "required": "false",
-      "read_only": "false"
+      "read_only": "false",
+      "relevant": "${primary_lithology} = 'evaporite'"
     },
     {
       "type": "decimal",
@@ -1019,14 +1021,16 @@
       "name": "phosphorite_type",
       "label": "Phosphorite Type",
       "required": "false",
-      "read_only": "false"
+      "read_only": "false",
+      "relevant": "${primary_lithology} = 'phosphatic'"
     },
     {
       "type": "select_multiple om8xr30",
       "name": "organic_coal_lithologies",
       "label": "Organic/Coal Lithologies",
       "required": "false",
-      "read_only": "false"
+      "read_only": "false",
+      "relevant": "${primary_lithology} = 'organic_coal'"
     },
     {
       "type": "decimal",

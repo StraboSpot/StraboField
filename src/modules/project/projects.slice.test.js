@@ -143,6 +143,16 @@ describe('movedSpotIdBetweenDatasets', () => {
     expect(datasets[12].spotIds).toEqual([otherSpotId]);
     expect(datasets[13].spotIds).toEqual([1756000000003, spotId.toString()]);
   });
+
+  // A map edit used to add the Spot to the target dataset too, so picking one of the datasets holding it must leave
+  // it in that one alone
+  it('leaves a Spot that is in two datasets in only the one it is moved to', () => {
+    const state = getDatasetsState();
+    state.datasets[13].spotIds.push(spotId);
+    const {datasets} = projectReducer(state, movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 12}));
+    expect(datasets[12].spotIds).toEqual([otherSpotId, spotId]);
+    expect(datasets[13].spotIds).toEqual([1756000000003]);
+  });
 });
 
 describe('updatedModifiedTimestampsBySpotsIds', () => {
@@ -344,6 +354,20 @@ describe('template reducers', () => {
         measurementTemplates: [linear],
         activeMeasurementTemplates: [],
         useMeasurementTemplates: false,
+      });
+    });
+
+    it('keeps the other active templates, and templates on, when one of several is deleted', () => {
+      const state = getState({
+        measurementTemplates: [planar, linear],
+        activeMeasurementTemplates: [planar, linear],
+        useMeasurementTemplates: true,
+      });
+      const {project} = projectReducer(state, deletedTemplate({key: MEASUREMENT_TEMPLATE_KEY, template: planar}));
+      expect(project.templates).toEqual({
+        measurementTemplates: [linear],
+        activeMeasurementTemplates: [linear],
+        useMeasurementTemplates: true,
       });
     });
 
