@@ -30,7 +30,7 @@
  * no `play` items falls back to one compact line per group. Items tagged `platforms` (e.g. ['ios'],
  * ['web']) are left out of the other platform's store notes.
  *
- * Also writes WHAT_TO_TEST.md at the repo root — a tester-facing rendering of the same curated
+ * Also writes WHAT_TO_TEST.txt at the repo root — a tester-facing rendering of the same curated
  * notes, refreshed on every run for paste into TestFlight / Play testing notes. It is gitignored
  * (a local aid, not a tracked artifact), so any hand-edits are overwritten on the next run.
  *
@@ -195,16 +195,24 @@ function playGroupText(groups, header) {
   return out.length + 2 + FOOTER.length <= PLAY_LIMIT ? `${out}\n\n${FOOTER}` : out;
 }
 
-// WHAT_TO_TEST.md: a tester-facing rendering of the same curated highlights — a heading per group,
-// a bullet per item — for paste into TestFlight / Play testing notes.
+// WHAT_TO_TEST.txt: a tester-facing rendering of the same curated highlights — an uppercase heading per
+// group, a bullet per item — as plain text, since the TestFlight / Play boxes don't render Markdown. TestFlight caps these at the
+// same 4000 chars as the App Store, so when the full text overflows, leading groups keep their full
+// items and the rest shrink to one line of item labels — every area still gets named for testers.
 function whatToTestText(groups, version, versionCode) {
-  const header = `# What to Test — StraboField ${version} (build ${versionCode})\n\n`
+  const header = `What to Test — StraboField ${version} (build ${versionCode})\n\n`
     + 'New in this build — please exercise each area and report anything off, with your device model and OS version.\n';
-  if (!groups.length) return `${header}\n- General stability and reliability improvements.\n`;
-  const blocks = groups.map(g =>
-    [`## ${g.title}`, ...g.items.map(i => `- ${i.text}`)].join('\n'),
-  );
-  return `${header}\n${blocks.join('\n\n')}\n`;
+  if (!groups.length) return `${header}\n• General stability and reliability improvements.\n`;
+  const full = groups.map(g => [g.title.toUpperCase(), ...g.items.map(i => `• ${i.text}`)].join('\n'));
+  const compact = groups.map(g => `${g.title.toUpperCase()}\n• ${g.items.map(i => label(i.text)).join('; ')}`);
+  const render = blocks => `${header}\n${blocks.join('\n\n')}\n`;
+
+  const blocks = [];
+  for (let i = 0; i < groups.length; i++) {
+    const fits = render([...blocks, full[i], ...compact.slice(i + 1)]).length <= APP_STORE_LIMIT;
+    blocks.push(fits ? full[i] : compact[i]);
+  }
+  return render(blocks);
 }
 
 function write(file, contents) {
@@ -260,7 +268,7 @@ async function main() {
 
   const appFile = path.join(ROOT, 'fastlane/metadata/en-US/release_notes.txt');
   const playFile = path.join(ROOT, `fastlane/metadata/android/en-US/changelogs/${versionCode || 'draft'}.txt`);
-  const whatToTestFile = path.join(ROOT, 'WHAT_TO_TEST.md');
+  const whatToTestFile = path.join(ROOT, 'WHAT_TO_TEST.txt');
   write(appFile, appStore);
   write(playFile, play);
   write(whatToTestFile, whatToTest);
@@ -275,7 +283,7 @@ async function main() {
   console.log(appStore);
   console.log(`\n── Google Play ── ${rel(playFile)}   [${play.length}/${PLAY_LIMIT} chars]`);
   console.log(play);
-  console.log(`\n── What to Test (gitignored) ── ${rel(whatToTestFile)}`);
+  console.log(`\n── What to Test (gitignored) ── ${rel(whatToTestFile)}   [${whatToTest.length}/${APP_STORE_LIMIT} chars]`);
   if (target !== version) console.log(`\nℹ️  Generated for ${target}, but package.json is ${version} — the Play file is still named for versionCode ${versionCode}.`);
   console.log('');
 }
