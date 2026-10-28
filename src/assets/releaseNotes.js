@@ -30,6 +30,31 @@ const RELEASE_NOTES = [
     version: '2.32.0',
     groups: [
       {
+        title: 'Samples & IGSN',
+        items: [
+          {
+            text: 'IGSNs from strabospot.org: IGSNs now come from your strabospot.org account, so the app no longer signs in to or registers with SESAR',
+            commit: '83c1a2953',
+          },
+          {
+            text: 'IGSNs on strabospot.org: View IGSN and Get IGSN open the sample\'s own page on strabospot.org',
+            commit: '513ecad96',
+          },
+          {
+            text: 'Upload first: a sample not yet on your account offers to upload the project, then opens its page when the upload is done',
+            commit: '01961165d',
+          },
+          {
+            text: 'IGSN edits reminder: editing a sample that has an IGSN reminds you to upload so strabospot.org can update it',
+            commit: '48be0ae10',
+          },
+          {
+            text: 'Correct sample location: a sample from an image-basemap Spot gets a real-world location',
+            commit: 'c8bf57cce',
+          },
+        ],
+      },
+      {
         title: 'Forms & validation',
         items: [
           {
@@ -165,6 +190,14 @@ const RELEASE_NOTES = [
             text: 'Map filter for Spots: filter Spots by whether they\'re on the geographic map or not mapped',
             commit: '7cddc4a4d',
           },
+          {
+            text: 'Edited Spots stay put: editing a Spot on the map no longer also adds it to the target dataset, so it can\'t vanish from its own dataset after an upload',
+            commit: '422b1382f',
+          },
+          {
+            text: 'Fix Spots in two datasets: on the Metadata page, tap a dataset to move a Spot listed in several datasets into just that one',
+            commit: '116d6a0e6',
+          },
         ],
       },
       {
@@ -190,19 +223,6 @@ const RELEASE_NOTES = [
           {
             text: 'Hidden datasets: opening a strat section or image basemap whose Spot is in a dataset that\'s off turns that dataset on',
             commit: 'fe892bf49',
-          },
-        ],
-      },
-      {
-        title: 'Samples & IGSN',
-        items: [
-          {
-            text: 'IGSNs from strabospot.org: IGSNs now come from your strabospot.org account, so the app no longer signs in to or registers with SESAR',
-            commit: '83c1a2953',
-          },
-          {
-            text: 'Correct sample location: a sample from an image-basemap Spot gets a real-world location',
-            commit: 'c8bf57cce',
           },
         ],
       },
