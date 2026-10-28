@@ -79,7 +79,7 @@ const useMapEditor = ({
     setDrawFeatures,
     spotsSelected,
   });
-  const {getTargetDatasetFromId} = useProject();
+  const {getDatasetIdFromSpotId, getTargetDatasetFromId} = useProject();
 
   /* Side Effects */
 
@@ -281,7 +281,9 @@ const useMapEditor = ({
       const spotIds = spotsEdited.map(s => s.properties.id);
       const targetDataset = getTargetDatasetFromId();
       if (!isEmpty(targetDataset)) {
-        dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: spotIds}));
+        // A Spot already in a dataset stays there even if the target has changed
+        const newSpotIds = spotIds.filter(spotId => !getDatasetIdFromSpotId(spotId));
+        if (!isEmpty(newSpotIds)) dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: newSpotIds}));
         dispatch(updatedModifiedTimestampsBySpotsIds(spotIds));
         dispatch(editedOrCreatedSpots(spotsEdited));
       }
