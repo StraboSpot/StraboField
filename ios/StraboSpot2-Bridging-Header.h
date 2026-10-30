@@ -9,3 +9,4 @@
 #import <React-RCTAppDelegate/RCTReactNativeFactory.h>
 #import <React-RCTAppDelegate/RCTDefaultReactNativeFactoryDelegate.h>
 #import "RCTAppDependencyProvider.h"
+#import "SentryCorruptReportGuard.h"
