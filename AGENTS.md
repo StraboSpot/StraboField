@@ -268,7 +268,7 @@ Form rendering in `/src/modules/form/` with custom field components.
 
 ## Code Style
 
-### ESLint Configuration (`.eslintrc.js`)
+### ESLint Configuration (`eslint.config.js`)
 
 **Key rules enforced:**
 - Single quotes for strings and JSX

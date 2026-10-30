@@ -246,7 +246,7 @@ track sync state. Check network via `ConnectionStatus` before any server call.
 
 ## Code Style
 
-ESLint (`.eslintrc.js`) enforces: single quotes; Stroustrup braces (else/catch on new line); import order (React/RN →
+ESLint (`eslint.config.js`) enforces: single quotes; Stroustrup braces (else/catch on new line); import order (React/RN →
 external → internal, alphabetical); alphabetized JSX props and StyleSheet keys; no unused vars (except function args).
 Run `npm run lint:fix` before committing.
 
