@@ -25,6 +25,8 @@ setup_permissions([
 ])
 
 $RNMapboxMapsImpl = 'mapbox'
+# Newer SDKs blank raster basemap tiles while zooming: 11.28.4 and up flicker. See CLAUDE.md before raising this.
+$RNMapboxMapsVersion = '= 11.23.1'
 
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil

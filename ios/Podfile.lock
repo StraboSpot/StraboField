@@ -63,13 +63,13 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - MapboxCommon (24.20.3):
+  - MapboxCommon (24.23.1):
     - Turf (= 4.0.0)
-  - MapboxCoreMaps (11.20.3):
-    - MapboxCommon (= 24.20.3)
-  - MapboxMaps (11.20.3):
-    - MapboxCommon (= 24.20.3)
-    - MapboxCoreMaps (= 11.20.3)
+  - MapboxCoreMaps (11.23.1):
+    - MapboxCommon (= 24.23.1)
+  - MapboxMaps (11.23.1):
+    - MapboxCommon (= 24.23.1)
+    - MapboxCoreMaps (= 11.23.1)
     - Turf (= 4.0.0)
   - RCT-Folly (2024.11.18.00):
     - RCT-Folly/Default (= 2024.11.18.00)
@@ -2204,7 +2204,7 @@ PODS:
     - React-Core
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.33.1):
+  - RNGestureHandler (3.4.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2226,16 +2226,17 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
+    - RNWorklets (>= 0.8.0)
     - Yoga
-  - rnmapbox-maps (10.3.1):
-    - MapboxMaps (~> 11.20.1)
+  - rnmapbox-maps (10.3.11):
+    - MapboxMaps (= 11.23.1)
     - React
     - React-Core
-    - rnmapbox-maps/DynamicLibrary (= 10.3.1)
+    - rnmapbox-maps/DynamicLibrary (= 10.3.11)
     - Turf
-  - rnmapbox-maps/DynamicLibrary (10.3.1):
+  - rnmapbox-maps/DynamicLibrary (10.3.11):
     - hermes-engine
-    - MapboxMaps (~> 11.20.1)
+    - MapboxMaps (= 11.23.1)
     - RCTRequired
     - RCTTypeSafety
     - React
@@ -2981,9 +2982,9 @@ SPEC CHECKSUMS:
   IQKeyboardManagerSwift: 90ba81812fbbd6694924a95a271fa3affdf04a14
   lottie-ios: 8f959969761e9c45d70353667d00af0e5b9cadb3
   lottie-react-native: e7f8565b0128379bcbd023886551f926fc595b13
-  MapboxCommon: bd1554a0c6e66ac04c9ecd3611f3b7d772eeac7e
-  MapboxCoreMaps: 821019cdd87447ecd895872f4095232723961627
-  MapboxMaps: 6191d857abe0da0f3bdfb5a71349c532d55d7d9d
+  MapboxCommon: d006256c4643860a7b3046af45d1671569b6c5ac
+  MapboxCoreMaps: de1a4461d0ab5d65d907f06e8d82fdbe06bb3213
+  MapboxMaps: 22340ae0e0d47b2e4761019b1d6c569ab04e088d
   RCT-Folly: 82921e585c0400eda46fac1068297aa9dfb035e4
   RCTDeprecation: c62b9b3fbf0d26b76755f3ebd1c913a4fb469dde
   RCTRequired: d0563e2484633b657976195f0543e180133afd3a
@@ -3080,8 +3081,8 @@ SPEC CHECKSUMS:
   RNDateTimePicker: 4ebf97a8ee633ad5e86a34b1196a9202b8e57760
   RNDeviceInfo: 4c852998208b60dc192ae3529e5867817719ad1e
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: 0124c0b5117c1376f013aaac888ed4134ca88b58
-  rnmapbox-maps: 2407e8525639b14bd862964e4c60b1d68ca957a4
+  RNGestureHandler: b5512a093e6923dd1c31fbdd8e6186cd0ebb3541
+  rnmapbox-maps: 4204dc9b4b34d6f0fcdcecb71d99904d59cc3268
   RNPermissions: ec51eb4691eb3274a0953505a8ca5ef875b30cc2
   RNReanimated: 3018727dbf272754d0f31ef73f619e49ade7baf0
   RNScreens: f15a5bda1ddeff8575b8ce41d83885b67129f84b
@@ -3098,6 +3099,6 @@ SPEC CHECKSUMS:
   Turf: c9eb11a65d96af58cac523460fd40fec5061b081
   Yoga: d1c536142c5ff8ec8cd856ab2a7c227a1d875c8e
 
-PODFILE CHECKSUM: f1cac9014f027e95d6b35d47c3c1f495c75bf2fd
+PODFILE CHECKSUM: 52fc33fc7b1b204321f4f58645b048f7dfe56e68
 
 COCOAPODS: 1.15.2

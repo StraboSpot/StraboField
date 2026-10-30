@@ -20,11 +20,14 @@ Guidance for Claude Code when working in this repository.
   skipping it breaks the build.
 - **`@rnmapbox/maps` bridgeless patch** — upstream bails out with "bridge is nil" when there's no bridge; the patch
   makes the image-fetch path take `RCTBridge?` and falls back to URLSession in `RNMBXImageQueue`, applied via
-  `patches/@rnmapbox+maps+10.3.1.patch`. **Regenerate (don't just rename) the patch when upgrading Mapbox**, then
+  `patches/@rnmapbox+maps+10.3.11.patch`. **Regenerate (don't just rename) the patch when upgrading Mapbox**, then
   confirm `npx patch-package` shows ✔ for it — a renamed 10.3.0 patch silently failed on 10.3.1.
-- **Mapbox is held at `@rnmapbox/maps` 10.3.1 / iOS SDK 11.20.3** — iOS SDK 11.33 (required by rnmapbox ≥ 10.3.12)
-  makes online raster basemap tiles blank and redraw while panning. A/B confirmed it's the SDK, not the wrapper
-  (10.3.1 on 11.33.1 flickers too). Suspect the 11.32.0 raster-reveal change. Re-test before upgrading.
+- **Mapbox is held at `@rnmapbox/maps` 10.3.11 / SDK 11.23.1** — newer iOS SDKs make online raster basemap tiles blank
+  to white or grey and redraw, mostly while zooming. Device tests: 11.23.1 clean; 11.28.4, 11.31.1, 11.33.1 and 11.34.1
+  flicker, and `raster-fade-duration: 0` doesn't help. It's the SDK, not the wrapper (10.3.1 on 11.33.1 flickers too), and
+  the regression starts somewhere in 11.24–11.28. rnmapbox ≥ 10.3.12 needs SDK 11.33, so it can't be upgraded yet.
+  `ios/Podfile` pins the SDK; Android uses the wrapper's default. Re-test on an iOS device before upgrading. Blurry tiles
+  that sharpen are normal; white or grey blocks are the bug.
 - **Library patches carry RN 0.88 fixes** — removed APIs (`InteractionManager`, `StyleSheet.absoluteFillObject`) and
   legacy headers are patched in `@rn-vui/base`, `react-native-indicators`, `react-native-draggable-flatlist` and
   `@rnmapbox/maps`. `absoluteFillObject` fails silently (the spread is empty), so check for it when adding libraries.
@@ -261,7 +264,7 @@ suffixes; `.web.js` for web overrides.
 - React 19.3.0 + React Native 0.88.1
 - Redux Toolkit 2.13.0 + Redux Persist 6.0.0
 - React Navigation 7.x
-- Mapbox Maps (@rnmapbox/maps 10.3.1 for native, mapbox-gl 3.x for web)
+- Mapbox Maps (@rnmapbox/maps 10.3.11 for native, mapbox-gl 3.x for web)
 - Formik 2.4.9 - Form management
 - Turf.js 7.x, RNFS, Sentry
 
