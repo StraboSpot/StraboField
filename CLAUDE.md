@@ -26,10 +26,10 @@ Guidance for Claude Code when working in this repository.
   makes online raster basemap tiles blank and redraw while panning. A/B confirmed it's the SDK, not the wrapper
   (10.3.1 on 11.33.1 flickers too). Suspect the 11.32.0 raster-reveal change. Re-test before upgrading.
 - **Library patches carry RN 0.88 fixes** — removed APIs (`InteractionManager`, `StyleSheet.absoluteFillObject`) and
-  legacy headers are patched in `@rn-vui/base`, `react-native-indicators`, `react-native-draggable-flatlist`,
-  `@sentry/react-native` and `@rnmapbox/maps`. `absoluteFillObject` fails silently (the spread is empty), so check
-  for it when adding libraries. Before regenerating a patch, delete the package's `android/build` and `android/.cxx`
-  or patch-package includes the build output.
+  legacy headers are patched in `@rn-vui/base`, `react-native-indicators`, `react-native-draggable-flatlist` and
+  `@rnmapbox/maps`. `absoluteFillObject` fails silently (the spread is empty), so check for it when adding libraries.
+  Before regenerating a patch, delete the package's `android/build` and `android/.cxx` or patch-package includes the
+  build output.
 - **After an RN bump, check `React-Core-prebuilt` in `Podfile.lock`** — `pod install` can leave it on the old version
   (fails with a missing `module.modulemap`). Fix: delete `Pods/React-Core-prebuilt` and its `Pods/Local Podspecs` json,
   then run `pod update React-Core-prebuilt`.
