@@ -26,11 +26,15 @@ const compileNodeModules = [
 
 // Packages that ship ESM (lib/module has {"type":"module"}), but babel-loader transforms them
 // to CommonJS. This rule overrides the module type so webpack doesn't try to evaluate the
-// CommonJS output as an ES module (which would cause "exports is not defined").
+// CommonJS output as an ES module (which would cause "exports is not defined"). Gesture-handler swallows that error
+// when it probes for reanimated, leaving webpack a cached empty module, so it surfaces later as draggable-flatlist's
+// "Your version of react-native-reanimated is too old".
 const esmLibModuleTypeOverride = {
   test: /\.js$/,
   include: [
     path.resolve(__dirname, 'node_modules/@react-native-async-storage/async-storage/lib/module'),
+    path.resolve(__dirname, 'node_modules/react-native-reanimated/lib/module'),
+    path.resolve(__dirname, 'node_modules/react-native-worklets/lib/module'),
   ],
   type: 'javascript/auto',
 };
