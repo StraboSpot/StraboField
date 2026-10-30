@@ -393,7 +393,7 @@ Minimal test coverage currently. Tests in `__tests__/`:
 - RNFS - File system access
 - Sentry - Error tracking
 
-**Node version:** >=18 (specified in `package.json`)
+**Node version:** >=26.0.0 (specified in `package.json`)
 
 **Package manager:** Yarn 4.13.0
 
