@@ -39,6 +39,16 @@ const esmLibModuleTypeOverride = {
   type: 'javascript/auto',
 };
 
+// babel-loader's own cache key covers only Babel and the loader, so upgrading a plugin keeps serving what the old one
+// compiled. Stale worklets from before 0.13 crash on web with "inputs is not iterable".
+const babelCacheIdentifier = [
+  '@babel/core',
+  '@react-native/babel-preset',
+  'babel-loader',
+  'react-native-reanimated',
+  'react-native-worklets',
+].map(name => `${name}@${require(`${appDirectory}/node_modules/${name}/package.json`).version}`).join();
+
 const babelLoaderConfiguration = {
   test: /\.(jsx?|tsx?)$/,
   // Add every directory that needs to be compiled by Babel during the build.
@@ -52,6 +62,7 @@ const babelLoaderConfiguration = {
     loader: 'babel-loader',
     options: {
       cacheDirectory: true,
+      cacheIdentifier: babelCacheIdentifier,
       presets,
       plugins: [
         'react-native-web',
