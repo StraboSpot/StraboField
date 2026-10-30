@@ -1573,7 +1573,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-pager-view (8.0.2):
+  - react-native-pager-view (9.0.11):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -3035,7 +3035,7 @@ SPEC CHECKSUMS:
   react-native-keep-awake: 21ff40767cde4bd81021ffee12480aee4b5b91bb
   react-native-netinfo: 687391ecedb199c6d67fbc46c87cbae3277de967
   react-native-orientation-director: 6ad88c06e3dbdd77c2c1876526075d40ac1744d1
-  react-native-pager-view: 84608b3532f0d985f1ad313b3aee3106e9fdeb3d
+  react-native-pager-view: b5d7055004441b835a643b927af7121d96f4c813
   react-native-pdf: 4367fe3940668c9549ac90b44998312b99e53f7d
   react-native-safe-area-context: e6b7da4a15e6d491e90442715412d9dbb059ac4d
   react-native-slider: 5f655882a4ec96c21d705abb305419c257a2f12b
@@ -3099,6 +3099,6 @@ SPEC CHECKSUMS:
   Turf: c9eb11a65d96af58cac523460fd40fec5061b081
   Yoga: d1c536142c5ff8ec8cd856ab2a7c227a1d875c8e
 
-PODFILE CHECKSUM: 52fc33fc7b1b204321f4f58645b048f7dfe56e68
+PODFILE CHECKSUM: f1ae484b20311309814be8a6405658c7a5b65eaf
 
 COCOAPODS: 1.15.2
