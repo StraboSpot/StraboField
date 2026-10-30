@@ -85,7 +85,6 @@ target 'StraboSpot2' do
 
       framework_paths = [
         "Pods/MapboxCommon/MapboxCommon.xcframework/ios-arm64/MapboxCommon.framework/MapboxCommon",
-        "Pods/MapboxMobileEvents/MapboxMobileEvents.xcframework/ios-arm64_armv7/MapboxMobileEvents.framework/MapboxMobileEvents",
         "Pods/MapboxCoreMaps/MapboxCoreMaps.xcframework/ios-arm64/MapboxCoreMaps.framework/MapboxCoreMaps",
       ]
 
@@ -125,10 +124,6 @@ target 'StraboSpot2' do
       end
   end
 
-
-pre_install do |installer|
-  fix_mapbox_events(installer)
-end
 
 pre_install do |installer|
     $RNMapboxMaps.pre_install(installer)

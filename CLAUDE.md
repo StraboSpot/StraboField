@@ -18,8 +18,13 @@ Guidance for Claude Code when working in this repository.
   requires SDK 36. Set in `android/app/build.gradle`.
 - **Run `npm run bundle:android` before every PlayStore deploy** — it bundles JS and removes duplicate resources;
   skipping it breaks the build.
-- **`@rnmapbox/maps` bridgeless patch** — requires `RCTBridge!` → `RCTBridge?` with a URLSession fallback in
-  `RNMBXImageQueue`, applied via `patches/@rnmapbox+maps+10.3.1.patch`. Rename the patch when upgrading Mapbox.
+- **`@rnmapbox/maps` bridgeless patch** — upstream bails out with "bridge is nil" when there's no bridge; the patch
+  makes the image-fetch path take `RCTBridge?` and falls back to URLSession in `RNMBXImageQueue`, applied via
+  `patches/@rnmapbox+maps+10.3.1.patch`. **Regenerate (don't just rename) the patch when upgrading Mapbox**, then
+  confirm `npx patch-package` shows ✔ for it — a renamed 10.3.0 patch silently failed on 10.3.1.
+- **Mapbox is held at `@rnmapbox/maps` 10.3.1 / iOS SDK 11.20.3** — iOS SDK 11.33 (required by rnmapbox ≥ 10.3.12)
+  makes online raster basemap tiles blank and redraw while panning. A/B confirmed it's the SDK, not the wrapper
+  (10.3.1 on 11.33.1 flickers too). Suspect the 11.32.0 raster-reveal change. Re-test before upgrading.
 - **Releases: tag on `master` after merge, with a `v` prefix** (e.g. `v2.29.1`) — never tag on the rc branch, never
   hand-write the changelog. See [Release Process](#release-process-rc--master).
 - **Package manager is Yarn 4** (exact version pinned by `packageManager` in `package.json`; install with `yarn`);
