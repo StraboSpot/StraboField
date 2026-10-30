@@ -141,7 +141,7 @@
     "babel-plugin-module-resolver": "^5.0.3",
     "babel-plugin-react-native-web": "^0.21.4",
     "babel-plugin-transform-remove-console": "6.9.4",
-    "concurrently": "^9.2.5",
+    "concurrently": "^10.0.6",
     "css-loader": "^7.1.5",
     "eslint": "^9.39.5",
     "eslint-plugin-ft-flow": "^3.0.11",
