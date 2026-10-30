@@ -124,7 +124,7 @@ const homeStyles = StyleSheet.create({
   // Lets Macrostrat unit info slide with the right side buttons. Level with them and the notebook drawer, so drawing
   // order decides: over the buttons, under the notebook.
   macrostratUnitInfoLayer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     zIndex: -1,
   },
   mapActionsContainer: {

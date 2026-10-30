@@ -11,3 +11,67 @@ index 19d242f..67961d2 100644
              React.createElement(View, { style: StyleSheet.flatten([
                      (reverse || raised) && buttonStyles,
                      {
+diff --git a/node_modules/@rn-vui/base/dist/Image/Image.js b/node_modules/@rn-vui/base/dist/Image/Image.js
+index d1d5a3d..64a8536 100644
+--- a/node_modules/@rn-vui/base/dist/Image/Image.js
++++ b/node_modules/@rn-vui/base/dist/Image/Image.js
+@@ -33,7 +33,7 @@ export const Image = (_a) => {
+     return (React.createElement(Component, Object.assign({}, pressableProps, { onPress, onPressIn, onPressOut, onLongPress, accessibilityIgnoresInvertColors: true, style: StyleSheet.flatten([styles.container, containerStyle]) }),
+         React.createElement(ImageComponent, Object.assign({ testID: "RNE__Image" }, props, { transition, transitionDuration, onLoad: onLoadHandler, style: StyleSheet.flatten([StyleSheet.absoluteFill, style]) })),
+         React.createElement(Animated.View, { pointerEvents: hasImage ? 'none' : 'auto', accessibilityElementsHidden: hasImage, importantForAccessibility: hasImage ? 'no-hide-descendants' : 'yes', style: [
+-                StyleSheet.absoluteFillObject,
++                StyleSheet.absoluteFill,
+                 {
+                     opacity: hasImage ? placeholderOpacity.current : 1,
+                 },
+diff --git a/node_modules/@rn-vui/base/dist/SpeedDial/SpeedDial.js b/node_modules/@rn-vui/base/dist/SpeedDial/SpeedDial.js
+index 6a3fe2a..7a12de9 100644
+--- a/node_modules/@rn-vui/base/dist/SpeedDial/SpeedDial.js
++++ b/node_modules/@rn-vui/base/dist/SpeedDial/SpeedDial.js
+@@ -27,9 +27,9 @@ export const SpeedDial = (_a) => {
+         }))[isOpen ? 'reverse' : 'sort']()).start();
+     }, [isOpen, animations, children, transitionDuration]);
+     return (React.createElement(View, { style: [styles.container, style], pointerEvents: "box-none" },
+-        React.createElement(Pressable, Object.assign({}, pressableProps, { onPress: onClose, style: [StyleSheet.absoluteFillObject], pointerEvents: isOpen ? 'auto' : 'none' }),
++        React.createElement(Pressable, Object.assign({}, pressableProps, { onPress: onClose, style: [StyleSheet.absoluteFill], pointerEvents: isOpen ? 'auto' : 'none' }),
+             React.createElement(Animated.View, { style: [
+-                    StyleSheet.absoluteFillObject,
++                    StyleSheet.absoluteFill,
+                     {
+                         opacity: animations.current[0],
+                         backgroundColor: overlayColor ||
+@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
+     safeArea: {
+         alignItems: 'flex-end',
+     },
+-    container: Object.assign(Object.assign({}, StyleSheet.absoluteFillObject), { justifyContent: 'flex-end' }),
++    container: Object.assign(Object.assign({}, StyleSheet.absoluteFill), { justifyContent: 'flex-end' }),
+     fab: {
+         margin: 16,
+         marginTop: 0,
+diff --git a/node_modules/@rn-vui/base/dist/TabView/TabView.js b/node_modules/@rn-vui/base/dist/TabView/TabView.js
+index e08b6d1..000bf94 100644
+--- a/node_modules/@rn-vui/base/dist/TabView/TabView.js
++++ b/node_modules/@rn-vui/base/dist/TabView/TabView.js
+@@ -62,7 +62,7 @@ export const TabViewBase = ({ value: activeIndex = 0, children, onChange = () =>
+             setContainerWidth(layout.width);
+         } },
+         React.createElement(Animated.View, Object.assign({ testID: "RNE__TabView", style: StyleSheet.flatten([
+-                StyleSheet.absoluteFillObject,
++                StyleSheet.absoluteFill,
+                 styles.container,
+                 {
+                     width: containerWidth * childCount,
+diff --git a/node_modules/@rn-vui/base/dist/Tile/Tile.js b/node_modules/@rn-vui/base/dist/Tile/Tile.js
+index b5767f0..90881b7 100644
+--- a/node_modules/@rn-vui/base/dist/Tile/Tile.js
++++ b/node_modules/@rn-vui/base/dist/Tile/Tile.js
+@@ -52,7 +52,7 @@ export const Tile = (_a) => {
+         React.createElement(ImageComponent, Object.assign({ resizeMode: "cover", source: imageSrc, containerStyle: StyleSheet.flatten([
+                 styles.imageContainer,
+                 imageContainerStyle && imageContainerStyle,
+-            ]), style: Object.assign(Object.assign({}, StyleSheet.absoluteFillObject), { alignItems: 'center', justifyContent: 'center' }) }, imageProps),
++            ]), style: Object.assign(Object.assign({}, StyleSheet.absoluteFill), { alignItems: 'center', justifyContent: 'center' }) }, imageProps),
+             React.createElement(View, { style: StyleSheet.flatten([
+                     styles.iconContainer,
+                     iconContainerStyle && iconContainerStyle,

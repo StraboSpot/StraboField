@@ -1,3 +1,43 @@
+diff --git a/node_modules/@rnmapbox/maps/android/build.gradle b/node_modules/@rnmapbox/maps/android/build.gradle
+index 7de0f2f..b78b6b2 100644
+--- a/node_modules/@rnmapbox/maps/android/build.gradle
++++ b/node_modules/@rnmapbox/maps/android/build.gradle
+@@ -245,7 +245,7 @@ Please upgrade to Mapbox v11.x or use @rnmapbox/maps 10.2.x
+     buildTypes {
+         release {
+             minifyEnabled false
+-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
++            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+         }
+     }
+ }
+diff --git a/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapViewManager.kt b/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapViewManager.kt
+index bdc2571..1f42001 100644
+--- a/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapViewManager.kt
++++ b/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/components/mapview/RNMBXMapViewManager.kt
+@@ -428,7 +428,7 @@ open class RNMBXMapViewManager(context: ReactApplicationContext, val viewTagReso
+          * onDropViewInstance.
+          */
+         private fun diposeNativeMapView() {
+-            val mapView = mViewManager.getByReactTag(reactTag)
++            val mapView = mViewManager.getByReactTag(getReactTag())
+             if (mapView != null) {
+                 UiThreadUtil.runOnUiThread {
+                     try {
+diff --git a/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt b/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt
+index 2638b11..aefaf6f 100644
+--- a/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt
++++ b/node_modules/@rnmapbox/maps/android/src/main/java/com/rnmapbox/rnmbx/utils/DownloadMapImageTask.kt
+@@ -77,7 +77,8 @@ class DownloadMapImageTask(context: Context, map: MapboxMap, imageManager: Image
+             result = DataSources.waitForFinalResult(dataSource)
+             result?.get()?.let { image ->
+                 if (image is CloseableStaticBitmap) {
+-                    val bitmap = image.underlyingBitmap.copy(Bitmap.Config.ARGB_8888, true)
++                    val bitmap = image.underlyingBitmap?.copy(Bitmap.Config.ARGB_8888, true)
++                        ?: return@let null
+                     bitmap.density = DisplayMetrics.DENSITY_DEFAULT
+ 
+                     CoroutineScope(Dispatchers.Main).launch {
 diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift
 index 778e932..929bc0b 100644
 --- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXImageQueue.swift
@@ -64,6 +104,30 @@ index 797cf3e..182dbb5 100644
        RNMBXUtils.fetchImages(bridge, style: style, objects: missingImages, forceUpdate: true) { name, image in
          self.loadedImages.insert(name)
          self.imageManager?.resolve(name: name, image: image)
+diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXMarkerViewComponentView.mm b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXMarkerViewComponentView.mm
+index 871bbe4..99aeea8 100644
+--- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXMarkerViewComponentView.mm
++++ b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXMarkerViewComponentView.mm
+@@ -99,17 +99,8 @@ - (void)updateLayoutMetrics:(const LayoutMetrics &)layoutMetrics
+       next = CGRectMake(0, 0, next.size.width, next.size.height);
+     }
+     
+-    LayoutMetrics newLayoutMetrics = LayoutMetrics{
+-        RCTRectFromCGRect(next),
+-        layoutMetrics.contentInsets,
+-        layoutMetrics.borderWidth,
+-        layoutMetrics.displayType,
+-        layoutMetrics.positionType, // RN074
+-        layoutMetrics.layoutDirection,
+-        layoutMetrics.wasLeftAndRightSwapped,
+-        layoutMetrics.pointScaleFactor,
+-        layoutMetrics.overflowInset
+-    };
++    LayoutMetrics newLayoutMetrics = layoutMetrics;
++    newLayoutMetrics.frame = RCTRectFromCGRect(next);
+ 
+     [super updateLayoutMetrics:newLayoutMetrics oldLayoutMetrics:oldLayoutMetrics];
+     if (frameDidChange) {
 diff --git a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyleValue.swift b/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyleValue.swift
 index a866da0..a18af47 100644
 --- a/node_modules/@rnmapbox/maps/ios/RNMBX/RNMBXStyleValue.swift

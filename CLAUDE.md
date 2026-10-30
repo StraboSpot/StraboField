@@ -14,8 +14,8 @@ Guidance for Claude Code when working in this repository.
 
 ## Critical / Non-obvious (read first)
 
-- **Android `compileSdkVersion` must be 36** — `react-native-screens` pulls in `androidx.core:core-ktx:1.17.0` which
-  requires SDK 36. Set in `android/app/build.gradle`.
+- **Android `compileSdkVersion` is 37** (`targetSdkVersion` stays 36) — the RN 0.88 template value. Set in
+  `android/build.gradle`.
 - **Run `npm run bundle:android` before every PlayStore deploy** — it bundles JS and removes duplicate resources;
   skipping it breaks the build.
 - **`@rnmapbox/maps` bridgeless patch** — upstream bails out with "bridge is nil" when there's no bridge; the patch
@@ -25,6 +25,14 @@ Guidance for Claude Code when working in this repository.
 - **Mapbox is held at `@rnmapbox/maps` 10.3.1 / iOS SDK 11.20.3** — iOS SDK 11.33 (required by rnmapbox ≥ 10.3.12)
   makes online raster basemap tiles blank and redraw while panning. A/B confirmed it's the SDK, not the wrapper
   (10.3.1 on 11.33.1 flickers too). Suspect the 11.32.0 raster-reveal change. Re-test before upgrading.
+- **Library patches carry RN 0.88 fixes** — removed APIs (`InteractionManager`, `StyleSheet.absoluteFillObject`) and
+  legacy headers are patched in `@rn-vui/base`, `react-native-indicators`, `react-native-draggable-flatlist`,
+  `@sentry/react-native` and `@rnmapbox/maps`. `absoluteFillObject` fails silently (the spread is empty), so check
+  for it when adding libraries. Before regenerating a patch, delete the package's `android/build` and `android/.cxx`
+  or patch-package includes the build output.
+- **After an RN bump, check `React-Core-prebuilt` in `Podfile.lock`** — `pod install` can leave it on the old version
+  (fails with a missing `module.modulemap`). Fix: delete `Pods/React-Core-prebuilt` and its `Pods/Local Podspecs` json,
+  then run `pod update React-Core-prebuilt`.
 - **Releases: tag on `master` after merge, with a `v` prefix** (e.g. `v2.29.1`) — never tag on the rc branch, never
   hand-write the changelog. See [Release Process](#release-process-rc--master).
 - **Package manager is Yarn 4** (exact version pinned by `packageManager` in `package.json`; install with `yarn`);
@@ -250,7 +258,7 @@ suffixes; `.web.js` for web overrides.
 
 ## Dependencies
 
-- React 19.2.3 + React Native 0.84.1
+- React 19.3.0 + React Native 0.88.1
 - Redux Toolkit 2.13.0 + Redux Persist 6.0.0
 - React Navigation 7.x
 - Mapbox Maps (@rnmapbox/maps 10.3.1 for native, mapbox-gl 2.x for web)

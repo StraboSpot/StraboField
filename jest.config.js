@@ -1,5 +1,5 @@
 module.exports = {
-  preset: 'react-native',
+  preset: '@react-native/jest-preset',
   setupFiles: ['<rootDir>/jest/setup.js'],
   // Stub native modules that are pulled in transitively by shared constants but not under test.
   moduleNameMapper: {

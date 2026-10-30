@@ -11,6 +11,19 @@ index 8c97fbd..5eea78c 100644
          <Animated.View style={ballStyle} />
        </Animated.View>
      );
+diff --git a/node_modules/react-native-indicators/src/components/ball-indicator/styles.js b/node_modules/react-native-indicators/src/components/ball-indicator/styles.js
+index 1c5b56f..3ad6289 100644
+--- a/node_modules/react-native-indicators/src/components/ball-indicator/styles.js
++++ b/node_modules/react-native-indicators/src/components/ball-indicator/styles.js
+@@ -9,7 +9,7 @@ export default StyleSheet.create({
+   },
+ 
+   layer: {
+-    ...StyleSheet.absoluteFillObject,
++    ...StyleSheet.absoluteFill,
+ 
+     justifyContent: 'flex-start',
+     alignItems: 'flex-start',
 diff --git a/node_modules/react-native-indicators/src/components/bar-indicator/index.js b/node_modules/react-native-indicators/src/components/bar-indicator/index.js
 index ad06a55..133949e 100644
 --- a/node_modules/react-native-indicators/src/components/bar-indicator/index.js
@@ -50,6 +63,19 @@ index bf7edc4..0bde608 100644
          <Animated.View style={layerStyle}>
            <Animated.View style={[containerStyle, offsetStyle]} collapsable={false}>
              <Animated.View style={viewportStyle}>
+diff --git a/node_modules/react-native-indicators/src/components/material-indicator/styles.js b/node_modules/react-native-indicators/src/components/material-indicator/styles.js
+index c062abb..7d03b39 100644
+--- a/node_modules/react-native-indicators/src/components/material-indicator/styles.js
++++ b/node_modules/react-native-indicators/src/components/material-indicator/styles.js
+@@ -8,7 +8,7 @@ export default StyleSheet.create({
+   },
+ 
+   layer: {
+-    ...StyleSheet.absoluteFillObject,
++    ...StyleSheet.absoluteFill,
+ 
+     justifyContent: 'center',
+     alignItems: 'center',
 diff --git a/node_modules/react-native-indicators/src/components/pulse-indicator/index.js b/node_modules/react-native-indicators/src/components/pulse-indicator/index.js
 index 53bcf92..e452df8 100644
 --- a/node_modules/react-native-indicators/src/components/pulse-indicator/index.js
@@ -63,6 +89,19 @@ index 53bcf92..e452df8 100644
          <Animated.View style={pulseStyle} />
        </Animated.View>
      );
+diff --git a/node_modules/react-native-indicators/src/components/pulse-indicator/styles.js b/node_modules/react-native-indicators/src/components/pulse-indicator/styles.js
+index c062abb..7d03b39 100644
+--- a/node_modules/react-native-indicators/src/components/pulse-indicator/styles.js
++++ b/node_modules/react-native-indicators/src/components/pulse-indicator/styles.js
+@@ -8,7 +8,7 @@ export default StyleSheet.create({
+   },
+ 
+   layer: {
+-    ...StyleSheet.absoluteFillObject,
++    ...StyleSheet.absoluteFill,
+ 
+     justifyContent: 'center',
+     alignItems: 'center',
 diff --git a/node_modules/react-native-indicators/src/components/skype-indicator/index.js b/node_modules/react-native-indicators/src/components/skype-indicator/index.js
 index 8a988df..1a0304f 100644
 --- a/node_modules/react-native-indicators/src/components/skype-indicator/index.js
@@ -76,6 +115,19 @@ index 8a988df..1a0304f 100644
          <Animated.View style={ballStyle} />
        </Animated.View>
      );
+diff --git a/node_modules/react-native-indicators/src/components/skype-indicator/styles.js b/node_modules/react-native-indicators/src/components/skype-indicator/styles.js
+index d33b9cf..a004f44 100644
+--- a/node_modules/react-native-indicators/src/components/skype-indicator/styles.js
++++ b/node_modules/react-native-indicators/src/components/skype-indicator/styles.js
+@@ -8,7 +8,7 @@ export default StyleSheet.create({
+   },
+ 
+   layer: {
+-    ...StyleSheet.absoluteFillObject,
++    ...StyleSheet.absoluteFill,
+ 
+     justifyContent: 'flex-start',
+     alignItems: 'center',
 diff --git a/node_modules/react-native-indicators/src/components/ui-activity-indicator/index.js b/node_modules/react-native-indicators/src/components/ui-activity-indicator/index.js
 index dcde1e5..392e174 100644
 --- a/node_modules/react-native-indicators/src/components/ui-activity-indicator/index.js
@@ -89,6 +141,19 @@ index dcde1e5..392e174 100644
          <Animated.View style={barStyle} />
        </Animated.View>
      );
+diff --git a/node_modules/react-native-indicators/src/components/ui-activity-indicator/styles.js b/node_modules/react-native-indicators/src/components/ui-activity-indicator/styles.js
+index d33b9cf..a004f44 100644
+--- a/node_modules/react-native-indicators/src/components/ui-activity-indicator/styles.js
++++ b/node_modules/react-native-indicators/src/components/ui-activity-indicator/styles.js
+@@ -8,7 +8,7 @@ export default StyleSheet.create({
+   },
+ 
+   layer: {
+-    ...StyleSheet.absoluteFillObject,
++    ...StyleSheet.absoluteFill,
+ 
+     justifyContent: 'flex-start',
+     alignItems: 'center',
 diff --git a/node_modules/react-native-indicators/src/components/wave-indicator/index.js b/node_modules/react-native-indicators/src/components/wave-indicator/index.js
 index 2de37d5..1fbe5ce 100644
 --- a/node_modules/react-native-indicators/src/components/wave-indicator/index.js
@@ -102,3 +167,16 @@ index 2de37d5..1fbe5ce 100644
          <Animated.View style={waveStyle} />
        </Animated.View>
      );
+diff --git a/node_modules/react-native-indicators/src/components/wave-indicator/styles.js b/node_modules/react-native-indicators/src/components/wave-indicator/styles.js
+index c062abb..7d03b39 100644
+--- a/node_modules/react-native-indicators/src/components/wave-indicator/styles.js
++++ b/node_modules/react-native-indicators/src/components/wave-indicator/styles.js
+@@ -8,7 +8,7 @@ export default StyleSheet.create({
+   },
+ 
+   layer: {
+-    ...StyleSheet.absoluteFillObject,
++    ...StyleSheet.absoluteFill,
+ 
+     justifyContent: 'center',
+     alignItems: 'center',
