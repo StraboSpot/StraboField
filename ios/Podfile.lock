@@ -1620,7 +1620,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context (5.8.0):
+  - react-native-safe-area-context (5.11.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1634,8 +1634,8 @@ PODS:
     - React-graphics
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.8.0)
-    - react-native-safe-area-context/fabric (= 5.8.0)
+    - react-native-safe-area-context/common (= 5.11.0)
+    - react-native-safe-area-context/fabric (= 5.11.0)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1645,7 +1645,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context/common (5.8.0):
+  - react-native-safe-area-context/common (5.11.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -1668,7 +1668,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-safe-area-context/fabric (5.8.0):
+  - react-native-safe-area-context/fabric (5.11.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2432,7 +2432,7 @@ PODS:
     - Yoga
   - RNSensors (7.3.6):
     - React-Core
-  - RNSentry (8.11.1):
+  - RNSentry (8.33.0):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2455,7 +2455,6 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-    - Sentry (= 9.13.0)
     - Yoga
   - RNSketchCanvas (0.8.0):
     - React
@@ -2582,9 +2581,6 @@ PODS:
     - ReactNativeDependencies
     - SSZipArchive (~> 2.5.5)
     - Yoga
-  - Sentry (9.13.0):
-    - Sentry/Core (= 9.13.0)
-  - Sentry/Core (9.13.0)
   - SocketRocket (0.7.1):
     - ReactNativeDependencies
   - SSZipArchive (2.5.5)
@@ -2722,7 +2718,6 @@ SPEC REPOS:
     - MapboxCoreMaps
     - MapboxMaps
     - React-Codegen
-    - Sentry
     - SSZipArchive
     - SwiftUIIntrospect
     - Turf
@@ -3041,7 +3036,7 @@ SPEC CHECKSUMS:
   react-native-orientation-director: 6ad88c06e3dbdd77c2c1876526075d40ac1744d1
   react-native-pager-view: 84608b3532f0d985f1ad313b3aee3106e9fdeb3d
   react-native-pdf: 4367fe3940668c9549ac90b44998312b99e53f7d
-  react-native-safe-area-context: df13a2a5a3cabab9c5ddf455b25f5ff340ee4f71
+  react-native-safe-area-context: e6b7da4a15e6d491e90442715412d9dbb059ac4d
   react-native-slider: 5f655882a4ec96c21d705abb305419c257a2f12b
   React-NativeModulesApple: 8cfb2f308f48c48068c96b932e7f0e4297c23342
   React-networking: 3325cf73ecbdaacab0da91260b094baf36061a56
@@ -3091,19 +3086,18 @@ SPEC CHECKSUMS:
   RNReanimated: 3018727dbf272754d0f31ef73f619e49ade7baf0
   RNScreens: f15a5bda1ddeff8575b8ce41d83885b67129f84b
   RNSensors: 111159597ac51505df10413c61b28bcd28e88983
-  RNSentry: 34f02f940d77d6fd02899a613a3b1f5f9c8c5a20
+  RNSentry: 21d98c50f71f88a0197966f41c4529e044a9f11c
   RNSketchCanvas: f7da2786bf042a29d5ca7a65571507d5c3108a29
   RNSoundPlayer: 7961678d02c7339d9e9cfb78b9f3e8fde17f9df2
   RNVectorIcons: 8e7890bf2ce85e41df79133e7778070c37dc8d70
   RNWorklets: c05b04d721cccc1d44182425cd09efeddb6b1bbe
   RNZipArchive: 1fb060b926bb2bae4e03c900c38f0c34e48c36a0
-  Sentry: 5c3f67235d4c16fcfab43158a8c1502a18fece9a
   SocketRocket: 37aec555668fb852ec12e3c0de59a86ca58f0871
   SSZipArchive: c69881e8ac5521f0e622291387add5f60f30f3c4
   SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d
   Turf: c9eb11a65d96af58cac523460fd40fec5061b081
   Yoga: d1c536142c5ff8ec8cd856ab2a7c227a1d875c8e
 
-PODFILE CHECKSUM: 5aec3573c326572abb2ba1b1c55330bc8d60887d
+PODFILE CHECKSUM: f1cac9014f027e95d6b35d47c3c1f495c75bf2fd
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.15.2
