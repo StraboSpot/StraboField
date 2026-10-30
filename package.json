@@ -159,10 +159,10 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.112.2",
     "webpack-cli": "^7.3.0",
-    "webpack-dev-server": "^5.2.7"
+    "webpack-dev-server": "^6.1.0"
   },
   "engines": {
-    "node": ">=22.11.0"
+    "node": ">=22.15.0"
   },
   "overrides": {
     "@react-native-clipboard/clipboard": {
