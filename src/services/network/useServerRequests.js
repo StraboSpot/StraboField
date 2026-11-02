@@ -18,6 +18,8 @@ import {toError} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {store} from '../../store/ConfigureStore';
 
+const ROCKD_IMAGE_TIMEOUT = 300000;
+
 const useServerRequests = () => {
   /* Data Hooks */
 
@@ -28,7 +30,7 @@ const useServerRequests = () => {
   /* Derived Variables */
 
   // URL Helpers
-  const {SPOT_CHECKIN, SPOT_CONVERSION, LOGIN, REDIRECT_URI} = MACROSTRAT_PATHS;
+  const {SPOT_CHECKIN, SPOT_CONVERSION, LOGIN, PHOTOS, REDIRECT_URI} = MACROSTRAT_PATHS;
   const baseUrl = endpoint && isSelected ? endpoint : STRABO_APIS.DB;
   const domain = endpoint && isSelected ? endpoint : STRABO_APIS.STRABO;
   const tilehost = STRABO_APIS.TILE_HOST;
@@ -96,9 +98,10 @@ const useServerRequests = () => {
     return postRequest(SPOT_CHECKIN, spotCheckIn, null, {});
   };
 
-  // const postCheckinImageToRockd = (spotCheckIn, image) => {
-  //
-  // };
+  const postCheckinImageToRockd = (checkinId, imageBase64, token) => {
+    const body = {token, type: 'checkin', id: checkinId, image: `data:image/jpg;base64,${imageBase64}`};
+    return postRequest(PHOTOS, body, null, {}, ROCKD_IMAGE_TIMEOUT);
+  };
 
   // A public endpoint, so no auth - but through getRequest like everything else, for its timeout and the
   // User-Agent identifying the app.
@@ -246,6 +249,7 @@ const useServerRequests = () => {
     getTileBaseUrl,
     getTilesFromHost,
     convertSpotToMacrostrat,
+    postCheckinImageToRockd,
     postCheckinToRockd,
     registerUser,
     testCustomMapUrl,

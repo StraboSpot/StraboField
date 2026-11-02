@@ -2,6 +2,7 @@ const account = '/account';
 const rockdSpotConversion = 'https://dev.macrostrat.org/api/v3/dev/convert/field-site?in=spot&out=checkin&bulk=false';
 const rockdLogin = 'https://dev.rockd.org/login';
 const rockdCheckIn = 'https://dev.rockd.org/api/v2/protected/checkin';
+const rockdPhotos = 'https://dev.rockd.org/api/v2/protected/photos';
 const rockdRedirectUri = 'strabofield://macrostrat/login';
 const straboSpotAPI = 'https://strabospot.org';
 const tilehost = 'https://tiles.strabospot.org';
@@ -59,6 +60,7 @@ export const SAMPLES_PATHS = {
 
 export const MACROSTRAT_PATHS = {
   LOGIN: rockdLogin,
+  PHOTOS: rockdPhotos,
   REDIRECT_URI: rockdRedirectUri,
   SPOT_CHECKIN: rockdCheckIn,
   SPOT_CONVERSION: rockdSpotConversion,
