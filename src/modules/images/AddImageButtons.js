@@ -115,7 +115,7 @@ const AddImageButtons = ({saveImages}) => {
     if (Platform.OS !== 'web') {
       const newImages = await getImagesFromCameraRoll();
       console.log('newImages', newImages);
-      saveImages(newImages);
+      if (newImages.length > 0) saveImages(newImages);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
     }
     else {

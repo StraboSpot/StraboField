@@ -183,6 +183,7 @@ const useImages = () => {
           console.log('RES', response);
           try {
             if (response.didCancel) {
+              toast.show('No Images Saved', {duration: 2000, type: 'warning'});
               dispatch(setLoadingStatus({view: 'home', bool: false}));
               res(newImages);  // Resolve, or the caller awaits a Promise that never settles
             }
