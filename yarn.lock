@@ -11813,10 +11813,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^17.13.0":
-  version: 17.13.0
-  resolution: "globals@npm:17.13.0"
-  checksum: 10c0/8371d9e4e5581640141b5cce70a098edd765d2e3ab063b14998e590698071e0afb4a4a6739ccfbdcbdeb2565c5553697ba07d95703c51039912cf341a7dba7a7
+"globals@npm:^17.14.0":
+  version: 17.14.0
+  resolution: "globals@npm:17.14.0"
+  checksum: 10c0/422d17c24e87170d4aa566b97a53339ae451c2f4d78512594a7ca951cdb939bc4a85c10071e6dcf77ca63de48713a77f2e71eb9214e44880233dff2090e92731
   languageName: node
   linkType: hard
 
@@ -13391,10 +13391,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-base64@npm:3.9.5":
-  version: 3.9.5
-  resolution: "js-base64@npm:3.9.5"
-  checksum: 10c0/3cfd1db27213bdc32eb7ae8cc70e8d91ed8d3486de2520846e8fe6fbc40a8932beb66549e3801d9502b9bd2d36d43a579787b47fe650807dc49a8f85c2cc3f25
+"js-base64@npm:3.9.6":
+  version: 3.9.6
+  resolution: "js-base64@npm:3.9.6"
+  checksum: 10c0/2e8966ab4cbe58c7cf4f7d0e89905bf6f6d8b2184db670960da4a3263c7f42e0021729008e943c0f2fdd3185ca92eec95359b28701795ace56a9313799c0f9bd
   languageName: node
   linkType: hard
 
@@ -17372,10 +17372,10 @@ __metadata:
     formik: "npm:2.4.9"
     generate-changelog: "npm:1.8.0"
     geomagnetism: "npm:0.2.0"
-    globals: "npm:^17.13.0"
+    globals: "npm:^17.14.0"
     html-webpack-plugin: "npm:^5.6.8"
     jest: "npm:^30.5.2"
-    js-base64: "npm:3.9.5"
+    js-base64: "npm:3.9.6"
     lottie-react-native: "npm:7.5.0"
     mapbox-gl: "npm:3.34.1"
     moment: "npm:2.31.0"
