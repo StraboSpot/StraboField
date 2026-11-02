@@ -16054,13 +16054,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-zip-archive@npm:8.0.1":
-  version: 8.0.1
-  resolution: "react-native-zip-archive@npm:8.0.1"
+"react-native-zip-archive@npm:9.5.3":
+  version: 9.5.3
+  resolution: "react-native-zip-archive@npm:9.5.3"
   peerDependencies:
     react: ">=18.0.0"
     react-native: ">=0.70.0"
-  checksum: 10c0/783c001f63f18155c141238e0551548b73d4b432502dd7d8910af44d0c6b04539656f671d0463bcd3466d98ad10bdcb530c20d47f1a933681e6773dd2ecd89bc
+  checksum: 10c0/8f4db033f8c69f9e2678f95755bfa9c32969d741fbf0a290ee4bde35f80995860a185ff686f5a1e9803c6350b857505464438c2d82f0baf32899020d49044a1c
   languageName: node
   linkType: hard
 
@@ -17419,7 +17419,7 @@ __metadata:
     react-native-vector-icons: "npm:10.3.0"
     react-native-web: "npm:0.21.4"
     react-native-worklets: "npm:0.13.1"
-    react-native-zip-archive: "npm:8.0.1"
+    react-native-zip-archive: "npm:9.5.3"
     react-redux: "npm:9.3.1"
     react-test-renderer: "npm:19.3.0"
     redux-logger: "npm:3.0.6"

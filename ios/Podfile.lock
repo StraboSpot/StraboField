@@ -2558,7 +2558,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNZipArchive (8.0.1):
+  - RNZipArchive (9.5.3):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -3092,7 +3092,7 @@ SPEC CHECKSUMS:
   RNSoundPlayer: 7961678d02c7339d9e9cfb78b9f3e8fde17f9df2
   RNVectorIcons: 8e7890bf2ce85e41df79133e7778070c37dc8d70
   RNWorklets: c05b04d721cccc1d44182425cd09efeddb6b1bbe
-  RNZipArchive: 1fb060b926bb2bae4e03c900c38f0c34e48c36a0
+  RNZipArchive: 86d0d8fa9a19b530a47725b8c58468dc0392ad02
   SocketRocket: 37aec555668fb852ec12e3c0de59a86ca58f0871
   SSZipArchive: c69881e8ac5521f0e622291387add5f60f30f3c4
   SwiftUIIntrospect: fee9aa07293ee280373a591e1824e8ddc869ba5d
