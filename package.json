@@ -130,7 +130,6 @@
     "@react-native/metro-config": "0.88.1",
     "@sentry/cli": "3.8.2",
     "@welldone-software/why-did-you-render": "^10.0.1",
-    "babel-jest": "^30.5.2",
     "babel-loader": "^10.1.1",
     "babel-plugin-module-resolver": "^5.0.3",
     "babel-plugin-react-native-web": "^0.21.4",

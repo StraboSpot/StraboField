@@ -7130,7 +7130,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-jest@npm:30.5.2, babel-jest@npm:^30.5.2":
+"babel-jest@npm:30.5.2":
   version: 30.5.2
   resolution: "babel-jest@npm:30.5.2"
   dependencies:
@@ -15174,7 +15174,6 @@ __metadata:
     "@sentry/react-native": "npm:8.33.0"
     "@turf/turf": "npm:7.4.0"
     "@welldone-software/why-did-you-render": "npm:^10.0.1"
-    babel-jest: "npm:^30.5.2"
     babel-loader: "npm:^10.1.1"
     babel-plugin-module-resolver: "npm:^5.0.3"
     babel-plugin-react-native-web: "npm:^0.21.4"
