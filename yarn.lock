@@ -4680,15 +4680,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rn-vui/themed@npm:5.1.10":
-  version: 5.1.10
-  resolution: "@rn-vui/themed@npm:5.1.10"
-  peerDependencies:
-    "@rn-vui/base": 5.1.10
-  checksum: 10c0/707029644b9429643a87d5744db8d756d96e8de713f23bcd43807eaede291da9fc374c185f0d118ec34cffe5759b084fe0e775ff86ad5cc52f6f41db3e764100
-  languageName: node
-  linkType: hard
-
 "@rnmapbox/maps@npm:10.3.11":
   version: 10.3.11
   resolution: "@rnmapbox/maps@npm:10.3.11"
@@ -17240,7 +17231,6 @@ __metadata:
     "@react-navigation/stack": "npm:7.12.1"
     "@reduxjs/toolkit": "npm:2.13.0"
     "@rn-vui/base": "npm:5.1.10"
-    "@rn-vui/themed": "npm:5.1.10"
     "@rnmapbox/maps": "npm:10.3.11"
     "@sentry/cli": "npm:3.8.2"
     "@sentry/react": "npm:10.77.1"
