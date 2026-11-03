@@ -15173,7 +15173,6 @@ __metadata:
     style-loader: "npm:^4.0.0"
     terser-webpack-plugin: "npm:^5.6.1"
     typescript: "npm:^5.9.3"
-    uuid: "npm:14.0.3"
     webpack: "npm:^5.112.2"
     webpack-cli: "npm:^7.3.1"
     webpack-dev-server: "npm:^6.1.0"
@@ -16062,15 +16061,6 @@ __metadata:
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
   checksum: 10c0/02ba649de1b7ca8854bfe20a82f1dfbdda3fb57a22ab4a8972a63a34553cf7aa51bc9081cf7e001b035b88186d23689d69e71b510e610a09a4c66f68aa95b672
-  languageName: node
-  linkType: hard
-
-"uuid@npm:14.0.3":
-  version: 14.0.3
-  resolution: "uuid@npm:14.0.3"
-  bin:
-    uuid: dist-node/bin/uuid
-  checksum: 10c0/e56e610ae3bd1ca099244e01ee5eff502675ede4601d971b80fff993ad97236c80197340113f759e6ead501ee6a8d52648f6deef1332ce9f192c4720f4891f62
   languageName: node
   linkType: hard
 

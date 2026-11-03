@@ -46,6 +46,10 @@ describe('getNewUUID', () => {
     expect(new Set(ids).size).toBe(5000);
     expect(typeof ids[0]).toBe('string');
   });
+
+  it('is a version 4 UUID in canonical lowercase form', () => {
+    expect(getNewUUID()).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+  });
 });
 
 // Feature ids minted from here on are UUIDs while those already in the field are numbers, so anything

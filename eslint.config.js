@@ -64,7 +64,7 @@ module.exports = [
 
       // StraboSpot2 Override Import rules
       'import/namespace': 'off', // Too many false positives with React Native namespace imports (e.g. MapboxGL)
-      'import/no-unresolved': ['error', {ignore: ['react-map-gl/mapbox', 'uuid']}],
+      'import/no-unresolved': ['error', {ignore: ['react-map-gl/mapbox']}],
       'import/order': ['error', {
         'groups': ['builtin', 'external', 'internal'],
         'pathGroups': [{pattern: '{react,react-native}', group: 'external', position: 'before'}],
@@ -86,7 +86,7 @@ module.exports = [
       'react-native/no-inline-styles': 'off',
     },
     settings: {
-      'import/ignore': ['react-native', 'react-map-gl', '@rnmapbox/maps', 'uuid'],
+      'import/ignore': ['react-native', 'react-map-gl', '@rnmapbox/maps'],
     },
   },
 ];
