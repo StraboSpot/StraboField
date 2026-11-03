@@ -16,6 +16,7 @@ import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import useSamples from '../../samples/useSamples';
+import {isOnGeoMap} from '../../spots/spots.helpers';
 import useSpots from '../../spots/useSpots';
 import {setNotebookPageVisible} from '../notebook.slice';
 import notebookStyles from '../notebook.styles';
@@ -33,7 +34,6 @@ const NotebookMenu = ({
 
   const dispatch = useDispatch();
   const spot = useSelector(state => state.spot.selectedSpot);
-  const checkedInSpotIds = useSelector(state => state.user.macrostrat?.checkedInSpotIds ?? []);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
@@ -114,10 +114,9 @@ const NotebookMenu = ({
     if (isReadOnly && ['delete', 'copy'].includes(item.key)) return;
     // A copy keeps image_basemap/strat_section_id, so it would be a new Spot on a read only map
     else if (item.key === 'copy' && isSpotOnReadOnlyMap(spot)) return;
-    else if (item.key === 'rockd' && !isTestingMode
-      && (checkedInSpotIds.includes(spot.properties.id)
-        || spot.geometry?.type !== 'Point')) return;
-    else if (item.key === 'rockd' && !isTestingMode) return;
+    // Rockd only accepts points with real coordinates for a check-in
+    else if (item.key === 'rockd'
+      && (!isTestingMode || spot.geometry?.type !== 'Point' || !isOnGeoMap(spot))) return;
     else {
       return (
         <ListItem
