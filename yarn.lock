@@ -4509,13 +4509,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native/typescript-config@npm:0.88.1":
-  version: 0.88.1
-  resolution: "@react-native/typescript-config@npm:0.88.1"
-  checksum: 10c0/a15eb36861842dbe699ac282e8254304b3f1ae929d91f742aa9a2177438d29ebb9e95a3f7eddba64e6ac5550bb8bb0da6fab6b77e4ebe17561fcb9cf9c678c5b
-  languageName: node
-  linkType: hard
-
 "@react-native/virtualized-lists@npm:0.88.1":
   version: 0.88.1
   resolution: "@react-native/virtualized-lists@npm:0.88.1"
@@ -7281,16 +7274,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:^30.0.0":
-  version: 30.0.0
-  resolution: "@types/jest@npm:30.0.0"
-  dependencies:
-    expect: "npm:^30.0.0"
-    pretty-format: "npm:^30.0.0"
-  checksum: 10c0/20c6ce574154bc16f8dd6a97afacca4b8c4921a819496a3970382031c509ebe87a1b37b152a1b8475089b82d8ca951a9e95beb4b9bf78fbf579b1536f0b65969
-  languageName: node
-  linkType: hard
-
 "@types/json-schema@npm:^7.0.15, @types/json-schema@npm:^7.0.9":
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
@@ -7349,15 +7332,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^19.3.0":
-  version: 19.3.0
-  resolution: "@types/react-dom@npm:19.3.0"
-  peerDependencies:
-    "@types/react": ^19.3.0
-  checksum: 10c0/ce0066d28b62bc6afdd17ca84756b8fbe0f6ffc0c8b1e60739abc30e81510da2edbc1007e6ab3d974d30f5a8c25bb0f7de8d7ce09736c909fe84c0f9aed0b946
-  languageName: node
-  linkType: hard
-
 "@types/react-native-vector-icons@npm:^6.4.10":
   version: 6.4.18
   resolution: "@types/react-native-vector-icons@npm:6.4.18"
@@ -7386,30 +7360,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-test-renderer@npm:^19.3.0":
-  version: 19.3.0
-  resolution: "@types/react-test-renderer@npm:19.3.0"
-  dependencies:
-    "@types/react": "npm:*"
-  checksum: 10c0/37f5588f698a057a33c1f4d5fd28a042f3df7f29a3554ddebb7f9c8ecd3e5fba085e5b12d14b30734c30b51959ef17544650b2a9704d629d0af251f126d8ae73
-  languageName: node
-  linkType: hard
-
 "@types/react@npm:*":
   version: 19.0.7
   resolution: "@types/react@npm:19.0.7"
   dependencies:
     csstype: "npm:^3.0.2"
   checksum: 10c0/818e546fa03a2a65ac2652fc472891ac96684211e8967bc25e1da6a8a09e2301ad972b1b038d128f8b4cbbd7691f6f57fee274db568169e9b6b01556abbb5bee
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:^19.3.0":
-  version: 19.3.0
-  resolution: "@types/react@npm:19.3.0"
-  dependencies:
-    csstype: "npm:^3.2.2"
-  checksum: 10c0/fbcabf303f935ca9f36ed2dcf81751cf84744098c5a683c8a62a0fa7edd31714b48d5c46b12fd0014f7f2dfe4d9ec6de428a850748eec719a70294e51029551b
   languageName: node
   linkType: hard
 
@@ -9795,13 +9751,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"csstype@npm:^3.2.2":
-  version: 3.2.3
-  resolution: "csstype@npm:3.2.3"
-  checksum: 10c0/cd29c51e70fa822f1cecd8641a1445bed7063697469d35633b516e60fe8c1bde04b08f6c5b6022136bb669b64c63d4173af54864510fbb4ee23281801841a3ce
-  languageName: node
-  linkType: hard
-
 "d3-array@npm:^2.5.0":
   version: 2.12.1
   resolution: "d3-array@npm:2.12.1"
@@ -10963,7 +10912,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expect@npm:30.5.2, expect@npm:^30.0.0":
+"expect@npm:30.5.2":
   version: 30.5.2
   resolution: "expect@npm:30.5.2"
   dependencies:
@@ -15250,7 +15199,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pretty-format@npm:30.5.1, pretty-format@npm:^30.0.0":
+"pretty-format@npm:30.5.1":
   version: 30.5.1
   resolution: "pretty-format@npm:30.5.1"
   dependencies:
@@ -17228,7 +17177,6 @@ __metadata:
     "@react-native/eslint-config": "npm:0.88.1"
     "@react-native/jest-preset": "npm:0.88.1"
     "@react-native/metro-config": "npm:0.88.1"
-    "@react-native/typescript-config": "npm:0.88.1"
     "@react-navigation/material-top-tabs": "npm:7.8.1"
     "@react-navigation/native": "npm:7.5.1"
     "@react-navigation/stack": "npm:7.12.1"
@@ -17239,10 +17187,6 @@ __metadata:
     "@sentry/react": "npm:10.77.1"
     "@sentry/react-native": "npm:8.33.0"
     "@turf/turf": "npm:7.4.0"
-    "@types/jest": "npm:^30.0.0"
-    "@types/react": "npm:^19.3.0"
-    "@types/react-dom": "npm:^19.3.0"
-    "@types/react-test-renderer": "npm:^19.3.0"
     "@welldone-software/why-did-you-render": "npm:^10.0.1"
     babel-jest: "npm:^30.5.2"
     babel-loader: "npm:^10.1.1"
