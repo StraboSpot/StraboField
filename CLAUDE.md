@@ -89,6 +89,7 @@ node scripts/install-hooks.js   # install git hooks (CLAUDE.md auto-update)
 
 # Run
 npm run ios | android | web            # dev
+npm run ios:fresh | android:fresh      # dev after clearing Metro's cache (Babel/dep/patch changes)
 npm run ios-sim                        # iPad Pro simulator
 npm run ios-release | android-release  # release mode
 npm run web-deploy                     # production web build
