@@ -11,8 +11,8 @@ import {openUrl} from '../../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 
-// How many releases the What's New modal lists before pointing to GitHub for the rest
-const RELEASES_SHOWN = 3;
+// The "x.y" a version belongs to; the What's New modal lists only releases in the running one
+const getMinorVersion = version => version.split('.').slice(0, 2).join('.');
 
 // Compare two "x.y.z" version strings; returns true if a <= b.
 const isVersionAtMost = (a, b) => {
@@ -27,14 +27,15 @@ const isVersionAtMost = (a, b) => {
 const About = () => {
   const [isReleaseNotesVisible, setIsReleaseNotesVisible] = useState(false);
 
-  // Only show notes for releases at or below the running build (guards against the bundled file
-  // getting ahead of the app during an rc). In dev builds, also show the not-yet-shipped release
-  // (flagged "unreleased") so we can preview the next version's highlights. Only the most recent few are
-  // listed; older ones are on the GitHub releases page.
+  // Only show notes for the running minor version (e.g. every 2.32.x on 2.32.1), and only releases at or
+  // below the running build (guards against the bundled file getting ahead of the app during an rc). In dev
+  // builds, also show the not-yet-shipped release (flagged "unreleased") so we can preview the next version's
+  // highlights. Earlier minor versions are on the GitHub releases page.
   const releases = RELEASE_NOTES
-    .filter(entry => __DEV__ || isVersionAtMost(entry.version, VERSION_NUMBER))
-    .slice(0, RELEASES_SHOWN)
-    .map(entry => ({...entry, isUnreleased: !isVersionAtMost(entry.version, VERSION_NUMBER)}));
+    .map(entry => ({...entry, isUnreleased: !isVersionAtMost(entry.version, VERSION_NUMBER)}))
+    .filter(entry => entry.isUnreleased
+      ? __DEV__
+      : getMinorVersion(entry.version) === getMinorVersion(VERSION_NUMBER));
 
   const hasReleaseNotes = releases.length > 0;
 
@@ -100,12 +101,15 @@ const About = () => {
           All maps — including built-in and custom — can be downloaded for full offline use in the field.
         </Text>
       </ScrollView>
+      {/* Prior releases is the footer action rather than a link in the body: ModalWrapper's body doesn't
+       reliably take touches, and a lone action button gets the stretched layout that always fits */}
       <ModalWrapper
-        actionTitle={'Ok'}
+        actionTitle={'View Prior Releases on GitHub'}
         closeModal={() => setIsReleaseNotesVisible(false)}
         headerTitle={'What\'s New'}
         isVisible={isReleaseNotesVisible}
-        onActionPressed={() => setIsReleaseNotesVisible(false)}
+        onActionPressed={() => openUrl(RELEASES_URL).catch(() => {
+        })}
         overlayStyleOverride={styles.releaseNotesOverlay}
         showCancelButton={false}
         showCloseButton
@@ -142,14 +146,6 @@ const About = () => {
                 ))}
             </View>
           ))}
-          <TouchableOpacity
-            onPress={() => openUrl(RELEASES_URL).catch(() => {
-            })}
-            style={styles.allReleasesLink}
-          >
-            <Ionicons color={PRIMARY_ACCENT_COLOR} name={'logo-github'} size={16}/>
-            <Text style={styles.allReleasesLinkText}>See notes for earlier versions on GitHub</Text>
-          </TouchableOpacity>
         </View>
       </ModalWrapper>
     </View>
