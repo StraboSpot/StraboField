@@ -15374,7 +15374,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:*, prop-types@npm:15.8.1, prop-types@npm:^15.5.10, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:*, prop-types@npm:^15.5.10, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -15891,18 +15891,6 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/e5ded425ece1819d56fa84dacffa30178a9b9af1e9350ae99f3b78a9cb21795886c6f74ca1fe1b89e7bb65a56733246c40bf57d5b470d9d7bbf10ad0fa117690
-  languageName: node
-  linkType: hard
-
-"react-native-sensors@npm:7.3.6":
-  version: 7.3.6
-  resolution: "react-native-sensors@npm:7.3.6"
-  dependencies:
-    rxjs: "npm:>= 6"
-  peerDependencies:
-    prop-types: ^15.6.0
-    react-native: ">=0.39.0"
-  checksum: 10c0/efa08b7f27b97b4d334afba51b564dac9ded6f7b684bb774a17f5c02a8f22cc7b72afa8338cb66fef2bf85f0fd96cfe89cd7d5a1ad280cef9e86f32d3c483b52
   languageName: node
   linkType: hard
 
@@ -16586,15 +16574,6 @@ __metadata:
   dependencies:
     tslib: "npm:^2.1.0"
   checksum: 10c0/1fcd33d2066ada98ba8f21fcbbcaee9f0b271de1d38dc7f4e256bfbc6ffcdde68c8bfb69093de7eeb46f24b1fb820620bf0223706cff26b4ab99a7ff7b2e2c45
-  languageName: node
-  linkType: hard
-
-"rxjs@npm:>= 6":
-  version: 7.8.1
-  resolution: "rxjs@npm:7.8.1"
-  dependencies:
-    tslib: "npm:^2.1.0"
-  checksum: 10c0/3c49c1ecd66170b175c9cacf5cef67f8914dcbc7cd0162855538d365c83fea631167cacb644b3ce533b2ea0e9a4d0b12175186985f89d75abe73dbd8f7f06f68
   languageName: node
   linkType: hard
 
@@ -17326,7 +17305,6 @@ __metadata:
     patch-package: "npm:^8.0.1"
     prettier: "npm:3.9.10"
     proj4: "npm:2.22.0"
-    prop-types: "npm:15.8.1"
     react: "npm:19.3.0"
     react-datepicker: "npm:9.1.0"
     react-dom: "npm:19.3.0"
@@ -17355,7 +17333,6 @@ __metadata:
     react-native-reanimated-table: "npm:0.0.2"
     react-native-safe-area-context: "npm:5.11.0"
     react-native-screens: "npm:4.30.1"
-    react-native-sensors: "npm:7.3.6"
     react-native-sound-player: "npm:0.14.5"
     react-native-tab-view: "npm:4.3.4"
     react-native-toast-notifications: "npm:3.4.0"
