@@ -29,7 +29,7 @@ Guidance for Claude Code when working in this repository.
   `ios/Podfile` pins the SDK; Android uses the wrapper's default. Re-test on an iOS device before upgrading. Blurry tiles
   that sharpen are normal; white or grey blocks are the bug.
 - **Library patches carry RN 0.88 fixes** — removed APIs (`InteractionManager`, `StyleSheet.absoluteFillObject`) and
-  legacy headers are patched in `@rn-vui/base`, `react-native-indicators`, `react-native-draggable-flatlist` and
+  legacy headers are patched in `@rn-vui/base`, `react-native-draggable-flatlist` and
   `@rnmapbox/maps`. `absoluteFillObject` fails silently (the spread is empty), so check for it when adding libraries.
   Before regenerating a patch, delete the package's `android/build` and `android/.cxx` or patch-package includes the
   build output.
