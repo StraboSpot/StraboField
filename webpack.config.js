@@ -81,18 +81,12 @@ const babelLoaderConfiguration = {
 
 const imageLoaderConfiguration = {
   test: /\.(gif|jpe?g|png|svg)$/,
-  use: {
-    loader: 'url-loader',
-    options: {
-      name: '[name].[ext]',
-      esModule: false,
-    },
-  },
+  type: 'asset/inline',
 };
 
 const ttfLoaderConfiguration = {
   test: /\.ttf$/,
-  loader: 'url-loader', // or directly file-loader
+  type: 'asset/inline',
   include: [
     path.resolve(appDirectory, 'node_modules/react-native-vector-icons'),
   ],
