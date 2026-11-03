@@ -3541,6 +3541,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sayem314/react-native-keep-awake@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@sayem314/react-native-keep-awake@npm:2.0.0"
+  peerDependencies:
+    react: "*"
+    react-native: ">=0.82.0"
+  checksum: 10c0/789fe5b043916abf463e0eede5259d8e6634ef6f77d2d508b8d942fba82e3c9aed40725314fb9dffca806f77e3611af66342a0ab255863263c64eb333faf611b
+  languageName: node
+  linkType: hard
+
 "@sentry/browser-utils@npm:10.77.1":
   version: 10.77.1
   resolution: "@sentry/browser-utils@npm:10.77.1"
@@ -13770,13 +13780,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-keep-awake@npm:4.0.0":
-  version: 4.0.0
-  resolution: "react-native-keep-awake@npm:4.0.0"
-  checksum: 10c0/73cabf9de1033e9157721280d23bdf1d7467d5e5db859dd706e43772388e4c9a12916f0c282ff44d4ef0d2a3eab246a2331bce2fff3a1834a2a73f646a5119c1
-  languageName: node
-  linkType: hard
-
 "react-native-multiple-select@npm:0.5.12":
   version: 0.5.12
   resolution: "react-native-multiple-select@npm:0.5.12"
@@ -15092,6 +15095,7 @@ __metadata:
     "@reduxjs/toolkit": "npm:2.14.0"
     "@rn-vui/base": "npm:5.1.10"
     "@rnmapbox/maps": "npm:10.3.11"
+    "@sayem314/react-native-keep-awake": "npm:2.0.0"
     "@sentry/cli": "npm:3.8.2"
     "@sentry/react": "npm:10.77.1"
     "@sentry/react-native": "npm:8.33.0"
@@ -15135,7 +15139,6 @@ __metadata:
     react-native-get-random-values: "npm:2.1.0"
     react-native-image-picker: "npm:8.3.1"
     react-native-json-tree: "npm:1.5.0"
-    react-native-keep-awake: "npm:4.0.0"
     react-native-multiple-select: "npm:0.5.12"
     react-native-orientation-director: "npm:3.1.0"
     react-native-pager-view: "npm:9.0.11"

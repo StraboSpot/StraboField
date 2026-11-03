@@ -1,7 +1,7 @@
 import {useRef, useState} from 'react';
 import {Platform} from 'react-native';
 
-import KeepAwake from 'react-native-keep-awake';
+import {activateKeepAwake, deactivateKeepAwake} from '@sayem314/react-native-keep-awake';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useUploadImages from './useUploadImages';
@@ -125,7 +125,7 @@ const useUpload = () => {
   /* Exported Functions */
 
   const initializeUpload = async () => {
-    if (Platform.OS !== 'web') KeepAwake.activate();
+    activateKeepAwake();
     try {
       console.log('Initializing Upload...');
       await uploadProject();
@@ -144,7 +144,7 @@ const useUpload = () => {
     }
     finally {
       // Release the wake lock on every path. A throw here used to skip it, leaving the screen awake indefinitely.
-      if (Platform.OS !== 'web') KeepAwake.deactivate();
+      deactivateKeepAwake();
     }
   };
 

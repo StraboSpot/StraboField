@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Platform, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 
-import KeepAwake from 'react-native-keep-awake';
+import {activateKeepAwake, deactivateKeepAwake} from '@sayem314/react-native-keep-awake';
 import ProgressBar from 'react-native-progress/Bar';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -106,7 +106,7 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
       dispatch(clearedStatusMessages());
       isImageTransferring && dispatch(setIsImageTransferring(false));
       dispatch(updatedProjectTransferProgress(0));
-      Platform.OS !== 'web' && KeepAwake.activate();
+      activateKeepAwake();
       setModalTitle('Uploading');
       setUploadState('uploading');
       setProjectUploadStatus(await uploadProject());
@@ -134,7 +134,7 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
     finally {
       isUploadInFlightRef.current = false;
       // Release the wake lock on every path, including when the user backs out and the upload finishes unseen.
-      Platform.OS !== 'web' && KeepAwake.deactivate();
+      deactivateKeepAwake();
     }
   };
 
@@ -147,7 +147,7 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
     try {
       isUploadInFlightRef.current = true;
       dispatch(clearedStatusMessages());
-      Platform.OS !== 'web' && KeepAwake.activate();
+      activateKeepAwake();
       setModalTitle('Uploading');
       setUploadState('uploading');
       const imageStatus = await initializeImageUpload();
@@ -171,7 +171,7 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
     }
     finally {
       isUploadInFlightRef.current = false;
-      Platform.OS !== 'web' && KeepAwake.deactivate();
+      deactivateKeepAwake();
     }
   };
 

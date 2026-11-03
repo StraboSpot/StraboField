@@ -52,6 +52,6 @@ jest.mock('react-native-geolocation-service', () => ({
 }));
 jest.mock('react-native-orientation-director', () => ({}));
 jest.mock('react-native-sound-player', () => ({}));
-jest.mock('react-native-keep-awake', () => ({}));
+jest.mock('@sayem314/react-native-keep-awake', () => ({activateKeepAwake: jest.fn(), deactivateKeepAwake: jest.fn()}));
 jest.mock('react-native-zip-archive', () => ({}));
 jest.mock('react-native-check-version', () => ({}));
