@@ -5,9 +5,6 @@ import isEqual from 'fast-deep-equal';
 import moment from 'moment/moment';
 import {v4 as uuidv4} from 'uuid';
 
-const passwordValidator = require('password-validator');
-const schema = new passwordValidator();
-
 /* Internal Functions */
 
 // return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
@@ -22,12 +19,8 @@ const minLengthValidator = (val, minLength) => val.length >= minLength;
 
 const notEmptyValidator = val => val.trim() !== '';
 
-const passwordValidation = (val) => {
-  schema.has().digits().uppercase();
-  schema.has().not().spaces();
-  schema.min(8);
-  return schema.validate(val);
-};
+// At least 8 characters with a digit and an uppercase letter (any letter that has a lowercase form), and no whitespace
+const passwordValidation = val => val.length >= 8 && /\d/.test(val) && val !== val.toLowerCase() && !/\s/.test(val);
 
 /* Exported Functions */
 

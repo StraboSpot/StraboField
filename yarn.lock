@@ -13036,13 +13036,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"password-validator@npm:5.3.0":
-  version: 5.3.0
-  resolution: "password-validator@npm:5.3.0"
-  checksum: 10c0/473ea684eb2d8a0f288ced7b712b49ca4d336bdc057f575fa893f2b87958626898e864eef33bfb3cbeefea23f509ce40cc54300ce9a44dd7e79b19ea4ffe9a2b
-  languageName: node
-  linkType: hard
-
 "patch-package@npm:^8.0.1":
   version: 8.0.1
   resolution: "patch-package@npm:8.0.1"
@@ -15135,7 +15128,6 @@ __metadata:
     lottie-react-native: "npm:7.5.0"
     mapbox-gl: "npm:3.34.2"
     moment: "npm:2.31.0"
-    password-validator: "npm:5.3.0"
     patch-package: "npm:^8.0.1"
     prettier: "npm:3.9.10"
     proj4: "npm:2.22.0"
