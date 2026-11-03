@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {Platform, ScrollView, Text, TouchableOpacity, View} from 'react-native';
 
+import {Icon} from '@rn-vui/base';
 import DeviceInfo from 'react-native-device-info';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import styles from './about.styles';
 import RELEASE_NOTES, {COMMIT_BASE_URL, RELEASES_URL} from '../../../assets/releaseNotes';
@@ -61,7 +61,7 @@ const About = () => {
             onPress={() => setIsReleaseNotesVisible(true)}
             style={styles.infoIcon}
           >
-            <Ionicons color={PRIMARY_ACCENT_COLOR} name={'information-circle-outline'} size={22}/>
+            <Icon color={PRIMARY_ACCENT_COLOR} name={'information-circle-outline'} size={22} type={'ionicon'}/>
           </TouchableOpacity>
         )}
       </View>
@@ -133,7 +133,7 @@ const About = () => {
                             })}
                             style={styles.commitLink}
                           >
-                            <Ionicons color={PRIMARY_ACCENT_COLOR} name={'logo-github'} size={16}/>
+                            <Icon color={PRIMARY_ACCENT_COLOR} name={'logo-github'} size={16} type={'ionicon'}/>
                           </TouchableOpacity>
                         )}
                       </View>
@@ -147,7 +147,7 @@ const About = () => {
             })}
             style={styles.allReleasesLink}
           >
-            <Ionicons color={PRIMARY_ACCENT_COLOR} name={'logo-github'} size={16}/>
+            <Icon color={PRIMARY_ACCENT_COLOR} name={'logo-github'} size={16} type={'ionicon'}/>
             <Text style={styles.allReleasesLinkText}>See notes for earlier versions on GitHub</Text>
           </TouchableOpacity>
         </View>

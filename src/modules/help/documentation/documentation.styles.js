@@ -1,7 +1,7 @@
 import {Dimensions, StyleSheet} from 'react-native';
 
 import * as themes from '../../../shared/styles.constants';
-import {BLUE, MEDIUM_TEXT_SIZE, WHITE} from '../../../shared/styles.constants';
+import {BLUE, MEDIUM_TEXT_SIZE, MEDIUMGREY, PRIMARY_ACCENT_COLOR, WHITE} from '../../../shared/styles.constants';
 
 const documentationStyles = StyleSheet.create({
   activityIndicatorStyle: {
@@ -27,7 +27,7 @@ const documentationStyles = StyleSheet.create({
     fontSize: MEDIUM_TEXT_SIZE,
   },
   closeButtonContainer: {
-    paddingHorizontal: 10,
+    paddingRight: 10,
     // alignItems: 'flex-end',
     // width: 24,
   },
@@ -36,15 +36,15 @@ const documentationStyles = StyleSheet.create({
   },
   headerContainer: {
     alignItems: 'center',
-    borderBottomColor: '#ddd',
+    borderBottomColor: MEDIUMGREY,
     borderBottomWidth: 1,
     flexDirection: 'row',
     height: 50,
     justifyContent: 'space-between',
-    paddingHorizontal: 25,
+    paddingHorizontal: 10,
   },
   jumpText: {
-    color: '#007AFF',
+    color: PRIMARY_ACCENT_COLOR,
     fontSize: 16,
     fontWeight: '500',
   },
