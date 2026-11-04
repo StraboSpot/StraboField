@@ -28,6 +28,263 @@ export const RELEASES_URL = 'https://github.com/StraboSpot/StraboField/releases'
 
 const RELEASE_NOTES = [
   {
+    version: '2.33.0',
+    groups: [
+      {
+        title: 'StraboSamples',
+        items: [
+          {
+            text: 'Link to StraboSamples: link a Field sample to its StraboSamples record, comparing the two and choosing which values to keep',
+            commit: '25f6b8edd',
+            play: 'Link samples to StraboSamples',
+          },
+          {
+            text: 'Linked sample details: a linked sample shows its StraboSamples data in tabs, with a button to open it online and its last-updated date',
+            commit: '164cdc139',
+          },
+          {
+            text: 'StraboMicro PDFs: linking a sample downloads its StraboMicro project PDF so the Micro tab can open it offline',
+            commit: '300805b47',
+          },
+          {
+            text: 'Stays in sync: linked data refreshes when a project is downloaded or uploaded, and the PDF downloads again when the project has changed on the server',
+            commit: 'a99d641d2',
+          },
+          {
+            text: 'Offline aware: linking and online actions are disabled with a note while you have no connection',
+            commit: 'eb371316f',
+          },
+        ],
+      },
+      {
+        title: 'Map layers & offline maps',
+        items: [
+          {
+            text: 'New map layers menu: each map shows a thumbnail, with its own options for an overlay switch, opacity, and centering on the map',
+            commit: '3774a6e6a',
+            play: 'Redesigned map layers menu with thumbnails',
+          },
+          {
+            text: 'Offline overlays: save an overlay for offline use, not only the basemap',
+            commit: 'de9ac0881',
+          },
+          {
+            text: 'Save a whole custom map: save a custom map\'s full extent for offline use from its edit page, which also shows its offline tiles',
+            commit: '90c5fec9a',
+            play: 'Save overlays and whole custom maps offline',
+          },
+          {
+            text: 'Offline map details: open a panel for each offline map showing its tiles, size, zoom levels, and location',
+            commit: '128ad2f59',
+          },
+          {
+            text: 'Preview downloads: a Preview button shows what a download covers, with a banner naming the map',
+            commit: 'e5dc1e7f3',
+          },
+          {
+            text: 'Tidier Offline Maps page: default and custom maps are listed separately, and a header menu downloads tiles or finds maps on the device',
+            commit: '1f08ce4c3',
+          },
+          {
+            text: 'Offline viewing: downloaded custom maps can be viewed offline, and the basemap comes back after a preview',
+            commit: 'c5de4cab1',
+          },
+          {
+            text: 'Zoom wheel is back: choose how deep to save a map with the zoom wheel again',
+            commit: 'ae3e6b9f8',
+            platforms: ['ios'],
+          },
+        ],
+      },
+      {
+        title: 'Drawing & map editing',
+        items: [
+          {
+            text: 'Snap to Spots: new vertices and edits snap to the nearest vertex or edge of a nearby Spot, with an adjustable tolerance under Adding New Spots',
+            commit: '108926aaa',
+            play: 'Snap to Spots while drawing',
+          },
+          {
+            text: 'No target dataset prompt: when the draw tools are hidden because no target dataset is set, a prompt says so and opens Datasets',
+            commit: '95826c95b',
+          },
+          {
+            text: 'Safer map edits: you\'re asked to save a map edit or interval drag before anything else can change a Spot, with Discard, Keep Editing, or Save',
+            commit: '8c88ec3c1',
+          },
+          {
+            text: 'Edited Spots stay put: Spots edited on the map stay in their own datasets, and Cancel or a press off it cancels Set in Current View',
+            commit: '873858b8a',
+          },
+          {
+            text: 'Strat sections: dragging intervals saves only the intervals that moved',
+            commit: '124f7e08d',
+          },
+        ],
+      },
+      {
+        title: 'Notebook & forms',
+        items: [
+          {
+            text: 'Unsaved changes prompt: leaving a notebook page with unsaved changes, by any route, asks whether to Discard, Keep Editing, or Save',
+            commit: '94ddf2983',
+            play: 'Never lose unsaved notebook edits',
+          },
+          {
+            text: 'Save when changed: Save stays disabled until something on the form has changed',
+            commit: 'bf8cdf355',
+          },
+          {
+            text: 'Trace & surface features: a Trace Feature or Surface Feature section on the Overview replaces the switch, opening its form as a subpage',
+            commit: '86e7b3ef7',
+          },
+          {
+            text: 'Done bar on iOS: text fields have a Done button above the keyboard',
+            commit: '1eca1289a',
+            platforms: ['ios'],
+          },
+          {
+            text: 'Read-only forms: read-only forms no longer fill in defaults or offer to save',
+            commit: '069521849',
+          },
+        ],
+      },
+      {
+        title: 'Sedimentary',
+        items: [
+          {
+            text: 'Better sed labels: structures, diagenesis, fossils, and interpretations are labeled from the data they hold',
+            commit: 'ca983bde3',
+          },
+          {
+            text: 'Clearer rock names: an untyped sed rock reads Unknown Rock Type, titles add the first composition in parentheses, and "other" shows what you typed',
+            commit: '3fd06a6aa',
+          },
+          {
+            text: 'Hidden lithology data: a sed rock with Composition, Texture, or Stratification data says so, with a link to open it in Lithologies',
+            commit: 'b5ee7dfa4',
+          },
+          {
+            text: 'Cleaner lists: lithologies and sed features show by their titles, and lithologies without rock data are left out of the sed rock lists',
+            commit: '612f1db65',
+          },
+          {
+            text: 'Composition kept: saving the Lithology tab no longer erases types entered on the Composition tab',
+            commit: 'dcccf4c56',
+          },
+        ],
+      },
+      {
+        title: 'Nesting',
+        items: [
+          {
+            text: 'Every dataset: the Nesting page shows Spots nested on image basemaps, strat sections, and nesting lists from every dataset, turning on a dataset when you select its Spot',
+            commit: 'd90a469a8',
+          },
+          {
+            text: 'Legacy samples: legacy samples appear on the Nesting page and open on their Spot\'s Samples page',
+            commit: '1ef65cefa',
+          },
+          {
+            text: 'Rich sample parents: a rich sample\'s parents show again on the Nesting page',
+            commit: '5fd87a2f1',
+          },
+        ],
+      },
+      {
+        title: 'Templates',
+        items: [
+          {
+            text: 'Name with the values: a template\'s name is the first field of its form, without a separate naming step',
+            commit: '85b317b99',
+          },
+          {
+            text: 'Unsaved template changes: leaving a template editor with unsaved changes asks first',
+            commit: '3dbffe7d1',
+          },
+          {
+            text: 'Picker templates: deleting and clearing templates from a picker works the same as from the main menu',
+            commit: '60467dedd',
+          },
+        ],
+      },
+      {
+        title: 'Backups & sync',
+        items: [
+          {
+            text: 'Saved before sync: the open project is saved to the device before an upload or download, so recent changes can\'t be lost',
+            commit: 'dfb1c6ecb',
+            play: 'Project saved to the device before every sync',
+          },
+          {
+            text: 'Manage saves: delete single saves or all of them from My Saves and Auto Saves tabs, each showing how much space it takes',
+            commit: 'd54e93278',
+          },
+          {
+            text: 'More auto saves: each project keeps its own 30 most recent auto saves, so one project no longer prunes another\'s',
+            commit: 'df7a7d5be',
+          },
+          {
+            text: 'Safer downloads: a download that fails partway keeps the open project, and My Maps maps that finish checking late are kept',
+            commit: 'c89ec22c7',
+          },
+        ],
+      },
+      {
+        title: 'Fixes',
+        items: [
+          {
+            text: 'Compass shortcut: the Measurement shortcut no longer shows a blank screen when no Spot is selected',
+            commit: '43279fd0d',
+          },
+          {
+            text: 'Map edit markers: pressing just before Save no longer leaves stray edit markers on the map',
+            commit: '94459e8a8',
+          },
+          {
+            text: 'Highlighted parent: a rich sample\'s parent Spot stays highlighted while the sample is selected',
+            commit: '13ceb1470',
+          },
+          {
+            text: 'Missing images: an image that\'s missing can be deleted from the memo or sample that holds it',
+            commit: '5eccfe586',
+          },
+          {
+            text: 'Image import: dismissing Import shows a warning instead of reporting 0 images saved',
+            commit: '2d1d07250',
+          },
+          {
+            text: 'Macrostrat unit info: drawn above the home screen buttons',
+            commit: '099d2bff1',
+          },
+          {
+            text: 'Map options: the overlay icon opens map options instead of setting the basemap',
+            commit: 'f1421af22',
+          },
+          {
+            text: 'Connection status: read as soon as the app starts',
+            commit: '6db34a74b',
+          },
+          {
+            text: 'Android back button: closes every modal the same way its Close button does',
+            commit: '7a5613c44',
+            platforms: ['android'],
+          },
+          {
+            text: 'PDFs on Android: StraboMicro PDFs scroll, and links in them can be tapped',
+            commit: '646e58832',
+            platforms: ['android'],
+          },
+          {
+            text: 'Portrait photos on web: kept at full size when resized',
+            commit: '5502a4acc',
+            platforms: ['web'],
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '2.32.1',
     groups: [
       {

@@ -1,4 +1,46 @@
-TEMPLATES
-• Templates menu: no longer crashes when a template group holds two or more templates
+STRABOSAMPLES
+• Link to StraboSamples: link a Field sample to its StraboSamples record, comparing the two and choosing which values to keep
+• Linked sample details: a linked sample shows its StraboSamples data in tabs, with a button to open it online and its last-updated date
+• StraboMicro PDFs: linking a sample downloads its StraboMicro project PDF so the Micro tab can open it offline
+• Stays in sync: linked data refreshes when a project is downloaded or uploaded, and the PDF downloads again when the project has changed on the server
+• Offline aware: linking and online actions are disabled with a note while you have no connection
+
+MAP LAYERS & OFFLINE MAPS
+• New map layers menu: each map shows a thumbnail, with its own options for an overlay switch, opacity, and centering on the map
+• Offline overlays: save an overlay for offline use, not only the basemap
+• Save a whole custom map: save a custom map's full extent for offline use from its edit page, which also shows its offline tiles
+• Offline map details: open a panel for each offline map showing its tiles, size, zoom levels, and location
+• Preview downloads: a Preview button shows what a download covers, with a banner naming the map
+• Tidier Offline Maps page: default and custom maps are listed separately, and a header menu downloads tiles or finds maps on the device
+• Offline viewing: downloaded custom maps can be viewed offline, and the basemap comes back after a preview
+• Zoom wheel is back: choose how deep to save a map with the zoom wheel again
+
+DRAWING & MAP EDITING
+• Snap to Spots: new vertices and edits snap to the nearest vertex or edge of a nearby Spot, with an adjustable tolerance under Adding New Spots
+• No target dataset prompt: when the draw tools are hidden because no target dataset is set, a prompt says so and opens Datasets
+• Safer map edits: you're asked to save a map edit or interval drag before anything else can change a Spot, with Discard, Keep Editing, or Save
+• Edited Spots stay put: Spots edited on the map stay in their own datasets, and Cancel or a press off it cancels Set in Current View
+• Strat sections: dragging intervals saves only the intervals that moved
+
+NOTEBOOK & FORMS
+• Unsaved changes prompt: leaving a notebook page with unsaved changes, by any route, asks whether to Discard, Keep Editing, or Save
+• Save when changed: Save stays disabled until something on the form has changed
+• Trace & surface features: a Trace Feature or Surface Feature section on the Overview replaces the switch, opening its form as a subpage
+• Done bar on iOS: text fields have a Done button above the keyboard
+• Read-only forms: read-only forms no longer fill in defaults or offer to save
+
+SEDIMENTARY
+• Better sed labels: structures, diagenesis, fossils, and interpretations are labeled from the data they hold
+• Clearer rock names: an untyped sed rock reads Unknown Rock Type, titles add the first composition in parentheses, and "other" shows what you typed
+• Hidden lithology data: a sed rock with Composition, Texture, or Stratification data says so, with a link to open it in Lithologies
+• Cleaner lists: lithologies and sed features show by their titles, and lithologies without rock data are left out of the sed rock lists
+• Composition kept: saving the Lithology tab no longer erases types entered on the Composition tab
+
+NESTING
+• Every dataset: the Nesting page shows Spots nested on image basemaps, strat sections, and nesting lists from every dataset, turning on a dataset when you select its Spot
+• Legacy samples: legacy samples appear on the Nesting page and open on their Spot's Samples page
+• Rich sample parents: a rich sample's parents show again on the Nesting page
+
+Full notes: https://github.com/StraboSpot/StraboField/releases/tag/v2.33.0
 
 Thanks for using StraboSpot!
