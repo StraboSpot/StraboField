@@ -6,6 +6,9 @@ import ReactTestRenderer from 'react-test-renderer';
 
 import useDownload from './useDownload';
 import connectionsReducer from '../../modules/connections/connections.slice';
+import homeReducer from '../../modules/home/home.slice';
+import {CUSTOM_MAP_SOURCES} from '../../modules/maps/custom-maps/customMaps.constants';
+import mapReducer from '../../modules/maps/maps.slice';
 import projectReducer from '../../modules/project/projects.slice';
 import spotReducer from '../../modules/spots/spots.slice';
 import listenerMiddleware from '../../store/listenerMiddleware';
@@ -15,6 +18,7 @@ const mockServer = {
   getDatasets: jest.fn(),
   getDatasetSpots: jest.fn(),
   getProject: jest.fn(),
+  testCustomMapUrl: jest.fn(),
 };
 const mockNewDataset = {id: 99, modified_timestamp: 1, name: 'Default', spotIds: []};
 
@@ -34,8 +38,12 @@ const makeSpot = (id, name) => ({
   type: 'Feature',
 });
 
-// The project open on the device before the download
+// The project open on the device before the download, on a custom endpoint so My Maps entries are checked against it
 const getPreloadedState = () => ({
+  connections: {
+    ...connectionsReducer(undefined, {type: 'init'}),
+    databaseEndpoint: {endpoint: 'https://custom.example/db', isSelected: true, isVerified: true},
+  },
   project: {
     ...projectReducer(undefined, {type: 'init'}),
     activeDatasetsIds: [12],
@@ -52,6 +60,8 @@ const renderHook = () => {
     preloadedState: getPreloadedState(),
     reducer: propagateModifiedTimestamps(combineReducers({
       connections: connectionsReducer,
+      home: homeReducer,
+      map: mapReducer,
       project: projectReducer,
       spot: spotReducer,
       user: (state = {encoded_login: 'login'}) => state,
@@ -120,4 +130,39 @@ it('keeps the dataset made for a project with none', async () => {
   expect(project.activeDatasetsIds).toEqual([99]);
   expect(project.targetDatasetId).toBe(99);
   expect(store.getState().connections.isLocalSaveNeeded).toBe(true);
+});
+
+// A My Maps entry is kept only once its tiles are found on the custom endpoint, which can take longer than the rest
+// of the download. Resolving the check on a later tick stands in for a slow server.
+describe('custom maps', () => {
+  const myMap = {id: 'my-map', source: CUSTOM_MAP_SOURCES.STRABO_MY_MAPS, title: 'My Map'};
+  const otherMyMap = {id: 'other-my-map', source: CUSTOM_MAP_SOURCES.STRABO_MY_MAPS, title: 'Other My Map'};
+  const mapboxMap = {id: 'user/style', source: CUSTOM_MAP_SOURCES.MAPBOX_STYLES, title: 'Mapbox Map'};
+  const resolveLater = value => new Promise(resolve => setTimeout(() => resolve(value), 0));
+
+  const downloadWithMaps = async (otherMaps) => {
+    mockServer.getProject.mockResolvedValue(
+      {description: {project_name: 'From server'}, id: 2, modified_timestamp: 5, other_maps: otherMaps});
+    const {getHook, store} = renderHook();
+    const error = await download(getHook);
+    const {home, map} = store.getState();
+    return {customMaps: map.customMaps, error, statusMessages: home.statusMessages};
+  };
+
+  it('keeps a My Maps map whose check finishes after the rest of the download', async () => {
+    mockServer.testCustomMapUrl.mockImplementation(() => resolveLater(true));
+    const {customMaps, error} = await downloadWithMaps([myMap, mapboxMap]);
+    expect(error).toBeUndefined();
+    expect(Object.keys(customMaps).sort()).toEqual(['my-map', 'user/style']);
+    expect(customMaps['my-map'].url).toEqual(['https://custom.example/geotiff/tiles/']);
+  });
+
+  // One map whose tiles aren't on the endpoint must not take the others with it, or fail the download
+  it('keeps the other maps when one My Maps map fails its check', async () => {
+    mockServer.testCustomMapUrl.mockImplementation(url => resolveLater(!url.endsWith(otherMyMap.id)));
+    const {customMaps, error, statusMessages} = await downloadWithMaps([myMap, otherMyMap, mapboxMap]);
+    expect(error).toBeUndefined();
+    expect(Object.keys(customMaps).sort()).toEqual(['my-map', 'user/style']);
+    expect(statusMessages).toContain('Custom Map Not Loaded: Other My Map');
+  });
 });

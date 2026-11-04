@@ -91,8 +91,7 @@ const useDownload = () => {
     }
   };
 
-  // Returns which datasets to show and which takes new Spots rather than setting them, since nothing is saved until
-  // the whole download has arrived
+  // Returns which datasets to show and which takes new Spots, for initializeDownload to set once everything has arrived
   const downloadDatasets = async (selectedProject, encodedLoginScoped) => {
     try {
       dispatch(addedStatusMessage('Downloading Datasets...'));
@@ -100,7 +99,7 @@ const useDownload = () => {
       const datasets = res?.datasets || [];
       console.log('Datasets Response:', JSON.stringify(res));
       let isTargetDatasetCleared = false;
-      let datasetSelection, newDataset;
+      let datasetSelection;
 
       // If same project set active and target dataset to same as before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
@@ -121,8 +120,8 @@ const useDownload = () => {
         datasetSelection = {activeDatasetIds: [datasets[0].id], targetDatasetId: datasets[0].id};
       }
       else {
-        newDataset = createDataset();
-        datasetSelection = {activeDatasetIds: [newDataset.id], targetDatasetId: newDataset.id};
+        const newDataset = createDataset();
+        datasetSelection = {activeDatasetIds: [newDataset.id], newDataset, targetDatasetId: newDataset.id};
       }
       datasetsObjToSave = Object.assign({},
         ...datasets.map(item => ({[item.id]: {...item, modified_timestamp: item.modified_timestamp || Date.now()}})));
@@ -135,7 +134,7 @@ const useDownload = () => {
         dispatch(addedStatusMessage('The previous target dataset was removed or is turned off, so no target '
           + 'dataset is set. Choose one to add new Spots.'));
       }
-      return {...datasetSelection, newDataset};
+      return datasetSelection;
     }
     catch (err) {
       console.error('Error getting datasets:', err);
@@ -175,8 +174,8 @@ const useDownload = () => {
     dispatch(addedStatusMessage(`Downloaded Linked Sample Data for ${fetchedCount} of ${linkedSpots.length} Samples`));
   };
 
-  // Download Project Properties. Returns them rather than saving them, since nothing is saved until the whole download
-  // has arrived. Memo images are saved now: they are files, and a failed download leaves the open project's own.
+  // Download Project Properties, for initializeDownload to save once everything has arrived. Memo images are saved to
+  // the device now, which leaves the open project untouched if the download fails.
   const downloadProject = async (selectedProject, encodedLoginScoped) => {
     try {
       console.log('Downloading Project Properties...');
@@ -186,14 +185,13 @@ const useDownload = () => {
       if (!isEmpty(projectResponse.other_maps)) {
         projectResponse.other_maps = projectResponse.other_maps.map(stripMapboxToken);
       }
-      if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
-        loadCustomMaps(projectResponse.other_maps);
-      }
       console.log('Finished Downloading Project Properties.', projectResponse);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Finished Downloading Project Properties'));
+      // Loaded after the message above replaces 'Downloading Project Properties...', or it would replace a map's own
+      if (!isEmpty(projectResponse.other_maps)) await loadCustomMaps(projectResponse.other_maps);
       // Web shows memo images from the server and has no device storage to save them to
-      if (Platform.OS !== 'web' && projectResponse.reports && !isEmpty(projectResponse.reports)) {
+      if (Platform.OS !== 'web' && !isEmpty(projectResponse.reports)) {
         await downloadReportImages(projectResponse.reports);
       }
       return projectResponse;
@@ -288,23 +286,22 @@ const useDownload = () => {
     }
   };
 
-  const loadCustomMaps = (maps) => {
-    maps.map(async (map) => {
+  // A My Maps map is kept only if its tiles are found on the custom endpoint; one that isn't is left out on its own
+  const loadCustomMaps = async (maps) => {
+    await Promise.all(maps.map(async (map) => {
       if (!map.id) {
         console.warn('Skipping custom map with no id', map);
         return;
       }
       const mapId = normalizeCustomMapId(map.id, map.source);
       let providerInfo = MAP_PROVIDERS[map.source];
-      if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
-        if (!isEmpty(endpoint) && isSelected) {
-          let tileEndpoint = endpoint.replace('/db', '/strabo_mymaps_check/');
-          if (await testCustomMapUrl(tileEndpoint + map.id)) {
-            tileEndpoint = endpoint.replace('/db', '/geotiff/tiles/');
-            providerInfo = {...providerInfo, url: [tileEndpoint]};
-          }
-          else throw Error('Invalid IP address');
+      if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS && !isEmpty(endpoint) && isSelected) {
+        if (!await testCustomMapUrl(endpoint.replace('/db', '/strabo_mymaps_check/') + map.id)) {
+          console.warn(map.id + ': My Maps map not found on the custom endpoint', map);
+          dispatch(addedStatusMessage(`Custom Map Not Loaded: ${map.title || map.id}`));
+          return;
         }
+        providerInfo = {...providerInfo, url: [endpoint.replace('/db', '/geotiff/tiles/')]};
       }
       const customMap = {
         ...map,
@@ -314,7 +311,7 @@ const useDownload = () => {
       };
       console.log(customMap.id + ': Loaded Custom Map', customMap);
       customMapsToSave = {...customMapsToSave, [customMap.id]: customMap};
-    });
+    }));
   };
 
   /* Exported Functions */
@@ -378,7 +375,7 @@ const useDownload = () => {
       dispatch(addedProjectFromServer(projectResponse));
       dispatch(addedSpotsFromServer(spotsToSave));
       dispatch(addedDatasets(datasetsObjToSave));
-      // Made here for a project with none, so it is a change to save, not part of the load
+      // Made here for a project with none, so dispatched as a change to save rather than loaded
       if (datasetSelection.newDataset) dispatch(addedDataset(datasetSelection.newDataset));
       dispatch(setActiveDatasetsMultiple(datasetSelection.activeDatasetIds));
       dispatch(setTargetDataset(datasetSelection.targetDatasetId));

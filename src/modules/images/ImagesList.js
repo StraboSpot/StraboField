@@ -15,7 +15,6 @@ const ImagesList = ({
                       onOpenImageProperties,
                       onPressEmpty,
                       saveUpdatedImage,
-                      spotWithImage,
                     }) => {
   /* Data Hooks */
 
@@ -39,6 +38,7 @@ const ImagesList = ({
       <View key={image.id} style={isThumbnailOnly ? undefined : imageStyles.imageCardWrapper}>
         <ImageCard
           areImageThumbnailsLoading={areImageThumbnailsLoading}
+          deleteImage={deleteImage}
           image={image}
           imageThumbnailURIs={imageThumbnailURIs}
           index={index}
@@ -49,7 +49,6 @@ const ImagesList = ({
           saveUpdatedImage={saveUpdatedImage}
           setAreImageThumbnailsLoading={setAreImageThumbnailsLoading}
           setImageThumbnailURIs={setImageThumbnailURIs}
-          spotWithImage={spotWithImage}
         />
       </View>
     );

@@ -316,18 +316,23 @@ const useStratSectionCalculations = () => {
     const targetExtent = turf.bbox(targetInterval);
     const targetHeight = targetExtent[3] - targetExtent[1];
 
-    // Every Spot on the section except the target interval, copied so the steps below can move them
-    let updatedSpots = getAllSpotsOnStratSection(stratSectionId)
-      .filter(s => s.properties.id !== targetInterval.properties.id)
-      .map(s => JSON.parse(JSON.stringify(s)));
+    // Steps 1 and 4 move the Spots past a cutoff by the target's height, one each way, so a Spot past both cutoffs ends
+    // up where it started. Each Spot's net move is kept so only the ones that really moved are saved.
+    const netPixelsBySpotId = {};
+    const moveSpotsPastCutoff = (spots, cutoff, pixels) => spots.map((spot) => {
+      const ext = turf.bbox(spot);
+      if (!(isCore ? ext[3] <= cutoff : ext[1] >= cutoff)) return spot;
+      netPixelsBySpotId[spot.properties.id] = (netPixelsBySpotId[spot.properties.id] || 0) + pixels;
+      return moveSpotByPixels(spot, pixels);
+    });
+
+    // The other intervals only. Other Spots on the section stay where the user put them, to be moved by editing.
+    let updatedSpots = getAllIntervalSpotsOnStratSection(stratSectionId)
+      .filter(s => s.properties.id !== targetInterval.properties.id);
 
     // Step 1: Close the gap at the target's old position
     const gapCutoff = isCore ? targetExtent[1] : targetExtent[3];
-    const gapPixels = isCore ? targetHeight : -targetHeight;
-    updatedSpots = updatedSpots.map((spot) => {
-      const ext = turf.bbox(spot);
-      return (isCore ? ext[3] <= gapCutoff : ext[1] >= gapCutoff) ? moveSpotByPixels(spot, gapPixels) : spot;
-    });
+    updatedSpots = moveSpotsPastCutoff(updatedSpots, gapCutoff, isCore ? targetHeight : -targetHeight);
 
     // Step 2: Find the updated preceding interval
     const updatedPrecedingInterval = precedingInterval
@@ -383,14 +388,11 @@ const useStratSectionCalculations = () => {
 
     // Step 4: Open space at the new position for the target
     const newCutoff = isCore ? newMaxY : newMinY;
-    const makeRoomPixels = isCore ? -targetHeight : targetHeight;
-    updatedSpots = updatedSpots.map((spot) => {
-      const ext = turf.bbox(spot);
-      return (isCore ? ext[3] <= newCutoff : ext[1] >= newCutoff) ? moveSpotByPixels(spot, makeRoomPixels) : spot;
-    });
+    updatedSpots = moveSpotsPastCutoff(updatedSpots, newCutoff, isCore ? -targetHeight : targetHeight);
 
-    // Dispatch all changes at once
-    const allChanged = [...updatedSpots, newTarget];
+    // Dispatch all changes at once. A Spot moved there and back is left out, keeping its stored geometry rather than
+    // a copy that could differ by rounding.
+    const allChanged = [...updatedSpots.filter(s => netPixelsBySpotId[s.properties.id]), newTarget];
     recordIntervalDragChange(allChanged.map(s => s.properties.id));
     dispatch(editedOrCreatedSpots(allChanged, timestampOptions));
   };
