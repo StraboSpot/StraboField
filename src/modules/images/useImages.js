@@ -59,7 +59,8 @@ const useImages = () => {
       }));
       return false;
     }
-    else if (spotWithImage) {
+    // A Spot not holding the image would be marked edited with nothing removed
+    else if (spotWithImage?.properties?.images?.some(image => image.id === imageId)) {
       const imagesDataCopy = spotWithImage.properties.images;
       const allOtherImages = imagesDataCopy.filter(item => imageId !== item.id);
       dispatch(setSelectedSpot(spotWithImage));
