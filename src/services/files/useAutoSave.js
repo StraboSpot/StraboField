@@ -11,8 +11,6 @@ import {isEmpty} from '../../shared/helpers';
 import {store} from '../../store/ConfigureStore';
 import useDevice from '../device/useDevice';
 
-export const MAX_SAVES = 10;
-
 // Saves the open project to the device if it has changed since the last save. Upload and download run it first,
 // whatever the auto-save frequency, so a download never replaces changes that exist nowhere else.
 export const useAutoSaveNow = () => {
@@ -31,8 +29,8 @@ export const useAutoSaveNow = () => {
         projectDb: {...projectDb, project: stripMapboxTokenFromProject(projectDb.project)},
         spotsDb: spot.spots,
       };
-      await saveProjectToDevice(snapshot);
-      await pruneOldProjectSaves(MAX_SAVES);
+      const savedFileName = await saveProjectToDevice(snapshot);
+      await pruneOldProjectSaves(savedFileName);
       dispatch(clearLocalSaveNeeded());
       console.log('Auto save complete. Spots:', Object.keys(spot.spots).length,
         'Custom maps:', Object.keys(map.customMaps).length);

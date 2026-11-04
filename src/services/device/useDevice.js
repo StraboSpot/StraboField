@@ -1,7 +1,6 @@
 import {Linking, Platform} from 'react-native';
 
 import {keepLocalCopy, types} from '@react-native-documents/picker';
-import moment from 'moment';
 import RNFS from 'react-native-fs';
 import {unzip} from 'react-native-zip-archive';
 import {useDispatch} from 'react-redux';
@@ -12,6 +11,7 @@ import {setLoadingStatus} from '../../modules/home/home.slice';
 import {deletedOfflineMap} from '../../modules/maps/offline-maps/offlineMaps.slice';
 import {doesBackupDirectoryExist, doesDownloadsDirectoryExist} from '../../modules/project/projects.slice';
 import {toError} from '../../shared/helpers';
+import {getAutoSaveFileName, getAutoSavesToPrune, MAX_SAVES_PER_PROJECT} from '../files/autoSave.helpers';
 import {APP_DIRECTORIES} from '../files/directories.constants';
 import {getDeviceIdHeader} from '../network/serverRequests.helpers';
 import useServerRequests from '../network/useServerRequests';
@@ -518,19 +518,12 @@ const useDevice = () => {
 
   const AUTO_SAVES_DIR = APP_DIRECTORIES.BACKUP_DIR + 'AutoBackups/';
 
-  const pruneOldProjectSaves = async (maxSaves) => {
+  const pruneOldProjectSaves = async (savedFileName) => {
     try {
       const dirExists = await RNFS.exists(AUTO_SAVES_DIR);
       if (!dirExists) return;
       const allItems = await RNFS.readdir(AUTO_SAVES_DIR);
-      const saveFiles = allItems
-        .filter(item => item.endsWith('.json'))
-        .sort((a, b) => {
-          const tsA = a.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/)?.[0] ?? '';
-          const tsB = b.match(/\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/)?.[0] ?? '';
-          return tsB.localeCompare(tsA);
-        });
-      const toDelete = saveFiles.slice(maxSaves);
+      const toDelete = getAutoSavesToPrune(allItems, savedFileName, MAX_SAVES_PER_PROJECT);
       for (const file of toDelete) {
         await RNFS.unlink(AUTO_SAVES_DIR + file);
         console.log('Auto save pruned:', file);
@@ -545,11 +538,10 @@ const useDevice = () => {
     try {
       await makeDirectory(APP_DIRECTORIES.BACKUP_DIR);
       await makeDirectory(AUTO_SAVES_DIR);
-      const projectName = snapshot?.projectDb?.project?.description?.project_name || '';
-      const sanitizedName = projectName.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/, '');
-      const filename = moment().format('YYYY-MM-DDTHH-mm-ss') + (sanitizedName ? '_' + sanitizedName : '') + '.json';
+      const filename = getAutoSaveFileName(snapshot?.projectDb?.project?.description?.project_name);
       await writeFileToDevice(AUTO_SAVES_DIR, filename, snapshot);
       console.log('Auto save written:', filename);
+      return filename;
     }
     catch (err) {
       console.error('Error saving project to device:', err);
