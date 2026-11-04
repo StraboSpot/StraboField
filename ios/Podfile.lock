@@ -1525,8 +1525,29 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - react-native-keep-awake (4.0.0):
-    - React
+  - react-native-keep-awake (2.0.0):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-netinfo (12.0.1):
     - hermes-engine
     - RCTRequired
@@ -2646,7 +2667,7 @@ DEPENDENCIES:
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - "react-native-image-resizer (from `../node_modules/@bam.tech/react-native-image-resizer`)"
-  - react-native-keep-awake (from `../node_modules/react-native-keep-awake`)
+  - "react-native-keep-awake (from `../node_modules/@sayem314/react-native-keep-awake`)"
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-orientation-director (from `../node_modules/react-native-orientation-director`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
@@ -2836,7 +2857,7 @@ EXTERNAL SOURCES:
   react-native-image-resizer:
     :path: "../node_modules/@bam.tech/react-native-image-resizer"
   react-native-keep-awake:
-    :path: "../node_modules/react-native-keep-awake"
+    :path: "../node_modules/@sayem314/react-native-keep-awake"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-orientation-director:
@@ -3027,7 +3048,7 @@ SPEC CHECKSUMS:
   react-native-get-random-values: 625b34d7f8a66d85c594071603f748d756bd90da
   react-native-image-picker: dc809b800c612d43b6508095cca505c32cf9d3c8
   react-native-image-resizer: 575d098da823642f4d67eef7d30f934a44a05d43
-  react-native-keep-awake: 21ff40767cde4bd81021ffee12480aee4b5b91bb
+  react-native-keep-awake: 50ada2d42af3fb8229652ced8eddabb774f0d70d
   react-native-netinfo: 687391ecedb199c6d67fbc46c87cbae3277de967
   react-native-orientation-director: 6ad88c06e3dbdd77c2c1876526075d40ac1744d1
   react-native-pager-view: b5d7055004441b835a643b927af7121d96f4c813
