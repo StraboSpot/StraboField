@@ -2,9 +2,10 @@
 //
 // An ordered list (newest release first) of what shipped in each PUBLIC release. Interim rc/patch
 // builds (e.g. the 2.30.x series) are not listed individually — their changes are rolled up into the
-// public release that ships them (e.g. 2.31.0). The About page shows the three most recent releases at or
-// below the running version (plus, in dev builds, not-yet-shipped ones flagged "unreleased"), then links to
-// RELEASES_URL for the rest. Older entries stay here, since scripts/release-notes.js reads them too.
+// public release that ships them (e.g. 2.31.0). The About page shows only the releases in the running
+// minor version (e.g. every 2.32.x up to 2.32.1), plus, in dev builds, not-yet-shipped ones flagged
+// "unreleased", with a button to RELEASES_URL for the rest. Older entries stay here, since
+// scripts/release-notes.js reads them too.
 //
 // Each release's highlights are organized into `groups` of related changes: {title, items}, where
 // each item is {text, commit}. `text` is the user-facing blurb (the part before the first colon is
@@ -26,6 +27,21 @@ export const COMMIT_BASE_URL = 'https://github.com/StraboSpot/StraboField/commit
 export const RELEASES_URL = 'https://github.com/StraboSpot/StraboField/releases';
 
 const RELEASE_NOTES = [
+  {
+    version: '2.32.1',
+    groups: [
+      {
+        title: 'Templates',
+        items: [
+          {
+            text: 'Templates menu: no longer crashes when a template group holds two or more templates',
+            commit: 'a19c26b2c',
+            play: 'Templates menu no longer crashes',
+          },
+        ],
+      },
+    ],
+  },
   {
     version: '2.32.0',
     groups: [

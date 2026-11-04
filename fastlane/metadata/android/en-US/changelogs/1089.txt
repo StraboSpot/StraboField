@@ -1,0 +1,5 @@
+StraboField 2.32.1
+
+• Templates menu no longer crashes
+
+Thanks for using StraboSpot!
