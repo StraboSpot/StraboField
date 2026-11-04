@@ -98,8 +98,9 @@ const useServerRequests = () => {
     return postRequest(SPOT_CHECKIN, spotCheckIn, null, {});
   };
 
-  const postCheckinImageToRockd = (checkinId, imageBase64, token) => {
-    const body = {token, type: 'checkin', id: checkinId, image: `data:image/jpg;base64,${imageBase64}`};
+  // type and id come from the check-in response's photos: 'checkin' for the cover, 'obs' for each observation
+  const postCheckinImageToRockd = (type, id, imageBase64, token) => {
+    const body = {token, type, id, image: `data:image/jpg;base64,${imageBase64}`};
     return postRequest(PHOTOS, body, null, {}, ROCKD_IMAGE_TIMEOUT);
   };
 

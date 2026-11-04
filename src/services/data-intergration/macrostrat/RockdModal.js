@@ -25,7 +25,6 @@ import useServerRequests from '../../network/useServerRequests';
 const STATUS_MESSAGES = {
   converting: 'Converting spot to Rockd format...',
   sending: 'Sending check-in to Rockd...',
-  uploading: 'Sending image to Rockd...',
   success: 'Successfully checked in to Rockd!',
 };
 
@@ -46,8 +45,9 @@ const RockdModal = ({closeModal, isVisible}) => {
   const [checkInStatus, setCheckInStatus] = React.useState('idle');
   const [availableImages, setAvailableImages] = React.useState([]);
   const [errorMessage, setErrorMessage] = React.useState('');
-  const [pendingImage, setPendingImage] = React.useState(null);
+  const [pendingUploads, setPendingUploads] = React.useState(null);
   const [selectedImageId, setSelectedImageId] = React.useState(null);
+  const [uploadProgress, setUploadProgress] = React.useState({current: 0, total: 0});
 
   const {areImageThumbnailsLoading, imageThumbnailURIs} = useImageThumbnails({images: availableImages});
 
@@ -57,6 +57,9 @@ const RockdModal = ({closeModal, isVisible}) => {
   const successMessage = isEmpty(availableImages) && !isEmpty(selectedSpot?.properties?.images)
     ? `${STATUS_MESSAGES.success} This Spot's images are not on this device, so none were sent.`
     : STATUS_MESSAGES.success;
+  const statusMessage = checkInStatus === 'uploading'
+    ? `Sending image ${uploadProgress.current} of ${uploadProgress.total} to Rockd...`
+    : STATUS_MESSAGES[checkInStatus];
 
   React.useEffect(() => {
     if (macrostratToken && selectedSpot && isVisible) {
@@ -64,21 +67,21 @@ const RockdModal = ({closeModal, isVisible}) => {
     }
   }, [macrostratToken, isVisible]);
 
-  const handleCheckIn = async (image) => {
+  const handleCheckIn = async (cover) => {
     try {
+      // The converter makes the first image the check-in photo and each of the rest an observation, so send only
+      // the images on this device, with the cover first
+      const images = cover ? [cover, ...availableImages.filter(image => image !== cover)] : [];
+
       console.log('RockdModal check-in CONVERTING');
       setCheckInStatus('converting');
-      const converted = await convertSpotToMacrostrat(selectedSpot);
+      const converted = await convertSpotToMacrostrat(
+        {...selectedSpot, properties: {...selectedSpot.properties, images}});
       if (!converted) throw new Error('Conversion returned an empty result');
-      const {photo: _firstImage, ...checkIn} = converted;
 
       console.log('RockdModal check-in SENDING');
       setCheckInStatus('sending');
-      const checkInResponse = await postCheckinToRockd({
-        ...checkIn,
-        ...(image && {photo: `${image.id}.jpg`}),
-        token: macrostratToken,
-      });
+      const checkInResponse = await postCheckinToRockd({...converted, token: macrostratToken});
 
       // A 400 resolves with its body rather than rejecting, so a failed check-in arrives here too
       const checkInId = checkInResponse?.success?.data?.checkin_id;
@@ -93,8 +96,11 @@ const RockdModal = ({closeModal, isVisible}) => {
           value: checkInId,
         }),
       );
-      if (image) await uploadImage({checkInId, image, spotId: selectedSpot.properties.id});
-      else setCheckInStatus('success');
+      // Each photo comes back with the type and id to post its image to, matched by local_id (<image id>.jpg)
+      const uploads = (checkInResponse.success.data.photos ?? [])
+        .map(photo => ({...photo, image: images.find(image => `${image.id}.jpg` === photo.local_id)}))
+        .filter(upload => upload.image);
+      await uploadImages({spotId: selectedSpot.properties.id, uploads});
     }
     catch (err) {
       showError('RockdModal check-in error', err);
@@ -106,9 +112,9 @@ const RockdModal = ({closeModal, isVisible}) => {
     handleCheckIn();
   };
 
-  // Once the check-in exists, send only its image, since repeating the check-in would duplicate it in Rockd
+  // Once the check-in exists, send only the images still to go, since repeating the check-in would duplicate it in Rockd
   const handleRetry = () => (
-    pendingImage?.spotId === selectedSpot.properties.id ? uploadImage(pendingImage) : handleCheckIn(coverImage)
+    pendingUploads?.spotId === selectedSpot.properties.id ? uploadImages(pendingUploads) : handleCheckIn(coverImage)
   );
 
   const showError = (logMessage, err) => {
@@ -118,7 +124,7 @@ const RockdModal = ({closeModal, isVisible}) => {
   };
 
   const startCheckIn = async () => {
-    if (pendingImage?.spotId === selectedSpot.properties.id) return uploadImage(pendingImage);
+    if (pendingUploads?.spotId === selectedSpot.properties.id) return uploadImages(pendingUploads);
 
     setCheckInStatus('idle');
     setSelectedImageId(null);
@@ -130,19 +136,25 @@ const RockdModal = ({closeModal, isVisible}) => {
     else setCheckInStatus('selectingImage');
   };
 
-  const uploadImage = async ({checkInId, image, spotId}) => {
+  // Rockd takes one image per request
+  const uploadImages = async ({spotId, uploads}) => {
+    let sent = 0;
     try {
       setCheckInStatus('uploading');
-      const uri = getLocalImageURI(image.id, image.modified_timestamp);
-      const resizedImage = await resizeImageForUpload({...image, uri});
-      const imageBase64 = await RNFS.readFile(resizedImage.uri.split('?')[0].replace('file://', ''), 'base64');
-      const imageResponse = await postCheckinImageToRockd(checkInId, imageBase64, macrostratToken);
-      if (imageResponse?.error) throw new Error(imageResponse.error.message);
-      setPendingImage(null);
+      for (const {id, image, type} of uploads) {
+        setUploadProgress({current: sent + 1, total: uploads.length});
+        const uri = getLocalImageURI(image.id, image.modified_timestamp);
+        const resizedImage = await resizeImageForUpload({...image, uri});
+        const imageBase64 = await RNFS.readFile(resizedImage.uri.split('?')[0].replace('file://', ''), 'base64');
+        const imageResponse = await postCheckinImageToRockd(type, id, imageBase64, macrostratToken);
+        if (imageResponse?.error) throw new Error(imageResponse.error.message);
+        sent++;
+      }
+      setPendingUploads(null);
       setCheckInStatus('success');
     }
     catch (err) {
-      setPendingImage({checkInId, image, spotId});
+      setPendingUploads({spotId, uploads: uploads.slice(sent)});
       showError('RockdModal image upload error', err);
     }
     finally {
@@ -152,7 +164,9 @@ const RockdModal = ({closeModal, isVisible}) => {
 
   const renderCoverImagePicker = () => (
     <View style={{flex: 1, gap: 12}}>
-      <Text style={{fontSize: 16, textAlign: 'center'}}>Select a main cover image for this check-in.</Text>
+      <Text style={{fontSize: 16, textAlign: 'center'}}>
+        Select a main cover image for this check-in. The other images will be sent with it.
+      </Text>
       <ScrollView contentContainerStyle={{flexDirection: 'row', flexWrap: 'wrap'}} style={{flex: 1}}>
         {availableImages.map(image => (
           <View key={image.id} style={{width: '50%'}}>
@@ -208,7 +222,7 @@ const RockdModal = ({closeModal, isVisible}) => {
               )}
               <Text style={{fontSize: 16, textAlign: 'center'}}>
                 {checkInStatus === 'error' ? errorMessage
-                  : checkInStatus === 'success' ? successMessage : STATUS_MESSAGES[checkInStatus]}
+                  : checkInStatus === 'success' ? successMessage : statusMessage}
               </Text>
               {checkInStatus === 'error' && (
                 <OutlineButton onPress={handleRetry} title={'Retry'}/>

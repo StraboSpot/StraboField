@@ -1,5 +1,4 @@
 import React from 'react';
-import {Text} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 import RNFS from 'react-native-fs';
@@ -52,6 +51,13 @@ jest.mock('../src/utils/animations/LottieAnimations', () => () => null);
 
 const images = [{id: 1}, {id: 2}, {id: 3}];
 
+// What Rockd returns for a check-in sent with images 2 (the cover), 1 and 3
+const photos = [
+  {type: 'checkin', id: 99, local_id: '2.jpg'},
+  {type: 'obs', id: 501, local_id: '1.jpg'},
+  {type: 'obs', id: 502, local_id: '3.jpg'},
+];
+
 const renderModal = async () => {
   let renderer;
   await ReactTestRenderer.act(async () => {
@@ -59,6 +65,10 @@ const renderModal = async () => {
   });
   return renderer;
 };
+
+const convertedImageIds = () => mockConvertSpot.mock.lastCall[0].properties.images.map(image => image.id);
+
+const postedImages = () => mockPostImage.mock.calls.map(([type, id]) => [type, id]);
 
 const pressButton = (renderer, title) => ReactTestRenderer.act(
   () => renderer.root.findAllByType(OutlineButton).find(button => button.props.title === title).props.onPress());
@@ -77,9 +87,9 @@ describe('RockdModal', () => {
       spot: {selectedSpot: {properties: {id: 10, images}}},
       user: {macrostrat: {token: 'rockd-token'}},
     };
-    mockConvertSpot.mockResolvedValue({photo: '1.jpg', spot_id: 10});
+    mockConvertSpot.mockResolvedValue({spot_id: 10});
     mockDoesDeviceDirExist.mockResolvedValue(true);
-    mockPostCheckin.mockResolvedValue({success: {data: {checkin_id: 99}}});
+    mockPostCheckin.mockResolvedValue({success: {data: {checkin_id: 99, photos}}});
     mockPostImage.mockResolvedValue({success: {}});
     mockResizeImageForUpload.mockImplementation(async image => image);
     RNFS.readFile.mockResolvedValue('encoded');
@@ -90,41 +100,44 @@ describe('RockdModal', () => {
   it('asks for a cover image before sending anything', async () => {
     const renderer = await renderModal();
 
-    expect(renderer.root.findAllByType(Text).map(node => node.props.children))
-      .toContain('Select a main cover image for this check-in.');
     expect(renderer.root.findAllByType(ListItem.CheckBox)).toHaveLength(3);
     expect(mockModalProps.disabled).toBe(true);
     expect(mockConvertSpot).not.toHaveBeenCalled();
   });
 
-  it('sends only the selected image, as the check-in photo', async () => {
+  it('sends the cover first, then every image to the id Rockd gave it', async () => {
     const renderer = await renderModal();
     await selectImage(renderer, 1);
     expect(mockModalProps.disabled).toBe(false);
     await sendCheckIn();
 
-    expect(mockPostCheckin).toHaveBeenCalledWith({photo: '2.jpg', spot_id: 10, token: 'rockd-token'});
-    expect(mockPostImage).toHaveBeenCalledTimes(1);
-    expect(mockPostImage).toHaveBeenCalledWith(99, 'encoded', 'rockd-token');
-    expect(RNFS.readFile).toHaveBeenCalledWith(expect.stringMatching(/\/2\.jpg$/), 'base64');
+    expect(convertedImageIds()).toEqual([2, 1, 3]);
+    expect(mockPostCheckin).toHaveBeenCalledWith({spot_id: 10, token: 'rockd-token'});
+    expect(postedImages()).toEqual([['checkin', 99], ['obs', 501], ['obs', 502]]);
+    expect(mockPostImage).toHaveBeenCalledWith('checkin', 99, 'encoded', 'rockd-token');
+    expect(RNFS.readFile.mock.calls[0][0]).toMatch(/\/2\.jpg$/);
     expect(mockDeleteTempImagesFolder).toHaveBeenCalled();
   });
 
-  it('sends no image when told not to include one', async () => {
+  it('sends no images when told not to include them', async () => {
     const renderer = await renderModal();
     await selectImage(renderer, 0);
     await pressButton(renderer, 'Do Not Include');
 
-    expect(mockPostCheckin).toHaveBeenCalledWith({spot_id: 10, token: 'rockd-token'});
+    expect(convertedImageIds()).toEqual([]);
     expect(mockPostImage).not.toHaveBeenCalled();
   });
 
-  it('offers only the images on this device', async () => {
+  it('offers and sends only the images on this device', async () => {
     mockDoesDeviceDirExist.mockImplementation(async uri => !uri.includes('2.jpg'));
 
     const renderer = await renderModal();
-
     expect(renderer.root.findAllByType(ListItem.CheckBox)).toHaveLength(2);
+    await selectImage(renderer, 1);
+    await sendCheckIn();
+
+    expect(convertedImageIds()).toEqual([3, 1]);
+    expect(postedImages()).toEqual([['obs', 501], ['obs', 502]]);
   });
 
   it('checks in straight away with no images on this device, and says so', async () => {
@@ -132,8 +145,8 @@ describe('RockdModal', () => {
 
     const renderer = await renderModal();
 
+    expect(convertedImageIds()).toEqual([]);
     expect(mockPostImage).not.toHaveBeenCalled();
-    expect(mockPostCheckin).toHaveBeenCalledWith({spot_id: 10, token: 'rockd-token'});
     expect(JSON.stringify(renderer.toJSON())).toContain('none were sent');
   });
 
@@ -146,21 +159,22 @@ describe('RockdModal', () => {
     expect(JSON.stringify(renderer.toJSON())).not.toContain('none were sent');
   });
 
-  it('retries only the image, without a second check-in', async () => {
-    mockPostImage.mockResolvedValueOnce({error: {message: 'Image too large'}});
+  it('retries only the images not yet sent, without a second check-in', async () => {
+    mockPostImage.mockResolvedValueOnce({success: {}}).mockResolvedValueOnce({error: {message: 'Image too large'}});
 
     const renderer = await renderModal();
-    await selectImage(renderer, 0);
+    await selectImage(renderer, 1);
     await sendCheckIn();
     expect(JSON.stringify(renderer.toJSON())).toContain('Image too large');
 
+    mockPostImage.mockClear();
     await pressButton(renderer, 'Retry');
 
     expect(mockPostCheckin).toHaveBeenCalledTimes(1);
-    expect(mockPostImage).toHaveBeenCalledTimes(2);
+    expect(postedImages()).toEqual([['obs', 501], ['obs', 502]]);
   });
 
-  it('keeps the selected image when retrying a failed check-in', async () => {
+  it('keeps the selected cover when retrying a failed check-in', async () => {
     mockPostCheckin.mockResolvedValueOnce({error: {message: 'Invalid check-in'}});
 
     const renderer = await renderModal();
@@ -171,7 +185,7 @@ describe('RockdModal', () => {
 
     await pressButton(renderer, 'Retry');
 
-    expect(mockPostCheckin).toHaveBeenLastCalledWith({photo: '3.jpg', spot_id: 10, token: 'rockd-token'});
-    expect(mockPostImage).toHaveBeenCalledTimes(1);
+    expect(mockPostCheckin).toHaveBeenCalledTimes(2);
+    expect(convertedImageIds()).toEqual([3, 1, 2]);
   });
 });
