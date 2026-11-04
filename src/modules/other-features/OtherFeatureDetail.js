@@ -19,7 +19,7 @@ import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePa
 import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {addedCustomFeatureTypes, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {addedCustomFeatureTypes} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 import useTags from '../tags/useTags';
 
@@ -62,7 +62,6 @@ const OtherFeatureDetail = ({
       delete existingFeature[0];
       deleteFeatureTags([selectedFeature]);
       otherFeatures = otherFeatures.filter(feature => feature.id !== selectedFeature.id);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'other_features', value: otherFeatures}));
     }
     hideFeatureDetail();
@@ -127,7 +126,6 @@ const OtherFeatureDetail = ({
     if (i === -1) otherFeatures.push(feature);
     else otherFeatures.splice(i, 1, feature);
     const spotId = spot.properties.id;
-    dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
     dispatch(editedSpotProperties({field: 'other_features', value: otherFeatures, spotId: spotId}));
     return true;
   };

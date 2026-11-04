@@ -30,7 +30,6 @@ import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePa
 import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import PageHeader from '../page/PageHeader';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {deselectedAttributes, editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import TemplateNameField from '../templates/TemplateNameField';
 import {TEMPLATE_FIELD_LABELS} from '../templates/templates.constants';
@@ -304,7 +303,6 @@ const MeasurementDetail = ({
       });
       dispatch(setSelectedAttributes(editedSelectedMeasurements));
       const spotId = spot.properties.id;
-      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: 'orientation_data', value: orientationDataCopy, spotId: spotId}));
       markSaved();
       await formCurrent.resetForm();

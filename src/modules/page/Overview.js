@@ -18,7 +18,6 @@ import ImageModal from '../images/ImageModal';
 import ImagePropertiesModal from '../images/ImagePropertiesModal';
 import useImages from '../images/useImages';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import SketchModal from '../sketch/SketchModal';
 import {isLineSpot, isPolygonSpot} from '../spots/spots.helpers';
 import {editedSpotImages, editedSpotProperties} from '../spots/spots.slice';
@@ -120,7 +119,6 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   };
 
   const saveImagesToSpot = (newImages) => {
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot?.properties?.id]));
     dispatch(editedSpotImages(newImages));
     toast.show(`${newImages.length} image(s) saved!`, {type: 'success', duration: 1500});
   };
@@ -128,7 +126,6 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
   const saveUpdatedImage = (updatedImage) => {
     const images = spot?.properties?.images || [];
     const updatedImages = images.map(i => i.id === updatedImage.id ? updatedImage : i);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot?.properties?.id]));
     dispatch(editedSpotProperties({field: 'images', value: updatedImages}));
   };
 
@@ -138,8 +135,7 @@ const Overview = ({isReadOnly, isSample, openMainMenuPanel}) => {
     if (page.testing && !isTestingMode) return null;
     else if (spot.properties?.isSample && page.key === PAGE_KEYS.SAMPLES) return null;
     const dividerText = spot.properties.isSample ? 'Sample ' + page.label : page.label;
-    const onPress = page.key === traceSurfaceFeatureSection.key
-      ? () => setIsTraceSurfaceFeatureEdit(true)
+    const onPress = page.key === traceSurfaceFeatureSection.key ? () => setIsTraceSurfaceFeatureEdit(true)
       : () => openPage(page);
     return (
       <Pressable onPress={onPress} style={uiStyles.sectionHeaderBackground}>

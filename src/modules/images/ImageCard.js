@@ -14,7 +14,6 @@ import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constan
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import TextInput from '../../shared/ui/TextInput';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImage} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
@@ -41,7 +40,7 @@ const ImageCard = ({
   const {downloadImageAndSave} = useDevice();
   const {deleteImageFromSpot, getImageBasemap, setAnnotation} = useImages();
   const {getImageThumbnailURIs} = useImageThumbnails();
-  const {getAllSpotsOnImageBasemap, getSpotWithThisImage} = useSpots();
+  const {getAllSpotsOnImageBasemap} = useSpots();
 
   /* Local State */
 
@@ -72,12 +71,7 @@ const ImageCard = ({
       const updatedImage = {...image, title};
       // Images owned by something other than a Spot (Sample, Memo) are saved through their owner
       if (saveUpdatedImage) saveUpdatedImage(updatedImage);
-      else {
-        // The Spot holding the image, not the selected Spot: the image gallery renames with none selected
-        const spotWithThisImage = getSpotWithThisImage(image.id);
-        dispatch(editedSpotImage(updatedImage));
-        if (spotWithThisImage) dispatch(updatedModifiedTimestampsBySpotsIds([spotWithThisImage.properties.id]));
-      }
+      else dispatch(editedSpotImage(updatedImage));
     }
     if (isEmpty(title)) setTitle(undefined);
     setIsEditing(false);

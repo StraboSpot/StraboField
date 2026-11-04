@@ -27,7 +27,6 @@ import FeatureListItem from '../../page/FeatureListItem';
 import PageHeader from '../../page/PageHeader';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import useFeatureDetailView from '../../page/useFeatureDetailView';
-import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {hasSedRockData} from '../../sed/sed.helpers';
 import {editedSpotProperties} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
@@ -98,7 +97,6 @@ const RocksPage = ({isReadOnly, page}) => {
           r => ({...r, id: getNewUUID()}));
         updatedPetData[pageKey] = [...rockData[pageKey] || [], ...copyDataWithNewIds];
       }
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: groupKey, value: updatedPetData}));
     };
 
@@ -138,7 +136,6 @@ const RocksPage = ({isReadOnly, page}) => {
       const rockIndex = spot.properties.sed[pageKey].indexOf(rock);
       rock = {...rock, id: getNewUUID()};
       editedSedData[pageKey].splice(rockIndex, 1, rock);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     }
     openDetailView(rock);

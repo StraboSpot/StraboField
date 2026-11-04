@@ -4,7 +4,6 @@ import {useDispatch, useSelector} from 'react-redux';
 import {SED_LABEL_DICTIONARY} from './stratSection.constants';
 import {moveSpotByPixels} from './stratSection.helpers';
 import alert from '../../../shared/ui/alert';
-import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {X_INTERVAL, Y_MULTIPLIER} from '../../sed/sed.constants';
 import {getBasicLithologyIndex, getSiliciclasticGrainSize} from '../../sed/sed.helpers';
 import {editedOrCreatedSpot, editedOrCreatedSpots} from '../../spots/spots.slice';
@@ -20,13 +19,16 @@ const useStratSectionCalculations = () => {
 
   const {getAllIntervalSpotsOnStratSection, getAllSpotsOnStratSection} = useSpots();
 
+  /* Derived Variables */
+
+  // During an interval drag the dataset and project timestamps wait for Save, which saves the recorded Spots again,
+  // so a cancel leaves nothing marked for save or sync
+  const timestampOptions = {shouldPropagateTimestamps: !isDragIntervalMode};
+
   /* Internal Functions */
 
-  // During an interval drag, defer the dataset/project timestamp bump until the user saves the
-  // reorder, so a cancel reverts cleanly without flagging anything for save/sync. Outside drag mode, bump now.
-  const bumpModifiedTimestampsForSpots = (spotIds) => {
+  const recordIntervalDragChange = (spotIds) => {
     if (isDragIntervalMode) dispatch(addedIntervalDragChangedSpotIds(spotIds));
-    else dispatch(updatedModifiedTimestampsBySpotsIds(spotIds));
   };
 
   const getIntervalWidth = (sedData, stratSectionId, interbed) => {
@@ -258,8 +260,8 @@ const useStratSectionCalculations = () => {
       });
     }
     console.log('interval w new geom:', targetIntervalModified);
-    bumpModifiedTimestampsForSpots([targetIntervalModified.properties.id]);
-    dispatch(editedOrCreatedSpot(targetIntervalModified));
+    recordIntervalDragChange([targetIntervalModified.properties.id]);
+    dispatch(editedOrCreatedSpot(targetIntervalModified, timestampOptions));
     targetIntervalExtent = turf.bbox(targetIntervalModified);
     // For core: push spots below the new interval deeper (negative direction).
     // For normal: push spots above the new interval up.
@@ -287,8 +289,8 @@ const useStratSectionCalculations = () => {
       })
       .map(spot => moveSpotByPixels(spot, pixels));
     console.log('Dispatching', movedSpots);
-    bumpModifiedTimestampsForSpots(movedSpots.map(s => s.properties.id));
-    dispatch(editedOrCreatedSpots(movedSpots));
+    recordIntervalDragChange(movedSpots.map(s => s.properties.id));
+    dispatch(editedOrCreatedSpots(movedSpots, timestampOptions));
   };
 
   const recalculateIntervalGeometry = (spot) => {
@@ -300,8 +302,8 @@ const useStratSectionCalculations = () => {
     const updatedGeometry = calculateIntervalGeometry(spot.properties.strat_section_id, spot.properties.sed, anchorY);
     const editedSpot = {...spot, geometry: updatedGeometry};
     console.log('Spot after geometry recalculation', editedSpot);
-    bumpModifiedTimestampsForSpots([editedSpot.properties.id]);
-    dispatch(editedOrCreatedSpot(editedSpot));
+    recordIntervalDragChange([editedSpot.properties.id]);
+    dispatch(editedOrCreatedSpot(editedSpot, timestampOptions));
     console.log('Dispatching', editedSpot);
     return editedSpot;
   };
@@ -384,14 +386,13 @@ const useStratSectionCalculations = () => {
     const makeRoomPixels = isCore ? -targetHeight : targetHeight;
     updatedSpots = updatedSpots.map((spot) => {
       const ext = turf.bbox(spot);
-      return (isCore ? ext[3] <= newCutoff : ext[1] >= newCutoff)
-        ? moveSpotByPixels(spot, makeRoomPixels) : spot;
+      return (isCore ? ext[3] <= newCutoff : ext[1] >= newCutoff) ? moveSpotByPixels(spot, makeRoomPixels) : spot;
     });
 
     // Dispatch all changes at once
     const allChanged = [...updatedSpots, newTarget];
-    bumpModifiedTimestampsForSpots(allChanged.map(s => s.properties.id));
-    dispatch(editedOrCreatedSpots(allChanged));
+    recordIntervalDragChange(allChanged.map(s => s.properties.id));
+    dispatch(editedOrCreatedSpots(allChanged, timestampOptions));
   };
 
   return {

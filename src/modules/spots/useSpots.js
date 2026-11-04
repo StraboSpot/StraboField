@@ -45,7 +45,6 @@ import {
   deletedSpotIdFromTags,
   restoredSpotReferences,
   setActiveDatasets,
-  updatedModifiedTimestampsBySpotsIds,
   updatedProject,
   updatedProjectPreference,
 } from '../project/projects.slice';
@@ -317,7 +316,6 @@ const useSpots = () => {
       newSpots.push(newSpot);
     });
     console.log('Creating', numRandomSpots, 'new random Spots near current location.');
-    dispatch(updatedModifiedTimestampsBySpotsIds([newSpots[0].properties.id]));
     dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: newSpots.map(s => s.properties.id)}));
     dispatch(editedOrCreatedSpots(newSpots));
     console.log('Finished creating new random Spot. All Spots: ', spots);
@@ -376,7 +374,6 @@ const useSpots = () => {
       return;
     }
     console.log('Creating new Spot:', newSpot);
-    dispatch(updatedModifiedTimestampsBySpotsIds([newSpot.properties.id]));
     dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newSpot.properties.id}));
     dispatch(editedOrCreatedSpot(newSpot));
     console.log('Finished creating new Spot. All Spots: ', spots);

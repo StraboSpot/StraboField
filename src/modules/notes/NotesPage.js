@@ -16,7 +16,6 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import {getActiveTemplateList, getIsTemplateInUse} from '../templates/templates.helpers';
 import TemplatesPicker from '../templates/TemplatesPicker';
@@ -97,14 +96,12 @@ const NotesPage = ({isReadOnly, openSpotInNotebook, registerSave, zoomToCurrentL
           },
         };
         console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
-        dispatch(updatedModifiedTimestampsBySpotsIds([pointSetAtCurrentLocation.properties.id]));
         dispatch(editedOrCreatedSpot(pointSetAtCurrentLocation));
         createdSpot = pointSetAtCurrentLocation;
       }
       else {
         await currentForm.submitForm();
         const spotId = spot.properties.id;
-        dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
         dispatch(editedSpotProperties({field: 'notes', value: currentForm.values.note, spotId: spotId}));
         markSaved();
         await currentForm.resetForm();

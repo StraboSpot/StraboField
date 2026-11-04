@@ -7,7 +7,6 @@ import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import useForm from '../form/useForm';
 import {openFeatureInNotebook} from '../notebook-panel/notebook.helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import useTags from '../tags/useTags';
 import {MEASUREMENT_TEMPLATE_KEY} from '../templates/templates.constants';
@@ -122,7 +121,6 @@ const useMeasurements = () => {
 
       const orientations = !spot.properties.orientation_data ? [newOrientation]
         : [...spot.properties.orientation_data, newOrientation];
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'orientation_data', value: orientations}));
 
       if (compassMeasurements.manual) openFeatureInNotebook(dispatch, PAGE_KEYS.MEASUREMENTS, newOrientation);
@@ -147,7 +145,6 @@ const useMeasurements = () => {
     // Only after the loop, which throws and deletes nothing if a feature has associated features - otherwise the
     // tags would be dropped while the measurements they point at are still there.
     deleteFeatureTags(measurementsToDelete);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'orientation_data', value: updatedOrientationData}));
     dispatch(setSelectedAttributes([]));
   };
