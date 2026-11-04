@@ -91,8 +91,7 @@ const useDownload = () => {
     }
   };
 
-  // Returns which datasets to show and which takes new Spots rather than setting them, since nothing is saved until
-  // the whole download has arrived
+  // Returns which datasets to show and which takes new Spots, for initializeDownload to set once everything has arrived
   const downloadDatasets = async (selectedProject, encodedLoginScoped) => {
     try {
       dispatch(addedStatusMessage('Downloading Datasets...'));
@@ -100,7 +99,7 @@ const useDownload = () => {
       const datasets = res?.datasets || [];
       console.log('Datasets Response:', JSON.stringify(res));
       let isTargetDatasetCleared = false;
-      let datasetSelection, newDataset;
+      let datasetSelection;
 
       // If same project set active and target dataset to same as before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
@@ -121,8 +120,8 @@ const useDownload = () => {
         datasetSelection = {activeDatasetIds: [datasets[0].id], targetDatasetId: datasets[0].id};
       }
       else {
-        newDataset = createDataset();
-        datasetSelection = {activeDatasetIds: [newDataset.id], targetDatasetId: newDataset.id};
+        const newDataset = createDataset();
+        datasetSelection = {activeDatasetIds: [newDataset.id], newDataset, targetDatasetId: newDataset.id};
       }
       datasetsObjToSave = Object.assign({},
         ...datasets.map(item => ({[item.id]: {...item, modified_timestamp: item.modified_timestamp || Date.now()}})));
@@ -135,7 +134,7 @@ const useDownload = () => {
         dispatch(addedStatusMessage('The previous target dataset was removed or is turned off, so no target '
           + 'dataset is set. Choose one to add new Spots.'));
       }
-      return {...datasetSelection, newDataset};
+      return datasetSelection;
     }
     catch (err) {
       console.error('Error getting datasets:', err);
@@ -175,8 +174,8 @@ const useDownload = () => {
     dispatch(addedStatusMessage(`Downloaded Linked Sample Data for ${fetchedCount} of ${linkedSpots.length} Samples`));
   };
 
-  // Download Project Properties. Returns them rather than saving them, since nothing is saved until the whole download
-  // has arrived. Memo images are saved now: they are files, and a failed download leaves the open project's own.
+  // Download Project Properties, for initializeDownload to save once everything has arrived. Memo images are saved to
+  // the device now, which leaves the open project untouched if the download fails.
   const downloadProject = async (selectedProject, encodedLoginScoped) => {
     try {
       console.log('Downloading Project Properties...');
@@ -378,7 +377,7 @@ const useDownload = () => {
       dispatch(addedProjectFromServer(projectResponse));
       dispatch(addedSpotsFromServer(spotsToSave));
       dispatch(addedDatasets(datasetsObjToSave));
-      // Made here for a project with none, so it is a change to save, not part of the load
+      // Made here for a project with none, so dispatched as a change to save rather than loaded
       if (datasetSelection.newDataset) dispatch(addedDataset(datasetSelection.newDataset));
       dispatch(setActiveDatasetsMultiple(datasetSelection.activeDatasetIds));
       dispatch(setTargetDataset(datasetSelection.targetDatasetId));
