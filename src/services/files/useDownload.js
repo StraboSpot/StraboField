@@ -185,14 +185,13 @@ const useDownload = () => {
       if (!isEmpty(projectResponse.other_maps)) {
         projectResponse.other_maps = projectResponse.other_maps.map(stripMapboxToken);
       }
-      if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
-        loadCustomMaps(projectResponse.other_maps);
-      }
       console.log('Finished Downloading Project Properties.', projectResponse);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Finished Downloading Project Properties'));
+      // Loaded after the message above replaces 'Downloading Project Properties...', or it would replace a map's own
+      if (!isEmpty(projectResponse.other_maps)) await loadCustomMaps(projectResponse.other_maps);
       // Web shows memo images from the server and has no device storage to save them to
-      if (Platform.OS !== 'web' && projectResponse.reports && !isEmpty(projectResponse.reports)) {
+      if (Platform.OS !== 'web' && !isEmpty(projectResponse.reports)) {
         await downloadReportImages(projectResponse.reports);
       }
       return projectResponse;
@@ -287,23 +286,22 @@ const useDownload = () => {
     }
   };
 
-  const loadCustomMaps = (maps) => {
-    maps.map(async (map) => {
+  // A My Maps map is kept only if its tiles are found on the custom endpoint; one that isn't is left out on its own
+  const loadCustomMaps = async (maps) => {
+    await Promise.all(maps.map(async (map) => {
       if (!map.id) {
         console.warn('Skipping custom map with no id', map);
         return;
       }
       const mapId = normalizeCustomMapId(map.id, map.source);
       let providerInfo = MAP_PROVIDERS[map.source];
-      if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
-        if (!isEmpty(endpoint) && isSelected) {
-          let tileEndpoint = endpoint.replace('/db', '/strabo_mymaps_check/');
-          if (await testCustomMapUrl(tileEndpoint + map.id)) {
-            tileEndpoint = endpoint.replace('/db', '/geotiff/tiles/');
-            providerInfo = {...providerInfo, url: [tileEndpoint]};
-          }
-          else throw Error('Invalid IP address');
+      if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS && !isEmpty(endpoint) && isSelected) {
+        if (!await testCustomMapUrl(endpoint.replace('/db', '/strabo_mymaps_check/') + map.id)) {
+          console.warn(map.id + ': My Maps map not found on the custom endpoint', map);
+          dispatch(addedStatusMessage(`Custom Map Not Loaded: ${map.title || map.id}`));
+          return;
         }
+        providerInfo = {...providerInfo, url: [endpoint.replace('/db', '/geotiff/tiles/')]};
       }
       const customMap = {
         ...map,
@@ -313,7 +311,7 @@ const useDownload = () => {
       };
       console.log(customMap.id + ': Loaded Custom Map', customMap);
       customMapsToSave = {...customMapsToSave, [customMap.id]: customMap};
-    });
+    }));
   };
 
   /* Exported Functions */
