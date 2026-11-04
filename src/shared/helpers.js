@@ -152,6 +152,12 @@ export const deepObjectExtend = (target, source) => {
   return target;
 };
 
+export const formatFileSize = (bytes) => {
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+};
+
 export const getFontSizeByWindowWidth = (window, fontSize) => {
   const baseWidth = 320; // width of smallest iPhone
   const width = getOrientation(window) === 'portrait' ? window.width : window.height;

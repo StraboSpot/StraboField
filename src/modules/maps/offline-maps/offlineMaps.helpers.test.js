@@ -1,5 +1,5 @@
 import {
-  formatTilesSize, getFoundMapsMessage, getOfflineMap, getScreenFitZoom, getTileStats, parseTileNames,
+  getFoundMapsMessage, getOfflineMap, getScreenFitZoom, getTileStats, parseTileNames,
 } from './offlineMaps.helpers';
 import {CUSTOM_MAP_SOURCES} from '../custom-maps/customMaps.constants';
 
@@ -63,14 +63,6 @@ describe('getTileStats', () => {
 
   it('has no extent for a map with no tiles', () => {
     expect(getTileStats([])).toEqual({bbox: undefined, size: 0, zoomCounts: {}});
-  });
-});
-
-describe('formatTilesSize', () => {
-  it('picks the unit that keeps the number readable', () => {
-    expect(formatTilesSize(2048)).toBe('2.0 KB');
-    expect(formatTilesSize(5.5 * 1024 * 1024)).toBe('5.5 MB');
-    expect(formatTilesSize(1.25 * 1024 * 1024 * 1024)).toBe('1.25 GB');
   });
 });
 

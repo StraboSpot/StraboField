@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Platform, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Platform, Text, View} from 'react-native';
 
 import {ButtonGroup} from '@rn-vui/base';
 import moment from 'moment';
@@ -8,6 +8,8 @@ import {useDispatch} from 'react-redux';
 import DeleteProjectModal from './DeleteProjectModal';
 import useDevice from '../../../services/device/useDevice';
 import {APP_DIRECTORIES, AUTO_SAVES_FOLDER} from '../../../services/files/directories.constants';
+import commonStyles from '../../../shared/common.styles';
+import {formatFileSize} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
 import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
@@ -25,19 +27,39 @@ const DeleteProject = () => {
 
   const dispatch = useDispatch();
 
-  const {openURL, readDirectory} = useDevice();
+  const {getSizeOnDevice, openURL, readDirectory} = useDevice();
 
   /* Local State */
 
   const [isDeleteProjectModalVisible, setIsDeleteProjectModalVisible] = useState(false);
-  // Changed after each delete so the list reloads
+  // Changed after each delete so the list and sizes reload
   const [listVersion, setListVersion] = useState(0);
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const [sizes, setSizes] = useState({});
   const [toDelete, setToDelete] = useState({filePaths: []});
 
   /* Derived Variables */
 
   const isAutoSavesTab = selectedTabIndex === 1;
+  const tabSize = isAutoSavesTab ? sizes.autoSaves : sizes.mySaves;
+
+  /* Side Effects */
+
+  useEffect(() => {
+    const getSizes = async () => {
+      try {
+        // The auto saves folder sits inside the backup directory, beside the manual saves
+        const autoSaves = await getSizeOnDevice(APP_DIRECTORIES.AUTO_SAVES);
+        const all = await getSizeOnDevice(APP_DIRECTORIES.BACKUP_DIR);
+        setSizes({autoSaves, mySaves: all - autoSaves});
+      }
+      catch (err) {
+        console.error('Error getting the size of the saves:', err);
+        setSizes({});
+      }
+    };
+    getSizes();
+  }, [listVersion]);
 
   /* Logic Helpers */
 
@@ -54,8 +76,8 @@ const DeleteProject = () => {
       : (await readDirectory(APP_DIRECTORIES.BACKUP_DIR) || []).filter(fileName => fileName !== AUTO_SAVES_FOLDER);
     const count = fileNames.length;
     if (!count) {
-      const savesName = isAutoSavesTab ? 'auto saves' : 'My Saves';
-      dispatch(openedMessageModal({message: `There are no ${savesName} on this device.`, title: 'Nothing to Delete'}));
+      const message = `There are no ${TABS[selectedTabIndex]} on this device.`;
+      dispatch(openedMessageModal({message: message, title: 'Nothing to Delete'}));
       return;
     }
     // All auto saves go with their folder, which the next auto save makes again
@@ -97,10 +119,15 @@ const DeleteProject = () => {
           onProjectPress={confirmDeleteProject}
           source={source}
         />
-        <DeleteButton
-          onPress={confirmDeleteAll}
-          title={isAutoSavesTab ? 'Delete All Auto Saves' : 'Delete All My Saves'}
-        />
+        {/* Every save has at least its data file, so a tab that takes up nothing is empty */}
+        {tabSize > 0 && (
+          <>
+            <Text style={[commonStyles.standardDescriptionText, {paddingTop: 8, textAlign: 'center'}]}>
+              {`${TABS[selectedTabIndex]} take up ${formatFileSize(tabSize)} on this device.`}
+            </Text>
+            <DeleteButton onPress={confirmDeleteAll} title={'Delete All ' + TABS[selectedTabIndex]}/>
+          </>
+        )}
         {Platform.OS === 'ios' && (
           <OutlineButton
             icon={{

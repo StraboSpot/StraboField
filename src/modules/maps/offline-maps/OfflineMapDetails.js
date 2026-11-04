@@ -4,12 +4,12 @@ import {ScrollView, Text, View} from 'react-native';
 import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {formatTilesSize, getOfflineMapTitle, getTileStats} from './offlineMaps.helpers';
+import {getOfflineMapTitle, getTileStats} from './offlineMaps.helpers';
 import {editedOfflineMap, selectedOfflineMap} from './offlineMaps.slice';
 import useMapsOffline from './useMapsOffline';
 import useDevice from '../../../services/device/useDevice';
 import commonStyles from '../../../shared/common.styles';
-import {isEmpty} from '../../../shared/helpers';
+import {formatFileSize, isEmpty} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import ActionButton from '../../../shared/ui/buttons/ActionButton';
 import DeleteButton from '../../../shared/ui/buttons/DeleteButton';
@@ -163,7 +163,7 @@ const OfflineMapDetails = () => {
     <>
       <SectionDivider dividerText={'Tiles'}/>
       {renderInfoRow('Tile Count', map.count === 0 ? 'No tiles downloaded' : map.count.toLocaleString())}
-      {tileStats?.size > 0 && renderInfoRow('Size on Device', formatTilesSize(tileStats.size))}
+      {tileStats?.size > 0 && renderInfoRow('Size on Device', formatFileSize(tileStats.size))}
       {!isEmpty(zoomLevels) && renderInfoRow('Zoom Levels', zoomLevels.length === 1 ? `${zoomLevels[0]}`
         : `${zoomLevels[0]} to ${zoomLevels[zoomLevels.length - 1]}`)}
       {!isEmpty(zoomLevels) && renderInfoRow('Tiles per Zoom', zoomLevels

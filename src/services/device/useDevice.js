@@ -327,6 +327,18 @@ const useDevice = () => {
     else return undefined;
   };
 
+  // Bytes a file takes, or a directory with everything inside it
+  const getSizeOnDevice = async (path) => {
+    if (!await RNFS.exists(path)) return 0;
+    const stat = await RNFS.stat(path);
+    if (!stat.isDirectory()) return Number(stat.size);
+    const items = await RNFS.readDir(path);
+    const sizes = await Promise.all(items.map(item => (
+      item.isDirectory() ? getSizeOnDevice(item.path) : Number(item.size)
+    )));
+    return sizes.reduce((total, size) => total + size, 0);
+  };
+
   const isPickDocumentCanceled = (err) => {
     console.log('Checking if pick was canceled:', err);
     const wasCanceled = handleError(err);
@@ -580,6 +592,7 @@ const useDevice = () => {
     getExternalProjectData,
     getMicroProjectName,
     getSavedMicroProjectModifiedTimestamp,
+    getSizeOnDevice,
     isPickDocumentCanceled,
     makeDirectory,
     moveFile,
