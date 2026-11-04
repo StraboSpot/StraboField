@@ -516,16 +516,14 @@ const useDevice = () => {
     }
   };
 
-  const AUTO_SAVES_DIR = APP_DIRECTORIES.BACKUP_DIR + 'AutoBackups/';
-
   const pruneOldProjectSaves = async (savedFileName) => {
     try {
-      const dirExists = await RNFS.exists(AUTO_SAVES_DIR);
+      const dirExists = await RNFS.exists(APP_DIRECTORIES.AUTO_SAVES);
       if (!dirExists) return;
-      const allItems = await RNFS.readdir(AUTO_SAVES_DIR);
+      const allItems = await RNFS.readdir(APP_DIRECTORIES.AUTO_SAVES);
       const toDelete = getAutoSavesToPrune(allItems, savedFileName, MAX_SAVES_PER_PROJECT);
       for (const file of toDelete) {
-        await RNFS.unlink(AUTO_SAVES_DIR + file);
+        await RNFS.unlink(APP_DIRECTORIES.AUTO_SAVES + file);
         console.log('Auto save pruned:', file);
       }
     }
@@ -537,9 +535,9 @@ const useDevice = () => {
   const saveProjectToDevice = async (snapshot) => {
     try {
       await makeDirectory(APP_DIRECTORIES.BACKUP_DIR);
-      await makeDirectory(AUTO_SAVES_DIR);
+      await makeDirectory(APP_DIRECTORIES.AUTO_SAVES);
       const filename = getAutoSaveFileName(snapshot?.projectDb?.project?.description?.project_name);
-      await writeFileToDevice(AUTO_SAVES_DIR, filename, snapshot);
+      await writeFileToDevice(APP_DIRECTORIES.AUTO_SAVES, filename, snapshot);
       console.log('Auto save written:', filename);
       return filename;
     }

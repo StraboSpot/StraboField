@@ -10,6 +10,7 @@ import {
   setTargetDataset,
 } from './projects.slice';
 import useDevice from '../../services/device/useDevice';
+import {AUTO_SAVES_FOLDER} from '../../services/files/directories.constants';
 import useServerRequests from '../../services/network/useServerRequests';
 import {getNewId, isEmpty, isSameId} from '../../shared/helpers';
 import useResetState from '../../store/useResetState';
@@ -168,7 +169,7 @@ const useProject = () => {
     const exists = await doesDeviceBackupDirExist(undefined);
     if (exists) {
       const res = await readDirectory(directory);
-      const manualBackupFiles = res.filter(file => file !== 'AutoBackups');
+      const manualBackupFiles = res.filter(file => file !== AUTO_SAVES_FOLDER);
       // Surface each backup's own last modified_timestamp (from its data.json) rather than leaving it undefined,
       // which would make moment() in ProjectList render the current time instead of when the project was last saved.
       const deviceFiles = await Promise.all(manualBackupFiles.map(async (file, index) => {
@@ -177,7 +178,7 @@ const useProject = () => {
         return {fileName: file, id: index, modified_timestamp: projectData?.modified_timestamp || projectData?.date};
       }));
       let id = manualBackupFiles.length;
-      const autoBackupFiles = await readDirectory(directory + 'AutoBackups/') || [];
+      const autoBackupFiles = await readDirectory(directory + AUTO_SAVES_FOLDER + '/') || [];
       const autoBackupItems = autoBackupFiles
         .filter(file => file.endsWith('.json') && /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/.test(file))
         .sort((a, b) => {
@@ -190,7 +191,13 @@ const useProject = () => {
           const modified_timestamp = tsMatch[0].replace(/(\d{2})-(\d{2})-(\d{2})$/, '$1:$2:$3');
           const sanitizedName = file.slice(tsMatch.index + 20, -'.json'.length);
           const displayName = sanitizedName ? sanitizedName.replace(/_/g, ' ') : 'Auto Backup';
-          return {displayName, fileName: 'AutoBackups/' + file, id: id++, isAutoBackup: true, modified_timestamp};
+          return {
+            displayName,
+            fileName: AUTO_SAVES_FOLDER + '/' + file,
+            id: id++,
+            isAutoBackup: true,
+            modified_timestamp,
+          };
         });
       return {projects: [...deviceFiles, ...autoBackupItems]};
     }

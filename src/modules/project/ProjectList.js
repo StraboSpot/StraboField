@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {AppState, FlatList, Text, View} from 'react-native';
 
-import {ListItem} from '@rn-vui/base';
+import {Icon, ListItem} from '@rn-vui/base';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -18,7 +18,8 @@ import Loading from '../../shared/ui/Loading';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
 import useIsConnectionAvailable from '../connections/useConnectionStatus';
 
-const ProjectList = ({backupType, doRefresh, onProjectPress, source}) => {
+// isDeleteList marks each row with a trash icon, since pressing it deletes rather than opens
+const ProjectList = ({backupType, doRefresh, isDeleteList, onProjectPress, source}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -114,7 +115,8 @@ const ProjectList = ({backupType, doRefresh, onProjectPress, source}) => {
             </ListItem.Subtitle>
           )}
         </ListItem.Content>
-        <ListItem.Chevron/>
+        {isDeleteList ? <Icon color={themes.WARNING_COLOR} name={'trash-outline'} size={25} type={'ionicon'}/>
+          : <ListItem.Chevron/>}
       </ListItem>
     );
   };
