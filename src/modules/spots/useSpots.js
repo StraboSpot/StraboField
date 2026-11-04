@@ -155,8 +155,8 @@ const useSpots = () => {
 
   // Every Spot whose dataset can make the given Spot read only. Locking always spreads down from the Spot
   // holding an image basemap or strat section to everything mapped on it, since that map is the Spot's own.
-  // It spreads back up only from a strat section, where adding, resizing or reordering an interval shifts
-  // every Spot on the section above or below it - intervals and anything else drawn there alike, see
+  // It spreads back up only from a strat section, where adding or resizing an interval shifts every Spot on
+  // the section above or below it - intervals and anything else drawn there alike, see
   // moveSpotsUpOrDownByPixels - so one locked Spot anywhere on a section locks all of it. Spots sharing an
   // image basemap write nothing to each other, so they never lock each other or the Spot holding the image.
   // Ids already collected end the walk, so maps that somehow reference each other can't loop.
