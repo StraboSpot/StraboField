@@ -86,12 +86,23 @@ const BackupProject = () => {
               onValueChanged={(name, value) => dispatch(setBackupFrequency({save: value}))}
             />
           </View>
-          <Text style={{...uiStyles.sectionDividerText, paddingVertical: 5}}>
-            {Platform.OS === 'ios'
-              ? 'Auto-saves are stored locally in the app\'s directory and can be accessed with the '
-              + '"View/Edit Files on Device" button below.'
-              : 'Auto-saves are stored locally in the app\'s private directory, which cannot be accessed '
-              + 'directly on Android. Use Save or Save & Export to Zip to keep an accessible copy.'}
+          <Text style={{...uiStyles.sectionDividerText, fontWeight: 'normal', paddingVertical: 5}}>
+            {Platform.OS === 'ios' ? (
+              <>
+                {'Auto-saves are stored locally in the app\'s directory and can be accessed with the '}
+                <Text style={{fontWeight: 'bold'}}>{'View/Edit Files on Device'}</Text>
+                {' button below.'}
+              </>
+            ) : (
+              <>
+                {'Auto-saves are stored locally in the app\'s private directory, which cannot be accessed directly '
+                  + 'on Android. Use '}
+                <Text style={{fontWeight: 'bold'}}>{'Save'}</Text>
+                {' or '}
+                <Text style={{fontWeight: 'bold'}}>{'Save & Export to Zip'}</Text>
+                {' to keep an accessible copy.'}
+              </>
+            )}
           </Text>
         </View>
       </FormikWrapper>
@@ -128,7 +139,7 @@ const BackupProject = () => {
       {Platform.OS === 'ios' && (
         <View style={{flex: 1, justifyContent: 'flex-end', paddingBottom: 15}}>
           <View style={{padding: 10, alignItems: 'center'}}>
-            <Text style={{...uiStyles.sectionDividerText, textAlign: 'center'}}>
+            <Text style={{...uiStyles.sectionDividerText, fontWeight: 'normal', textAlign: 'center'}}>
               Additional help documents can be found in the Menu -&gt; Help -&gt; Documentation
             </Text>
           </View>
