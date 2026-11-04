@@ -19,11 +19,7 @@ import alert from '../../shared/ui/alert';
 import {hasValidCoords} from '../maps/maps.helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {
-  addedNewSpotIdToDataset,
-  addedSampleSpotIdToUpload,
-  updatedModifiedTimestampsBySpotsIds,
-} from '../project/projects.slice';
+import {addedNewSpotIdToDataset, addedSampleSpotIdToUpload} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {isOnGeoMap} from '../spots/spots.helpers';
 import {
@@ -84,7 +80,6 @@ const useSamples = () => {
       dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: samples}));
       dispatch(setSelectedAttributes([editedSample]));
     }
-    dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot.properties.id]));
   };
 
   /* Exported Functions */
@@ -134,7 +129,6 @@ const useSamples = () => {
     if (i === -1) samplesCopy.push(editedSample);
     else samplesCopy.splice(i, 1, editedSample);
     const spotId = spot.properties.id;
-    dispatch(updatedModifiedTimestampsBySpotsIds([newEnrichedSample.properties.id, spotId]));
     dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: samplesCopy, spotId: spotId}));
 
     dispatch(setSelectedSpot(newEnrichedSample));

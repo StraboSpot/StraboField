@@ -11,7 +11,6 @@ import FeatureDetail from '../page/FeatureDetail';
 import FeatureListItem from '../page/FeatureListItem';
 import PageHeader from '../page/PageHeader';
 import useFeatureDetailView from '../page/useFeatureDetailView';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const EarthquakesPage = ({isReadOnly, page}) => {
@@ -37,7 +36,6 @@ const EarthquakesPage = ({isReadOnly, page}) => {
       let editedEarthquakeData = JSON.parse(JSON.stringify(spot.properties[page.key]));
       attribute = {...attribute, id: getNewUUID()};
       editedEarthquakeData.splice(i, 1, attribute);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: page.key, value: editedEarthquakeData}));
     }
     openDetailView(attribute);

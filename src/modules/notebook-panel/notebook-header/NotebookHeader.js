@@ -21,7 +21,6 @@ import {getUtmDisplayString} from '../../maps/maps.helpers';
 import useMapLocation from '../../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import projectStyles from '../../project/project.styles';
-import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {isLineSpot, isPolygonSpot} from '../../spots/spots.helpers';
 import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
@@ -85,7 +84,6 @@ const NotebookHeader = ({
   /* Event Handlers */
 
   const onSpotEdit = async (field, value) => {
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: field, value: value}));
     if (spot.properties?.isSample) {
       const sampleMetadataCopy = isEmpty(spot.properties?.samples?.[0]) ? {id: spot.properties.id}
@@ -204,7 +202,6 @@ const NotebookHeader = ({
     delete editedSpot.properties.strat_section_id;
     if (currentLocation.altitude) editedSpot.properties.altitude = currentLocation.altitude;
     if (currentLocation.accuracy) editedSpot.properties.gps_accuracy = currentLocation.accuracy;
-    dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
     dispatch(editedOrCreatedSpot(editedSpot));
     handleSpotSelected(editedSpot);
   };

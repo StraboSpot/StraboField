@@ -4,7 +4,6 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
-import {clearLocalSaveNeeded} from '../../modules/connections/connections.slice';
 import {
   addedStatusMessage,
   clearedStatusMessages,
@@ -23,7 +22,6 @@ import {
   addedDataset,
   addedDatasets,
   addedProjectFromServer,
-  setActiveDatasets,
   setActiveDatasetsMultiple,
   setTargetDataset,
 } from '../../modules/project/projects.slice';
@@ -44,8 +42,6 @@ let datasetsObjToSave = {};
 let imagesDownloadedCount = 0;
 let imagesFailedCount = 0;
 let spotsToSave = [];
-// Stays an array: the capture below is skipped when nothing is active, and downloadDatasets filters it either way
-let prevActiveDatasetsIds = [], prevTargetDatasetId;
 
 // Every caller shares the accumulators above, so a second download would reset the arrays the first is still
 // filling and save a mixed set. Module scope too, since the project list, QAQC and auto-login all start downloads.
@@ -80,8 +76,6 @@ const useDownload = () => {
     spotsToSave = [];
     imagesDownloadedCount = 0;
     imagesFailedCount = 0;
-    prevActiveDatasetsIds = [];
-    prevTargetDatasetId = undefined;
   };
 
   /* Internal Functions */
@@ -97,6 +91,8 @@ const useDownload = () => {
     }
   };
 
+  // Returns which datasets to show and which takes new Spots rather than setting them, since nothing is saved until
+  // the whole download has arrived
   const downloadDatasets = async (selectedProject, encodedLoginScoped) => {
     try {
       dispatch(addedStatusMessage('Downloading Datasets...'));
@@ -104,32 +100,29 @@ const useDownload = () => {
       const datasets = res?.datasets || [];
       console.log('Datasets Response:', JSON.stringify(res));
       let isTargetDatasetCleared = false;
+      let datasetSelection, newDataset;
 
       // If same project set active and target dataset to same as before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
         const newDatasetIds = datasets.map(d => d.id);
-        const updatedActiveDatasetIds = prevActiveDatasetsIds.reduce((acc, prevActiveDatasetId) => {
+        const updatedActiveDatasetIds = (activeDatasetsIds || []).reduce((acc, prevActiveDatasetId) => {
           console.log('Checking if active dataset still exists:', prevActiveDatasetId);
           return newDatasetIds.includes(prevActiveDatasetId) ? [...acc, prevActiveDatasetId] : acc;
         }, []);
         const activeDatasetIds = isEmpty(updatedActiveDatasetIds) ? [datasets[0].id] : updatedActiveDatasetIds;
-        dispatch(setActiveDatasetsMultiple(activeDatasetIds));
         // A target that is not shown would take new Spots out of sight, so the previous target is kept only if it
         // is still among the shown datasets. Otherwise there is none, and which dataset takes new Spots stays the
         // user's choice
-        const isPrevTargetDatasetKept = activeDatasetIds.includes(prevTargetDatasetId);
-        dispatch(setTargetDataset(isPrevTargetDatasetKept ? prevTargetDatasetId : undefined));
-        isTargetDatasetCleared = !!prevTargetDatasetId && !isPrevTargetDatasetKept;
+        const isPrevTargetDatasetKept = activeDatasetIds.includes(targetDatasetId);
+        datasetSelection = {activeDatasetIds, targetDatasetId: isPrevTargetDatasetKept ? targetDatasetId : undefined};
+        isTargetDatasetCleared = !!targetDatasetId && !isPrevTargetDatasetKept;
       }
       else if (datasets.length >= 1) {
-        dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        dispatch(setTargetDataset(datasets[0].id));
+        datasetSelection = {activeDatasetIds: [datasets[0].id], targetDatasetId: datasets[0].id};
       }
       else {
-        const targetDataset = createDataset();
-        dispatch(addedDataset(targetDataset));
-        dispatch(setActiveDatasets({bool: true, dataset: targetDataset.id}));
-        dispatch(setTargetDataset(targetDataset.id));
+        newDataset = createDataset();
+        datasetSelection = {activeDatasetIds: [newDataset.id], targetDatasetId: newDataset.id};
       }
       datasetsObjToSave = Object.assign({},
         ...datasets.map(item => ({[item.id]: {...item, modified_timestamp: item.modified_timestamp || Date.now()}})));
@@ -142,6 +135,7 @@ const useDownload = () => {
         dispatch(addedStatusMessage('The previous target dataset was removed or is turned off, so no target '
           + 'dataset is set. Choose one to add new Spots.'));
       }
+      return {...datasetSelection, newDataset};
     }
     catch (err) {
       console.error('Error getting datasets:', err);
@@ -181,24 +175,17 @@ const useDownload = () => {
     dispatch(addedStatusMessage(`Downloaded Linked Sample Data for ${fetchedCount} of ${linkedSpots.length} Samples`));
   };
 
-  // Download Project Properties
+  // Download Project Properties. Returns them rather than saving them, since nothing is saved until the whole download
+  // has arrived. Memo images are saved now: they are files, and a failed download leaves the open project's own.
   const downloadProject = async (selectedProject, encodedLoginScoped) => {
     try {
       console.log('Downloading Project Properties...');
       dispatch(addedStatusMessage('Downloading Project Properties...'));
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
-      if (!isEmpty(project)) {
-        if (project.id === selectedProject.id) {
-          if (!isEmpty(activeDatasetsIds)) prevActiveDatasetsIds = activeDatasetsIds;
-          if (targetDatasetId) prevTargetDatasetId = targetDatasetId;
-        }
-        clearProject();
-      }
       // Strip before anything downstream reads it — loadCustomMaps spreads the whole map object through.
       if (!isEmpty(projectResponse.other_maps)) {
         projectResponse.other_maps = projectResponse.other_maps.map(stripMapboxToken);
       }
-      dispatch(addedProjectFromServer(projectResponse));
       if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
         loadCustomMaps(projectResponse.other_maps);
       }
@@ -209,6 +196,7 @@ const useDownload = () => {
       if (Platform.OS !== 'web' && projectResponse.reports && !isEmpty(projectResponse.reports)) {
         await downloadReportImages(projectResponse.reports);
       }
+      return projectResponse;
     }
     catch (err) {
       console.error('Error Downloading Project Properties.', err);
@@ -380,15 +368,21 @@ const useDownload = () => {
       dispatch(setIsStatusMessagesModalVisible(true));
       dispatch(setLoadingStatus({view: 'modal', bool: true}));
       dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
-      await downloadProject(selectedProject, encodedLoginScoped);
-      await downloadDatasets(selectedProject, encodedLoginScoped);
+      const projectResponse = await downloadProject(selectedProject, encodedLoginScoped);
+      const datasetSelection = await downloadDatasets(selectedProject, encodedLoginScoped);
       await downloadLinkedSampleData(encodedLoginScoped);
       console.log('Download Complete! Spots Downloaded!');
       dispatch(addedStatusMessage('------------------'));
+      // The open project is replaced only now, so a download that fails partway leaves it as it was
+      if (!isEmpty(project)) clearProject();
+      dispatch(addedProjectFromServer(projectResponse));
       dispatch(addedSpotsFromServer(spotsToSave));
       dispatch(addedDatasets(datasetsObjToSave));
+      // Made here for a project with none, so it is a change to save, not part of the load
+      if (datasetSelection.newDataset) dispatch(addedDataset(datasetSelection.newDataset));
+      dispatch(setActiveDatasetsMultiple(datasetSelection.activeDatasetIds));
+      dispatch(setTargetDataset(datasetSelection.targetDatasetId));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
-      dispatch(clearLocalSaveNeeded());
       dispatch(addedStatusMessage('Complete!'));
     }
     catch (err) {

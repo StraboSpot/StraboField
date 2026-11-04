@@ -11,7 +11,6 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import {openFeatureInNotebook} from '../notebook-panel/notebook.helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {hasSedRockData} from '../sed/sed.helpers';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -47,7 +46,6 @@ const FeatureOverviewList = ({page}) => {
     }
     else if (page.key === PAGE_KEYS.BEDDING) editedSedData[page.key].beds.splice(i, 1, itemWithId);
     else editedSedData[page.key].splice(i, 1, itemWithId);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     openFeatureInNotebook(dispatch, page.key, itemWithId);
   };

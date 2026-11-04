@@ -17,7 +17,6 @@ import {getFeatureTitle} from '../../page/featureLabels.helpers';
 import FeatureListItem from '../../page/FeatureListItem';
 import PageHeader from '../../page/PageHeader';
 import useFeatureDetailView from '../../page/useFeatureDetailView';
-import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import {editedSpotProperties} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 
@@ -62,7 +61,6 @@ const MineralsPage = ({isReadOnly, page}) => {
         ? [...spot.properties.pet[page.key], ...mineralsToCopy] : mineralsToCopy;
       const updatedPet = spot.properties?.pet ? {...spot.properties.pet, minerals: updatedMinerals}
         : {minerals: updatedMinerals};
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'pet', value: updatedPet}));
       preFormRef.current.resetForm();
     }

@@ -19,7 +19,6 @@ import {clearedStratSection, setStratSection} from '../maps/maps.slice';
 import useStratSectionCalculations from '../maps/strat-section/useStratSectionCalculations';
 import {getDefaultLabel, resolveLabelOnSave} from '../page/featureLabels.helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot, editedSpotProperties} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
@@ -167,7 +166,6 @@ const useSed = () => {
     editedSedData.strat_section.strat_section_id = getNewUUID();
     editedSedData.strat_section.column_profile = 'clastic';
     editedSedData.strat_section.column_y_axis_units = 'm';
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
   };
 
@@ -175,7 +173,6 @@ const useSed = () => {
     let editedSedData = spot.properties.sed ? JSON.parse(JSON.stringify(spot.properties.sed)) : {};
     const deletedStratSectionId = editedSedData.strat_section?.strat_section_id;
     delete editedSedData.strat_section;
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     // If the deleted strat section is the one currently displayed, close its view
     if (stratSection?.strat_section_id === deletedStratSectionId) dispatch(clearedStratSection());
@@ -215,7 +212,6 @@ const useSed = () => {
       editedSedData[pageKey] = remainingFeatures;
       if (isEmpty(editedSedData[pageKey])) delete editedSedData[pageKey];
     }
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     return true;
   };
@@ -290,14 +286,12 @@ const useSed = () => {
         editedSpot.properties.sed = editedSedData;
         const updatedSpot = checkForIntervalUpdates(pageKey, editedSpot, spot);
         // console.log('Saving', pageKey, 'data to Spot ...');
-        dispatch(updatedModifiedTimestampsBySpotsIds([updatedSpot.properties.id]));
         dispatch(editedOrCreatedSpot(updatedSpot));
       }
       // Update Sed data
       else {
         // console.log('Saving', pageKey, 'data to Spot ...');
         const spotId = spot.properties.id;
-        dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
         dispatch(editedSpotProperties({field: 'sed', value: editedSedData, spotId: spotId}));
       }
 
@@ -323,7 +317,6 @@ const useSed = () => {
       feature.label = getDefaultLabel(key, feature, getLabel, getLabels);
       editedSedData[key].push(feature);
     });
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
   };
 

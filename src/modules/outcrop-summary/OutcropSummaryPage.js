@@ -14,7 +14,6 @@ import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePa
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const pageKey = PAGE_KEYS.OUTCROP_SUMMARIES;
@@ -56,7 +55,6 @@ const OutcropSummaryPage = ({isReadOnly, page}) => {
       // An empty form saves an empty array, which removes the property from the Spot
       const editedOutcropSummaries = isEmpty(editedOutcropSummaryData) ? []
         : [{...editedOutcropSummaryData, id: outcropSummaries[0]?.id || getNewUUID()}];
-      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: pageKey, value: editedOutcropSummaries, spotId: spotId}));
       markSaved();
       await currentForm.resetForm();

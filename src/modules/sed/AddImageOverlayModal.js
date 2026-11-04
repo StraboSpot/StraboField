@@ -18,7 +18,6 @@ import NumberInputField from '../form/inputs/NumberInputField';
 import SelectInputField from '../form/inputs/SelectInputField';
 import useForm from '../form/useForm';
 import {setStratSection} from '../maps/maps.slice';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const AddImageOverlayModal = ({
@@ -80,7 +79,6 @@ const AddImageOverlayModal = ({
     const editedStratSectionImages = editedSedData.strat_section.images.filter(i => i.id !== image.id);
     if (isEmpty(editedStratSectionImages)) delete editedSedData.strat_section.images;
     else editedSedData.strat_section.images = editedStratSectionImages;
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
 
     // Update strat section for map if matches edited strat section
