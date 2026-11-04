@@ -21,12 +21,20 @@ const mockServer = {
   testCustomMapUrl: jest.fn(),
 };
 const mockNewDataset = {id: 99, modified_timestamp: 1, name: 'Default', spotIds: []};
+const mockDevice = {
+  deleteProfileImageFile: jest.fn(),
+  pruneOldProjectSaves: jest.fn(),
+  saveProjectToDevice: jest.fn(),
+};
+const mockAlert = jest.fn();
+let mockStore;
 
 jest.mock('../network/useServerRequests', () => () => mockServer);
-jest.mock('../device/useDevice', () => () => ({deleteProfileImageFile: jest.fn()}));
+jest.mock('../device/useDevice', () => () => mockDevice);
+jest.mock('../../shared/ui/alert', () => (...args) => mockAlert(...args));
 jest.mock('../../modules/images/useImages', () => () => ({gatherNeededImages: async () => undefined}));
 jest.mock('../../modules/project/useProject', () => () => ({createDataset: () => mockNewDataset}));
-jest.mock('../../store/ConfigureStore', () => ({store: {getState: () => ({user: {}})}}));
+jest.mock('../../store/ConfigureStore', () => ({store: {getState: () => mockStore.getState()}}));
 jest.mock('../../shared/ui/modals/modal.constants', () => ({
   ...jest.requireActual('../../shared/ui/modals/modal.constants'),
   MODAL_TRANSITION_DELAY: 0,
@@ -54,10 +62,10 @@ const getPreloadedState = () => ({
   spot: {...spotReducer(undefined, {type: 'init'}), spots: {1: makeSpot(1, 'Open')}},
 });
 
-const renderHook = () => {
+const renderHook = (preloadedState = getPreloadedState()) => {
   const store = configureStore({
     middleware: getDefaultMiddleware => getDefaultMiddleware().prepend(listenerMiddleware.middleware),
-    preloadedState: getPreloadedState(),
+    preloadedState: preloadedState,
     reducer: propagateModifiedTimestamps(combineReducers({
       connections: connectionsReducer,
       home: homeReducer,
@@ -67,6 +75,7 @@ const renderHook = () => {
       user: (state = {encoded_login: 'login'}) => state,
     })),
   });
+  mockStore = store;
   let hookApi;
   const Probe = () => {
     hookApi = useDownload();
@@ -91,7 +100,14 @@ const download = async (getHook) => {
   return error;
 };
 
+const pressAlertButton = text => mockAlert.mockImplementation((title, message, buttons) => (
+  buttons.find(button => button.text === text).onPress()
+));
+
 beforeEach(() => {
+  mockAlert.mockReset();
+  mockDevice.saveProjectToDevice.mockReset();
+  mockServer.getProject.mockClear();
   mockServer.getProject.mockResolvedValue({description: {project_name: 'From server'}, id: 2, modified_timestamp: 5});
   mockServer.getDatasets.mockResolvedValue({datasets: [{id: 22, modified_timestamp: 5, name: 'From server'}]});
   mockServer.getDatasetSpots.mockResolvedValue({features: [makeSpot(2, 'From server')]});
@@ -118,6 +134,62 @@ it('replaces the open project when the download succeeds', async () => {
   expect(project.activeDatasetsIds).toEqual([22]);
   expect(project.targetDatasetId).toBe(22);
   expect(store.getState().connections.isLocalSaveNeeded).toBe(false);
+});
+
+// A download replaces the open project, so changes not yet saved to the device are saved first
+it('saves the open project to the device before replacing it', async () => {
+  const preloadedState = getPreloadedState();
+  preloadedState.connections.isLocalSaveNeeded = true;
+  const {getHook, store} = renderHook(preloadedState);
+  expect(await download(getHook)).toBeUndefined();
+  expect(mockDevice.saveProjectToDevice).toHaveBeenCalledTimes(1);
+  const snapshot = mockDevice.saveProjectToDevice.mock.calls[0][0];
+  expect(snapshot.projectDb.project.id).toBe(1);
+  expect(snapshot.spotsDb).toEqual({1: makeSpot(1, 'Open')});
+  expect(store.getState().home.statusMessages).toContain('Saved a backup of the current project to the device.');
+});
+
+it('skips the save when nothing has changed since the last one', async () => {
+  const {getHook, store} = renderHook();
+  expect(await download(getHook)).toBeUndefined();
+  expect(mockDevice.saveProjectToDevice).not.toHaveBeenCalled();
+  expect(mockAlert).not.toHaveBeenCalled();
+  expect(store.getState().home.statusMessages.some(msg => msg.includes('backup'))).toBe(false);
+});
+
+describe('when the save before the download fails', () => {
+  const renderWithFailingSave = () => {
+    mockDevice.saveProjectToDevice.mockRejectedValue(new Error('Disk full'));
+    const preloadedState = getPreloadedState();
+    preloadedState.connections.isLocalSaveNeeded = true;
+    return renderHook(preloadedState);
+  };
+
+  it('leaves the open project as it was when the user cancels', async () => {
+    pressAlertButton('Cancel');
+    const {getHook, store} = renderWithFailingSave();
+    const before = store.getState();
+    let isDownloaded;
+    await ReactTestRenderer.act(async () => {
+      isDownloaded = await getHook().initializeDownload({id: 2, name: 'From server'});
+    });
+    expect(isDownloaded).toBe(false);
+    expect(mockAlert).toHaveBeenCalledTimes(1);
+    expect(mockServer.getProject).not.toHaveBeenCalled();
+    expect(store.getState().project).toEqual(before.project);
+    expect(store.getState().spot).toEqual(before.spot);
+    expect(store.getState().home.isStatusMessagesModalVisible).toBe(false);
+  });
+
+  it('replaces the open project when the user downloads anyway', async () => {
+    pressAlertButton('Download Anyway');
+    const {getHook, store} = renderWithFailingSave();
+    expect(await download(getHook)).toBeUndefined();
+    expect(mockAlert).toHaveBeenCalledTimes(1);
+    expect(store.getState().project.project.id).toBe(2);
+    expect(store.getState().home.statusMessages)
+      .toContain('Could not save a backup of the current project to the device.');
+  });
 });
 
 // The dataset made for a project with none is a change made here, so it is kept and counts as unsaved

@@ -65,7 +65,8 @@ const BackupStatusIcons = () => {
 
   /* Derived Variables */
 
-  const isSaveVisible = !!saveFrequency && (isLocalSaveNeeded || isAutoSaving);
+  // Uploads and downloads save first even with auto save off, so a running save always shows
+  const isSaveVisible = isAutoSaving || (!!saveFrequency && isLocalSaveNeeded);
 
   /* Event Handlers */
 

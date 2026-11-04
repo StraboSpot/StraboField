@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
+import {useAutoSaveNow} from './useAutoSave';
 import {
   addedStatusMessage,
   clearedStatusMessages,
@@ -31,6 +32,7 @@ import {getSampleMetadata, getStraboSampleFromResponse} from '../../modules/samp
 import {addedSpotsFromServer} from '../../modules/spots/spots.slice';
 import {setUserData} from '../../modules/user/userProfile.slice';
 import {isEmpty, toError} from '../../shared/helpers';
+import alert from '../../shared/ui/alert';
 import {MODAL_TRANSITION_DELAY} from '../../shared/ui/modals/modal.constants';
 import {store} from '../../store/ConfigureStore';
 import useResetState from '../../store/useResetState';
@@ -56,6 +58,7 @@ const useDownload = () => {
   const encodedLogin = useSelector(state => state.user.encoded_login);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
 
+  const {autoSaveNow} = useAutoSaveNow();
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
   const {doesImageExistOnDevice, gatherNeededImages} = useImages();
   const {createDataset} = useProject();
@@ -79,6 +82,16 @@ const useDownload = () => {
   };
 
   /* Internal Functions */
+
+  const confirmDownloadWithoutBackup = () => new Promise((resolve) => {
+    alert('Backup Failed',
+      'The current project could not be saved to the device. Downloading will replace it, and any changes not yet'
+      + ' uploaded will be lost.',
+      [
+        {onPress: () => resolve(false), style: 'cancel', text: 'Cancel'},
+        {onPress: () => resolve(true), style: 'destructive', text: 'Download Anyway'},
+      ]);
+  });
 
   const doGetDatasetSpots = async (datasets, encodedLoginScoped) => {
     if (datasets.length >= 1) {
@@ -362,8 +375,13 @@ const useDownload = () => {
       // native present and dismiss at once and trips UIViewControllerHierarchyInconsistency (Sentry STRABOSPOT-2-6JN).
       // Let it finish dismissing first.
       if (Platform.OS === 'ios') await new Promise(resolve => setTimeout(resolve, MODAL_TRANSITION_DELAY));
+      // Saved before the status modal opens, so a failure's question never shows over it
+      const {hasFailed, hasSaved} = await autoSaveNow();
+      if (hasFailed && !await confirmDownloadWithoutBackup()) return false;
       dispatch(setIsStatusMessagesModalVisible(true));
       dispatch(setLoadingStatus({view: 'modal', bool: true}));
+      if (hasSaved) dispatch(addedStatusMessage('Saved a backup of the current project to the device.'));
+      if (hasFailed) dispatch(addedStatusMessage('Could not save a backup of the current project to the device.'));
       dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
       const projectResponse = await downloadProject(selectedProject, encodedLoginScoped);
       const datasetSelection = await downloadDatasets(selectedProject, encodedLoginScoped);
@@ -381,6 +399,7 @@ const useDownload = () => {
       dispatch(setTargetDataset(datasetSelection.targetDatasetId));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(addedStatusMessage('Complete!'));
+      return true;
     }
     catch (err) {
       console.error('Error Initializing Download.', err);

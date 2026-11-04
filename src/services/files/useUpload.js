@@ -4,6 +4,7 @@ import {Platform} from 'react-native';
 import {activateKeepAwake, deactivateKeepAwake} from '@sayem314/react-native-keep-awake';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {useAutoSaveNow} from './useAutoSave';
 import useUploadImages from './useUploadImages';
 import {setSpotsUploadedTimestamp} from '../../modules/connections/connections.slice';
 import {addedStatusMessage} from '../../modules/home/home.slice';
@@ -33,6 +34,7 @@ const useUpload = () => {
   const spotsRef = useRef(spots);
   spotsRef.current = spots;
 
+  const {autoSaveNow} = useAutoSaveNow();
   const {checkValidDateTime} = useProject();
   const {
     addDatasetToProject,
@@ -47,6 +49,8 @@ const useUpload = () => {
 
   /* Local State */
 
+  // Kept apart from uploadStatusMessage, which each upload step replaces
+  const [backupStatusMessage, setBackupStatusMessage] = useState('');
   const [uploadStatusMessage, setUploadStatusMessage] = useState('');
 
   /* Internal Functions */
@@ -207,6 +211,12 @@ const useUpload = () => {
 
   // Upload Project Properties
   const uploadProject = async () => {
+    // Every upload starts here, so save to the device first
+    setBackupStatusMessage('');
+    setUploadStatusMessage('Saving the project to the device...');
+    const {hasFailed, hasSaved} = await autoSaveNow();
+    if (hasSaved) setBackupStatusMessage('Saved a backup of the current project to the device.');
+    if (hasFailed) setBackupStatusMessage('Could not save a backup of the current project to the device.');
     // Read live from the store: an async caller (e.g. trySync) can close over a stale `project`
     // snapshot, which would make uploadedTimestamp mismatch the live store and never clear the flag.
     // Strip on the way out too: a project loaded before custom maps stopped storing the token still carries it.
@@ -233,6 +243,7 @@ const useUpload = () => {
   };
 
   return {
+    backupStatusMessage,
     initializeUpload,
     uploadDatasets,
     uploadFromWeb,

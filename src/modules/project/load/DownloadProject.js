@@ -40,8 +40,8 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
     closeNotebookPanel();
     closeConfirmOverwriteModal();
     try {
-      await initializeDownload(inProjectToDownload);
-      closeMainMenuPanel();
+      // Left open when the user cancels, to pick again
+      if (await initializeDownload(inProjectToDownload)) closeMainMenuPanel();
     }
     catch (err) {
       // initializeDownload already reported the failure into the status modal, and it rethrows because the web

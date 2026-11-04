@@ -1,4 +1,4 @@
-import {useEffect, useRef} from 'react';
+import {useEffect} from 'react';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -8,56 +8,62 @@ import {
   stripMapboxTokenFromProject,
 } from '../../modules/maps/custom-maps/customMaps.helpers';
 import {isEmpty} from '../../shared/helpers';
+import {store} from '../../store/ConfigureStore';
 import useDevice from '../device/useDevice';
 
 export const MAX_SAVES = 10;
 
-const useAutoSave = () => {
-  /* Data Hooks */
-
+// Saves the open project to the device if it has changed since the last save. Upload and download run it first,
+// whatever the auto-save frequency, so a download never replaces changes that exist nowhere else.
+export const useAutoSaveNow = () => {
   const dispatch = useDispatch();
-  const isSaveNeeded = useSelector(state => state.connections.isLocalSaveNeeded);
-  const nextAutoSaveTime = useSelector(state => state.connections.nextAutoSaveTime);
-  const otherMapsDb = useSelector(state => state.map.customMaps);
-  const projectDb = useSelector(state => state.project);
-  const saveFrequency = useSelector(state => state.connections.backupFrequency?.save);
-  const spotsDb = useSelector(state => state.spot.spots);
-
   const {pruneOldProjectSaves, saveProjectToDevice} = useDevice();
 
-  /* Internal Functions */
-
-  const SAVE_INTERVAL_MS = saveFrequency * 60 * 1000;
-
-  const runSave = async () => {
-    if (!isSaveNeeded || isEmpty(projectDb.project)) return;
+  const autoSaveNow = async () => {
+    const {connections, map, project: projectDb, spot} = store.getState();
+    if (!connections.isLocalSaveNeeded || isEmpty(projectDb.project)) return {hasFailed: false, hasSaved: false};
     try {
       dispatch(setAutoSaving(true));
       const snapshot = {
         mapNamesDb: {},
         mapTilesDb: {},
-        otherMapsDb: stripMapboxTokenFromCustomMaps(otherMapsDb),
+        otherMapsDb: stripMapboxTokenFromCustomMaps(map.customMaps),
         projectDb: {...projectDb, project: stripMapboxTokenFromProject(projectDb.project)},
-        spotsDb: spotsDb,
+        spotsDb: spot.spots,
       };
       await saveProjectToDevice(snapshot);
       await pruneOldProjectSaves(MAX_SAVES);
       dispatch(clearLocalSaveNeeded());
-      console.log('Auto save complete. Spots:', Object.keys(spotsDb).length,
-        'Custom maps:', Object.keys(otherMapsDb).length);
+      console.log('Auto save complete. Spots:', Object.keys(spot.spots).length,
+        'Custom maps:', Object.keys(map.customMaps).length);
+      return {hasFailed: false, hasSaved: true};
     }
     catch (err) {
       console.error('Auto save failed:', err);
+      return {hasFailed: true, hasSaved: false};
     }
     finally {
       dispatch(setAutoSaving(false));
     }
   };
 
-  /* Side Effects */
+  return {autoSaveNow};
+};
 
-  const runSaveRef = useRef(runSave);
-  runSaveRef.current = runSave;
+const useAutoSave = () => {
+  /* Data Hooks */
+
+  const dispatch = useDispatch();
+  const nextAutoSaveTime = useSelector(state => state.connections.nextAutoSaveTime);
+  const saveFrequency = useSelector(state => state.connections.backupFrequency?.save);
+
+  const {autoSaveNow} = useAutoSaveNow();
+
+  /* Internal Functions */
+
+  const SAVE_INTERVAL_MS = saveFrequency * 60 * 1000;
+
+  /* Side Effects */
 
   useEffect(() => {
     console.log('Auto Save interval set (ms):', SAVE_INTERVAL_MS);
@@ -68,7 +74,7 @@ const useAutoSave = () => {
     if (!nextAutoSaveTime) return;
     const delay = Math.max(0, nextAutoSaveTime - Date.now());
     const timer = setTimeout(async () => {
-      await runSaveRef.current();
+      await autoSaveNow();
       dispatch(setNextAutoSaveTime(SAVE_INTERVAL_MS ? Date.now() + SAVE_INTERVAL_MS : null));
     }, delay);
     return () => clearTimeout(timer);

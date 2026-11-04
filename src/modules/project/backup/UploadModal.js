@@ -29,7 +29,7 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
   const projectName = useSelector(state => state.project.project?.description?.project_name);
   const projectTransferProgress = useSelector(state => state.connections.projectTransferProgress);
 
-  const {uploadProject, uploadDatasets, uploadStatusMessage} = useUpload();
+  const {backupStatusMessage, uploadProject, uploadDatasets, uploadStatusMessage} = useUpload();
   const {
     currentImage,
     currentImageStatus,
@@ -184,6 +184,9 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
           doesLoop={false}
           type={'error'}
         />
+        {!!backupStatusMessage && (
+          <Text style={[uploadModalStyles.messageText, {marginTop: 24}]}>{backupStatusMessage}</Text>
+        )}
         <Text style={{marginTop: 24, textAlign: 'center'}}>{errorMessage}</Text>
       </View>
     );
@@ -267,6 +270,7 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
     return (
       <View>
         <View style={uploadModalStyles.messageContainer}>
+          {!!backupStatusMessage && <Text style={uploadModalStyles.messageText}>{backupStatusMessage}</Text>}
           <Text style={uploadModalStyles.messageText}>{imageUploadStatusMessage || uploadStatusMessage}</Text>
         </View>
         <View style={[uploadModalStyles.statusContainer]}>
