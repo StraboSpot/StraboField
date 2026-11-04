@@ -254,6 +254,14 @@ describe('with the dirty-flag listeners', () => {
     store.dispatch(addedSpotsFromServer([makeSpot(spotId, {name: 'From server'})]));
     expect(store.getState().connections.isLocalSaveNeeded).toBe(false);
   });
+
+  // A download that fails after the project arrives must not leave the half-loaded project flagged for auto backup
+  it('does not mark a local save needed for a load that changes the timestamps', () => {
+    const store = getStore();
+    store.dispatch(addedProjectFromServer({id: 1, modified_timestamp: OLD + 1, description: {}}));
+    store.dispatch(addedDatasetFromServer({id: 12, modified_timestamp: OLD + 1, name: 'From server'}));
+    expect(store.getState().connections.isLocalSaveNeeded).toBe(false);
+  });
 });
 
 // A new Spot reducer that changes a Spot must be wrapped in withModifiedTimestamp. List it here only if it changes no

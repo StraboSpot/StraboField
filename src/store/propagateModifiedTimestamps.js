@@ -13,7 +13,7 @@ import {isEmpty, isSameId} from '../shared/helpers';
 // Project actions that load a project or its datasets rather than change them, so what they load keeps the
 // timestamps it arrives with. A new one has to be added here, or everything it loads looks unsaved. Clearing the
 // project needs no entry: with no project open there is nothing to update.
-const isProjectLoad = isAnyOf(addedDatasetFromServer, addedDatasets, addedProject, addedProjectFromServer);
+export const isProjectLoad = isAnyOf(addedDatasetFromServer, addedDatasets, addedProject, addedProjectFromServer);
 
 // The keys whose value is not the one it was before the action - changed, added or removed
 const getChangedKeys = (before = {}, after = {}) => {
