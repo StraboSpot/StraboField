@@ -29,7 +29,14 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
   const projectName = useSelector(state => state.project.project?.description?.project_name);
   const projectTransferProgress = useSelector(state => state.connections.projectTransferProgress);
 
-  const {backupStatusMessage, uploadProject, uploadDatasets, uploadStatusMessage} = useUpload();
+  const {
+    backupStatusMessage,
+    endManualUpload,
+    startManualUpload,
+    uploadDatasets,
+    uploadProject,
+    uploadStatusMessage,
+  } = useUpload();
   const {
     currentImage,
     currentImageStatus,
@@ -41,9 +48,6 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
 
   /* Local State */
 
-  // A ref, not state: dismissing the modal mid-upload resets the state below while the upload keeps running, so
-  // only a ref still knows an upload is in flight and can stop a second one from starting.
-  const isUploadInFlightRef = useRef(false);
   // Lets the auto-start effect below call the latest initiateUpload without depending on it (it's defined later).
   const initiateUploadRef = useRef(() => {});
 
@@ -98,11 +102,10 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
   /* Logic Helpers */
 
   const initiateUpload = async () => {
-    if (isUploadInFlightRef.current) {
-      return alert('Upload In Progress', 'Please wait for the current upload to finish before starting another.');
-    }
+    // Tracked app-wide, not in this modal's state: closing the modal resets that while the upload keeps running
+    const busyMessage = startManualUpload();
+    if (busyMessage) return alert('Upload In Progress', busyMessage);
     try {
-      isUploadInFlightRef.current = true;
       dispatch(clearedStatusMessages());
       isImageTransferring && dispatch(setIsImageTransferring(false));
       dispatch(updatedProjectTransferProgress(0));
@@ -134,7 +137,7 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
       setUploadState('error');
     }
     finally {
-      isUploadInFlightRef.current = false;
+      endManualUpload();
       // Release the wake lock on every path, including when the user backs out and the upload finishes unseen.
       deactivateKeepAwake();
     }
@@ -143,11 +146,9 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
   initiateUploadRef.current = initiateUpload;
 
   const uploadImagesOnly = async () => {
-    if (isUploadInFlightRef.current) {
-      return alert('Upload In Progress', 'Please wait for the current upload to finish before starting another.');
-    }
+    const busyMessage = startManualUpload();
+    if (busyMessage) return alert('Upload In Progress', busyMessage);
     try {
-      isUploadInFlightRef.current = true;
       dispatch(clearedStatusMessages());
       activateKeepAwake();
       setModalTitle('Uploading');
@@ -173,7 +174,7 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
       handleClosePress();
     }
     finally {
-      isUploadInFlightRef.current = false;
+      endManualUpload();
       deactivateKeepAwake();
     }
   };

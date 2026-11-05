@@ -55,7 +55,13 @@ const RunQAQC = ({dataset}) => {
             setIsQAQCModalVisible(false);
             let toast_id = toast.show(`Uploading project: ${project.description.project_name}`,
               {type: 'warning', animationType: 'slide-in', duration: 20000, placement: 'top'});
-            let uploadStatus = await initializeUpload();
+            let uploadStatus;
+            try {
+              uploadStatus = await initializeUpload();
+            }
+            catch (err) {
+              return toast.update(toast_id, err.message, {type: 'error', duration: 5000});
+            }
             if (uploadStatus.datasets === 'uploaded') {
               try {
                 await runQAQC(dataset, project.id, encodedLogin, toast, toast_id);

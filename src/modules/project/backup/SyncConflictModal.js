@@ -9,6 +9,7 @@ import useDownload from '../../../services/files/useDownload';
 import useUpload from '../../../services/files/useUpload';
 import commonStyles from '../../../shared/common.styles';
 import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
+import alert from '../../../shared/ui/alert';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../../shared/ui/SectionDivider';
 import {setIsSyncConflictModalVisible} from '../../home/home.slice';
@@ -49,6 +50,7 @@ const SyncConflictModal = () => {
     }
     catch (err) {
       console.error('Error resolving sync conflict:', err);
+      alert('Conflict Not Resolved', err.message);
     }
     finally {
       setResolvingId(null);

@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useContext, useEffect, useRef} from 'react';
 import {AppState, Platform} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -11,10 +11,11 @@ import {
   setPendingImagesChanges,
 } from '../../modules/connections/connections.slice';
 import {setIsSyncConflictModalVisible} from '../../modules/home/home.slice';
+import {MapEditContext} from '../../modules/maps/MapEditContext';
 import {setIsImageTransferring} from '../../modules/project/projects.slice';
 import {store} from '../../store/ConfigureStore';
 import useDownload, {isDownloadRunning} from '../files/useDownload';
-import useUpload from '../files/useUpload';
+import useUpload, {isManualUploadRunning} from '../files/useUpload';
 import useUploadImages from '../files/useUploadImages';
 
 const useAutoSync = () => {
@@ -31,6 +32,7 @@ const useAutoSync = () => {
   const projectId = useSelector(state => state.project.project?.id);
   const syncFrequency = useSelector(state => state.connections.backupFrequency?.sync);
 
+  const {isMapEditing} = useContext(MapEditContext);
   const {applyServerDownloads, classifyServerDatasets} = useDownload();
   const {uploadDatasetsByIds, uploadProject} = useUpload();
   const {initializeImageUpload} = useUploadImages();
@@ -45,12 +47,17 @@ const useAutoSync = () => {
   const trySync = useCallback(async () => {
     // Capture live: this cycle may have been triggered by the user pressing "Sync Now", which works with auto sync off
     const isManualSync = store.getState().connections.isManualSyncRequested;
-    if (!isOnline || !projectId || (!syncFrequency && !isManualSync) || isSyncingRef.current || isDownloadRunning()) {
+    // Waits out a map edit or interval drag. A map edit saves whole copies of its Spots taken when it began, so a Spot
+    // pulled meanwhile would be written over on Save. A drag moves its Spots live but holds back their dataset
+    // timestamps until Save, and Cancel puts them back unrecorded, so a push mid-drag could send canceled positions.
+    const isBusy = isSyncingRef.current || isDownloadRunning() || isManualUploadRunning() || isMapEditing();
+    if (!isOnline || !projectId || (!syncFrequency && !isManualSync) || isBusy) {
       // A skipped Sync Now is dropped rather than left to make a later automatic sync act as a manual one
       if (isManualSync) dispatch(setManualSyncRequested(false));
       return;
     }
     isSyncingRef.current = true;
+    const isSameProjectOpen = () => store.getState().project.project?.id === projectId;
     try {
       dispatch(setAutoSyncing(true));
       // Classify datasets before pushing so we never clobber something changed on both sides: dataset
@@ -58,6 +65,8 @@ const useAutoSync = () => {
       // merges project-level data (tags, reports, templates) and returns the merged copy, so a project
       // push never conflicts.
       const {conflictIds, toPull} = await classifyServerDatasets();
+      // A project opened, imported or deleted meanwhile ends the cycle, since what was checked belongs to the old one
+      if (!isSameProjectOpen()) return;
       const pushableIds = pendingIds.filter(id => !conflictIds.includes(String(id)));
 
       // Push the project when we have local project edits or datasets to push (a dataset push bumps the
@@ -90,6 +99,7 @@ const useAutoSync = () => {
       // applyServerDownloads pulls the project when the server holds the newer copy and no local edit is
       // pending.
       await applyServerDownloads(toPull, {applyProject: !shouldPushProject});
+      if (!isSameProjectOpen()) return;
       // Merge in any dataset conflicts a mid-cycle push rejection flagged (uploadDataset).
       const liveConflictIds = store.getState().connections.conflictedDatasetIds.map(String);
       const allConflictIds = [...new Set([...conflictIds, ...liveConflictIds])];

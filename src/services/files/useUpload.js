@@ -33,12 +33,17 @@ import useServerRequests from '../network/useServerRequests';
 
 let projectUploadStatus = {};
 
+// The server can't handle parallel dataset writes, so a manual upload and auto sync never run at once. Module scope,
+// since every page with an upload modal runs its own copy of this hook.
+let isManualUploadInFlight = false;
+
+export const isManualUploadRunning = () => isManualUploadInFlight;
+
 const useUpload = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const spots = useSelector(state => state.spot.spots);
-  const project = useSelector(state => state.project.project);
   const user = useSelector(state => state.user);
 
   const spotsRef = useRef(spots);
@@ -65,7 +70,10 @@ const useUpload = () => {
 
   /* Internal Functions */
 
-  const uploadDataset = async (dataset) => {
+  // projectId is the project an upload started with. Once another is open, the upload's results must not touch it.
+  const isProjectStillOpen = projectId => store.getState().project.project?.id === projectId;
+
+  const uploadDataset = async (dataset, projectId) => {
     try {
       setUploadStatusMessage(`Uploading dataset ${dataset.name}...`);
       let datasetCopy = JSON.parse(JSON.stringify(dataset));
@@ -74,9 +82,10 @@ const useUpload = () => {
       const resJSON = await updateDataset(datasetCopy);
       if (resJSON.modified_on_server) {
         console.log(dataset.name + ': Dataset that was uploaded:', resJSON);
-        await addDatasetToProject(project.id, dataset.id);
+        await addDatasetToProject(projectId, dataset.id);
         setUploadStatusMessage(`Finished uploading dataset ${dataset.name}...`);
         await uploadSpots(dataset);
+        if (!isProjectStillOpen(projectId)) return;
         // An edit made while this was going up changed the timestamp and still has to go up, so it stays queued
         const liveDataset = store.getState().project.datasets[dataset.id];
         if (liveDataset && liveDataset.modified_timestamp !== dataset.modified_timestamp) {
@@ -91,8 +100,8 @@ const useUpload = () => {
         // pending local edit for this dataset - otherwise this is a benign no-op (a full push re-uploads
         // every dataset, including unchanged ones, which the server correctly reports as not-newer).
         setUploadStatusMessage(`Dataset ${dataset.name} has a newer copy on the server; needs conflict resolution.`);
-        const isPendingLocalEdit = store.getState().connections.pendingUploadDatasetIds
-          .map(String).includes(String(dataset.id));
+        const pendingIds = store.getState().connections.pendingUploadDatasetIds.map(String);
+        const isPendingLocalEdit = isProjectStillOpen(projectId) && pendingIds.includes(String(dataset.id));
         if (isPendingLocalEdit) dispatch(addConflictedDatasetId(dataset.id));
       }
     }
@@ -151,20 +160,42 @@ const useUpload = () => {
 
   /* Exported Functions */
 
-  // Resolve a conflict by keeping the device's copy: bump the dataset timestamp so the server accepts it
-  // over its newer copy, push it, then clear the conflict flag. Bumping the dataset also flags the project
-  // for sync, so push the project too (the server merges it) - otherwise that flag lingers as a phantom
-  // "pending sync".
+  // Returns why a manual upload can't start, or nothing once it has started. endManualUpload ends it.
+  const startManualUpload = () => {
+    if (isManualUploadInFlight) return 'Please wait for the current upload to finish before starting another.';
+    if (store.getState().connections.isAutoSyncing) {
+      return 'A sync with the server is running. Please wait for it to finish, then try again.';
+    }
+    isManualUploadInFlight = true;
+    return undefined;
+  };
+
+  const endManualUpload = () => {
+    isManualUploadInFlight = false;
+  };
+
+  // Resolve a conflict by keeping the device's copy. Re-adding the dataset as a new object counts as a change, so
+  // propagateModifiedTimestamps stamps it with the current time and the server takes it over its newer copy. The
+  // project is stamped and flagged for sync too, so push it as well, or that flag lingers as a phantom "pending sync".
   const keepDeviceConflict = async (datasetId) => {
     const dataset = store.getState().project.datasets[datasetId];
     if (!dataset) return;
-    dispatch(addedDataset({...dataset, modified_timestamp: Date.now()}));
-    await uploadDatasetsByIds([datasetId]);
-    dispatch(clearConflictedDatasetId(datasetId));
-    await uploadProject();
+    const busyMessage = startManualUpload();
+    if (busyMessage) throw Error(busyMessage);
+    try {
+      dispatch(addedDataset({...dataset}));
+      await uploadDatasetsByIds([datasetId]);
+      dispatch(clearConflictedDatasetId(datasetId));
+      await uploadProject();
+    }
+    finally {
+      endManualUpload();
+    }
   };
 
   const initializeUpload = async () => {
+    const busyMessage = startManualUpload();
+    if (busyMessage) throw Error(busyMessage);
     activateKeepAwake();
     try {
       console.log('Initializing Upload...');
@@ -188,6 +219,7 @@ const useUpload = () => {
     finally {
       // Release the wake lock on every path. A throw here used to skip it, leaving the screen awake indefinitely.
       deactivateKeepAwake();
+      endManualUpload();
     }
   };
 
@@ -198,8 +230,11 @@ const useUpload = () => {
       return true;
     }
     setUploadStatusMessage(`Uploading ${datasets.length} ${label}datasets...\n`);
+    // A project opened, imported or deleted meanwhile stops the rest from going up under the old one
+    const projectId = store.getState().project.project?.id;
     for (const dataset of datasets) {
-      await uploadDataset(dataset);
+      if (!isProjectStillOpen(projectId)) throw Error('The open project changed while its datasets were uploading.');
+      await uploadDataset(dataset, projectId);
     }
     projectUploadStatus = {...projectUploadStatus, datasets: 'uploaded'};
     console.log('Completed uploading datasets!');
@@ -278,9 +313,10 @@ const useUpload = () => {
     // The server merges project-level data (tags, reports, templates) with its own copy and returns the
     // merged, authoritative project - so a project push never conflicts. Apply the merged response back as
     // the new base, unless a newer local edit landed mid-flight (already flagged for sync, retries next
-    // cycle), in which case don't clobber it.
-    const noNewerLocalEdit = store.getState().project.project.modified_timestamp === uploadedTimestamp;
-    if (!isEmpty(uploadProjectResponse) && noNewerLocalEdit) {
+    // cycle), or a different project was opened, in which case don't clobber it.
+    const isUploadedCopyStillOpen = isProjectStillOpen(liveProject.id)
+      && store.getState().project.project.modified_timestamp === uploadedTimestamp;
+    if (!isEmpty(uploadProjectResponse) && isUploadedCopyStillOpen) {
       dispatch(addedProjectFromServer(uploadProjectResponse));
       dispatch(clearProjectSyncNeeded());
       // Local now matches the server's merged copy - record its timestamp as the new base.
@@ -292,8 +328,10 @@ const useUpload = () => {
 
   return {
     backupStatusMessage,
+    endManualUpload,
     initializeUpload,
     keepDeviceConflict,
+    startManualUpload,
     uploadDatasets,
     uploadDatasetsByIds,
     uploadFromWeb,
