@@ -26,14 +26,42 @@ const RunQAQC = ({dataset}) => {
 
   const [isQAQCModalVisible, setIsQAQCModalVisible] = useState(false);
 
+  /* Derived Variables */
+
+  const isDatasetReadOnly = datasets[dataset.id]?.isReadOnly || readOnlyDatasetsIds.includes(dataset.id);
+  const isProjectReadOnly = project?.isReadOnly;
+
   /* Event Handlers */
 
   const handleQAQCPressed = () => setIsQAQCModalVisible(true);
 
-  /* View */
+  const handleUploadAndRunPressed = async () => {
+    setIsQAQCModalVisible(false);
+    const toastId = toast.show(`Uploading project: ${project.description.project_name}`,
+      {type: 'warning', animationType: 'slide-in', duration: 20000, placement: 'top'});
+    let uploadStatus;
+    try {
+      uploadStatus = await initializeUpload();
+    }
+    catch (err) {
+      toast.update(toastId, err.message, {type: 'error', duration: 5000});
+      return;
+    }
+    if (uploadStatus.datasets !== 'uploaded') {
+      toast.update(toastId, 'Failed to upload datasets.', {type: 'error', duration: 5000});
+      return;
+    }
+    try {
+      await runQAQC(dataset, project.id, encodedLogin, toast, toastId);
+      await initializeDownload(project, encodedLogin);
+    }
+    catch (err) {
+      console.error('Failed to run QAQC.', err);
+      toast.update(toastId, 'Failed to run QAQC.', {type: 'error', duration: 5000});
+    }
+  };
 
-  const isDatasetReadOnly = datasets[dataset.id]?.isReadOnly || readOnlyDatasetsIds.includes(dataset.id);
-  const isProjectReadOnly = project?.isReadOnly;
+  /* View */
 
   if (!isTestingMode || isProjectReadOnly || isDatasetReadOnly) return null;
 
@@ -43,38 +71,13 @@ const RunQAQC = ({dataset}) => {
         onPress={handleQAQCPressed}
         title={'Run QAQC'}
       />
-
-      {/* Modal */}
       {isQAQCModalVisible && (
         <ModalWrapper
           actionTitle={'Upload and Run'}
           cancelTitle={'Cancel'}
           headerTitle={'QAQC Confirmation'}
           isVisible={isQAQCModalVisible}
-          onActionPressed={async () => {
-            setIsQAQCModalVisible(false);
-            let toast_id = toast.show(`Uploading project: ${project.description.project_name}`,
-              {type: 'warning', animationType: 'slide-in', duration: 20000, placement: 'top'});
-            let uploadStatus;
-            try {
-              uploadStatus = await initializeUpload();
-            }
-            catch (err) {
-              return toast.update(toast_id, err.message, {type: 'error', duration: 5000});
-            }
-            if (uploadStatus.datasets === 'uploaded') {
-              try {
-                await runQAQC(dataset, project.id, encodedLogin, toast, toast_id);
-                await initializeDownload(project, encodedLogin);
-              }
-              catch (err) {
-                toast.update(toast_id, 'Failed to run QAQC.', {type: 'error', duration: 5000});
-              }
-            }
-            else {
-              toast.update(toast_id, 'Failed to upload datasets.', {type: 'error', duration: 5000});
-            }
-          }}
+          onActionPressed={handleUploadAndRunPressed}
           onCancelPress={() => setIsQAQCModalVisible(false)}
           overlayStyleOverride={{height: 'auto'}}
         >
