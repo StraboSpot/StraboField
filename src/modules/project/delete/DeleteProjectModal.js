@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 
 import useDevice from '../../../services/device/useDevice';
-import {APP_DIRECTORIES} from '../../../services/files/directories.constants';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
@@ -14,10 +13,11 @@ const DELETE_STATUS = {
   ERROR: 'error',
 };
 
-const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToDeleteFilename, setDoReloadPage}) => {
+// Deletes filePaths, which label names to the user; isPlural when that is more than one save
+const DeleteProjectModal = ({closeModal, filePaths, isDeleteProjectModalVisible, isPlural, label, onDeleted}) => {
   /* Data Hooks */
 
-  const {deleteFromDevice} = useDevice();
+  const {deleteFromDevice, doesDeviceDirExist} = useDevice();
 
   /* Local State */
 
@@ -38,9 +38,11 @@ const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToD
   const deleteProjectFromLocalStorage = async () => {
     try {
       setDeleteProjectStatus(DELETE_STATUS.IN_PROGRESS);
-      await deleteFromDevice(APP_DIRECTORIES.BACKUP_DIR, projectToDeleteFilename);
+      for (const filePath of filePaths) {
+        if (await doesDeviceDirExist(filePath)) await deleteFromDevice(filePath);
+      }
       setDeleteProjectStatus(DELETE_STATUS.SUCCESS);
-      setDoReloadPage(true);
+      onDeleted();
     }
     catch (err) {
       setDeleteProjectStatus(DELETE_STATUS.ERROR);
@@ -53,7 +55,7 @@ const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToD
   return (
     <ModalWrapper
       actionTitle={deleteProjectStatus === DELETE_STATUS.PENDING ? 'Delete' : 'Ok'}
-      headerTitle={'Delete Locally Saved Project'}
+      headerTitle={isPlural ? 'Delete Locally Saved Projects' : 'Delete Locally Saved Project'}
       isLoading={deleteProjectStatus === DELETE_STATUS.IN_PROGRESS}
       isVisible={isDeleteProjectModalVisible}
       onActionPressed={handleConfirmPress}
@@ -64,16 +66,15 @@ const DeleteProjectModal = ({closeModal, isDeleteProjectModalVisible, projectToD
       <View style={overlayStyles.overlayContent}>
         {deleteProjectStatus === DELETE_STATUS.PENDING ? (
           <Text style={overlayStyles.contentText}>
-            Are you sure you want to delete {'\n'} the following locally saved
-            project? {'\n\n' + projectToDeleteFilename}
-            {'\n'}{'\n'}*Uploaded copy on server will remain.
+            Are you sure you want to delete{'\n\n' + label + '?'}
+            {'\n'}{'\n'}*Only copies uploaded to the server, exported, or copied out of the app's folder will remain.
           </Text>
         ) : (
           <>
             <Text style={overlayStyles.contentText}>
-              {deleteProjectStatus === DELETE_STATUS.IN_PROGRESS ? 'Deleting ' + projectToDeleteFilename
-                : deleteProjectStatus === DELETE_STATUS.SUCCESS ? projectToDeleteFilename + ' has been deleted'
-                  : 'Error deleting ' + projectToDeleteFilename}
+              {deleteProjectStatus === DELETE_STATUS.IN_PROGRESS ? 'Deleting ' + label
+                : deleteProjectStatus === DELETE_STATUS.SUCCESS ? 'Deleted ' + label
+                  : 'Error deleting ' + label}
             </Text>
             <LottieAnimations
               doesLoop={false}

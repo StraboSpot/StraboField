@@ -138,3 +138,25 @@ describe('isNegativeAllowed', () => {
     expect(isNegativeAllowed({constraint: '. <= 100'})).toBe(true);
   });
 });
+
+// The lines the save alerts and the unsaved changes prompt list a form's errors with
+describe('getErrorMessages', () => {
+  const {getErrorMessages} = useForm();
+
+  it('names a survey field by its label', () => {
+    expect(getErrorMessages({status: {formName: ['sed', 'texture']}, errors: {sand_grain_size: 'Required'}}))
+      .toEqual(['Sandstone Grain Size: Required']);
+  });
+
+  // A tabbed record is validated whole, so a tab can report a field that only another tab has
+  it('names a field from another tab of the same record by that tab\'s label', () => {
+    expect(getErrorMessages({status: {formName: ['sed', 'lithology']}, errors: {sand_grain_size: 'Required'}}))
+      .toEqual(['Sandstone Grain Size: Required']);
+  });
+
+  it('names a field outside the survey by the form\'s own label for it', () => {
+    const form = {status: {fieldLabels: {longitude: 'Longitude'}, formName: ['general', 'geography']}};
+    expect(getErrorMessages({...form, errors: {longitude: 'Value must be between -180 and 180.'}}))
+      .toEqual(['Longitude: Value must be between -180 and 180.']);
+  });
+});

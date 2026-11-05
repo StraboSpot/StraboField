@@ -4,7 +4,7 @@ import {Text, TouchableOpacity, View} from 'react-native';
 import {Icon} from '@rn-vui/base';
 import {ToastProvider} from 'react-native-toast-notifications';
 
-import {MEDIUM_TEXT_SIZE} from '../styles.constants';
+import {CAUTION_COLOR, MEDIUM_TEXT_SIZE} from '../styles.constants';
 import styles from './ui.styles';
 
 const ToastWrapper = ({children}) => {
@@ -62,10 +62,11 @@ const ToastWrapper = ({children}) => {
       }
       swipeEnabled
       textStyle={{fontWeight: 'bold', paddingLeft: 5}}
+      warningColor={CAUTION_COLOR}
       warningIcon={
         <Icon
           color={'white'}
-          name={'error-outline'}
+          name={'warning-amber'}
           size={25}
         />
       }

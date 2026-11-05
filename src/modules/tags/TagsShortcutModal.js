@@ -1,6 +1,6 @@
 import React from 'react';
 
-import TagsModal from './TagsModal';
+import TagsChecklist from './TagsChecklist';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 
 const TagsShortcutModal = ({
@@ -21,7 +21,7 @@ const TagsShortcutModal = ({
         showCancelButton={false}
         showCloseButton={true}
       >
-        <TagsModal openSpotInNotebook={openSpotInNotebook} zoomToCurrentLocation={zoomToCurrentLocation}/>
+        <TagsChecklist openSpotInNotebook={openSpotInNotebook} zoomToCurrentLocation={zoomToCurrentLocation}/>
       </ModalWrapper>
     );
   };

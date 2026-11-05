@@ -20,7 +20,7 @@ const MapLayers = ({
                      basemap,
                      drawFeatures,
                      editFeatureVertex,
-                     isShowMacrostratOverlay,
+                     isShowMacrostratUnitInfo,
                      location,
                      mapMode,
                      measureFeatures,
@@ -43,7 +43,7 @@ const MapLayers = ({
   return (
     <>
       {/* Displays the marker when macrostrat view is displayed */}
-      {isShowMacrostratOverlay && basemap.id === 'macrostrat' && <MacrostratMarkerLayer location={location}/>}
+      {isShowMacrostratUnitInfo && basemap.id === 'macrostrat' && <MacrostratMarkerLayer location={location}/>}
 
       {/* Small screens render this with the map action buttons instead, so it would double up here */}
       {!SMALL_SCREEN && <MapControlsContainer/>}

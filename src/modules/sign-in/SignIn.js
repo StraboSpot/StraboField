@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import {KeyboardAvoidingView, Linking, Platform, Pressable, Text, TextInput, View} from 'react-native';
+import {KeyboardAvoidingView, Linking, Platform, Pressable, Text, View} from 'react-native';
 
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import signInStyles from './signIn.styles';
 import useSignIn from './useSignIn';
@@ -13,11 +13,14 @@ import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import CustomEndpoint from '../../shared/ui/CustomEndpoint';
 import MessageModal from '../../shared/ui/modals/MessageModal';
 import ConnectionRequiredMessage from '../../shared/ui/text/ConnectionRequiredMessage';
+import TextInput from '../../shared/ui/TextInput';
+import {openedMessageModal} from '../home/home.slice';
 import SplashScreen from '../splash-screen/SplashScreen';
 
 const SignIn = ({navigation}) => {
   /* Data Hooks */
 
+  const dispatch = useDispatch();
   const isEndpointSelected = useSelector(state => state.connections.databaseEndpoint.isSelected);
   const isOnline = useSelector(state => state.connections.isOnline);
 
@@ -37,7 +40,14 @@ const SignIn = ({navigation}) => {
 
   /* Event Handlers */
 
-  const handleForgotPassword = () => Linking.openURL('https://strabospot.org/forgotpassword');
+  // Some iOS devices refuse to open the link, so say where to go instead.
+  const handleForgotPassword = () => Linking.openURL('https://strabospot.org/forgotpassword').catch((err) => {
+    console.error('Error opening forgot password page', err);
+    dispatch(openedMessageModal({
+      message: 'Your device could not open a browser. To reset your password, go to strabospot.org/forgotpassword.',
+      title: 'Forgot Password',
+    }));
+  });
 
   const handleGuestSignIn = async () => {
     await guestSignIn();
@@ -91,13 +101,13 @@ const SignIn = ({navigation}) => {
           })}
         >
           <Text style={
-            {
-              color: themes.PRIMARY_ACCENT_COLOR,
-              fontSize: themes.MEDIUM_TEXT_SIZE,
-              fontWeight: 'bold',
-              // textAlign: 'right',
-            }
-          }>
+                  {
+                    color: themes.PRIMARY_ACCENT_COLOR,
+                    fontSize: themes.MEDIUM_TEXT_SIZE,
+                    fontWeight: 'bold',
+                    // textAlign: 'right',
+                  }
+                }>
             Forgot Password
           </Text>
         </Pressable>

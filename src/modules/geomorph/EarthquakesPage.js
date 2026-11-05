@@ -1,48 +1,34 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {FlatList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getNewUUID, isEmpty} from '../../shared/helpers';
+import {getNewUUID} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
-import {setModalVisible} from '../home/home.slice';
-import BasicListItem from '../page/BasicListItem';
-import BasicPageDetail from '../page/BasicPageDetail';
+import {setActiveModal} from '../home/home.slice';
+import FeatureDetail from '../page/FeatureDetail';
+import FeatureListItem from '../page/FeatureListItem';
 import PageHeader from '../page/PageHeader';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
-import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
+import useFeatureDetailView from '../page/useFeatureDetailView';
+import {editedSpotProperties} from '../spots/spots.slice';
 
 const EarthquakesPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
-  /* Local State */
-
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selectedAttribute, setSelectedAttribute] = useState({});
+  const {closeDetailView, isDetailView, openDetailView, selectedFeature} = useFeatureDetailView();
 
   /* Derived Variables */
 
   const attributes = spot && spot.properties && spot.properties[page.key] || [];
 
-  /* Side Effects */
-
-  useEffect(() => {
-    console.log('UE EarthquakesPage [selectedAttributes, spot]', selectedAttributes, spot);
-    if (!isEmpty(selectedAttributes)) {
-      setSelectedAttribute(selectedAttributes[0]);
-      setIsDetailView(true);
-    }
-  }, [selectedAttributes, spot]);
-
   /* Logic Helpers */
 
   const addAttribute = () => {
-    dispatch(setModalVisible({modal: page.key}));
+    dispatch(setActiveModal({modal: page.key}));
   };
 
   const editAttribute = (attribute, i) => {
@@ -50,25 +36,20 @@ const EarthquakesPage = ({isReadOnly, page}) => {
       let editedEarthquakeData = JSON.parse(JSON.stringify(spot.properties[page.key]));
       attribute = {...attribute, id: getNewUUID()};
       editedEarthquakeData.splice(i, 1, attribute);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: page.key, value: editedEarthquakeData}));
     }
-    setIsDetailView(true);
-    setSelectedAttribute(attribute);
-    // In Redux too, so an edit from elsewhere can hand the open detail view back its updated record
-    dispatch(setSelectedAttributes([attribute]));
-    dispatch(setModalVisible({modal: null}));
+    openDetailView(attribute);
   };
 
   /* Render Functions */
 
   const renderAttributeDetail = () => {
     return (
-      <BasicPageDetail
-        closeDetailView={() => setIsDetailView(false)}
+      <FeatureDetail
+        closeDetailView={closeDetailView}
         isReadOnly={isReadOnly}
         page={page}
-        selectedFeature={selectedAttribute}
+        selectedFeature={selectedFeature}
       />
     );
   };
@@ -83,7 +64,7 @@ const EarthquakesPage = ({isReadOnly, page}) => {
           data={attributes}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item, index}) => (
-            <BasicListItem
+            <FeatureListItem
               editItem={itemToEdit => editAttribute(itemToEdit, index)}
               index={index}
               item={item}

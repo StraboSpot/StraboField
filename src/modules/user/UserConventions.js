@@ -23,12 +23,11 @@ import FieldInfoModal from '../form/FieldInfoModal';
 import Form from '../form/Form';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {calculateMissingOrientations, getSpotOrientations} from '../spots/spots.helpers';
 import {editedOrCreatedSpots, setSelectedAttributes} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
-const UserProfile = () => {
+const UserConventions = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -92,7 +91,6 @@ const UserProfile = () => {
 
       else {
         const spotsEdited = [];
-        const spotsEditedIds = [];
         spotsFiltered.forEach((s) => {
           // Don't copy a Spot only to find it holds nothing that could carry a plane
           if (isEmpty(getSpotOrientations(s))) return;
@@ -101,18 +99,10 @@ const UserProfile = () => {
           getSpotOrientations(updatedSpot).forEach(({fields, orientation}) => {
             if (calculateMissingOrientations(orientation, fields)) isSpotEdited = true;
           });
-          if (isSpotEdited) {
-            spotsEdited.push(updatedSpot);
-            // As stored, not as a string: the dataset holding the Spot is found by matching its own numeric ids
-            spotsEditedIds.push(s.properties.id);
-          }
+          if (isSpotEdited) spotsEdited.push(updatedSpot);
         });
         if (!isEmpty(spotsEdited)) {
-          // console.log('Spots Original', Object.values(spots).reduce((acc, s) => {
-          //   return spotsEditedIds.includes(s.properties.id) ? [...acc, s] : acc;
-          // }, []));
           // console.log('Spots to update', spotsEdited);
-          dispatch(updatedModifiedTimestampsBySpotsIds(spotsEditedIds));
           dispatch(editedOrCreatedSpots(spotsEdited));
           const selectedAttributesUpdated = getUpdatedSelectedAttributes(spotsEdited);
           if (selectedAttributesUpdated) dispatch(setSelectedAttributes(selectedAttributesUpdated));
@@ -157,7 +147,7 @@ const UserProfile = () => {
       // A save that kept only some of the fields has already been alerted about, so don't announce it as a save
       const isFullSave = isEmpty(errors);
       const newValues = JSON.parse(JSON.stringify(formValues));
-      const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...userValuesToUpdate} = newValues;
+      const {email, encoded_login, image, isAuthenticated, macrostrat, ...userValuesToUpdate} = newValues;
       dispatch(setUserData(userValuesToUpdate));
       if (isConnectionAvailable) {
         if (isEmpty(userData.encoded_login)) {
@@ -299,4 +289,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default UserConventions;

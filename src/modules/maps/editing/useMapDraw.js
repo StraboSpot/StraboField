@@ -17,6 +17,7 @@ import {
   thinCoordsByDistance,
   thinCoordsByPixels,
 } from './editing.helpers';
+import useMapSnap from './useMapSnap';
 import useMapSymbology from '../symbology/useMapSymbology';
 import useMapCoords from '../view/useMapCoords';
 
@@ -37,6 +38,7 @@ const useMapDraw = ({applySelectingMode, mapMode, mapRef, onEndDrawPressed, sele
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {convertFeatureGeometryToImagePixels} = useMapCoords();
+  const {snapCoord} = useMapSnap(mapRef);
   const {getSymbology} = useMapSymbology();
   const {createSpot} = useSpots();
   const toast = useToast();
@@ -101,6 +103,12 @@ const useMapDraw = ({applySelectingMode, mapMode, mapRef, onEndDrawPressed, sele
         : await mapRef.current.getCoordinateFromView(screenCoordinates[i]);
       featureCoordinates.push(geoCoordinates);
     }
+    // Snap only the ends, so a stroke can join another Spot without being pulled onto it all along; a lasso isn't saved
+    if (!selectingMode) {
+      const lastIndex = featureCoordinates.length - 1;
+      featureCoordinates[0] = await snapCoord(screenCoordinates[0], featureCoordinates[0]);
+      featureCoordinates[lastIndex] = await snapCoord(screenCoordinates[lastIndex], featureCoordinates[lastIndex]);
+    }
     if (isThinning && freehandVertexSpacing?.unit === 'distance') {
       featureCoordinates = thinCoordsByDistance(featureCoordinates, freehandVertexSpacing.distanceSpacing);
     }
@@ -109,6 +117,36 @@ const useMapDraw = ({applySelectingMode, mapMode, mapRef, onEndDrawPressed, sele
       return turf.polygon([featureCoordinates]);
     }
     return turf.lineString(featureCoordinates);
+  };
+
+  // The draw features after a vertex is placed at newCoord: the first vertex placed, the line or polygon through
+  // every vertex so far, and the last vertex placed - or just the one vertex, for a point or a first press.
+  const getDrawFeaturesWithNewVertex = (currentDrawFeatures, newCoord) => {
+    const lastVertexPlaced = turf.point(newCoord);
+    if (mapMode === MAP_MODES.DRAW.POINT || isEmpty(currentDrawFeatures)) return [lastVertexPlaced];
+    const firstVertexPlaced = currentDrawFeatures[0];
+    const firstVertexPlacedCoords = turf.getCoords(firstVertexPlaced);
+    let feature;
+    // Draw a line given a point and a new point
+    if (currentDrawFeatures.length === 1) feature = turf.lineString([firstVertexPlacedCoords, newCoord]);
+    // Draw a line given a line and a new point
+    else if (mapMode === MAP_MODES.DRAW.LINE) {
+      feature = turf.lineString([...turf.getCoords(currentDrawFeatures[1]), newCoord]);
+    }
+    else if (mapMode === MAP_MODES.DRAW.POLYGON) {
+      // Draw a polygon given a line and a new point
+      if (turf.getType(currentDrawFeatures[1]) === 'LineString') {
+        const lineCoords = turf.getCoords(currentDrawFeatures[1]);
+        feature = turf.polygon([[...lineCoords, newCoord, firstVertexPlacedCoords]]);
+      }
+      // Draw a polygon given a polygon and a new point, dropping the closing coordinate to re-add it last
+      else {
+        const polyCoords = turf.getCoords(currentDrawFeatures[1])[0].slice(0, -1);
+        feature = turf.polygon([[...polyCoords, newCoord, firstVertexPlacedCoords]]);
+      }
+    }
+    else return currentDrawFeatures;
+    return [firstVertexPlaced, feature, lastVertexPlaced];
   };
 
   // The freehand paths measure raw screen points before any feature exists, so the type comes from the mode.
@@ -209,47 +247,12 @@ const useMapDraw = ({applySelectingMode, mapMode, mapRef, onEndDrawPressed, sele
     return Promise.resolve(newOrEditedSpot);
   };
 
-  const setDrawFeaturesNew = (e) => {
+  const setDrawFeaturesNew = async (e, screenPoint) => {
     console.log('Drawing', mapMode, '...');
-    let feature = {};
-    const newCoord = Platform.OS === 'web' ? [e.lngLat.lng, e.lngLat.lat] : turf.getCoord(e);
-    // Draw a point for the last coordinate touched
-    // const lastVertexPlaced = MapboxGL.geoUtils.makeFeature(e.geometry);
-    const lastVertexPlaced = turf.point(newCoord);
-    // Draw a point (if set point to current location not working)
-    if (mapMode === MAP_MODES.DRAW.POINT) setDrawFeatures([lastVertexPlaced]);
-    else if (isEmpty(drawFeatures)) setDrawFeatures([lastVertexPlaced]);
-    // Draw a line given a point and a new point
-    else if (drawFeatures.length === 1) {
-      const firstVertexPlaced = drawFeatures[0];
-      const firstVertexPlacedCoords = turf.getCoords(firstVertexPlaced);
-      feature = turf.lineString([firstVertexPlacedCoords, newCoord]);
-      setDrawFeatures([firstVertexPlaced, feature, lastVertexPlaced]);
-    }
-    // Draw a line given a line and a new point
-    else if (drawFeatures.length > 1 && mapMode === MAP_MODES.DRAW.LINE) {
-      const firstVertexPlaced = drawFeatures[0];
-      const lineCoords = turf.getCoords(drawFeatures[1]);
-      feature = turf.lineString([...lineCoords, newCoord]);
-      setDrawFeatures([firstVertexPlaced, feature, lastVertexPlaced]);
-    }
-    else if (drawFeatures.length > 1 && mapMode === MAP_MODES.DRAW.POLYGON) {
-      const firstVertexPlaced = drawFeatures[0];
-      const firstVertexPlacedCoords = turf.getCoords(firstVertexPlaced);
-
-      // Draw a polygon given a line and a new point
-      if (turf.getType(drawFeatures[1]) === 'LineString') {
-        const lineCoords = turf.getCoords(drawFeatures[1]);
-        feature = turf.polygon([[...lineCoords, newCoord, firstVertexPlacedCoords]]);
-      }
-      // Draw a polygon given a polygon and a new point
-      else {
-        let polyCoords = turf.getCoords(drawFeatures[1])[0];
-        polyCoords.pop();
-        feature = turf.polygon([[...polyCoords, newCoord, firstVertexPlacedCoords]]);
-      }
-      setDrawFeatures([firstVertexPlaced, feature, lastVertexPlaced]);
-    }
+    const pressedCoord = Platform.OS === 'web' ? [e.lngLat.lng, e.lngLat.lat] : turf.getCoord(e);
+    const newCoord = selectingMode ? pressedCoord : await snapCoord(screenPoint, pressedCoord);
+    // Build on the draw features as they are after the snap's await, so a quick second press can't drop this vertex
+    setDrawFeatures(currentDrawFeatures => getDrawFeaturesWithNewVertex(currentDrawFeatures, newCoord));
   };
 
   return {

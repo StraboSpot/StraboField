@@ -2,10 +2,9 @@ import React from 'react';
 import {Text, View} from 'react-native';
 
 import {Image} from '@rn-vui/base';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import modalStyles from './modal.styles';
-import {setModalVisible} from '../../../modules/home/home.slice';
 import {MODALS} from '../../../modules/page/page.constants';
 import CloseButton from '../buttons/CloseButton';
 
@@ -19,12 +18,11 @@ const ModalWrapperHeader = ({
                             }) => {
   /* Data Hooks */
 
-  const dispatch = useDispatch();
-  const modalVisible = useSelector(state => state.home.modalVisible);
+  const activeModal = useSelector(state => state.home.activeModal);
 
   /* Derived Variables */
 
-  const modalInfo = MODALS.find(p => p.key === modalVisible);
+  const modalInfo = MODALS.find(p => p.key === activeModal);
 
   /* Logic Helpers */
 
@@ -38,7 +36,7 @@ const ModalWrapperHeader = ({
         {showCloseButton && (
           <View style={modalStyles.modalHeaderButtonsContainer}>
             <CloseButton
-              onPress={closeModal || (() => dispatch(setModalVisible({modal: null})))}
+              onPress={closeModal}
               title={buttonTitleRight}
             />
           </View>

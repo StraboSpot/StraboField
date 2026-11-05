@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Platform, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 
-import KeepAwake from 'react-native-keep-awake';
+import {activateKeepAwake, deactivateKeepAwake} from '@sayem314/react-native-keep-awake';
 import ProgressBar from 'react-native-progress/Bar';
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -16,11 +16,11 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import Spacer from '../../../shared/ui/Spacer';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
-import {updatedProjectTransferProgress} from '../../connections/connections.slice';
+import {setPendingImagesChanges, updatedProjectTransferProgress} from '../../connections/connections.slice';
 import {clearedStatusMessages, setIsProgressModalVisible} from '../../home/home.slice';
 import {setIsImageTransferring} from '../projects.slice';
 
-const UploadModal = ({autoStart, closeModal, isVisible}) => {
+const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, onAfterUploadActionPressed}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -29,7 +29,7 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
   const projectName = useSelector(state => state.project.project?.description?.project_name);
   const projectTransferProgress = useSelector(state => state.connections.projectTransferProgress);
 
-  const {uploadProject, uploadDatasets, uploadStatusMessage} = useUpload();
+  const {backupStatusMessage, uploadProject, uploadDatasets, uploadStatusMessage} = useUpload();
   const {
     currentImage,
     currentImageStatus,
@@ -55,6 +55,11 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
   const [uploadImageSuccess, setUploadImageSuccess] = useState(false);
   const [uploadState, setUploadState] = useState('not started');
 
+  /* Derived Variables */
+
+  // A caller can offer a next step once everything is up, e.g. going on to the uploaded sample on strabospot.org
+  const isAfterUploadActionShown = uploadState === 'complete' && !!onAfterUploadActionPressed;
+
   /* Side Effects */
 
   useEffect(() => {
@@ -72,7 +77,11 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
   /* Event Handlers */
 
   const handleActionPressed = async () => {
-    if (uploadState === 'not started') await initiateUpload();
+    if (isAfterUploadActionShown) {
+      handleClosePress();
+      onAfterUploadActionPressed();
+    }
+    else if (uploadState === 'not started') await initiateUpload();
     else if (uploadState === 'complete' || uploadState === 'error') handleClosePress();
   };
 
@@ -97,12 +106,14 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
       dispatch(clearedStatusMessages());
       isImageTransferring && dispatch(setIsImageTransferring(false));
       dispatch(updatedProjectTransferProgress(0));
-      Platform.OS !== 'web' && KeepAwake.activate();
+      activateKeepAwake();
       setModalTitle('Uploading');
       setUploadState('uploading');
       setProjectUploadStatus(await uploadProject());
       setDatasetUploadStatus(await uploadDatasets());
       const imageStatus = await initializeImageUpload();
+      // Images stay pending only if some failed, so the status icon clears after a successful upload
+      dispatch(setPendingImagesChanges((imageStatus?.failed || 0) > 0));
       setUploadImageSuccess(true);
       dispatch(setIsProgressModalVisible(false));
       dispatch(setIsImageTransferring(false));
@@ -125,7 +136,7 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
     finally {
       isUploadInFlightRef.current = false;
       // Release the wake lock on every path, including when the user backs out and the upload finishes unseen.
-      Platform.OS !== 'web' && KeepAwake.deactivate();
+      deactivateKeepAwake();
     }
   };
 
@@ -138,10 +149,11 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
     try {
       isUploadInFlightRef.current = true;
       dispatch(clearedStatusMessages());
-      Platform.OS !== 'web' && KeepAwake.activate();
+      activateKeepAwake();
       setModalTitle('Uploading');
       setUploadState('uploading');
       const imageStatus = await initializeImageUpload();
+      dispatch(setPendingImagesChanges((imageStatus?.failed || 0) > 0));
       setImageUploadStatus(imageStatus);
       if (imageStatus.imagesNotFound) {
         setUploadState('error');
@@ -162,7 +174,7 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
     }
     finally {
       isUploadInFlightRef.current = false;
-      Platform.OS !== 'web' && KeepAwake.deactivate();
+      deactivateKeepAwake();
     }
   };
 
@@ -175,6 +187,9 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
           doesLoop={false}
           type={'error'}
         />
+        {!!backupStatusMessage && (
+          <Text style={[uploadModalStyles.messageText, {marginTop: 24}]}>{backupStatusMessage}</Text>
+        )}
         <Text style={{marginTop: 24, textAlign: 'center'}}>{errorMessage}</Text>
       </View>
     );
@@ -258,6 +273,7 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
     return (
       <View>
         <View style={uploadModalStyles.messageContainer}>
+          {!!backupStatusMessage && <Text style={uploadModalStyles.messageText}>{backupStatusMessage}</Text>}
           <Text style={uploadModalStyles.messageText}>{imageUploadStatusMessage || uploadStatusMessage}</Text>
         </View>
         <View style={[uploadModalStyles.statusContainer]}>
@@ -289,7 +305,9 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
 
   return (
     <ModalWrapper
-      actionTitle={uploadState === 'complete' || uploadState === 'error' ? 'OK' : 'Upload'}
+      actionTitle={isAfterUploadActionShown ? afterUploadActionTitle
+        : uploadState === 'complete' || uploadState === 'error' ? 'OK' : 'Upload'}
+      cancelTitle={isAfterUploadActionShown ? 'OK' : undefined}
       closeModal={handleClosePress}
       headerTitle={modalTitle}
       isLoading={uploadState === 'uploading'}
@@ -298,7 +316,7 @@ const UploadModal = ({autoStart, closeModal, isVisible}) => {
       onCancelPress={handleClosePress}
       overlayStyleOverride={{height: 'auto'}}
       showActionButton={uploadState === 'not started' || uploadState === 'error' || uploadState === 'complete'}
-      showCancelButton={uploadState === 'not started'}
+      showCancelButton={uploadState === 'not started' || isAfterUploadActionShown}
       showCloseButton
     >
       {uploadState === 'not started' ? renderInitialUploadView()

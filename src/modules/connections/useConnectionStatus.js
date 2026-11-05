@@ -7,7 +7,7 @@ const useIsConnectionAvailable = () => useSelector((state) => {
 });
 
 // Wording for what the user needs to connect to. isInternetRequired forces "the Internet" for features that
-// always need it regardless of the endpoint (e.g. SESAR).
+// always need it regardless of the endpoint (e.g. StraboMicro).
 export const getConnectionTargetText = ({isEndpointSelected, isInternetRequired = false}) =>
   !isInternetRequired && isEndpointSelected ? 'your custom database endpoint' : 'the Internet';
 

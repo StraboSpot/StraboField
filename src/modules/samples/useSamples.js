@@ -1,21 +1,48 @@
+import {Linking, Platform} from 'react-native';
+
 import * as turf from '@turf/turf';
 import {useToast} from 'react-native-toast-notifications';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
+import {SAMPLE_LOCATION_KEY, STRABOSAMPLES_LINKED_DATA_KEYS} from './samples.constants';
+import {
+  getLinkedSample,
+  getSampleMetadata,
+  getStraboSampleLocation,
+  getUnlinkedSample,
+  isSampleStub,
+} from './samples.helpers';
+import {SAMPLES_PATHS} from '../../services/network/urls.constants';
+import useServerRequests from '../../services/network/useServerRequests';
 import {isEmpty} from '../../shared/helpers';
+import alert from '../../shared/ui/alert';
+import {hasValidCoords} from '../maps/maps.helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {addedNewSpotIdToDataset, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {addedNewSpotIdToDataset, addedSampleSpotIdToUpload} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {isOnGeoMap} from '../spots/spots.helpers';
-import {clearedSelectedSpots, editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../spots/spots.slice';
+import {
+  clearedSelectedSpots,
+  editedOrCreatedSpot,
+  editedSpotProperties,
+  setSelectedAttributes,
+  setSelectedSpot,
+} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
+import {setUserData} from '../user/userProfile.slice';
 
 const useSamples = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const encodedLogin = useSelector(state => state.user?.encoded_login);
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
+  const selectedSpot = useSelector(state => state.spot.selectedSpot);
+  const sampleSpotIdsToUpload = useSelector(state => state.project.sampleSpotIdsToUpload);
+  const straboUserId = useSelector(state => state.user?.straboUserId);
 
+  const {getProfile} = useServerRequests();
   const {getTargetDatasetFromId} = useProject();
   const {deleteSpot, getRootSpotGeoCoords} = useSpots();
   const toast = useToast();
@@ -33,15 +60,33 @@ const useSamples = () => {
       if (!geoCoords) return undefined;
       return turf.point(geoCoords).geometry;
     }
-    if (isEmpty(parentSpot.geometry)) return undefined;
+    if (!hasValidCoords(parentSpot)) return undefined;
     return parentSpot.geometry.type === 'Point' || parentSpot.geometry.type === 'LineString' ? parentSpot.geometry
       : turf.centroid(parentSpot).geometry;
+  };
+
+  // Replace the selected sample's record: the one a rich sample holds, or the one open on its parent Spot
+  const saveSelectedSample = (editedSample) => {
+    if (selectedSpot.properties.isSample) {
+      dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: [editedSample]}));
+      // A Sample Spot is named after its sample, as when the sample form is saved
+      if (editedSample.sample_id_name && selectedSpot.properties.name !== editedSample.sample_id_name) {
+        dispatch(editedSpotProperties({field: 'name', value: editedSample.sample_id_name}));
+      }
+    }
+    else {
+      const samples = (selectedSpot.properties[PAGE_KEYS.SAMPLES] || [])
+        .map(s => s.id === editedSample.id ? editedSample : s);
+      dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: samples}));
+      dispatch(setSelectedAttributes([editedSample]));
+    }
   };
 
   /* Exported Functions */
 
   // Create new Sample Spot
-  const createRichSample = (spot, selectedSample, sampleImages = []) => {
+  // The geometry is the parent's location unless one is given, as it is when linking takes StraboSamples'
+  const createRichSample = (spot, selectedSample, sampleImages = [], geometry = getSampleGeometry(spot)) => {
     // Nowhere to file the new Sample Spot without a target, so stop before anything is created rather than
     // leaving one behind in no dataset
     const targetDataset = getTargetDatasetFromId();
@@ -57,7 +102,7 @@ const useSamples = () => {
     d.setMilliseconds(0);
 
     const newEnrichedSample = {
-      geometry: getSampleGeometry(spot),
+      geometry: geometry,
       properties: {
         date: d.toISOString(),
         id: selectedSample.id,
@@ -74,6 +119,7 @@ const useSamples = () => {
     console.log('Creating new Enriched Sample:', newEnrichedSample);
     dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newEnrichedSample.properties.id}));
     dispatch(editedOrCreatedSpot(newEnrichedSample));
+    if (Platform.OS !== 'web') dispatch(addedSampleSpotIdToUpload(newEnrichedSample.properties.id));
 
     // Modify current sample in Spot object to only have id of new Sample Spot
     let editedSample = {id: selectedSample.id};
@@ -83,12 +129,57 @@ const useSamples = () => {
     if (i === -1) samplesCopy.push(editedSample);
     else samplesCopy.splice(i, 1, editedSample);
     const spotId = spot.properties.id;
-    dispatch(updatedModifiedTimestampsBySpotsIds([newEnrichedSample.properties.id, spotId]));
     dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: samplesCopy, spotId: spotId}));
 
     dispatch(setSelectedSpot(newEnrichedSample));
     dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
     return newEnrichedSample;
+  };
+
+  // The selected sample's record, whether it is a rich sample or a sample kept on its parent Spot
+  // A stub on a parent Spot is not a sample of its own, so it is never given back to be linked: filling it in would
+  // turn it into a second sample record on the server.
+  const getSelectedSample = () => {
+    if (selectedSpot.properties?.isSample) return getSampleMetadata(selectedSpot);
+    // Read back off the Spot, which holds the sample as last saved, rather than the copy taken when it was opened
+    const sample = selectedSpot.properties?.[PAGE_KEYS.SAMPLES]?.find(s => s.id === selectedAttributes?.[0]?.id)
+      ?? selectedAttributes?.[0];
+    return sample && !isSampleStub(sample) ? sample : undefined;
+  };
+
+  // Where the selected sample is: its own Spot's geometry, or for one kept on its parent Spot, the geometry it would
+  // be given as a Sample Spot of its own
+  const getSelectedSampleGeometry = () => selectedSpot.properties?.isSample ? selectedSpot.geometry
+    : getSampleGeometry(selectedSpot);
+
+  // Link the selected sample, taking the StraboSamples values for the keys picked. Linking adds data to the sample, so
+  // one kept on its parent Spot is made a Sample Spot of its own with the linked record. False if it could not be.
+  // The StraboSamples location is taken too if picked, which moves the Sample Spot there.
+  // What StraboMicro and StraboExperimental hold for the sample is kept on the Sample Spot, beside the sample record
+  // rather than in it, so it isn't sent back as part of the Field sample.
+  const linkSample = (strabosample, keysToTake = []) => {
+    const linkedSample = getLinkedSample(getSelectedSample(), strabosample, keysToTake);
+    const location = keysToTake.includes(SAMPLE_LOCATION_KEY) && getStraboSampleLocation(strabosample);
+    const geometry = location ? turf.point(location).geometry : getSelectedSampleGeometry();
+    if (selectedSpot.properties.isSample) {
+      // The geometry goes first, so the sample saved after it is saved onto the Spot as moved
+      if (location) dispatch(editedOrCreatedSpot({...selectedSpot, geometry: geometry}));
+      saveSelectedSample(linkedSample);
+    }
+    else if (!createRichSample(selectedSpot, linkedSample, [], geometry)) return false;
+    // A rich sample's Spot shares the sample's id. Any key the sample no longer has is cleared from a relink.
+    setLinkedData(linkedSample.id, strabosample);
+    return true;
+  };
+
+  // Keep what StraboMicro and StraboExperimental hold for a linked sample on its Sample Spot, or clear it when none
+  const setLinkedData = (spotId, strabosample = {}) => STRABOSAMPLES_LINKED_DATA_KEYS.forEach(
+    key => dispatch(editedSpotProperties({field: key, value: strabosample[key], spotId: spotId})),
+  );
+
+  const unlinkSample = () => {
+    saveSelectedSample(getUnlinkedSample(getSelectedSample()));
+    if (selectedSpot.properties.isSample) setLinkedData(selectedSpot.properties.id);
   };
 
   const deleteRichSample = (sampleToDelete, parentSpot) => {
@@ -111,9 +202,51 @@ const useSamples = () => {
     }
   };
 
+  const openUploadedSamplePage = (sampleId, userId = straboUserId) => (
+    Linking.openURL(`${SAMPLES_PATHS.WEB_SAMPLE}${userId}/${sampleId}`));
+
+  // The user id arrives with the profile, which is only downloaded at sign-in, so a sign-in from before the server
+  // sent it has none. Fetch it rather than make them sign in again.
+  const getStraboUserId = async () => {
+    if (straboUserId) return straboUserId;
+    try {
+      const {straboUserId: fetchedId} = await getProfile(encodedLogin) ?? {};
+      if (fetchedId) dispatch(setUserData({straboUserId: fetchedId}));
+      return fetchedId;
+    }
+    catch (err) {
+      console.error('Error getting the StraboSpot user id', err);
+    }
+  };
+
+  // IGSNs are minted and sent to SESAR on strabospot.org, which can only work from what has been uploaded there.
+  // A guest has no account to upload to. A legacy sample is saved, and so uploaded, as part of its parent Spot, so
+  // pass that Spot's id as uploadSpotId.
+  const openSamplePage = async (sampleId, startUpload, uploadSpotId = sampleId) => {
+    if (!encodedLogin || sampleSpotIdsToUpload.includes(uploadSpotId)) {
+      alert('Upload Project First',
+        'This sample, or its latest changes, is not on your StraboSpot account yet. Upload the project to your '
+        + 'account first.',
+        [{text: 'Not Now', style: 'cancel'}, {text: 'Upload', onPress: startUpload}]);
+      return;
+    }
+    const userId = await getStraboUserId();
+    if (userId) openUploadedSamplePage(sampleId, userId);
+    else {
+      alert('Sample Page Unavailable',
+        'Your StraboSpot account details could not be loaded. Check your connection and try again.');
+    }
+  };
+
   return {
     createRichSample,
     deleteRichSample,
+    getSelectedSample,
+    getSelectedSampleGeometry,
+    linkSample,
+    unlinkSample,
+    openSamplePage,
+    openUploadedSamplePage,
   };
 };
 

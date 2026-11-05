@@ -1,31 +1,46 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 
 import {ListItem} from '@rn-vui/base';
 
+import {GEOMETRY_FIELD_LABELS} from './geography.constants';
 import commonStyles from '../../shared/common.styles';
 import ClearButton from '../../shared/ui/buttons/ClearButton';
 import NumberInputField from '../form/inputs/NumberInputField';
 import useMapLocation from '../maps/view/useMapLocation';
 
-const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
+const GeoFieldInputs = ({formRef, isReadOnly}) => {
   /* Data Hooks */
 
-  const {getCurrentLocation} = useMapLocation();
+  const {getCurrentLocation, showLocationError} = useMapLocation();
+
+  /* Local State */
+
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   /* Logic Helpers */
 
   const fillWithCurrentLocation = async () => {
-    const currentLocation = await getCurrentLocation();
-    if (currentLocation.latitude) geomFormRef.current.setFieldValue('latitude', currentLocation.latitude);
-    if (currentLocation.longitude) geomFormRef.current.setFieldValue('longitude', currentLocation.longitude);
-    if (formRef) {
-      if (currentLocation.altitude) formRef.current.setFieldValue('altitude', currentLocation.altitude);
-      if (currentLocation.accuracy) formRef.current.setFieldValue('gps_accuracy', currentLocation.accuracy);
-      if (currentLocation.altitudeAccuracy) {
-        formRef.current.setFieldValue('altitude_accuracy', currentLocation.altitudeAccuracy);
-      }
+    let currentLocation;
+    setIsGettingLocation(true);
+    try {
+      currentLocation = await getCurrentLocation();
     }
+    catch (err) {
+      showLocationError(err);
+      return;
+    }
+    finally {
+      setIsGettingLocation(false);
+    }
+    // A fix can take up to 30 seconds, long enough to have left the page and taken its form with it
+    const form = formRef.current;
+    if (!form) return;
+    if (currentLocation.latitude) form.setFieldValue('latitude', currentLocation.latitude);
+    if (currentLocation.longitude) form.setFieldValue('longitude', currentLocation.longitude);
+    if (currentLocation.altitude) form.setFieldValue('altitude', currentLocation.altitude);
+    if (currentLocation.accuracy) form.setFieldValue('gps_accuracy', currentLocation.accuracy);
+    if (currentLocation.altitudeAccuracy) form.setFieldValue('altitude_accuracy', currentLocation.altitudeAccuracy);
   };
 
   /* View */
@@ -38,14 +53,14 @@ const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
             <View style={{flex: 1, paddingRight: 5}}>
               <NumberInputField
                 editable={!isReadOnly}
-                label={'Longitude'}
+                label={GEOMETRY_FIELD_LABELS.longitude}
                 name={'longitude'}
               />
             </View>
             <View style={{flex: 1}}>
               <NumberInputField
                 editable={!isReadOnly}
-                label={'Latitude'}
+                label={GEOMETRY_FIELD_LABELS.latitude}
                 name={'latitude'}
               />
             </View>
@@ -58,6 +73,7 @@ const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
                 size: 30,
                 color: commonStyles.iconColor.color,
               }}
+              isLoading={isGettingLocation}
               onPress={fillWithCurrentLocation}
             />
           )}
@@ -67,4 +83,4 @@ const GeoFieldsInputs = ({formRef, geomFormRef, isReadOnly}) => {
   );
 };
 
-export default GeoFieldsInputs;
+export default GeoFieldInputs;

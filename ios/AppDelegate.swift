@@ -2,13 +2,13 @@ import UIKit
 import OrientationDirector
 
 @main class AppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
-
     var reactNativeDelegate: ReactNativeDelegate?
     var reactNativeFactory: RCTReactNativeFactory?
 
     func application(_ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+
+        SentryCorruptReportGuard.install()
 
         let delegate = ReactNativeDelegate()
         let factory = RCTReactNativeFactory(delegate: delegate)
@@ -17,13 +17,9 @@ import OrientationDirector
         reactNativeDelegate = delegate
         reactNativeFactory = factory
 
-        window = UIWindow(frame: UIScreen.main.bounds)
+        ModalStatusBarStyle.install()
 
-        factory.startReactNative(
-            withModuleName: "StraboSpot2",
-            in: window,
-            launchOptions: launchOptions
-        )
+        // The window and React Native root are created in SceneDelegate
 
         return true
     }
@@ -31,16 +27,47 @@ import OrientationDirector
     func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         return SharedOrientationDirectorImpl.shared.supportedInterfaceOrientations
     }
+}
 
-    func application(_ app: UIApplication,
-    open url: URL,
-    options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-        return RCTLinkingManager.application(app, open: url, options: options)
+
+// The status bar is view-controller-based (UIViewControllerBasedStatusBarAppearance = YES): under the UIScene
+// lifecycle the app-wide UIApplication calls behind RN's <StatusBar> have no effect. iPhone shows light text over
+// the app's black safe area; iPad keeps it hidden.
+class RootViewController: UIViewController {
+    override var preferredStatusBarStyle: UIStatusBarStyle { .darkContent }
+    override var prefersStatusBarHidden: Bool { UIDevice.current.userInterfaceIdiom == .pad }
+
+    // react-native-screens swizzles UIViewController to defer these to its screen controllers, which default to
+    // dark text in light mode (invisible on black). Keep the decision here.
+    override var childForStatusBarStyle: UIViewController? { nil }
+    override var childForStatusBarHidden: UIViewController? { nil }
+}
+
+// Small-screen ModalWrappers are opaque fullscreen RN Modals on a light background, but RN's modal controller just
+// mirrors the style already showing (light), so give fullscreen presentations dark text. Transparent modals are
+// presented over full screen and leave the status bar to RootViewController.
+enum ModalStatusBarStyle {
+    static func install() {
+        let selector = #selector(getter: UIViewController.preferredStatusBarStyle)
+        guard let modalClass = NSClassFromString("RCTFabricModalHostViewController"),
+              let method = class_getInstanceMethod(modalClass, selector) else { return }
+
+        typealias StyleGetter = @convention(c) (AnyObject, Selector) -> UIStatusBarStyle
+        let original = unsafeBitCast(method_getImplementation(method), to: StyleGetter.self)
+        let replacement: @convention(block) (UIViewController) -> UIStatusBarStyle = { controller in
+            controller.modalPresentationStyle == .fullScreen ? .darkContent : original(controller, selector)
+        }
+        class_replaceMethod(modalClass, selector, imp_implementationWithBlock(replacement),
+                            method_getTypeEncoding(method))
     }
 }
 
 
 class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
+    override func createRootViewController() -> UIViewController {
+        RootViewController()
+    }
+
     override func sourceURL(for bridge: RCTBridge) -> URL? {
         self.bundleURL()
     }

@@ -8,6 +8,7 @@ import {
   getFeatureWithNewVertex,
   getScreenExtent,
   getScreenPolygonWidth,
+  getSnappedCoord,
   splitLineAtVertex,
   thinCoordsByDistance,
   thinCoordsByPixels,
@@ -223,6 +224,49 @@ describe('getScreenPolygonWidth', () => {
 
   it('returns 0 rather than dividing by zero when every point is identical', () => {
     expect(getScreenPolygonWidth([[5, 5], [5, 5], [5, 5]])).toBe(0);
+  });
+});
+
+describe('getSnappedCoord', () => {
+  const tolerance = [0.001, 0]; // paired with a press at the origin, a tolerance of 0.001 degrees
+  const line = turf.lineString([[-0.01, 0.0005], [0.0002, 0.0005], [0.01, 0.0005]]);
+
+  it('snaps onto a vertex in range, returning the vertex itself', () => {
+    expect(getSnappedCoord([0, 0], tolerance, [line])).toEqual([0.0002, 0.0005]);
+  });
+
+  it('prefers a vertex in range over a nearer edge', () => {
+    const farVertexLine = turf.lineString([[-0.01, 0.0002], [0.0008, 0.0002], [0.01, 0.0002]]);
+    expect(getSnappedCoord([0, 0], tolerance, [farVertexLine])).toEqual([0.0008, 0.0002]);
+  });
+
+  it('snaps onto the nearest edge when no vertex is in range', () => {
+    const edgeOnlyLine = turf.lineString([[-0.01, 0.0005], [0.01, 0.0005]]);
+    const [lng, lat] = getSnappedCoord([0, 0], tolerance, [edgeOnlyLine]);
+    expect(lng).toBeCloseTo(0, 9);
+    expect(lat).toBeCloseTo(0.0005, 9);
+  });
+
+  it('snaps onto a polygon edge', () => {
+    const polygon = turf.polygon([[[0.0005, -0.01], [0.01, -0.01], [0.01, 0.01], [0.0005, 0.01], [0.0005, -0.01]]]);
+    const [lng, lat] = getSnappedCoord([0, 0], tolerance, [polygon]);
+    expect(lng).toBeCloseTo(0.0005, 9);
+    expect(lat).toBeCloseTo(0, 9);
+  });
+
+  it('snaps onto a point', () => {
+    expect(getSnappedCoord([0, 0], tolerance, [turf.point([0, -0.0003])])).toEqual([0, -0.0003]);
+  });
+
+  it('picks the closest of several vertices in range', () => {
+    const points = [turf.point([0.0009, 0]), turf.point([0, 0.0004]), turf.point([-0.0006, 0])];
+    expect(getSnappedCoord([0, 0], tolerance, points)).toEqual([0, 0.0004]);
+  });
+
+  it('returns the coord unchanged when nothing is in range', () => {
+    const coord = [0, 0];
+    expect(getSnappedCoord(coord, tolerance, [turf.point([0.002, 0])])).toBe(coord);
+    expect(getSnappedCoord(coord, tolerance, [])).toBe(coord);
   });
 });
 

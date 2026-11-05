@@ -66,6 +66,8 @@ export const getSpotOrientations = (spot) => {
 };
 
 // If feature is mapped on geographical map, not an image basemap or strat section
+export const isLineSpot = spot => spot?.geometry?.type === 'LineString' || spot?.geometry?.type === 'MultiLineString';
+
 export const isOnGeoMap = (feature) => {
   if (isEmpty(feature)) return false;
   return !feature.properties.image_basemap && !feature.properties.strat_section_id;
@@ -88,6 +90,10 @@ export const isOnSameStratSection = (spot1, spot2) => {
 };
 
 export const isOnStratSection = feature => feature.properties?.strat_section_id;
+
+// A GeometryCollection is counted as a polygon, as it is everywhere else the app sorts Spots by shape
+export const isPolygonSpot = spot => spot?.geometry?.type === 'Polygon' || spot?.geometry?.type === 'MultiPolygon'
+  || spot?.geometry?.type === 'GeometryCollection';
 
 export const isStratInterval = (spot) => {
   return spot?.properties?.strat_section_id && spot?.properties?.surface_feature?.surface_feature_type === 'strat_interval';

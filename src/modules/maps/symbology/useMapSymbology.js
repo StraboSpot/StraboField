@@ -317,7 +317,7 @@ const useMapSymbology = () => {
     }
   };
 
-  // If feature has a tag of the type specified in the Map Symbols dialog (geologic unit or tag)
+  // If feature has a tag of the type specified in the Map Symbols menu (geologic unit or tag)
   // and that tag has a color assigned to then apply that color first
   const getTagColor = (feature) => {
     let color;

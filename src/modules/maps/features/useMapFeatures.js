@@ -17,7 +17,7 @@ const useMapFeatures = () => {
   const mapSymbols = useSelector(state => state.map.mapSymbols);
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getMappableSpots} = useSpots();
+  const {getMappableSpots, getSpotWithThisSample} = useSpots();
 
   /* Internal Functions */
 
@@ -108,8 +108,11 @@ const useMapFeatures = () => {
     console.log('Getting Spots to display...');
     let mappedSpots = getAllMappedSpots();
 
-    // Separate selected Spots and not selected Spots
-    const selectedIds = new Set(selectedSpots.map(sel => sel.properties.id));
+    // Separate selected Spots and not selected Spots. A Sample Spot isn't drawn, so its parent shows as selected.
+    const selectedIds = new Set(selectedSpots.map((spot) => {
+      const parentSpot = spot.properties.isSample && getSpotWithThisSample(spot.properties.id);
+      return (parentSpot || spot).properties.id;
+    }));
     const selectedMappedSpots = mappedSpots.filter(spot => selectedIds.has(spot.properties.id));
     const notSelectedMappedSpots = mappedSpots.filter(spot => !selectedIds.has(spot.properties.id));
 

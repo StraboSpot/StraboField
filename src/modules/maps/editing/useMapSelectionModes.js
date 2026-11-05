@@ -1,7 +1,7 @@
 import {useDispatch} from 'react-redux';
 
 import alert from '../../../shared/ui/alert';
-import {setModalVisible} from '../../home/home.slice';
+import {setActiveModal} from '../../home/home.slice';
 import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import {setIntersectedSpotsForTagging} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
@@ -31,7 +31,7 @@ const useMapSelectionModes = ({mapRef, spotsNotSelected}) => {
     const selectedSpots = getLassoedSpots(spotsNotSelected, feature);
     if (selectedSpots.length > 0) {
       dispatch(setIntersectedSpotsForTagging(selectedSpots));
-      dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_SPOTS_TO_REPORTS}));
+      dispatch(setActiveModal({modal: MODAL_KEYS.OTHER.ADD_SPOTS_TO_REPORTS}));
     }
     else {
       alert(
@@ -47,7 +47,7 @@ const useMapSelectionModes = ({mapRef, spotsNotSelected}) => {
     console.log('Selected Spots', selectedSpots);
     if (selectedSpots.length > 0) {
       dispatch(setIntersectedSpotsForTagging(selectedSpots));
-      dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.INSPECT_SPOTS_RAW_DATA}));
+      dispatch(setActiveModal({modal: MODAL_KEYS.OTHER.INSPECT_SPOTS_RAW_DATA}));
     }
     else console.warn('No Spots selected.');
   };
@@ -62,7 +62,7 @@ const useMapSelectionModes = ({mapRef, spotsNotSelected}) => {
 
     if (selectedSpotsFiltered.length > 0) {
       dispatch(setIntersectedSpotsForTagging(selectedSpotsFiltered));
-      dispatch(setModalVisible({modal: MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS}));
+      dispatch(setActiveModal({modal: MODAL_KEYS.OTHER.ADD_TAGS_TO_SPOTS}));
     }
     else if (selectedSpots.length > 0) {
       alert(

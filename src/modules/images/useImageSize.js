@@ -4,15 +4,12 @@ import ImageResizer from '@bam.tech/react-native-image-resizer';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {readExifOrientation, readJpegSize} from './imageOrientation.helpers';
+import {IMAGE_MAX_LOCAL_SIZE, IMAGE_MAX_THUMBNAIL_SIZE, IMAGE_MAX_UPLOAD_SIZE} from './images.constants';
 import {getLocalImageURI} from './imageURIs.helpers';
 import useDevice from '../../services/device/useDevice';
 import {TEMP_IMAGES_DOWNSIZED_DIRECTORY} from '../../services/files/directories.constants';
 import {setCurrentImageBasemap} from '../maps/maps.slice';
 import {editedSpotImage} from '../spots/spots.slice';
-
-const IMAGE_MAX_THUMBNAIL_SIZE = 200;
-const IMAGE_MAX_UPLOAD_SIZE = 2000;
-const IMAGE_MAX_LOCAL_SIZE = 4096;
 
 const useImageSize = () => {
   /* Data Hooks */

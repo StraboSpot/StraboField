@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View} from 'react-native';
+import {KeyboardAvoidingView, Platform, ScrollView, Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -13,6 +13,7 @@ import ActionButton from '../../shared/ui/buttons/ActionButton';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
 import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import TextInput from '../../shared/ui/TextInput';
 import SplashScreen from '../splash-screen/SplashScreen';
 
 const initialState = {

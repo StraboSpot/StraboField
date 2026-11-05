@@ -11,7 +11,7 @@ import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import {setShortcutSwitchPositions} from '../home/home.slice';
-import useShortcutSwitches from '../home/useShortcutSwitches';
+import useShortcutSwitches from '../home/shortcuts/useShortcutSwitches';
 import {SHORTCUT_MODALS} from '../page/page.constants';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 

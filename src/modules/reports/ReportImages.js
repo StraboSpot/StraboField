@@ -88,14 +88,17 @@ const ReportImages = ({isReadOnly, setUpdatedImages, updatedImages}) => {
       <ImagesList
         deleteImage={deleteImage}
         images={updatedImages}
+        isReadOnlyImages={isReadOnly}
         isThumbnailOnly
         onOpenImage={handleOpenImage}
+        saveUpdatedImage={saveUpdatedImage}
       />
 
       {/* Modals */}
       <ImageModal
         deleteImage={deleteImage}
         image={imageToView}
+        isReadOnly={isReadOnly}
         isVisible={isImageModalVisible}
         onOpenSketch={handleOpenSketch}
         saveUpdatedImage={saveUpdatedImage}

@@ -10,6 +10,7 @@ import {isEmpty} from '../../shared/helpers';
 import * as themes from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SwitchWrapper from '../../shared/ui/SwitchWrapper';
+import TextInput from '../../shared/ui/TextInput';
 import {setTestingMode} from '../project/projects.slice';
 
 const errorMessage = 'Wrong Password!';
@@ -79,6 +80,7 @@ const TestingMode = ({isTestingMode, textStyles}) => {
         Data saved under pages that are in testing may NOT be compatible with future versions of StraboSpot.
       </Text>
       <Input
+        InputComponent={TextInput}
         defaultValue={__DEV__ ? testingModePassword : ''}
         errorMessage={isErrorMessage && errorMessage}
         onChangeText={userEntry}

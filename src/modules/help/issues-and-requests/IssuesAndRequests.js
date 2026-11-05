@@ -5,7 +5,7 @@ import {useSelector} from 'react-redux';
 
 import issuesAndRequestsStyles from './issuesAndRequests.styles';
 import {SUPPORT_PATHS} from '../../../services/network/urls.constants';
-import UrlLinkButton from '../../../shared/ui/buttons/UrlLinkButton';
+import URLLinkButton from '../../../shared/ui/buttons/URLLinkButton';
 import FormFlatList from '../../form/FormFlatList';
 
 const IssuesAndRequests = () => {
@@ -25,12 +25,12 @@ const IssuesAndRequests = () => {
     <FormFlatList style={issuesAndRequestsStyles.container}>
       <Text style={issuesAndRequestsStyles.header}>🐞 Report an Issue</Text>
       <Text style={issuesAndRequestsStyles.description}>{message}</Text>
-      <UrlLinkButton
+      <URLLinkButton
         icon={'logo-github'}
         title={'Open GitHub Issues'}
         url={SUPPORT_PATHS.GITHUB}
       />
-      <UrlLinkButton
+      <URLLinkButton
         icon={'mail-outline'}
         title={'Email Support'}
         url={SUPPORT_PATHS.EMAIL}

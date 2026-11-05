@@ -29,11 +29,9 @@ import compassStyles from '../compass/compass.styles';
 import Form from '../form/Form';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
-import {setModalValues, setModalVisible} from '../home/home.slice';
-import useDeviceOrientation from '../home/useDeviceOrientation';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {MEASUREMENT_TEMPLATE_KEY} from '../templates/templates.constants';
 import {
@@ -42,27 +40,27 @@ import {
   getLinearTemplates,
   getPlanarTemplates,
 } from '../templates/templates.helpers';
-import TemplatesNotebook from '../templates/TemplatesNotebook';
+import TemplatesPicker from '../templates/TemplatesPicker';
 import {setUserData} from '../user/userProfile.slice';
 
 const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const compassMeasurementTypes = useSelector(state => state.compass.measurementTypes);
   const defaultManualMeasurement = useSelector(state => state.user.default_manual_measurement);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
   const templates = useSelector(state => state.project.project?.templates) || {};
 
-  const {lockToCurrentOrientation, unlockOrientation} = useDeviceOrientation();
   const {getChoices, getLabel, getRelevantFields, getSurvey, showErrors, validateForm} = useForm();
   const {setPointAtCurrentLocation} = useMapLocation();
   const toast = useToast();
 
   /* Local State */
 
+  const closeTemplatesRef = useRef(null);
   const formRef = useRef(null);
   const prevValuesRef = useRef({compassMeasurementTypes: null, templates: null});
 
@@ -78,6 +76,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
   const [sliderValue, setSliderValue] = useState(6);
   const [survey, setSurvey] = useState({});
+  const [templatesHeaderTitle, setTemplatesHeaderTitle] = useState(null);
 
   /* Derived Variables */
 
@@ -85,7 +84,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
   const isSelectedAttitude = !isEmpty(selectedAttributes) && selectedAttributes?.length > 0;
 
   // The shortcut makes its own Spot at the current location, where the Notebook is editing the Spot it is open on
-  const isShortcutMeasurement = modalVisible === MODAL_KEYS.SHORTCUTS.MEASUREMENT;
+  const isShortcutMeasurement = activeModal === MODAL_KEYS.SHORTCUTS.MEASUREMENT;
 
   // Web has no Compass input and no toggle to leave Manual, so Manual is always on there whatever the preference
   // says. Everywhere else follow the shared user preference, so this toggle and the one in User Conventions stay in
@@ -99,19 +98,8 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
     console.log('UE AddMeasurementModal []');
     return () => {
       dispatch(setModalValues({}));
-      if (!SMALL_SCREEN && Platform.OS !== 'web') unlockOrientation();
     };
   }, []);
-
-  // The compass reads correctly in any hold now (trend/plunge follows the edge that's up as held, strike/dip
-  // never depended on orientation), so instead of forcing portrait we lock to whatever orientation the user
-  // opened it in — the screen then stays put while they move/tilt the tablet to take the reading. Manual
-  // entry needs no lock. Phones (SMALL_SCREEN) stay portrait app-wide.
-  useEffect(() => {
-    if (SMALL_SCREEN || Platform.OS === 'web') return;
-    if (isManualMeasurement) unlockOrientation();
-    else lockToCurrentOrientation();
-  }, [isManualMeasurement]);
 
   useLayoutEffect(() => {
     console.log('UE AddMeasurementModal [compassMeasurementTypes, templates]', compassMeasurementTypes, templates);
@@ -169,8 +157,8 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
       setChoicesViewKey(null);
       setAssocChoicesViewKey(null);
     }
-    else if (isShowTemplates) setIsShowTemplates(false);
-    else dispatch(setModalVisible({modal: null}));
+    else if (isShowTemplates) closeTemplatesRef.current();
+    else dispatch(setActiveModal({modal: null}));
   };
 
   const onMeasurementTypePress = (i) => {
@@ -306,7 +294,6 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
       // afterwards would blank the page being opened.
       if (isShortcutMeasurement) openSpotInNotebook(spotToUpdate, PAGE_KEYS.MEASUREMENTS);
 
-      dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
       dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
 
       if (isSelectedAttitude) {
@@ -315,7 +302,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
       }
       // The shortcut always steps aside; from the Notebook the modal only does so on a small screen, where it
       // covers the page it just saved to. Both before the toast, which a modal on top would paint over.
-      if (isShortcutMeasurement || SMALL_SCREEN) dispatch(setModalVisible({modal: null}));
+      if (isShortcutMeasurement || SMALL_SCREEN) dispatch(setActiveModal({modal: null}));
       // After the zoom, which raises a full-screen spinner the toast would otherwise sit behind for most of its
       // life - the reason only shortcut saves looked too fast
       if (isShortcutMeasurement) await zoomToCurrentLocation();
@@ -390,9 +377,11 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
           />
         )}
         {!isSelectedAttitude && (
-          <TemplatesNotebook
+          <TemplatesPicker
             isShowTemplates={isShowTemplates}
+            registerCloseTemplates={closeTemplatesRef}
             setIsShowTemplates={bool => setIsShowTemplates(bool)}
+            setTemplatesHeaderTitle={setTemplatesHeaderTitle}
             typeKey={typeKey}
           />
         )}
@@ -471,6 +460,7 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
         buttonTitleRight={(choicesViewKey || assocChoicesViewKey) ? 'Done' : isShowTemplates ? '' : null}
         closeModal={onCloseButton}
         disabled={isFormInvalid}
+        headerTitle={isShowTemplates ? templatesHeaderTitle : undefined}
         isLoading={isSaving}
         onActionPressed={saveMeasurement}
         onFooterButtonPress={onPress}

@@ -3,10 +3,6 @@ import {Linking, PixelRatio} from 'react-native';
 import 'react-native-get-random-values';
 import isEqual from 'fast-deep-equal';
 import moment from 'moment/moment';
-import {v4 as uuidv4} from 'uuid';
-
-const passwordValidator = require('password-validator');
-const schema = new passwordValidator();
 
 /* Internal Functions */
 
@@ -22,12 +18,8 @@ const minLengthValidator = (val, minLength) => val.length >= minLength;
 
 const notEmptyValidator = val => val.trim() !== '';
 
-const passwordValidation = (val) => {
-  schema.has().digits().uppercase();
-  schema.has().not().spaces();
-  schema.min(8);
-  return schema.validate(val);
-};
+// At least 8 characters with a digit and an uppercase letter (any letter that has a lowercase form), and no whitespace
+const passwordValidation = val => val.length >= 8 && /\d/.test(val) && val !== val.toLowerCase() && !/\s/.test(val);
 
 /* Exported Functions */
 
@@ -160,6 +152,12 @@ export const deepObjectExtend = (target, source) => {
   return target;
 };
 
+export const formatFileSize = (bytes) => {
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB';
+};
+
 export const getFontSizeByWindowWidth = (window, fontSize) => {
   const baseWidth = 320; // width of smallest iPhone
   const width = getOrientation(window) === 'portrait' ? window.width : window.height;
@@ -174,9 +172,6 @@ export const getLatLngText = (lat, lng) => {
     + toFixedInteger(lat, 6) + degreeSymbol + ' ' + latitudeCardinal;
 };
 
-// return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-//   c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-
 // Stays a number because Spot, dataset, project and image ids are the server's keys, and stays this length
 // deliberately: past Number.MAX_SAFE_INTEGER JavaScript drops an integer's low digits and two different ids
 // compare equal. A timestamp plus one random digit gave only 11 ids per millisecond, so a burst of mints
@@ -188,7 +183,15 @@ export const getNewId = () => {
   return lastIdIssued;
 };
 
-export const getNewUUID = () => uuidv4();
+// A random (version 4) UUID. crypto.getRandomValues is the browser's on web and react-native-get-random-values
+// on native; Math.random is not random enough for ids that must never collide across devices.
+export const getNewUUID = () => {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = bytes[6] % 16 + 0x40; // version 4: high four bits 0100
+  bytes[8] = bytes[8] % 64 + 0x80; // RFC 9562 variant: high two bits 10
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+};
 
 export const getTimeAndDateFromModifiedTimestamp = (field) => {
   return {

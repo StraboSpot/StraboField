@@ -1,11 +1,16 @@
 import {createSlice} from '@reduxjs/toolkit';
 
+import {getNewUUID} from '../../shared/helpers';
+
 const initialConnectionsState = {
   databaseEndpoint: {
     endpoint: '',
     isSelected: false,
     isVerified: false,
   },
+  // Identifies this install to the server (the X-Strabo-Device header). Persisted and never reset, so it outlives
+  // signing out; the one minted here only sticks on an install's first launch, since rehydration replaces it after.
+  deviceId: getNewUUID(),
   isAutoSaving: false,
   isAutoSyncing: false,
   isForceOffline: false,
@@ -28,6 +33,8 @@ const initialConnectionsState = {
   nextAutoSyncTime: null,
   pendingUploadDatasetIds: [],
   projectSaveStatus: null,
+  // When Spots were last uploaded, so views showing what the server has can check again
+  spotsUploadedTimestamp: null,
 };
 
 const connectionsSlice = createSlice({
@@ -132,6 +139,9 @@ const connectionsSlice = createSlice({
     setProjectSaveStatus(state, action) {
       state.projectSaveStatus = action.payload;
     },
+    setSpotsUploadedTimestamp(state, action) {
+      state.spotsUploadedTimestamp = action.payload;
+    },
     setNextAutoSaveTime(state, action) {
       state.nextAutoSaveTime = action.payload;
     },
@@ -186,6 +196,7 @@ export const {
   setProjectSaveStatus,
   setPendingImagesChanges,
   setProjectSyncNeeded,
+  setSpotsUploadedTimestamp,
   setTransferringImages,
   setWifiOnlyForImages,
   updatedProjectTransferProgress,

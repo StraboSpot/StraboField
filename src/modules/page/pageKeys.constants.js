@@ -7,7 +7,6 @@ export const PAGE_KEYS = {
   FOSSILS: 'fossils',
   GEOGRAPHY: 'geography',
   GEOLOGIC_UNITS: 'geologic_unit',
-  IGSN: 'igsn',
   IMAGES: 'images',
   INTERPRETATIONS: 'interpretations',
   INTERVAL: 'interval',
@@ -69,8 +68,6 @@ export const MODAL_KEYS = {
     ADD_SPOTS_TO_REPORTS: 'AddSpotsToReports',
     INSPECT_SPOTS_RAW_DATA: 'InspectSpotsRawData',
     ADD_TAGS_TO_SPOTS: 'AddTagsToSpots',
-    DAILY_NOTES: 'daily_setup',
-    FEATURE_TAGS: 'FeatureTags',
     GEOLOGIC_UNITS: 'geologic_unit',
   },
 };

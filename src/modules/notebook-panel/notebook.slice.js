@@ -6,6 +6,8 @@ const initialNotebookState = {
   isNotebookPanelVisible: false,
   isSamplesModalVisible: false,
   morePagesSectionsCollapsed: [],
+  // The tab Sample Detail opens on next, when something asks for one other than Field
+  requestedSampleDetailTab: undefined,
   notebookPagesOn: ['geologic_unit', 'notes', 'orientation_data', 'images', 'tags', 'samples'],
   // notebookPagesOn: PRIMARY_PAGES.map(p => p.key),  // This worked in Native but not Web
   visibleNotebookPagesStack: [],
@@ -45,6 +47,9 @@ const notebookSlice = createSlice({
         visibleNotebookPagesStack = state.visibleNotebookPagesStack.push(action.payload);
       }
     },
+    setRequestedSampleDetailTab(state, action) {
+      state.requestedSampleDetailTab = action.payload;
+    },
     setNotebookPageVisibleToPrev(state) {
       state.visibleNotebookPagesStack = state.visibleNotebookPagesStack.slice(0, -1);
     },
@@ -59,6 +64,7 @@ export const {
   setMorePagesSectionsCollapsed,
   setNotebookPageVisible,
   setNotebookPageVisibleToPrev,
+  setRequestedSampleDetailTab,
 } = notebookSlice.actions;
 
 export default notebookSlice.reducer;

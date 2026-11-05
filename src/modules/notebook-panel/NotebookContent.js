@@ -1,8 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import {LeavePageContext} from './LeavePageContext';
 import NotebookFooter from './notebook-footer/NotebookFooter';
 import NotebookHeader from './notebook-header/NotebookHeader';
 import {setNotebookPageVisible} from './notebook.slice';
@@ -13,7 +14,7 @@ import ClearButton from '../../shared/ui/buttons/ClearButton';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import {MAIN_MENU_ITEMS} from '../main-menu-panel/mainMenu.constants';
 import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
@@ -38,11 +39,12 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const projectName = useSelector(state => state.project.project?.description?.project_name);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {goToNotebookPage} = useContext(LeavePageContext);
 
   const {getAllRelevantPages, getPopulatedPagesKeys} = usePage();
   const {
     getRootSpot,
-    getSpotWithThisImageBasemap,
+    getSpotWithThisImage,
     handleSpotSelected,
     isSpotReadOnly,
   } = useSpots();
@@ -52,6 +54,9 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   // The open sample form's current values, registered by the page that renders it so the footer's 'Add Data to
   // Sample' can carry the edits on screen into the sample it creates
   const getSampleValuesRef = useRef(null);
+  // The open sample form's unsaved changes and a way to save them, registered the same way, so the footer's 'Link
+  // Sample' can have them saved before the sample is linked
+  const sampleChangesRef = useRef(null);
 
   const [selectedSample, setSelectedSample] = useState({});
 
@@ -60,7 +65,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   const isReadOnly = isSpotReadOnly(spot);
   const isSample = !isEmpty(selectedSample) || spot.properties?.isSample;
   const spotWithThisImageBasemap = spot.properties?.image_basemap
-    && getSpotWithThisImageBasemap(spot.properties.image_basemap);
+    && getSpotWithThisImage(spot.properties.image_basemap);
   const isSampleOrSampleChild = isSample || spotWithThisImageBasemap?.properties?.isSample;
   const pageVisible = pagesStack.slice(-1)[0];
 
@@ -70,7 +75,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     console.log('UE NotebookContent [pageVisible, spot]', pageVisible, spot);
     if (isMultipleFeaturesTaggingEnabled) dispatch(setMultipleFeaturesTaggingEnabled(false));
     if (isNotebookPanelVisible && spot.properties?.isSample && isEmpty(spot.properties.samples)) {
-      dispatch(setModalVisible({modal: MODAL_KEYS.NOTEBOOK.SAMPLES}));
+      dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.SAMPLES}));
     }
     const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
       || getAllRelevantPages().some(p => p.key === pageVisible)
@@ -84,16 +89,16 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
 
   /* Logic Helpers */
 
-  const openPage = (key) => {
-    dispatch(setNotebookPageVisible(key));
+  const openPage = async (key) => {
+    if (!await goToNotebookPage(key)) return;
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
-    if (SMALL_SCREEN || isReadOnly) dispatch(setModalVisible({modal: null}));
+    if (SMALL_SCREEN || isReadOnly) dispatch(setActiveModal({modal: null}));
     else if (page.modal_component) {
       const populatedPagesKeys = getPopulatedPagesKeys(spot);
-      if (populatedPagesKeys.includes(page.key)) dispatch(setModalVisible({modal: null}));
-      else dispatch(setModalVisible({modal: page.key}));
+      if (populatedPagesKeys.includes(page.key)) dispatch(setActiveModal({modal: null}));
+      else dispatch(setActiveModal({modal: page.key}));
     }
-    else dispatch(setModalVisible({modal: null}));
+    else dispatch(setActiveModal({modal: null}));
   };
 
   const openDatasetsPage = () => {
@@ -106,12 +111,13 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
 
   const renderNotebookContent = () => {
     const page = NOTEBOOK_PAGES.find(p => p.key === pageVisible);
-    const Page = page?.page_component || Overview;
+    const Page = page?.page_component() || Overview;
     let pageProps = {isReadOnly: isReadOnly, isSample: isSample, openMainMenuPanel: openMainMenuPanel, page: page};
     if (page?.key === PAGE_KEYS.SAMPLES) {
       pageProps = {
         ...pageProps,
         registerGetValues: getSampleValuesRef,
+        registerSaveChanges: sampleChangesRef,
         selectedSample: selectedSample,
         setSelectedSample: setSelectedSample,
       };
@@ -133,13 +139,15 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
         </View>
         <View style={[{flex: 1}, isSampleOrSampleChild && notebookStyles.sampleBorder]}>
           <View style={notebookStyles.centerContainer}>
-            <Page {...pageProps}/>
+            {/* Keyed by page, so a component that serves several pages (RocksPage, SedFeaturesPage) starts fresh */}
+            <Page key={page?.key} {...pageProps}/>
           </View>
           <NotebookFooter
             isReadOnly={isReadOnly}
             isRichSample={spot.properties?.isSample}
             openPage={openPage}
             registerGetValues={getSampleValuesRef}
+            sampleChangesRef={sampleChangesRef}
             selectedSample={selectedSample}
           />
         </View>

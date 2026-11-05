@@ -8,8 +8,6 @@ import {BACKUP_ICON_NAMES, ICON_TYPE} from './backup.constants';
 import backupStatusStyles from './backupStatus.styles';
 import BackupStatusModal from './BackupStatusModal';
 import SyncConflictModal from './SyncConflictModal';
-import UploadModal from './UploadModal';
-import useBackupUpload from './useBackupUpload';
 import * as themes from '../../../shared/styles.constants';
 import homeStyles from '../../home/home.styles';
 
@@ -61,13 +59,10 @@ const BackupStatusIcons = () => {
   const isTransferringImages = useSelector(state => state.connections.isTransferringImages);
   const pendingUploadDatasetIds = useSelector(state => state.connections.pendingUploadDatasetIds);
   const saveFrequency = useSelector(state => state.connections.backupFrequency?.save);
-  const syncFrequency = useSelector(state => state.connections.backupFrequency?.sync);
 
   const imagesBounce = useBounceAnimation(isTransferringImages);
   const saveBounce = useBounceAnimation(isAutoSaving);
   const syncBounce = useBounceAnimation(isAutoSyncing);
-  const {closeUploadModal, isUploadAutoStart, isUploadModalVisible, isUploadPending: isUploadHostPending, startUploadFromStatus}
-    = useBackupUpload();
 
   /* Local State */
 
@@ -75,36 +70,26 @@ const BackupStatusIcons = () => {
 
   /* Derived Variables */
 
-  const isSaveVisible = !!saveFrequency && (isLocalSaveNeeded || isAutoSaving);
+  // Uploads and downloads save first even with auto save off, so a running save always shows
+  const isSaveVisible = isAutoSaving || (!!saveFrequency && isLocalSaveNeeded);
   const isUploadPending = isProjectSyncNeeded || pendingUploadDatasetIds.length > 0;
   const isImagesActive = isPendingImagesChanges || isTransferringImages;
-  const isSyncVisible = !!syncFrequency && (isUploadPending || isAutoSyncing);
+  // Shown with auto sync off too: the changes still need syncing, just with Sync Now
+  const isSyncVisible = isUploadPending || isAutoSyncing;
   // A distinct icon for when images are the only thing left to sync - if project/dataset
   // changes are pending or a sync is running, the upload icon above already covers it.
-  const isImagesOnlyVisible = !!syncFrequency && isImagesActive && !isUploadPending && !isAutoSyncing;
+  const isImagesOnlyVisible = isImagesActive && !isUploadPending && !isAutoSyncing;
   // Conflicts persist across restart, so surface them regardless of sync frequency.
   const isConflictVisible = conflictedDatasetIds.length > 0;
 
-  /* Event Handlers */
-
-  const onUploadFromStatus = () => startUploadFromStatus(() => setIsModalVisible(false));
-
   /* View */
 
-  // isUploadHostPending keeps the icon host mounted across the transient gap after an upload (see useBackupUpload).
-  if (!isSaveVisible && !isSyncVisible && !isImagesOnlyVisible && !isConflictVisible && !isModalVisible
-    && !isUploadModalVisible && !isUploadHostPending) return null;
+  if (!isSaveVisible && !isSyncVisible && !isImagesOnlyVisible && !isConflictVisible && !isModalVisible) return null;
 
   return (
     <>
       <BackupStatusModal isVisible={isModalVisible} onClose={() => setIsModalVisible(false)}/>
       <SyncConflictModal/>
-      <BackupStatusModal
-        isVisible={isModalVisible}
-        onClose={() => setIsModalVisible(false)}
-        onUpload={onUploadFromStatus}
-      />
-      <UploadModal autoStart={isUploadAutoStart} closeModal={closeUploadModal} isVisible={isUploadModalVisible}/>
       <TouchableOpacity onPress={() => setIsModalVisible(true)}>
         <View style={backupStatusStyles.backupStatusContainer}>
           {isConflictVisible && (

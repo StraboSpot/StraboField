@@ -24,7 +24,7 @@ const Map = ({
                editFeatureVertex,
                handleMapLongPress,
                handleMapPress,
-               isShowMacrostratOverlay,
+               isShowMacrostratUnitInfo,
                location,
                mapMode,
                mapRef,
@@ -58,8 +58,8 @@ const Map = ({
   /* Side Effects */
 
   useEffect(() => {
-    console.log('isShowMacrostratOverlay', isShowMacrostratOverlay);
-  }, [isShowMacrostratOverlay, basemap]);
+    console.log('isShowMacrostratUnitInfo', isShowMacrostratUnitInfo);
+  }, [isShowMacrostratUnitInfo, basemap]);
 
   useEffect(() => {
     console.log('Map ID changed to:', currentMapId);
@@ -105,7 +105,7 @@ const Map = ({
           basemap={basemap}
           drawFeatures={drawFeatures}
           editFeatureVertex={editFeatureVertex}
-          isShowMacrostratOverlay={isShowMacrostratOverlay}
+          isShowMacrostratUnitInfo={isShowMacrostratUnitInfo}
           location={location}
           mapMode={mapMode}
           measureFeatures={measureFeatures}

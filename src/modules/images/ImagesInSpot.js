@@ -7,7 +7,6 @@ import ImagePropertiesModal from './ImagePropertiesModal';
 import ImagesList from './ImagesList';
 import useImages from './useImages';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import SketchModal from '../sketch/SketchModal';
 import {editedSpotProperties} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
@@ -17,7 +16,6 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEm
 
   const dispatch = useDispatch();
   const images = useSelector(state => state.spot.selectedSpot.properties?.images) || [];
-  const selectedSpot = useSelector(state => state.spot.selectedSpot);
 
   const {deleteImageFromSpot} = useImages();
   const {getSpotByImageId} = useSpots();
@@ -80,7 +78,6 @@ const ImagesInSpot = ({isReadOnly, onOpenImage, onOpenImageProperties, onPressEm
 
   const saveUpdatedImage = (updatedImage) => {
     const updatedImages = images.map(i => i.id === updatedImage.id ? updatedImage : i);
-    dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot?.properties?.id]));
     dispatch(editedSpotProperties({field: 'images', value: updatedImages}));
   };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, Text, TextInput, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {CheckBox} from '@rn-vui/base';
 import {useSelector} from 'react-redux';
@@ -14,6 +14,7 @@ import {
   SMALL_TEXT_SIZE,
   TEXT_WEIGHT_700,
 } from '../../../shared/styles.constants';
+import TextInput from '../../../shared/ui/TextInput';
 import LottieAnimations from '../../../utils/animations/LottieAnimations';
 import {TAG_BACKUP_ACTIONS} from '../../tags/backup/tagBackup.constants';
 import {TEMPLATE_BACKUP_ACTIONS} from '../../templates/templates.constants';

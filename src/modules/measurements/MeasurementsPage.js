@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {SectionList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
@@ -18,23 +18,27 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import {COMPASS_TOGGLE_BUTTONS} from '../compass/compass.constants';
 import {setCompassMeasurements, setCompassMeasurementTypes} from '../compass/compass.slice';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 import PageHeader from '../page/PageHeader';
-import {setSelectedAttributes} from '../spots/spots.slice';
+import {deselectedAttributes, setSelectedAttributes} from '../spots/spots.slice';
 
 const MeasurementsPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const compassMeasurements = useSelector(state => state.compass.measurements);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   const {createNewMeasurement, deleteMeasurements} = useMeasurements();
 
   /* Local State */
+
+  // The selection as this page last showed it, which is all it may drop as it closes
+  const selectedAttributesRef = useRef(selectedAttributes);
+  selectedAttributesRef.current = selectedAttributes;
 
   const [isDetailView, setIsDetailView] = useState(false);
   const [multiSelectMode, setMultiSelectMode] = useState();
@@ -61,7 +65,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
 
   useEffect(() => {
     console.log('UE MeasurementsPage []');
-    return () => dispatch(setSelectedAttributes([]));
+    return () => dispatch(deselectedAttributes(selectedAttributesRef.current));
   }, []);
 
   useEffect(() => {
@@ -74,7 +78,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
     console.log('UE MeasurementsPage [compassMeasurements]', compassMeasurements);
     if (!isEmpty(compassMeasurements) && !isDetailView) {
       console.log('New compass measurement recorded in Measurements.', compassMeasurements);
-      if (compassMeasurements.manual) dispatch(setModalVisible({modal: false}));
+      if (compassMeasurements.manual) dispatch(setActiveModal({modal: null}));
       createNewMeasurement();
       dispatch(setCompassMeasurements({}));
     }
@@ -85,7 +89,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   const onIdentifyAll = (type, data) => {
     console.log('Identify All:', data);
     setMultiSelectMode();
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
     dispatch(setSelectedAttributes(data));
     setIsDetailView(true);
   };
@@ -113,7 +117,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
 
   const onSelectingEnd = () => {
     console.log('Identify Selected:', selectedFeaturesTemp);
-    if (selectedFeaturesTemp.length > 1) dispatch(setModalVisible({modal: null}));
+    if (selectedFeaturesTemp.length > 1) dispatch(setActiveModal({modal: null}));
     dispatch(setSelectedAttributes(selectedFeaturesTemp));
     setIsDetailView(true);
   };
@@ -128,7 +132,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
 
   const addMeasurement = (type) => {
     dispatch(setCompassMeasurementTypes(SECTIONS[type].compass_toggles));
-    dispatch(setModalVisible({modal: page.key}));
+    dispatch(setActiveModal({modal: page.key}));
   };
 
   const deleteMeasurementsConfirm = (measurementsToDelete) => {
@@ -164,7 +168,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
   const editMeasurement = (measurements) => {
     setIsDetailView(true);
     dispatch(setSelectedAttributes(measurements));
-    if (measurements.length > 1) dispatch(setModalVisible({modal: null}));
+    if (measurements.length > 1) dispatch(setActiveModal({modal: null}));
   };
 
   const getIdsOfSelected = () => {
@@ -235,7 +239,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
                     title={'Select'}
                   />
                 </>
-                {!modalVisible && (
+                {!activeModal && (
                   <ClearButton
                     disabled={isMultipleFeaturesTaggingEnabled}
                     icon={{
@@ -279,7 +283,7 @@ const MeasurementsPage = ({isReadOnly, page}) => {
           return (
             section.data.length === 0 && (
               <ListEmptyText
-                onPress={!isReadOnly && !modalVisible && (() => addMeasurement(sectionType))}
+                onPress={!isReadOnly && !activeModal && (() => addMeasurement(sectionType))}
                 text={'No ' + section.title}
               />
             )

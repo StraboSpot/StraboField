@@ -1,64 +1,37 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {SectionList, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
 import ThreeDStructureItem from './ThreeDStructureItem';
 import {THREE_D_STRUCTURE_SECTIONS} from './threeDStructures.constants';
-import {getNewUUID, isEmpty, toTitleCase} from '../../shared/helpers';
+import {getNewUUID, toTitleCase} from '../../shared/helpers';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../shared/ui/ListEmptyText';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRightButton';
 import useForm from '../form/useForm';
-import {setModalValues, setModalVisible} from '../home/home.slice';
-import BasicPageDetail from '../page/BasicPageDetail';
+import {setActiveModal, setModalValues} from '../home/home.slice';
+import FeatureDetail from '../page/FeatureDetail';
 import PageHeader from '../page/PageHeader';
-import {setSelectedAttributes} from '../spots/spots.slice';
+import useFeatureDetailView from '../page/useFeatureDetailView';
 
 const ThreeDStructuresPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {closeDetailView, isDetailView, openDetailView, selectedFeature} = useFeatureDetailView();
   const {getLabel} = useForm();
-
-  /* Local State */
-
-  const [isDetailView, setIsDetailView] = useState(false);
-  const [selected3dStructure, setSelected3dStructure] = useState({});
-
-  /* Side Effects */
-
-  useEffect(() => {
-    console.log('UE ThreeDStructuresPage []');
-    return () => dispatch(setSelectedAttributes([]));
-  }, []);
-
-  useEffect(() => {
-    console.log('UE ThreeDStructuresPage [selectedAttributes, spot]', selectedAttributes, spot);
-    if (isEmpty(selectedAttributes)) setSelected3dStructure({});
-    else if (!isMultipleFeaturesTaggingEnabled) {
-      setSelected3dStructure(selectedAttributes[0]);
-      setIsDetailView(true);
-    }
-  }, [selectedAttributes, spot]);
 
   /* Logic Helpers */
 
   const add3dStructure = (type) => {
     const new3dStructure = {id: getNewUUID(), type: type};
     dispatch(setModalValues(new3dStructure));
-    dispatch(setModalVisible({modal: page.key}));
-  };
-
-  const edit3dStructure = (threeDStructure) => {
-    dispatch(setSelectedAttributes([threeDStructure]));
-    setSelected3dStructure(threeDStructure);
-    setIsDetailView(true);
+    dispatch(setActiveModal({modal: page.key}));
   };
 
   const get3dStructureTitle = (threeDStructure) => {
@@ -71,7 +44,7 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
   /* Render Functions */
 
   const render3dStructure = (threeDStructure) => {
-    return <ThreeDStructureItem edit3dStructure={item => edit3dStructure((item))} item={threeDStructure}/>;
+    return <ThreeDStructureItem edit3dStructure={openDetailView} item={threeDStructure}/>;
   };
 
   const renderSectionHeader = (sectionTitle) => {
@@ -133,11 +106,11 @@ const ThreeDStructuresPage = ({isReadOnly, page}) => {
         </View>
       )}
       {isDetailView && (
-        <BasicPageDetail
-          closeDetailView={() => setIsDetailView(false)}
+        <FeatureDetail
+          closeDetailView={closeDetailView}
           isReadOnly={isReadOnly}
           page={page}
-          selectedFeature={selected3dStructure}
+          selectedFeature={selectedFeature}
         />
       )}
     </>

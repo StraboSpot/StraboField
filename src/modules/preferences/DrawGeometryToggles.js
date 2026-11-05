@@ -12,8 +12,8 @@ import {toTitleCase} from '../../shared/helpers';
 import AvatarWrapper from '../../shared/ui/avatars/AvatarWrapper';
 import FlatListItemSeparator from '../../shared/ui/FlatListItemSeparator';
 import SectionDivider from '../../shared/ui/SectionDivider';
-import {DRAW_ACTION_IMAGES} from '../home/buttons/drawActionButtons.constants';
-import useDrawGeometryToggle from '../home/buttons/useDrawGeometryToggle';
+import {DRAW_ACTION_IMAGES} from '../home/drawing/drawActionButtons.constants';
+import useDrawGeometryToggle from '../home/drawing/useDrawGeometryToggle';
 import {MAP_MODES} from '../maps/maps.constants';
 
 const DrawGeometryToggles = () => {

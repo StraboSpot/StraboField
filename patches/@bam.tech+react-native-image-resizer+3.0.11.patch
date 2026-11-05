@@ -1,8 +1,30 @@
+diff --git a/node_modules/@bam.tech/react-native-image-resizer/ios/ImageResizer.mm b/node_modules/@bam.tech/react-native-image-resizer/ios/ImageResizer.mm
+index ac23dd8..99d1d2c 100644
+--- a/node_modules/@bam.tech/react-native-image-resizer/ios/ImageResizer.mm
++++ b/node_modules/@bam.tech/react-native-image-resizer/ios/ImageResizer.mm
+@@ -57,8 +57,15 @@ RCT_REMAP_METHOD(createResizedImage, uri:(NSString *)uri width:(double)width hei
+                     reject([NSString stringWithFormat: @"%ld", (long)error.code], error.description, nil);
+                     return;
+                 }
+-                NSDictionary * response =  transformImage(image, uri, [rotation integerValue], newSize, fullPath, format, (int)quality, [keepMeta boolValue], @{@"mode": mode, @"onlyScaleDown": [NSNumber numberWithBool:onlyScaleDown]});
+-                resolve(response);
++                // transformImage raises on failure, and this block runs after the outer @try has exited,
++                // so an uncaught raise here crashes the app instead of rejecting the promise.
++                @try {
++                    NSDictionary * response =  transformImage(image, uri, [rotation integerValue], newSize, fullPath, format, (int)quality, [keepMeta boolValue], @{@"mode": mode, @"onlyScaleDown": [NSNumber numberWithBool:onlyScaleDown]});
++                    resolve(response);
++                } @catch (NSException *exception) {
++                    RCTLogError(@"%@", [NSString stringWithFormat:@"Code : %@ / Message : %@", exception.name, exception.reason]);
++                    reject(exception.name, exception.reason, nil);
++                }
+             }];
+         } @catch (NSException *exception) {
+             RCTLogError(@"%@", [NSString stringWithFormat:@"Code : %@ / Message : %@", exception.name, exception.reason]);
 diff --git a/node_modules/@bam.tech/react-native-image-resizer/react-native-image-resizer.podspec b/node_modules/@bam.tech/react-native-image-resizer/react-native-image-resizer.podspec
-index 1234567..abcdefg 100644
+index 1848ae8..305b1de 100644
 --- a/node_modules/@bam.tech/react-native-image-resizer/react-native-image-resizer.podspec
 +++ b/node_modules/@bam.tech/react-native-image-resizer/react-native-image-resizer.podspec
-@@ -27,7 +27,6 @@
+@@ -27,7 +27,6 @@ Pod::Spec.new do |s|
          "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
      }
      s.dependency "React-Codegen"

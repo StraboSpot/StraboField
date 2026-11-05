@@ -16,9 +16,13 @@ import FormikWrapper from '../form/FormikWrapper';
 import NumberInputField from '../form/inputs/NumberInputField';
 import {MODAL_KEYS} from '../page/pageKeys.constants';
 
+// Formik keeps no values at all without initial ones, and the first write then fails. This is one object rather than
+// a fresh {} per render, which enableReinitialize would take as new initial values and clear what was typed.
+const NO_INITIAL_VALUES = {};
+
 const ManualMeasurement = ({
                              addAttributeMeasurement,
-                             initialValues,
+                             initialValues = NO_INITIAL_VALUES,
                              measurementTypes,
                              setAttributeMeasurements,
                              setSliderValue,
@@ -27,7 +31,7 @@ const ManualMeasurement = ({
                            }) => {
   /* Data Hooks */
 
-  const modalVisible = useSelector(state => state.home.modalVisible);
+  const activeModal = useSelector(state => state.home.activeModal);
 
   /* Local State */
 
@@ -105,8 +109,8 @@ const ManualMeasurement = ({
               <FlatListItemSeparator/>
             </>
           )}
-          {setAttributeMeasurements && modalVisible !== MODAL_KEYS.SHORTCUTS.MEASUREMENT
-            && modalVisible !== MODAL_KEYS.NOTEBOOK.MEASUREMENTS && (
+          {setAttributeMeasurements && activeModal !== MODAL_KEYS.SHORTCUTS.MEASUREMENT
+            && activeModal !== MODAL_KEYS.NOTEBOOK.MEASUREMENTS && (
               <>
                 <View style={compassStyles.sliderContainer}>
                   <Text style={{...commonStyles.listItemTitle, fontWeight: 'bold'}}>Quality of Measurement</Text>

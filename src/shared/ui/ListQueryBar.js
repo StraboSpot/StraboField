@@ -15,9 +15,11 @@ import {
   WHITE,
 } from '../styles.constants';
 import PickerOverlay from './modals/PickerOverlay';
+import TextInput from './TextInput';
 
 // Presentational search + filter + sort + reverse bar shared by the Spots and Tags lists. Owns only the
-// picker open/close state; consumers supply the option data, the current values, and the callbacks.
+// picker open/close state; consumers supply the option data, the current values, and the callbacks. The filter,
+// sort and reverse buttons are each shown only when given their callback, so a list can offer search alone.
 const ListQueryBar = ({
                         filterOptions,
                         filterTitle = 'Filters',
@@ -65,6 +67,7 @@ const ListQueryBar = ({
     <>
       <View style={{flexDirection: 'row', alignItems: 'center', paddingHorizontal: 5, marginVertical: -5}}>
         <SearchBar
+          InputComponent={TextInput}
           containerStyle={{
             backgroundColor: SECONDARY_BACKGROUND_COLOR,
             borderBottomColor: 'transparent',
@@ -81,28 +84,34 @@ const ListQueryBar = ({
           value={searchValue}
         />
         <View style={{alignItems: 'center', flexDirection: 'row'}}>
-          <ClearButton
-            icon={{
-              color: isFilterActive ? WHITE : undefined,
-              containerStyle: isFilterActive
-                ? {backgroundColor: PRIMARY_ACCENT_COLOR, borderRadius: 10, marginHorizontal: 4, padding: 5}
-                : {marginHorizontal: 4},
-              name: 'filter-alt',
-              type: 'material',
-            }}
-            onPress={() => setIsFilterPickerVisible(true)}
-            size={'xs'}
-          />
-          <ClearButton
-            icon={{containerStyle: {marginHorizontal: 4}, name: 'sort', type: 'material'}}
-            onPress={() => setIsSortPickerVisible(true)}
-            size={'xs'}
-          />
-          <ClearButton
-            icon={{containerStyle: {marginHorizontal: 4}, name: 'swap-vert', type: 'material'}}
-            onPress={onReversePress}
-            size={'xs'}
-          />
+          {onFilterToggle && (
+            <ClearButton
+              icon={{
+                color: isFilterActive ? WHITE : undefined,
+                containerStyle: isFilterActive
+                  ? {backgroundColor: PRIMARY_ACCENT_COLOR, borderRadius: 10, marginHorizontal: 4, padding: 5}
+                  : {marginHorizontal: 4},
+                name: 'filter-alt',
+                type: 'material',
+              }}
+              onPress={() => setIsFilterPickerVisible(true)}
+              size={'xs'}
+            />
+          )}
+          {onSortSelect && (
+            <ClearButton
+              icon={{containerStyle: {marginHorizontal: 4}, name: 'sort', type: 'material'}}
+              onPress={() => setIsSortPickerVisible(true)}
+              size={'xs'}
+            />
+          )}
+          {onReversePress && (
+            <ClearButton
+              icon={{containerStyle: {marginHorizontal: 4}, name: 'swap-vert', type: 'material'}}
+              onPress={onReversePress}
+              size={'xs'}
+            />
+          )}
         </View>
       </View>
       <HorizontalLine style={{marginTop: 5}}/>

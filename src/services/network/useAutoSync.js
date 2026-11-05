@@ -13,7 +13,7 @@ import {
 import {setIsSyncConflictModalVisible} from '../../modules/home/home.slice';
 import {setIsImageTransferring} from '../../modules/project/projects.slice';
 import {store} from '../../store/ConfigureStore';
-import useDownload from '../files/useDownload';
+import useDownload, {isDownloadRunning} from '../files/useDownload';
 import useUpload from '../files/useUpload';
 import useUploadImages from '../files/useUploadImages';
 
@@ -43,10 +43,14 @@ const useAutoSync = () => {
   const SYNC_INTERVAL_MS = syncFrequency * 60 * 1000;
 
   const trySync = useCallback(async () => {
-    if (!isOnline || !projectId || !syncFrequency || isSyncingRef.current) return;
-    isSyncingRef.current = true;
-    // Capture live: this cycle may have been triggered by the user pressing "Sync Now".
+    // Capture live: this cycle may have been triggered by the user pressing "Sync Now", which works with auto sync off
     const isManualSync = store.getState().connections.isManualSyncRequested;
+    if (!isOnline || !projectId || (!syncFrequency && !isManualSync) || isSyncingRef.current || isDownloadRunning()) {
+      // A skipped Sync Now is dropped rather than left to make a later automatic sync act as a manual one
+      if (isManualSync) dispatch(setManualSyncRequested(false));
+      return;
+    }
+    isSyncingRef.current = true;
     try {
       dispatch(setAutoSyncing(true));
       // Classify datasets before pushing so we never clobber something changed on both sides: dataset

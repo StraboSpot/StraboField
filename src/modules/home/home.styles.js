@@ -121,6 +121,12 @@ const homeStyles = StyleSheet.create({
     right: 0,
     top: 100,
   },
+  // Lets Macrostrat unit info slide with the right side buttons. Level with them and the notebook drawer, so drawing
+  // order decides: over the buttons, under the notebook.
+  macrostratUnitInfoLayer: {
+    ...StyleSheet.absoluteFill,
+    zIndex: -1,
+  },
   mapActionsContainer: {
     bottom: 150,
     left: 10,
@@ -169,6 +175,30 @@ const homeStyles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
+  },
+  // A card like DrawInfo's above it. On a small screen the map actions pill is already the card, and the
+  // padding on the right matches the divider's on the left.
+  noTargetDatasetPrompt: SMALL_SCREEN ? {
+    alignItems: 'center',
+    paddingRight: 10,
+  } : {
+    alignItems: 'center',
+    backgroundColor: themes.SECONDARY_BACKGROUND_COLOR,
+    borderRadius: 10,
+    elevation: 2,
+    marginTop: 10,
+    padding: 10,
+    shadowColor: 'black',
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  noTargetDatasetPromptAction: {
+    color: themes.PRIMARY_ACCENT_COLOR,
+    fontSize: themes.SMALL_TEXT_SIZE,
+    fontWeight: 'bold',
+  },
+  noTargetDatasetPromptText: {
+    fontSize: themes.SMALL_TEXT_SIZE,
   },
   notebookButton: {
     position: 'absolute',

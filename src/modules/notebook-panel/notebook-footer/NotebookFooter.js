@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {View} from 'react-native';
+import React, {useContext, useState} from 'react';
+import {Text, View} from 'react-native';
 
 import {useSelector} from 'react-redux';
 
@@ -10,19 +10,40 @@ import * as themes from '../../../shared/styles.constants';
 import {BLACK, PRIMARY_ACCENT_COLOR} from '../../../shared/styles.constants';
 import ClearButton from '../../../shared/ui/buttons/ClearButton';
 import IconButton from '../../../shared/ui/buttons/IconButton';
+import OutlineButton from '../../../shared/ui/buttons/OutlineButton';
 import {NOTEBOOK_PAGES} from '../../page/page.constants';
 import usePage from '../../page/usePage';
+import LinkSampleModal from '../../samples/LinkSampleModal';
+import sampleStyles from '../../samples/samples.styles';
+import useLinkSampleAction from '../../samples/useLinkSampleAction';
 import useSamples from '../../samples/useSamples';
+import {LeavePageContext} from '../LeavePageContext';
 
-const NotebookFooter = ({openPage, isReadOnly, isRichSample, registerGetValues, selectedSample}) => {
+const NotebookFooter = ({
+                          isReadOnly,
+                          isRichSample,
+                          openPage,
+                          registerGetValues,
+                          sampleChangesRef,
+                          selectedSample,
+                        }) => {
   /* Data Hooks */
 
   const notebookPagesOn = useSelector(state => state.notebook.notebookPagesOn);
   const pagesState = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
 
   const {getAllRelevantPages} = usePage();
   const {createRichSample} = useSamples();
+  const {
+    closeLinkSampleModal,
+    isLinkOrUnlinkDisabled,
+    isLinkSampleModalVisible,
+    isLinked,
+    linkOrUnlinkSample,
+  } = useLinkSampleAction(
+    sampleChangesRef);
 
   /* Local State */
 
@@ -58,26 +79,55 @@ const NotebookFooter = ({openPage, isReadOnly, isRichSample, registerGetValues, 
     return notebookPageVisible === key ? page.icon_pressed_src : page.icon_src;
   };
 
+  // Picking a page there leaves this one, so its changes are asked about as the menu opens
+  const openMorePagesMenu = async () => {
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
+    setIsMorePagesMenuVisible(true);
+  };
+
   /* View */
 
   return (
     <View style={footerStyle.footerContainer}>
       {(!isEmpty(selectedSample) && !isRichSample) ? (
-        <View style={[footerStyle.footerIconContainer, {padding: 5}]}>
-          {/* Adding data rewrites the sample, so a read-only Spot doesn't offer it */}
-          {!isReadOnly && (
-            <ClearButton
-              icon={{
-                color: PRIMARY_ACCENT_COLOR,
-                name: 'add',
-                size: 20,
-              }}
-              onPress={convertToRichSample}
-              title={'Add Data to Sample'}
-              titleProps={{style: {color: PRIMARY_ACCENT_COLOR, fontSize: themes.MEDIUM_TEXT_SIZE}}}
-            />
+        // A sample kept on its parent Spot has no notebook menu of its own to link it from, so it is linked here
+        <>
+          <View style={[footerStyle.footerIconContainer, footerStyle.sampleButtonsContainer]}>
+            {/* Adding data and linking both rewrite the sample, so a read-only Spot offers neither */}
+            {!isReadOnly && (
+              <>
+                <OutlineButton
+                  containerStyle={footerStyle.sampleButtonContainer}
+                  icon={{
+                    color: PRIMARY_ACCENT_COLOR,
+                    name: 'add',
+                    size: 20,
+                  }}
+                  iconContainerStyle={{paddingRight: 0}}
+                  onPress={convertToRichSample}
+                  title={'Add Data'}
+                />
+                <OutlineButton
+                  containerStyle={footerStyle.sampleButtonContainer}
+                  disabled={isLinkOrUnlinkDisabled}
+                  icon={{
+                    color: PRIMARY_ACCENT_COLOR,
+                    name: isLinked ? 'unlink' : 'link',
+                    size: 20,
+                    type: 'ionicon',
+                  }}
+                  onPress={linkOrUnlinkSample}
+                  title={isLinked ? 'Unlink Sample' : 'Link Sample'}
+                />
+              </>
+            )}
+          </View>
+          {!isReadOnly && isLinkOrUnlinkDisabled && (
+            <Text style={[sampleStyles.offlineNote, {paddingBottom: 8, paddingTop: 0}]}>
+              Linking a sample needs an internet connection
+            </Text>
           )}
-        </View>
+        </>
       ) : (
         <>
           <View
@@ -91,7 +141,7 @@ const NotebookFooter = ({openPage, isReadOnly, isRichSample, registerGetValues, 
               />
             ))}
             <ClearButton
-              onPress={() => setIsMorePagesMenuVisible(true)}
+              onPress={openMorePagesMenu}
               title={'MORE'}
               titleProps={{style: {color: BLACK, fontSize: themes.MEDIUM_TEXT_SIZE}}}
             />
@@ -103,6 +153,11 @@ const NotebookFooter = ({openPage, isReadOnly, isRichSample, registerGetValues, 
           />
         </>
       )}
+      {/* Kept out of the sample's buttons, which go once linking makes the sample a Spot of its own */}
+      <LinkSampleModal
+        closeModal={closeLinkSampleModal}
+        isVisible={isLinkSampleModalVisible}
+      />
     </View>
   );
 };

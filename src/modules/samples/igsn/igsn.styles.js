@@ -1,19 +1,20 @@
 import {StyleSheet} from 'react-native';
 
-import * as themes from '../../../shared/styles.constants';
-
 const igsnStyles = StyleSheet.create({
   IGSNLogo: {
     height: 20,
     width: 20,
   },
-  IGSNLogoSmall: {
-    height: 20,
-    width: 20,
+  getIGSNButton: {
+    alignItems: 'center',
+    borderColor: 'black',
+    borderRadius: 7,
+    borderWidth: 1,
+    justifyContent: 'center',
+    padding: 2,
   },
-  mySesarUpdateDisclaimer: {
-    fontSize: themes.MEDIUM_TEXT_SIZE,
-    fontWeight: 'bold',
+  getIGSNText: {
+    fontSize: 10,
     textAlign: 'center',
   },
 });

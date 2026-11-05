@@ -1,9 +1,10 @@
 import {useRef, useState} from 'react';
 import {Platform} from 'react-native';
 
-import KeepAwake from 'react-native-keep-awake';
+import {activateKeepAwake, deactivateKeepAwake} from '@sayem314/react-native-keep-awake';
 import {useDispatch, useSelector} from 'react-redux';
 
+import {useAutoSaveNow} from './useAutoSave';
 import useUploadImages from './useUploadImages';
 import {
   addConflictedDatasetId,
@@ -13,6 +14,7 @@ import {
   setLastSyncedDatasetTimestamp,
   setLastSyncedProjectTimestamp,
   setPendingImagesChanges,
+  setSpotsUploadedTimestamp,
 } from '../../modules/connections/connections.slice';
 import {addedStatusMessage} from '../../modules/home/home.slice';
 import {stripMapboxTokenFromProject} from '../../modules/maps/custom-maps/customMaps.helpers';
@@ -20,6 +22,7 @@ import {
   addedDataset,
   addedProjectFromServer,
   deletedSpotIdFromDataset,
+  removedSampleSpotIdsToUpload,
   setIsImageTransferring,
 } from '../../modules/project/projects.slice';
 import useProject from '../../modules/project/useProject';
@@ -41,6 +44,7 @@ const useUpload = () => {
   const spotsRef = useRef(spots);
   spotsRef.current = spots;
 
+  const {autoSaveNow} = useAutoSaveNow();
   const {checkValidDateTime} = useProject();
   const {
     addDatasetToProject,
@@ -55,6 +59,8 @@ const useUpload = () => {
 
   /* Local State */
 
+  // Kept apart from uploadStatusMessage, which each upload step replaces
+  const [backupStatusMessage, setBackupStatusMessage] = useState('');
   const [uploadStatusMessage, setUploadStatusMessage] = useState('');
 
   /* Internal Functions */
@@ -71,8 +77,13 @@ const useUpload = () => {
         await addDatasetToProject(project.id, dataset.id);
         setUploadStatusMessage(`Finished uploading dataset ${dataset.name}...`);
         await uploadSpots(dataset);
-        dispatch(removePendingDatasetId(dataset.id));
-        // Server stores our timestamp verbatim, so local is now in sync - record it as the new base.
+        // An edit made while this was going up changed the timestamp and still has to go up, so it stays queued
+        const liveDataset = store.getState().project.datasets[dataset.id];
+        if (liveDataset && liveDataset.modified_timestamp !== dataset.modified_timestamp) {
+          console.log(dataset.name + ': Edited during upload, keeping it queued for the next sync.');
+        }
+        else dispatch(removePendingDatasetId(dataset.id));
+        // Server stores our timestamp verbatim, so it now has this copy - record it as the new base.
         dispatch(setLastSyncedDatasetTimestamp({id: dataset.id, timestamp: dataset.modified_timestamp}));
       }
       else {
@@ -112,6 +123,14 @@ const useUpload = () => {
         console.log(dataset.name + ': Uploading Spots...', spotCollection);
         setUploadStatusMessage(`Uploading ${dataset.name} spots...`);
         await updateDatasetSpots(dataset.id, spotCollection);
+        // A Spot edited again while it was going up still has changes the server has not seen
+        const liveSpots = store.getState().spot.spots;
+        const uploadedSpotIds = datasetSpots
+          .filter(spot => liveSpots[spot.properties.id]?.properties.modified_timestamp
+            === spot.properties.modified_timestamp)
+          .map(spot => spot.properties.id);
+        dispatch(removedSampleSpotIdsToUpload(uploadedSpotIds));
+        dispatch(setSpotsUploadedTimestamp(Date.now()));
         setUploadStatusMessage(`Finished uploading ${dataset.name} spots.`);
       }
     }
@@ -146,7 +165,7 @@ const useUpload = () => {
   };
 
   const initializeUpload = async () => {
-    if (Platform.OS !== 'web') KeepAwake.activate();
+    activateKeepAwake();
     try {
       console.log('Initializing Upload...');
       await uploadProject();
@@ -168,7 +187,7 @@ const useUpload = () => {
     }
     finally {
       // Release the wake lock on every path. A throw here used to skip it, leaving the screen awake indefinitely.
-      if (Platform.OS !== 'web') KeepAwake.deactivate();
+      deactivateKeepAwake();
     }
   };
 
@@ -239,6 +258,12 @@ const useUpload = () => {
 
   // Upload Project Properties
   const uploadProject = async () => {
+    // Every upload starts here, so save to the device first
+    setBackupStatusMessage('');
+    setUploadStatusMessage('Saving the project to the device...');
+    const {hasFailed, hasSaved} = await autoSaveNow();
+    if (hasSaved) setBackupStatusMessage('Saved a backup of the current project to the device.');
+    if (hasFailed) setBackupStatusMessage('Could not save a backup of the current project to the device.');
     // Read live from the store: an async caller (e.g. trySync) can close over a stale `project`
     // snapshot, which would make uploadedTimestamp mismatch the live store and never clear the flag.
     // Strip on the way out too: a project loaded before custom maps stopped storing the token still carries it.
@@ -266,6 +291,7 @@ const useUpload = () => {
   };
 
   return {
+    backupStatusMessage,
     initializeUpload,
     keepDeviceConflict,
     uploadDatasets,

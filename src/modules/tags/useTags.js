@@ -4,7 +4,7 @@ import {Text} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {TAG_FORM_NAMES, TAG_TYPES} from './tags.constants';
-import {filterTagsByTagType, getFeatureLabel, tagSpotExists} from './tags.helpers';
+import {filterTagsByTagType, getFeatureLabel, getTagTitle, tagSpotExists} from './tags.helpers';
 import {deepFindFeatureById, isEmpty} from '../../shared/helpers';
 import useForm from '../form/useForm';
 import MeasurementLabel from '../measurements/MeasurementLabel';
@@ -26,8 +26,8 @@ const useTags = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const reports = useSelector(state => state.project.project?.reports) || [];
   const selectedFeaturesForTagging = useSelector(state => state.spot.selectedAttributes) || [];
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
@@ -136,7 +136,7 @@ const useTags = () => {
 
   const addTag = () => {
     dispatch(setSelectedTag({}));
-    if (modalVisible === MODAL_KEYS.NOTEBOOK.TAGS) dispatch(addedTagToSelectedSpot(true));
+    if (activeModal === MODAL_KEYS.NOTEBOOK.TAGS) dispatch(addedTagToSelectedSpot(true));
     else dispatch(addedTagToSelectedSpot(false));
   };
 
@@ -280,7 +280,7 @@ const useTags = () => {
       updatedTags = tags.filter(tag => !tagIdsToSave.has(tag.id));
       updatedTags = tagToSave.map(tag => ({...tag, modified_timestamp: timestamp})).concat(updatedTags);
     }
-    updatedTags = updatedTags.sort((tagA, tagB) => tagA.name.localeCompare(tagB.name));
+    updatedTags = updatedTags.sort((tagA, tagB) => getTagTitle(tagA).localeCompare(getTagTitle(tagB)));
     dispatch(updatedProject({field: 'tags', value: updatedTags}));
   };
 

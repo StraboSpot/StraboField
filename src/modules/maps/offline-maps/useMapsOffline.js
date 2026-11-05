@@ -16,7 +16,7 @@ import useDevice from '../../../services/device/useDevice';
 import {APP_DIRECTORIES} from '../../../services/files/directories.constants';
 import {STRABO_APIS} from '../../../services/network/urls.constants';
 import useServerRequests from '../../../services/network/useServerRequests';
-import {isEmpty, toError} from '../../../shared/helpers';
+import {isEmpty, sleep, toError} from '../../../shared/helpers';
 import alert from '../../../shared/ui/alert';
 import config from '../../../utils/config';
 import {addedStatusMessage, removedLastStatusMessage} from '../../home/home.slice';
@@ -175,24 +175,36 @@ const useMapsOffline = () => {
     }
   };
 
+  // Polls one at a time, a second apart. A poll that doesn't get through (a dropped connection, the phone asleep) is
+  // retried and the status line says so; an error the server reports is not. The time limit is checked after a poll,
+  // so an app waking from sleep asks once more before giving up.
   const checkZipStatus = async (zipId) => {
-    return new Promise((resolve, reject) => {
-      const interval = setInterval(async () => {
-        const status = await zipURLStatus(zipId);
-        if (checkIfZipStatusReady(status)) {
-          clearInterval(interval);
-          resolve(status.status);
-        }
-      }, 1000);
-      // Set a timeout to reject the promise if the condition isn't met in a certain time
-      setTimeout(() => {
-        clearInterval(interval);
-        reject(new Error(`Timed out after 90 seconds waiting for zip ${zipId} to be ready`));
-      }, 90000);
-    }).catch((err) => {
-      console.error(`Error checking the status of zip ${zipId}`, err);
-      return Promise.reject(err);
-    });
+    const deadline = Date.now() + 90000;
+    let isWaitingForConnection = false;
+    const showStatus = (message) => {
+      dispatch(removedLastStatusMessage());
+      dispatch(addedStatusMessage(message));
+    };
+    while (true) {
+      let status;
+      try {
+        status = await zipURLStatus(zipId);
+        if (isWaitingForConnection) showStatus('Preparing Data...');
+        isWaitingForConnection = false;
+      }
+      catch (err) {
+        console.warn(`Checking the status of zip ${zipId} failed, trying again`, err);
+        if (!isWaitingForConnection) showStatus('Waiting for a connection to the map server...');
+        isWaitingForConnection = true;
+      }
+      if (status?.error) throw Error(status.error);
+      if (status && checkIfZipStatusReady(status)) return status.status;
+      if (Date.now() >= deadline) {
+        throw Error(isWaitingForConnection ? 'Could not reach the map server. Check your connection and try again.'
+          : 'The map server took too long to prepare the map. Try again, or save a smaller area.');
+      }
+      await sleep(1000);
+    }
   };
 
   const doUnzip = async () => {

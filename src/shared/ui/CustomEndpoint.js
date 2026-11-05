@@ -5,6 +5,7 @@ import {Input} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import SwitchWrapper from './SwitchWrapper';
+import TextInput from './TextInput';
 import uiStyles from './ui.styles';
 import {setCustomDatabaseUrl, setDatabaseIsSelected} from '../../modules/connections/connections.slice';
 import {updateCustomMap} from '../../modules/maps/maps.slice';
@@ -45,6 +46,7 @@ const CustomEndpoint = ({containerStyles, textStyles}) => {
         {isSelected && (
           <View style={uiStyles.customEndpointVerifyInputContainer}>
             <Input
+              InputComponent={TextInput}
               autoCapitalize={'none'}
               containerStyle={uiStyles.customEndpointInputContainer}
               defaultValue={endpoint}

@@ -22,7 +22,8 @@ const drawGeometryTogglesStyles = StyleSheet.create({
     borderColor: themes.PRIMARY_ACCENT_COLOR,
     borderRadius: 10,
     flex: 1,
-    height: Platform.OS === 'web' ? 35 : 45,
+    height: 'auto',
+    minHeight: Platform.OS === 'web' ? 35 : 45,
   },
   selectedButton: {
     backgroundColor: PRIMARY_ACCENT_COLOR,

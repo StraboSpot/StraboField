@@ -16,10 +16,9 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import Form from '../form/Form';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const groupKey = '_3d_structures';
@@ -64,7 +63,7 @@ const AddThreeDStructureModal = () => {
 
   /* Logic Helpers */
 
-  const closeModal = () => dispatch(setModalVisible({modal: null}));
+  const closeModal = () => dispatch(setActiveModal({modal: null}));
 
   const on3DStructureTypePress = (i) => {
     if (i !== selectedTypeIndex) {
@@ -88,7 +87,6 @@ const AddThreeDStructureModal = () => {
       let edited3DStructuresData = spot.properties[groupKey] ? JSON.parse(JSON.stringify(spot.properties[groupKey]))
         : [];
       edited3DStructuresData.push({...edited3DStructureData, id: getNewUUID()});
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: groupKey, value: edited3DStructuresData}));
       if (SMALL_SCREEN) closeModal();
     }

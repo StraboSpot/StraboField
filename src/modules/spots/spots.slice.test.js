@@ -1,4 +1,9 @@
-import spotReducer, {editedOrCreatedSpots, restoredIntervalDragSnapshot, setSelectedAttributes} from './spots.slice';
+import spotReducer, {
+  deselectedAttributes,
+  editedOrCreatedSpots,
+  restoredIntervalDragSnapshot,
+  setSelectedAttributes,
+} from './spots.slice';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
@@ -72,5 +77,29 @@ describe('selectedAttributes on changing the notebook page', () => {
     state = spotReducer(state, setNotebookPageVisible(PAGE_KEYS.MEASUREMENTS));
     state = spotReducer(state, setSelectedAttributes([measurement]));
     expect(state.selectedAttributes).toEqual([measurement]);
+  });
+});
+
+// A page that closes drops its own selection, but never one the page replacing it has already made
+describe('deselectedAttributes', () => {
+  const fabric = {id: 'f1', type: 'fault_rock'};
+  const mineral = {id: 'mn1'};
+
+  it('drops the selection while it is still the one given', () => {
+    const state = spotReducer({selectedAttributes: []}, setSelectedAttributes([fabric]));
+    expect(spotReducer(state, deselectedAttributes(state.selectedAttributes)).selectedAttributes).toEqual([]);
+  });
+
+  it('leaves a selection made since alone', () => {
+    const left = spotReducer({selectedAttributes: []}, setSelectedAttributes([fabric]));
+    const state = spotReducer(left, setSelectedAttributes([mineral]));
+    expect(spotReducer(state, deselectedAttributes(left.selectedAttributes)).selectedAttributes).toEqual([mineral]);
+  });
+
+  // A sed rock's link hands the Lithologies page the very lithology the sed rock page has open
+  it('leaves a selection made since alone, even of the same feature', () => {
+    const left = spotReducer({selectedAttributes: []}, setSelectedAttributes([fabric]));
+    const state = spotReducer(left, setSelectedAttributes([fabric]));
+    expect(spotReducer(state, deselectedAttributes(left.selectedAttributes)).selectedAttributes).toEqual([fabric]);
   });
 });

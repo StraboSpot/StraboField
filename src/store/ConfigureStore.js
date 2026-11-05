@@ -5,6 +5,7 @@ import {createMigrate, persistReducer, persistStore} from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 
 import listenerMiddleware from './listenerMiddleware';
+import propagateModifiedTimestamps from './propagateModifiedTimestamps';
 import compassSlice from '../modules/compass/compass.slice';
 import connectionsSlice from '../modules/connections/connections.slice';
 import homeSlice from '../modules/home/home.slice';
@@ -28,12 +29,17 @@ const migrations = {
       },
     },
   }),
+  // IGSNs are minted on strabospot.org now, so the app no longer keeps SESAR credentials
+  2: (state) => {
+    const {orcidToken, sesar, ...user} = state.user ?? {};
+    return {...state, user: user};
+  },
 };
 
 // Redux Persist
 export const persistConfig = {
   key: 'root',
-  version: 1,
+  version: 2,
   storage: AsyncStorage,
   blacklist: [
     'compass',
@@ -53,8 +59,8 @@ export const persistConfig = {
 const connectionsConfig = {
   key: 'connections',
   storage: AsyncStorage,
-  blacklist: ['isAutoSaving', 'isAutoSyncing', 'isForceOffline', 'isManualSyncRequested', 'projectSaveStatus',
-    'isTransferringImages', 'nextAutoSaveTime', 'nextAutoSyncTime'],
+  blacklist: ['isAutoSaving', 'isAutoSyncing', 'isForceOffline', 'isManualSyncRequested', 'isTransferringImages',
+    'nextAutoSaveTime', 'nextAutoSyncTime', 'projectSaveStatus', 'spotsUploadedTimestamp'],
   timeout: null,
 };
 
@@ -83,7 +89,7 @@ const homeConfig = {
     'loading',
     'messageModal',
     'modalValues',
-    'modalVisible',
+    'activeModal',
     'offlineMapToSaveId',
     'statusMessageModalTitle',
     'statusMessages',
@@ -96,6 +102,7 @@ const notebookConfig = {
   storage: AsyncStorage,
   blacklist: [
     'isNotebookPanelVisible',
+    'requestedSampleDetailTab',
     'visibleNotebookPagesStack',
   ],
   timeout: null,
@@ -178,9 +185,7 @@ const combinedReducers = combineReducers({
   user: userSlice,
 });
 
-const rootReducer = (state, action) => {
-  return combinedReducers(state, action);
-};
+const rootReducer = propagateModifiedTimestamps(combinedReducers);
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
@@ -196,15 +201,14 @@ const defaultMiddlewareOptions = {
 const store = configureStore({
   reducer: persistedReducer,
   middleware: getDefaultMiddleware => __DEV__
-    ? getDefaultMiddleware(defaultMiddlewareOptions)
-      .concat(loggerMiddleware, listenerMiddleware.middleware)
+    ? getDefaultMiddleware(defaultMiddlewareOptions).concat(loggerMiddleware, listenerMiddleware.middleware)
     : getDefaultMiddleware(defaultMiddlewareOptions).concat(listenerMiddleware.middleware),
 });
 
 let persistor = persistStore(store);
 
 // Expose the store on global in dev so it can be inspected/dispatched from the debugger console
-// (e.g. store.dispatch(...) to inject a test SESAR token). No-op in release builds.
+// (e.g. store.dispatch(...)). No-op in release builds.
 if (__DEV__) global.store = store;
 
 export {store, persistor};

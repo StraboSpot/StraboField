@@ -2,9 +2,10 @@
 //
 // An ordered list (newest release first) of what shipped in each PUBLIC release. Interim rc/patch
 // builds (e.g. the 2.30.x series) are not listed individually — their changes are rolled up into the
-// public release that ships them (e.g. 2.31.0). The About page shows the three most recent releases at or
-// below the running version (plus, in dev builds, not-yet-shipped ones flagged "unreleased"), then links to
-// RELEASES_URL for the rest. Older entries stay here, since scripts/release-notes.js reads them too.
+// public release that ships them (e.g. 2.31.0). The About page shows only the releases in the running
+// minor version (e.g. every 2.32.x up to 2.32.1), plus, in dev builds, not-yet-shipped ones flagged
+// "unreleased", with a button to RELEASES_URL for the rest. Older entries stay here, since
+// scripts/release-notes.js reads them too.
 //
 // Each release's highlights are organized into `groups` of related changes: {title, items}, where
 // each item is {text, commit}. `text` is the user-facing blurb (the part before the first colon is
@@ -27,8 +28,305 @@ export const RELEASES_URL = 'https://github.com/StraboSpot/StraboField/releases'
 
 const RELEASE_NOTES = [
   {
+    version: '2.33.0',
+    groups: [
+      {
+        title: 'StraboSamples',
+        items: [
+          {
+            text: 'Link to StraboSamples: link a Field sample to its StraboSamples record, comparing the two and choosing which values to keep',
+            commit: '25f6b8edd',
+            play: 'Link samples to StraboSamples',
+          },
+          {
+            text: 'Linked sample details: a linked sample shows its StraboSamples data in tabs, with a button to open it online and its last-updated date',
+            commit: '164cdc139',
+          },
+          {
+            text: 'StraboMicro PDFs: linking a sample downloads its StraboMicro project PDF so the Micro tab can open it offline',
+            commit: '300805b47',
+          },
+          {
+            text: 'Stays in sync: linked data refreshes when a project is downloaded or uploaded, and the PDF downloads again when the project has changed on the server',
+            commit: 'a99d641d2',
+          },
+          {
+            text: 'Offline aware: linking and online actions are disabled with a note while you have no connection',
+            commit: 'eb371316f',
+          },
+        ],
+      },
+      {
+        title: 'Map layers & offline maps',
+        items: [
+          {
+            text: 'New map layers menu: each map shows a thumbnail, with its own options for an overlay switch, opacity, and centering on the map',
+            commit: '3774a6e6a',
+            play: 'Redesigned map layers menu with thumbnails',
+          },
+          {
+            text: 'Offline overlays: save an overlay for offline use, not only the basemap',
+            commit: 'de9ac0881',
+          },
+          {
+            text: 'Save a whole custom map: save a custom map\'s full extent for offline use from its edit page, which also shows its offline tiles',
+            commit: '90c5fec9a',
+            play: 'Save overlays and whole custom maps offline',
+          },
+          {
+            text: 'Offline map details: open a panel for each offline map showing its tiles, size, zoom levels, and location',
+            commit: '128ad2f59',
+          },
+          {
+            text: 'Preview downloads: a Preview button shows what a download covers, with a banner naming the map',
+            commit: 'e5dc1e7f3',
+          },
+          {
+            text: 'Tidier Offline Maps page: default and custom maps are listed separately, and a header menu downloads tiles or finds maps on the device',
+            commit: '1f08ce4c3',
+          },
+          {
+            text: 'Offline viewing: downloaded custom maps can be viewed offline, and the basemap comes back after a preview',
+            commit: 'c5de4cab1',
+          },
+          {
+            text: 'Zoom wheel is back: choose how deep to save a map with the zoom wheel again',
+            commit: 'ae3e6b9f8',
+            platforms: ['ios'],
+          },
+        ],
+      },
+      {
+        title: 'Drawing & map editing',
+        items: [
+          {
+            text: 'Snap to Spots: new vertices and edits snap to the nearest vertex or edge of a nearby Spot, with an adjustable tolerance under Adding New Spots',
+            commit: '108926aaa',
+            play: 'Snap to Spots while drawing',
+          },
+          {
+            text: 'No target dataset prompt: when the draw tools are hidden because no target dataset is set, a prompt says so and opens Datasets',
+            commit: '95826c95b',
+          },
+          {
+            text: 'Safer map edits: you\'re asked to save a map edit or interval drag before anything else can change a Spot, with Discard, Keep Editing, or Save',
+            commit: '8c88ec3c1',
+          },
+          {
+            text: 'Edited Spots stay put: Spots edited on the map stay in their own datasets, and Cancel or a press off it cancels Set in Current View',
+            commit: '873858b8a',
+          },
+          {
+            text: 'Strat sections: dragging intervals saves only the intervals that moved',
+            commit: '124f7e08d',
+          },
+        ],
+      },
+      {
+        title: 'Notebook & forms',
+        items: [
+          {
+            text: 'Unsaved changes prompt: leaving a notebook page with unsaved changes, by any route, asks whether to Discard, Keep Editing, or Save',
+            commit: '94ddf2983',
+            play: 'Never lose unsaved notebook edits',
+          },
+          {
+            text: 'Save when changed: Save stays disabled until something on the form has changed',
+            commit: 'bf8cdf355',
+          },
+          {
+            text: 'Trace & surface features: a Trace Feature or Surface Feature section on the Overview replaces the switch, opening its form as a subpage',
+            commit: '86e7b3ef7',
+          },
+          {
+            text: 'Done bar on iOS: text fields have a Done button above the keyboard',
+            commit: '1eca1289a',
+            platforms: ['ios'],
+          },
+          {
+            text: 'Read-only forms: read-only forms no longer fill in defaults or offer to save',
+            commit: '069521849',
+          },
+        ],
+      },
+      {
+        title: 'Sedimentary',
+        items: [
+          {
+            text: 'Better sed labels: structures, diagenesis, fossils, and interpretations are labeled from the data they hold',
+            commit: 'ca983bde3',
+          },
+          {
+            text: 'Clearer rock names: an untyped sed rock reads Unknown Rock Type, titles add the first composition in parentheses, and "other" shows what you typed',
+            commit: '3fd06a6aa',
+          },
+          {
+            text: 'Hidden lithology data: a sed rock with Composition, Texture, or Stratification data says so, with a link to open it in Lithologies',
+            commit: 'b5ee7dfa4',
+          },
+          {
+            text: 'Cleaner lists: lithologies and sed features show by their titles, and lithologies without rock data are left out of the sed rock lists',
+            commit: '612f1db65',
+          },
+          {
+            text: 'Composition kept: saving the Lithology tab no longer erases types entered on the Composition tab',
+            commit: 'dcccf4c56',
+          },
+        ],
+      },
+      {
+        title: 'Nesting',
+        items: [
+          {
+            text: 'Every dataset: the Nesting page shows Spots nested on image basemaps, strat sections, and nesting lists from every dataset, turning on a dataset when you select its Spot',
+            commit: 'd90a469a8',
+          },
+          {
+            text: 'Legacy samples: legacy samples appear on the Nesting page and open on their Spot\'s Samples page',
+            commit: '1ef65cefa',
+          },
+          {
+            text: 'Rich sample parents: a rich sample\'s parents show again on the Nesting page',
+            commit: '5fd87a2f1',
+          },
+        ],
+      },
+      {
+        title: 'Templates',
+        items: [
+          {
+            text: 'Name with the values: a template\'s name is the first field of its form, without a separate naming step',
+            commit: '85b317b99',
+          },
+          {
+            text: 'Unsaved template changes: leaving a template editor with unsaved changes asks first',
+            commit: '3dbffe7d1',
+          },
+          {
+            text: 'Picker templates: deleting and clearing templates from a picker works the same as from the main menu',
+            commit: '60467dedd',
+          },
+        ],
+      },
+      {
+        title: 'Backups & sync',
+        items: [
+          {
+            text: 'Saved before sync: the open project is saved to the device before an upload or download, so recent changes can\'t be lost',
+            commit: 'dfb1c6ecb',
+            play: 'Project saved to the device before every sync',
+          },
+          {
+            text: 'Manage saves: delete single saves or all of them from My Saves and Auto Saves tabs, each showing how much space it takes',
+            commit: 'd54e93278',
+          },
+          {
+            text: 'More auto saves: each project keeps its own 30 most recent auto saves, so one project no longer prunes another\'s',
+            commit: 'df7a7d5be',
+          },
+          {
+            text: 'Safer downloads: a download that fails partway keeps the open project, and My Maps maps that finish checking late are kept',
+            commit: 'c89ec22c7',
+          },
+        ],
+      },
+      {
+        title: 'Fixes',
+        items: [
+          {
+            text: 'Compass shortcut: the Measurement shortcut no longer shows a blank screen when no Spot is selected',
+            commit: '43279fd0d',
+          },
+          {
+            text: 'Map edit markers: pressing just before Save no longer leaves stray edit markers on the map',
+            commit: '94459e8a8',
+          },
+          {
+            text: 'Highlighted parent: a rich sample\'s parent Spot stays highlighted while the sample is selected',
+            commit: '13ceb1470',
+          },
+          {
+            text: 'Missing images: an image that\'s missing can be deleted from the memo or sample that holds it',
+            commit: '5eccfe586',
+          },
+          {
+            text: 'Image import: dismissing Import shows a warning instead of reporting 0 images saved',
+            commit: '2d1d07250',
+          },
+          {
+            text: 'Macrostrat unit info: drawn above the home screen buttons',
+            commit: '099d2bff1',
+          },
+          {
+            text: 'Map options: the overlay icon opens map options instead of setting the basemap',
+            commit: 'f1421af22',
+          },
+          {
+            text: 'Connection status: read as soon as the app starts',
+            commit: '6db34a74b',
+          },
+          {
+            text: 'Android back button: closes every modal the same way its Close button does',
+            commit: '7a5613c44',
+            platforms: ['android'],
+          },
+          {
+            text: 'PDFs on Android: StraboMicro PDFs scroll, and links in them can be tapped',
+            commit: '646e58832',
+            platforms: ['android'],
+          },
+          {
+            text: 'Portrait photos on web: kept at full size when resized',
+            commit: '5502a4acc',
+            platforms: ['web'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    version: '2.32.1',
+    groups: [
+      {
+        title: 'Templates',
+        items: [
+          {
+            text: 'Templates menu: no longer crashes when a template group holds two or more templates',
+            commit: 'a19c26b2c',
+            play: 'Templates menu no longer crashes',
+          },
+        ],
+      },
+    ],
+  },
+  {
     version: '2.32.0',
     groups: [
+      {
+        title: 'Samples & IGSN',
+        items: [
+          {
+            text: 'IGSNs from strabospot.org: IGSNs now come from your strabospot.org account, so the app no longer signs in to or registers with SESAR',
+            commit: '83c1a2953',
+          },
+          {
+            text: 'IGSNs on strabospot.org: View IGSN and Get IGSN open the sample\'s own page on strabospot.org',
+            commit: '513ecad96',
+          },
+          {
+            text: 'Upload first: a sample not yet on your account offers to upload the project, then opens its page when the upload is done',
+            commit: '01961165d',
+          },
+          {
+            text: 'IGSN edits reminder: editing a sample that has an IGSN reminds you to upload so strabospot.org can update it',
+            commit: '48be0ae10',
+          },
+          {
+            text: 'Correct sample location: a sample from an image-basemap Spot gets a real-world location',
+            commit: 'c8bf57cce',
+          },
+        ],
+      },
       {
         title: 'Forms & validation',
         items: [
@@ -48,6 +346,15 @@ const RELEASE_NOTES = [
             text: 'Negative numbers on iOS: type negative values, with a keyboard matched to the field',
             commit: '37f4bd19b',
           },
+          {
+            text: 'Sensible limits: number fields reject impossible values, like negative thicknesses, percentages over 100, or azimuths past 360',
+            commit: '5a11493cb',
+          },
+          {
+            text: 'Number pad on iOS: fields that can\'t be negative open the number pad instead of the full keyboard',
+            commit: '5a11493cb',
+            platforms: ['ios'],
+          },
         ],
       },
       {
@@ -60,6 +367,33 @@ const RELEASE_NOTES = [
           {
             text: 'Declination without GPS: falls back through your project location and nearby Spots to stay corrected, with clearer warnings when it can\'t',
             commit: 'cbf505d88',
+          },
+          {text: 'Lineation hint: "Align long side with lineation" shows for linear measurements', commit: '58372162d'},
+        ],
+      },
+      {
+        title: 'Location',
+        items: [
+          {
+            text: 'Location button spinner: the Geography location button shows a spinner while it waits for a fix',
+            commit: '2d6bb68fa',
+          },
+          {
+            text: 'Location checked first: shortcuts and geolocate check that location is on and allowed before they start, and tell you if it isn\'t',
+            commit: '15a7596b7',
+          },
+          {
+            text: 'Clear location errors: a failed location lookup says why, and shortcuts no longer leave the spinner running',
+            commit: 'fc8402033',
+          },
+          {
+            text: 'Location Services off: a separate message tells you to turn Location Services back on in Settings',
+            commit: '0d228862c',
+            platforms: ['ios'],
+          },
+          {
+            text: 'Coordinate checks: Geography coordinates must be numbers, so a typo can no longer leave a Spot without a location',
+            commit: '166f2feee',
           },
         ],
       },
@@ -85,6 +419,10 @@ const RELEASE_NOTES = [
           },
           {text: 'Cleaner tag counts: a tag\'s counts show as icon chips instead of a legend', commit: '336086e36'},
           {text: 'Sample tagging: only samples that have their own Spot can be tagged', commit: '74bd5d3af'},
+          {
+            text: 'Synced tags stay current: saving a tag after an auto-sync no longer overwrites edits made on another device',
+            commit: 'e87e61904',
+          },
         ],
       },
       {
@@ -104,6 +442,10 @@ const RELEASE_NOTES = [
           {text: 'Feature labels: every feature list shows a label, filled in on save', commit: '0f264290d'},
           {text: 'Full Spots list: see the full Spots list when no Spot is selected', commit: '290258006'},
           {text: 'Collapsible More Pages: the More Pages sections collapse like the main menu\'s', commit: '63286a2b7'},
+          {
+            text: 'Tidier Overview: Sedimentary Rocks is hidden from the Overview when no lithology has rock data',
+            commit: '1e47168a7',
+          },
         ],
       },
       {
@@ -120,6 +462,14 @@ const RELEASE_NOTES = [
           {
             text: 'Map filter for Spots: filter Spots by whether they\'re on the geographic map or not mapped',
             commit: '7cddc4a4d',
+          },
+          {
+            text: 'Edited Spots stay put: editing a Spot on the map no longer also adds it to the target dataset, so it can\'t vanish from its own dataset after an upload',
+            commit: '422b1382f',
+          },
+          {
+            text: 'Fix Spots in two datasets: on the Metadata page, tap a dataset to move a Spot listed in several datasets into just that one',
+            commit: '116d6a0e6',
           },
         ],
       },
@@ -143,16 +493,9 @@ const RELEASE_NOTES = [
             text: 'Open with intervals: opening a section activates the datasets holding its intervals',
             commit: '6252cf94b',
           },
-        ],
-      },
-      {
-        title: 'Samples & IGSN',
-        items: [
-          {text: 'Steadier SESAR: improved login and token handling for IGSN registration', commit: '340bbda00'},
-          {text: 'Safer saves: Save is disabled when SESAR registration can\'t go through', commit: 'eed4069c7'},
           {
-            text: 'Correct sample location: a sample from an image-basemap Spot gets a real-world location',
-            commit: 'c8bf57cce',
+            text: 'Hidden datasets: opening a strat section or image basemap whose Spot is in a dataset that\'s off turns that dataset on',
+            commit: 'fe892bf49',
           },
         ],
       },
@@ -175,12 +518,140 @@ const RELEASE_NOTES = [
           },
           {text: 'Remembered map view: the map view is saved once the camera settles', commit: 'ae29924cc'},
           {text: 'Single name label: a Spot with multiple measurements draws its name label once', commit: '28772ecd6'},
+          {
+            text: 'Reliable offline map saves: a dropped connection, or the phone going to sleep, no longer breaks saving a map',
+            commit: 'e8db6fc14',
+          },
+          {
+            text: 'Zoom to Spot: a Spot without a usable location shows a message instead of an error',
+            commit: '1ddf6c498',
+          },
+        ],
+      },
+      {
+        title: 'Stability',
+        items: [
+          {
+            text: 'Recover instead of closing: if something unexpected goes wrong, the app offers Try Again instead of closing, and your data stays safe',
+            commit: 'bc5e33008',
+          },
+          {text: 'Compass: opening the compass with no Spot selected no longer crashes the app', commit: '8f1a66b31'},
+          {text: 'Renaming images: renaming an image from the Image Gallery no longer crashes the app', commit: '13b5fedd3'},
+          {
+            text: 'Project import: tapping Unzip and Save before a large zip finished copying no longer crashes the app',
+            commit: 'ac0d53859',
+          },
+          {
+            text: 'Geography page: leaving the page while it waits for a location no longer causes errors',
+            commit: 'c93e971b0',
+          },
+          {
+            text: 'iPad orientation: opening a window while the screen is locked upside down no longer crashes the app',
+            commit: '166f2feee',
+            platforms: ['ios'],
+          },
         ],
       },
       {
         title: 'Small touches',
         items: [
           {text: 'Copied Spots: a copied Spot gets its own feature ids', commit: '4bc897794'},
+          {
+            text: 'Imported sed rocks: a StraboSpot 1 sedimentary rock missing an id no longer takes another lithology\'s id',
+            commit: '0e65eaa07',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    version: '2.31.8',
+    groups: [
+      {
+        title: 'Measurements',
+        items: [
+          {
+            text: 'Adjusted Android tablets whose natural top is in landscape',
+            commit: '9e737be',
+            platforms: ['android'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    version: '2.31.7',
+    groups: [
+      {
+        title: 'Photos',
+        items: [
+          {
+            text: 'Taking photos on iPad: taking photos, especially several in a row, no longer crashes the app',
+            commit: 'f3808f8b9',
+            platforms: ['ios'],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    version: '2.31.6',
+    groups: [
+      {
+        title: 'Measurements',
+        items: [
+          {
+            text: 'Steady compass for lineations: trend and plunge are always taken along the top of the screen, which now stays in portrait while the compass is open, instead of sometimes reading 90° or 180° off depending on how the device was held. The live strike/dip and trend/plunge are shown under the compass',
+            commit: '543c2cc2f',
+            play: 'Lineation trend no longer reads 90° or 180° off',
+          },
+        ],
+      },
+      {
+        title: 'Notebook & navigation',
+        items: [
+          {
+            text: 'Zoom to Spot: zooming to a Spot opened from the Spot Navigator no longer crashes or reopens the navigator',
+            commit: 'ea10e66e8',
+            play: 'Zoom to Spot from the Spot Navigator no longer crashes',
+          },
+          {
+            text: 'Notebook tab on phones: the Notebook tab no longer goes blank after opening a project',
+            commit: 'b258ceffd',
+            play: 'Notebook tab no longer blank after opening a project',
+          },
+          {
+            text: 'Notebook from the image viewer: the Notebook button opens the Notebook instead of a second map',
+            commit: '8dcad73d2',
+          },
+        ],
+      },
+      {
+        title: 'Photos & backups',
+        items: [
+          {
+            text: 'Photo resize errors: a photo that fails to resize shows an error instead of closing the app',
+            commit: '85f39627e',
+            platforms: ['ios'],
+          },
+          {
+            text: 'Re-importing backups: images already on the device are copied correctly when a backup is imported again',
+            commit: 'd7db85335',
+            platforms: ['ios'],
+          },
+        ],
+      },
+      {
+        title: 'Maps & sign-in',
+        items: [
+          {
+            text: 'Downloaded custom maps: a custom map without an id no longer stops a downloaded project\'s custom maps from loading',
+            commit: 'e2316ee24',
+          },
+          {
+            text: 'Forgot password: when the reset link can\'t be opened, the sign-in screen tells you where to reset it',
+            commit: '5cb339d3c',
+          },
         ],
       },
     ],
@@ -252,13 +723,19 @@ const RELEASE_NOTES = [
       {
         title: 'Small touches',
         items: [
-          {text: 'Map editing: Edit goes straight to the selected Spot when it is on the current map', commit: '000aea5a6'},
+          {
+            text: 'Map editing: Edit goes straight to the selected Spot when it is on the current map',
+            commit: '000aea5a6',
+          },
           {
             text: 'Halted collaborations: an owner\'s project shows in the server list again once its collaboration is halted',
             commit: '25ec904b4',
           },
           {text: 'Project screen on tablets: shows as a centered box instead of fullscreen', commit: '7a1c2626b'},
-          {text: 'Profile photo: a camera or gallery error no longer breaks setting a profile photo', commit: '595d86752'},
+          {
+            text: 'Profile photo: a camera or gallery error no longer breaks setting a profile photo',
+            commit: '595d86752',
+          },
           {text: 'StraboField naming: permission prompts and support email now say StraboField', commit: '048edfc6d'},
         ],
       },

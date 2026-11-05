@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {Platform, Text, TouchableOpacity, View} from 'react-native';
 
 import {Card, Icon} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -13,13 +13,13 @@ import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constants';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SwitchWrapper from '../../shared/ui/SwitchWrapper';
-import {MODAL_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import TextInput from '../../shared/ui/TextInput';
 import {editedSpotImage} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
 const ImageCard = ({
                      areImageThumbnailsLoading,
+                     deleteImage,
                      image,
                      imageThumbnailURIs,
                      index,
@@ -30,19 +30,16 @@ const ImageCard = ({
                      saveUpdatedImage,
                      setAreImageThumbnailsLoading,
                      setImageThumbnailURIs,
-                     spotWithImage,
                    }) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const modalVisible = useSelector(state => state.home.modalVisible);
-  const spot = useSelector(state => state.spot.selectedSpot);
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
 
   const {downloadImageAndSave} = useDevice();
   const {deleteImageFromSpot, getImageBasemap, setAnnotation} = useImages();
   const {getImageThumbnailURIs} = useImageThumbnails();
-  const {getAllSpotsOnImageBasemap} = useSpots();
+  const {getAllSpotsOnImageBasemap, getSpotByImageId} = useSpots();
 
   /* Local State */
 
@@ -71,13 +68,9 @@ const ImageCard = ({
   const handleEndEditing = () => {
     if (!isEmpty(title) && title !== image.title) {
       const updatedImage = {...image, title};
-      if (modalVisible === MODAL_KEYS.NOTEBOOK.SAMPLES || modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
-        saveUpdatedImage(updatedImage);
-      }
-      else {
-        dispatch(editedSpotImage(updatedImage));
-        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
-      }
+      // Images owned by something other than a Spot (Sample, Memo) are saved through their owner
+      if (saveUpdatedImage) saveUpdatedImage(updatedImage);
+      else dispatch(editedSpotImage(updatedImage));
     }
     if (isEmpty(title)) setTitle(undefined);
     setIsEditing(false);
@@ -121,10 +114,10 @@ const ImageCard = ({
 
   /* Logic Helpers */
 
-  const deleteImage = async () => {
-    console.log('Deleting image from spot', image.id);
-    await deleteImageFromSpot(image.id, spotWithImage || spot);
-    console.log('Deleted image from spot', image.id);
+  // Images owned by something other than a Spot (Sample, Memo) are deleted through their owner
+  const deleteMissingImage = async () => {
+    if (deleteImage) await deleteImage(image);
+    else await deleteImageFromSpot(image.id, getSpotByImageId(image.id));
     setIsMissingImageModalVisible(false);
   };
 
@@ -245,7 +238,7 @@ const ImageCard = ({
         actionTitle={'Delete'}
         headerTitle={'Missing Image on Server!'}
         isVisible={isMissingImageModalVisible}
-        onActionPressed={deleteImage}
+        onActionPressed={deleteMissingImage}
         onCancelPress={() => setIsMissingImageModalVisible(false)}
         overlayStyleOverride={{height: 'auto'}}
         showActionButton={true}

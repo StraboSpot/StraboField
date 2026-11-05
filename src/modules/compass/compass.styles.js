@@ -58,6 +58,21 @@ const styles = StyleSheet.create({
     fontSize: themes.PRIMARY_TEXT_SIZE - 2,
     textAlign: 'center',
   },
+  lineationHintText: {
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontSize: themes.PRIMARY_TEXT_SIZE - 2,
+    fontStyle: 'italic',
+    paddingHorizontal: 15,
+    paddingTop: 8,
+    textAlign: 'center',
+  },
+  liveReadingText: {
+    color: themes.PRIMARY_TEXT_COLOR,
+    fontSize: themes.PRIMARY_TEXT_SIZE,
+    fontWeight: 'bold',
+    paddingTop: 8,
+    textAlign: 'center',
+  },
   matrixDataButtonContainer: {
     alignItems: 'center',
     flexDirection: 'row',

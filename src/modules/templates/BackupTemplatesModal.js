@@ -27,8 +27,16 @@ const BackupTemplatesModal = ({closeModal}) => {
   const [backupFileName, setBackupFileName] = useState(defaultFileName);
   const [isFileNameError, setIsFileNameError] = useState(false);
 
-  const actionLabel = Platform.OS === 'ios' ? 'Backup' : 'Export';
-  const [modalTitle, setModalTitle] = useState(actionLabel + ' ' + TEMPLATE_BACKUP_MESSAGES.TITLE);
+  /* Derived Variables */
+
+  const isIos = Platform.OS === 'ios';
+  const actionLabel = isIos ? 'Backup' : 'Export';
+  const {STATUS, TITLE} = TEMPLATE_BACKUP_MESSAGES;
+  const modalTitle = backingUpStatus === TEMPLATE_BACKUP_STATUS.IN_PROGRESS
+    ? (isIos ? STATUS.ZIPPING : STATUS.EXPORTING) + TITLE
+    : backingUpStatus === TEMPLATE_BACKUP_STATUS.COMPLETE ? TITLE + (isIos ? STATUS.ZIPPED : STATUS.EXPORTED)
+      : backingUpStatus === TEMPLATE_BACKUP_STATUS.ERROR ? STATUS.FAILED
+        : actionLabel + ' ' + TITLE;
 
   /* Event Handlers */
 
@@ -37,21 +45,14 @@ const BackupTemplatesModal = ({closeModal}) => {
       console.log('FileName', backupFileName);
       setBackingUpStatus(TEMPLATE_BACKUP_STATUS.IN_PROGRESS);
       dispatch(setLoadingStatus({view: 'home', bool: true}));
-      if (Platform.OS === 'ios') {
-        setModalTitle(TEMPLATE_BACKUP_MESSAGES.STATUS.ZIPPING + TEMPLATE_BACKUP_MESSAGES.TITLE);
-      }
-      else setModalTitle(TEMPLATE_BACKUP_MESSAGES.STATUS.EXPORTING + TEMPLATE_BACKUP_MESSAGES.TITLE);
       dispatch(clearedStatusMessages());
       await backupTemplates(backupFileName);
       setBackingUpStatus(TEMPLATE_BACKUP_STATUS.COMPLETE);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      if (Platform.OS === 'ios') setModalTitle(TEMPLATE_BACKUP_MESSAGES.TITLE + TEMPLATE_BACKUP_MESSAGES.STATUS.ZIPPED);
-      else setModalTitle(TEMPLATE_BACKUP_MESSAGES.TITLE + TEMPLATE_BACKUP_MESSAGES.STATUS.EXPORTED);
     }
     catch (err) {
       console.error('Error backing up templates!', err);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
-      setModalTitle(TEMPLATE_BACKUP_MESSAGES.STATUS.FAILED);
       setBackingUpStatus(TEMPLATE_BACKUP_STATUS.ERROR);
     }
   };
@@ -67,7 +68,7 @@ const BackupTemplatesModal = ({closeModal}) => {
       isLoading={backingUpStatus === TEMPLATE_BACKUP_STATUS.IN_PROGRESS}
       onActionPressed={backingUpStatus === TEMPLATE_BACKUP_STATUS.COMPLETE ? closeModal : handleBackup}
       onCancelPress={closeModal}
-      showActionButton={backingUpStatus === '' || backingUpStatus === TEMPLATE_BACKUP_STATUS.COMPLETE || backingUpStatus === TEMPLATE_BACKUP_STATUS.ERROR}
+      showActionButton={backingUpStatus !== TEMPLATE_BACKUP_STATUS.IN_PROGRESS}
       showCancelButton={backingUpStatus === ''}
       showCloseButton
     >

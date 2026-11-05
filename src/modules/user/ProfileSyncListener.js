@@ -36,7 +36,7 @@ const ProfileSyncListener = () => {
 
       isUploadingRef.current = true;
       try {
-        const {email, encoded_login, image, isAuthenticated, macrostrat, sesar, ...rest} = currentUser;
+        const {email, encoded_login, image, isAuthenticated, macrostrat, ...rest} = currentUser;
         // Server echoes default_manual_measurement back as an integer; normalize to a boolean before re-uploading.
         const userValuesToUpload = 'default_manual_measurement' in rest
           ? {...rest, default_manual_measurement: Boolean(rest.default_manual_measurement)}

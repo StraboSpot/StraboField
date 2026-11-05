@@ -9,6 +9,7 @@ import OutlineButton from '../buttons/OutlineButton';
 
 const ModalSaveAndCancelButtons = ({
                                      cancelTitle,
+                                     deleteTitle,
                                      disabled,
                                      onCancelPress,
                                      onDeletePress,
@@ -42,7 +43,7 @@ const ModalSaveAndCancelButtons = ({
       justifyContent: 'space-between',
     }}>
       <View style={overlayStyles.buttonContainer}>
-        {showDeleteButton && <DeleteButton onPress={onDeletePress}/>}
+        {showDeleteButton && <DeleteButton onPress={onDeletePress} title={deleteTitle}/>}
       </View>
       <View style={overlayStyles.buttonContainer}>
         {showCancelButton && (

@@ -13,7 +13,7 @@ import Form from '../../form/Form';
 import formStyles from '../../form/form.styles';
 import FormikWrapper from '../../form/FormikWrapper';
 import useForm from '../../form/useForm';
-import {setModalValues, setModalVisible} from '../../home/home.slice';
+import {setActiveModal, setModalValues} from '../../home/home.slice';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import usePetrology from '../usePetrology';
 
@@ -71,7 +71,7 @@ const AddReactionTextureModal = () => {
 
   /* Logic Helpers */
 
-  const closeModal = () => dispatch(setModalVisible({modal: null}));
+  const closeModal = () => dispatch(setActiveModal({modal: null}));
 
   // Wait on the save and stop if it fails: it alerts and throws when the form has errors, and rolling the id over
   // or closing the modal would lose what was entered

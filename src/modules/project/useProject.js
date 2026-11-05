@@ -10,6 +10,7 @@ import {
   setTargetDataset,
 } from './projects.slice';
 import useDevice from '../../services/device/useDevice';
+import {AUTO_SAVES_FOLDER} from '../../services/files/directories.constants';
 import useServerRequests from '../../services/network/useServerRequests';
 import {getNewId, isEmpty, isSameId} from '../../shared/helpers';
 import useResetState from '../../store/useResetState';
@@ -168,7 +169,7 @@ const useProject = () => {
     const exists = await doesDeviceBackupDirExist(undefined);
     if (exists) {
       const res = await readDirectory(directory);
-      const manualBackupFiles = res.filter(file => file !== 'AutoBackups');
+      const manualBackupFiles = res.filter(file => file !== AUTO_SAVES_FOLDER);
       // Surface each backup's own last modified_timestamp (from its data.json) rather than leaving it undefined,
       // which would make moment() in ProjectList render the current time instead of when the project was last saved.
       const deviceFiles = await Promise.all(manualBackupFiles.map(async (file, index) => {
@@ -177,7 +178,7 @@ const useProject = () => {
         return {fileName: file, id: index, modified_timestamp: projectData?.modified_timestamp || projectData?.date};
       }));
       let id = manualBackupFiles.length;
-      const autoBackupFiles = await readDirectory(directory + 'AutoBackups/') || [];
+      const autoBackupFiles = await readDirectory(directory + AUTO_SAVES_FOLDER + '/') || [];
       const autoBackupItems = autoBackupFiles
         .filter(file => file.endsWith('.json') && /\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/.test(file))
         .sort((a, b) => {
@@ -190,7 +191,13 @@ const useProject = () => {
           const modified_timestamp = tsMatch[0].replace(/(\d{2})-(\d{2})-(\d{2})$/, '$1:$2:$3');
           const sanitizedName = file.slice(tsMatch.index + 20, -'.json'.length);
           const displayName = sanitizedName ? sanitizedName.replace(/_/g, ' ') : 'Auto Backup';
-          return {displayName, fileName: 'AutoBackups/' + file, id: id++, isAutoBackup: true, modified_timestamp};
+          return {
+            displayName,
+            fileName: AUTO_SAVES_FOLDER + '/' + file,
+            id: id++,
+            isAutoBackup: true,
+            modified_timestamp,
+          };
         });
       return {projects: [...deviceFiles, ...autoBackupItems]};
     }
@@ -228,8 +235,13 @@ const useProject = () => {
   const toggleActiveDataset = async (val, dataset) => {
     try {
       dispatch(setActiveDatasets({bool: val, dataset: dataset.id}));
-      // A dataset that is no longer shown cannot go on taking new Spots, so it gives up the target with it
-      if (!val && dataset.id === targetDatasetId) dispatch(setTargetDataset(undefined));
+      // A dataset that is no longer shown cannot go on taking new Spots, so it gives up the target with it. The
+      // user only asked to hide it, so they are told.
+      if (!val && dataset.id === targetDatasetId) {
+        dispatch(setTargetDataset(undefined));
+        toast.show(`Turning off ${dataset.name} also cleared the target dataset.`,
+          {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
+      }
       dispatch(clearedSpotsInMapExtentIds());
       if (!val && !isEmpty(selectedSpot) && dataset.spotIds?.includes(selectedSpot.properties.id)) {
         if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
@@ -247,14 +259,14 @@ const useProject = () => {
   const toggleTargetDataset = (datasetId) => {
     if (datasetId === targetDatasetId) {
       toast.show('Target Dataset deselected.',
-        {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
+        {type: 'normal', animationType: 'slide-in', duration: 3000, placement: 'top'});
       toast.hideAll();
       dispatch(setTargetDataset(undefined));
     }
     else {
       const datasetName = datasets[datasetId].name;
       toast.show(`Target Dataset switched to ${datasetName}!`,
-        {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
+        {type: 'success', animationType: 'slide-in', duration: 3000, placement: 'top'});
       toast.hideAll();
       dispatch(setTargetDataset(datasetId));
     }

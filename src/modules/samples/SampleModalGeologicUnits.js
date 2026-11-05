@@ -10,8 +10,8 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import imageStyles from '../images/image.styles';
+import TagsChecklist from '../tags/TagsChecklist';
 import TagsListItem from '../tags/TagsListItem';
-import TagsModal from '../tags/TagsModal';
 
 const SampleModalGeologicUnits = ({checkedTagsIds, handleTagChecked}) => {
   /* Data Hooks */
@@ -77,11 +77,11 @@ const SampleModalGeologicUnits = ({checkedTagsIds, handleTagChecked}) => {
         >
           {Platform.OS === 'web' ? (
             <ScrollView>
-              <TagsModal checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>
+              <TagsChecklist checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>
             </ScrollView>
           ) : (
             <FlatList
-              ListHeaderComponent={<TagsModal checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>}
+              ListHeaderComponent={<TagsChecklist checkedTagsIds={checkedTagsIds} handleTagChecked={handleTagChecked}/>}
             />
           )}
         </ModalWrapper>

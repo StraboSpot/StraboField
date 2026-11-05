@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 
 import TablesData from './TablesData';
-import UrlData from './URLData';
+import URLData from './URLData';
 import useExternalData from './useExternalData';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
@@ -58,7 +58,7 @@ function DataWrapper({
   return (
     <View style={{flex: 1}}>
       {urlData && (
-        <UrlData
+        <URLData
           editable={editable}
           initializeDelete={(type, item) => initializeDelete(type, item)}
           spot={spot}

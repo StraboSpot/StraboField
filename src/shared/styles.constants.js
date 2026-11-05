@@ -4,9 +4,8 @@ const platform = Platform.OS === 'ios' ? 'screen' : 'window';
 const {width, height} = Dimensions.get(platform);
 
 //See https://facebook.github.io/react-native/docs/colors
-export const LIGHTGREY = '#f7f7f7'; //(lightgrey)
-export const MEDIUMGREY = 'darkgray'; //(#d3d3d3)
-export const MEDIUMGREY_FADED = '#d3d3d3E6'; // 90% opacity
+export const LIGHTGREY = '#f7f7f7'; // Near white (not CSS lightgrey, which is #d3d3d3)
+export const MEDIUMGREY = 'darkgray'; //(#a9a9a9)
 export const DARKGREY = 'dimgray';
 export const BLUE = 'dodgerblue'; // (#1e90ff)
 export const BLUE_FADED_20 = '#1e90ff33';  // Blue at 40% opacity
@@ -36,6 +35,8 @@ export const POSITIVE_COLOR = GREEN;
 export const NEGATIVE_COLOR = RED;
 export const NEUTRAL_COLOR = PRIMARY_ACCENT_COLOR;
 export const WARNING_COLOR = RED;
+// The warning toasts' orange (react-native-toast-notifications' default), for anything that should match them
+export const CAUTION_COLOR = '#ed6c02';
 
 export const LIST_BORDER_COLOR = MEDIUMGREY;
 

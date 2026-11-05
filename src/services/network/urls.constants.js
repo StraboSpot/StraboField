@@ -1,13 +1,9 @@
-import config from '../../utils/config';
-
 const account = '/account';
-const orcid = 'https://orcid.org/oauth';
-const orcidClientId = config.get('orcid_client_id');
 const rockdSpotConversion = 'https://dev.macrostrat.org/api/v3/dev/convert/field-site?in=spot&out=checkin&bulk=false';
 const rockdLogin = 'https://dev.rockd.org/login';
 const rockdCheckIn = 'https://dev.rockd.org/api/v2/protected/checkin';
+const rockdPhotos = 'https://dev.rockd.org/api/v2/protected/photos';
 const rockdRedirectUri = 'strabofield://macrostrat/login';
-const sesarAPI = __DEV__ ? 'https://api-sandbox.geosamples.org/api' : 'https://api.geosamples.org/api';
 const straboSpotAPI = 'https://strabospot.org';
 const tilehost = 'https://tiles.strabospot.org';
 
@@ -53,24 +49,18 @@ export const MICRO_PATHS = {
   WEB_PROJECT: microDB + '/webProject',
 };
 
-export const SESAR_PATHS = {
-  // `strabospot` is the connection id SESAR stamps on the tokens it issues for this app.
-  GET_TOKEN: '/auth/token/strabospot/',
-  REFRESH_TOKEN: '/auth/token/refresh/',
-  GET_USER_CODES: '/sesar-codes/by-permission/?permission=create_sample',
-  SAMPLES: '/samples/',
-  SESAR_API: sesarAPI,
-};
+// StraboSamples
+const samplesDB = '/samplesdb';
 
-export const ORCID_PATHS = {
-  AUTH: '/authorize',
-  ORCID: orcid,
-  REDIRECT_URL: 'redirect_uri=https://www.strabospot.org/orcid_callback%3Fcreds%3D$',
-  SCOPE: `?client_id=${orcidClientId}&response_type=code&scope=openid&`,
+export const SAMPLES_PATHS = {
+  MY_SAMPLES: samplesDB + '/mysamples/',
+  SAMPLE: samplesDB + '/sample/',
+  WEB_SAMPLE: straboSpotAPI + '/samples/',
 };
 
 export const MACROSTRAT_PATHS = {
   LOGIN: rockdLogin,
+  PHOTOS: rockdPhotos,
   REDIRECT_URI: rockdRedirectUri,
   SPOT_CHECKIN: rockdCheckIn,
   SPOT_CONVERSION: rockdSpotConversion,

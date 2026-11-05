@@ -5,10 +5,12 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
 import {classifyDatasetChange, DATASET_STATUS} from './syncConflicts.helpers';
+import {useAutoSaveNow} from './useAutoSave';
 import {
   clearConflictedDatasetId,
   removePendingDatasetId,
   resetSyncState,
+  setLocalSaveNeeded,
   setLastSyncedDatasetTimestamps,
   setLastSyncedProjectTimestamp,
   setTransferringImages,
@@ -32,14 +34,16 @@ import {
   addedDatasetFromServer,
   addedDatasets,
   addedProjectFromServer,
-  setActiveDatasets,
   setActiveDatasetsMultiple,
   setTargetDataset,
 } from '../../modules/project/projects.slice';
 import useProject from '../../modules/project/useProject';
+import {MISSING_STRABO_USER_ID_MESSAGE, STRABOSAMPLES_LINKED_DATA_KEYS} from '../../modules/samples/samples.constants';
+import {getSampleMetadata, getStraboSampleFromResponse} from '../../modules/samples/samples.helpers';
 import {addedSpotsFromServer} from '../../modules/spots/spots.slice';
 import {setUserData} from '../../modules/user/userProfile.slice';
-import {isEmpty, toError} from '../../shared/helpers';
+import {isEmpty, isEqual, toError} from '../../shared/helpers';
+import alert from '../../shared/ui/alert';
 import {MODAL_TRANSITION_DELAY} from '../../shared/ui/modals/modal.constants';
 import {store} from '../../store/ConfigureStore';
 import useResetState from '../../store/useResetState';
@@ -51,12 +55,13 @@ let datasetsObjToSave = {};
 let imagesDownloadedCount = 0;
 let imagesFailedCount = 0;
 let spotsToSave = [];
-// Stays an array: the capture below is skipped when nothing is active, and downloadDatasets filters it either way
-let prevActiveDatasetsIds = [], prevTargetDatasetId;
 
 // Every caller shares the accumulators above, so a second download would reset the arrays the first is still
 // filling and save a mixed set. Module scope too, since the project list, QAQC and auto-login all start downloads.
 let isDownloadInFlight = false;
+
+// Auto sync waits while a download runs, since the download replaces the project it would sync
+export const isDownloadRunning = () => isDownloadInFlight;
 
 const useDownload = () => {
   /* Data Hooks */
@@ -70,11 +75,20 @@ const useDownload = () => {
   const isPendingImagesChanges = useSelector(state => state.connections.isPendingImagesChanges);
   const isWifiOnlyForImages = useSelector(state => state.connections.isWifiOnlyForImages);
 
+  const {autoSaveNow} = useAutoSaveNow();
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
   const {doesImageExistOnDevice, gatherNeededImages} = useImages();
   const {createDataset} = useProject();
   const {clearProject} = useResetState();
-  const {getDatasets, getDatasetSpots, getProfile, getProfileImage, getProject, testCustomMapUrl} = useServerRequests();
+  const {
+    getDatasets,
+    getDatasetSpots,
+    getProfile,
+    getProfileImage,
+    getProject,
+    getStraboSample,
+    testCustomMapUrl,
+  } = useServerRequests();
 
   const resetDownloadState = () => {
     customMapsToSave = {};
@@ -82,51 +96,63 @@ const useDownload = () => {
     spotsToSave = [];
     imagesDownloadedCount = 0;
     imagesFailedCount = 0;
-    prevActiveDatasetsIds = [];
-    prevTargetDatasetId = undefined;
   };
 
   /* Internal Functions */
 
-  const doGetDatasetSpots = async (datasets, encodedLoginScoped) => {
+  const confirmDownloadWithoutBackup = () => new Promise((resolve) => {
+    alert('Backup Failed',
+      'The current project could not be saved to the device. Downloading will replace it, and any changes not yet'
+      + ' uploaded will be lost.',
+      [
+        {onPress: () => resolve(false), style: 'cancel', text: 'Cancel'},
+        {onPress: () => resolve(true), style: 'destructive', text: 'Download Anyway'},
+      ]);
+  });
+
+  // Collects into the download's own buffer unless given another, so an auto sync pull can't mix into a download
+  const doGetDatasetSpots = async (datasets, encodedLoginScoped, buffer) => {
     if (datasets.length >= 1) {
 
       // Synchronous download
       await datasets.reduce(async (previousPromise, dataset) => {
         await previousPromise;
-        await downloadSpots(dataset, encodedLoginScoped);
+        await downloadSpots(dataset, encodedLoginScoped, buffer);
       }, Promise.resolve());
     }
   };
 
+  // Returns which datasets to show and which takes new Spots, for initializeDownload to set once everything has arrived
   const downloadDatasets = async (selectedProject, encodedLoginScoped) => {
     try {
       dispatch(addedStatusMessage('Downloading Datasets...'));
       const res = await getDatasets(selectedProject.id, encodedLoginScoped);
       const datasets = res?.datasets || [];
       console.log('Datasets Response:', JSON.stringify(res));
+      let isTargetDatasetCleared = false;
+      let datasetSelection;
 
       // If same project set active and target dataset to same as before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
         const newDatasetIds = datasets.map(d => d.id);
-        const updatedActiveDatasetIds = prevActiveDatasetsIds.reduce((acc, prevActiveDatasetId) => {
+        const updatedActiveDatasetIds = (activeDatasetsIds || []).reduce((acc, prevActiveDatasetId) => {
           console.log('Checking if active dataset still exists:', prevActiveDatasetId);
           return newDatasetIds.includes(prevActiveDatasetId) ? [...acc, prevActiveDatasetId] : acc;
         }, []);
-        if (!isEmpty(updatedActiveDatasetIds)) dispatch(setActiveDatasetsMultiple(updatedActiveDatasetIds));
-        else dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        if (newDatasetIds.includes(prevTargetDatasetId)) dispatch(setTargetDataset(prevTargetDatasetId));
-        else dispatch(setTargetDataset(datasets[0].id));
+        const activeDatasetIds = isEmpty(updatedActiveDatasetIds) ? [datasets[0].id] : updatedActiveDatasetIds;
+        // A target that is not shown would take new Spots out of sight, so the previous target is kept only if it
+        // is still among the shown datasets. Otherwise there is none, and which dataset takes new Spots stays the
+        // user's choice
+        const isPrevTargetDatasetKept = activeDatasetIds.includes(targetDatasetId);
+        datasetSelection = {activeDatasetIds, targetDatasetId: isPrevTargetDatasetKept ? targetDatasetId : undefined};
+        isTargetDatasetCleared = !!targetDatasetId && !isPrevTargetDatasetKept;
       }
       else if (datasets.length >= 1) {
-        dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-        dispatch(setTargetDataset(datasets[0].id));
+        datasetSelection = {activeDatasetIds: [datasets[0].id], targetDatasetId: datasets[0].id};
       }
       else {
-        const targetDataset = createDataset();
-        dispatch(addedDataset(targetDataset));
-        dispatch(setActiveDatasets({bool: true, dataset: targetDataset.id}));
-        dispatch(setTargetDataset(targetDataset.id));
+        const newDataset = createDataset();
+        datasetSelection = {activeDatasetIds: [newDataset.id], newDataset, targetDatasetId: newDataset.id};
       }
       datasetsObjToSave = Object.assign({},
         ...datasets.map(item => ({[item.id]: {...item, modified_timestamp: item.modified_timestamp || Date.now()}})));
@@ -134,6 +160,12 @@ const useDownload = () => {
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Downloaded ' + spotsToSave.length + ' Spots\nDownloaded '
         + Object.keys(datasetsObjToSave).length + ' Datasets\nFinished Downloading Datasets'));
+      // The user had a target and did not choose to drop it
+      if (isTargetDatasetCleared) {
+        dispatch(addedStatusMessage('The previous target dataset was removed or is turned off, so no target '
+          + 'dataset is set. Choose one to add new Spots.'));
+      }
+      return datasetSelection;
     }
     catch (err) {
       console.error('Error getting datasets:', err);
@@ -141,33 +173,59 @@ const useDownload = () => {
     }
   };
 
-  // Download Project Properties
+  // A linked Sample Spot's StraboMicro and StraboExperimental data can change after it was uploaded, so fetch it
+  // fresh. A sample that can't be fetched keeps what came down with its Spot.
+  const downloadLinkedSampleData = async (encodedLoginScoped) => {
+    const linkedSpots = spotsToSave.filter(
+      spot => spot.properties?.isSample && !isEmpty(getSampleMetadata(spot).strabosamples_id));
+    if (isEmpty(linkedSpots)) return;
+    if (isEmpty(store.getState().user.straboUserId)) {
+      dispatch(addedStatusMessage(`Linked Sample Data Not Downloaded\n${MISSING_STRABO_USER_ID_MESSAGE}`));
+      return;
+    }
+    let fetchedCount = 0;
+    dispatch(addedStatusMessage('Downloading Linked Sample Data...'));
+    for (const spot of linkedSpots) {
+      const strabosamplesId = getSampleMetadata(spot).strabosamples_id;
+      try {
+        const strabosample = getStraboSampleFromResponse(
+          await getStraboSample(strabosamplesId, undefined, encodedLoginScoped));
+        if (isEmpty(strabosample?.id)) throw Error('No sample returned');
+        STRABOSAMPLES_LINKED_DATA_KEYS.forEach((key) => {
+          if (isEmpty(strabosample[key])) delete spot.properties[key];
+          else spot.properties[key] = strabosample[key];
+        });
+        fetchedCount++;
+      }
+      catch (err) {
+        console.warn(spot.properties.id + ': Error Downloading Linked Sample Data for', strabosamplesId, err);
+      }
+    }
+    dispatch(removedLastStatusMessage());
+    dispatch(addedStatusMessage(`Downloaded Linked Sample Data for ${fetchedCount} of ${linkedSpots.length} Samples`));
+  };
+
+  // Download Project Properties, for initializeDownload to save once everything has arrived. Memo images are saved to
+  // the device now, which leaves the open project untouched if the download fails.
   const downloadProject = async (selectedProject, encodedLoginScoped) => {
     try {
       console.log('Downloading Project Properties...');
       dispatch(addedStatusMessage('Downloading Project Properties...'));
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
-      if (!isEmpty(project)) {
-        if (project.id === selectedProject.id) {
-          if (!isEmpty(activeDatasetsIds)) prevActiveDatasetsIds = activeDatasetsIds;
-          if (targetDatasetId) prevTargetDatasetId = targetDatasetId;
-        }
-        clearProject();
-      }
       // Strip before anything downstream reads it — loadCustomMaps spreads the whole map object through.
       if (!isEmpty(projectResponse.other_maps)) {
         projectResponse.other_maps = projectResponse.other_maps.map(stripMapboxToken);
       }
-      dispatch(addedProjectFromServer(projectResponse));
-      if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
-        loadCustomMaps(projectResponse.other_maps);
-      }
       console.log('Finished Downloading Project Properties.', projectResponse);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Finished Downloading Project Properties'));
-      if (projectResponse.reports && !isEmpty(projectResponse.reports)) {
+      // Loaded after the message above replaces 'Downloading Project Properties...', or it would replace a map's own
+      if (!isEmpty(projectResponse.other_maps)) await loadCustomMaps(projectResponse.other_maps);
+      // Web shows memo images from the server and has no device storage to save them to
+      if (Platform.OS !== 'web' && !isEmpty(projectResponse.reports)) {
         await downloadReportImages(projectResponse.reports);
       }
+      return projectResponse;
     }
     catch (err) {
       console.error('Error Downloading Project Properties.', err);
@@ -181,7 +239,8 @@ const useDownload = () => {
     try {
       let neededImagesIds = [];
       await Promise.all(reports.map(async (report) => {
-        await Promise.all(report.images?.map(async (image) => {
+        // Deleting a memo's last image removes its images key rather than leaving an empty list
+        await Promise.all((report.images ?? []).map(async (image) => {
           const doesExist = await doesImageExistOnDevice(image.id);
           if (!doesExist) {
             console.log(image.id + ': Need to download report image.');
@@ -215,7 +274,8 @@ const useDownload = () => {
     }
   };
 
-  const downloadSpots = async (dataset, encodedLoginScoped) => {
+  const downloadSpots = async (dataset, encodedLoginScoped,
+    buffer = {datasets: datasetsObjToSave, spots: spotsToSave}) => {
     try {
       const featureCollection = await getDatasetSpots(dataset.id, encodedLoginScoped);
       if (isEmpty(featureCollection) || !featureCollection.features) {
@@ -225,11 +285,11 @@ const useDownload = () => {
         const spotsDownloaded = featureCollection.features;
         const spotImages = await findNeededImages(spotsDownloaded, dataset);
         if (spotImages) {
-          datasetsObjToSave[dataset.id] = {...datasetsObjToSave[dataset.id], images: {imageIds: spotImages.imageIds}};
+          buffer.datasets[dataset.id] = {...buffer.datasets[dataset.id], images: {imageIds: spotImages.imageIds}};
         }
-        spotsToSave.push(...spotsDownloaded);
+        buffer.spots.push(...spotsDownloaded);
         const spotIds = Object.values(spotsDownloaded).map(spot => spot.properties.id);
-        datasetsObjToSave[dataset.id] = {...datasetsObjToSave[dataset.id], spotIds: spotIds};
+        buffer.datasets[dataset.id] = {...buffer.datasets[dataset.id], spotIds: spotIds};
       }
     }
     catch (err) {
@@ -258,19 +318,22 @@ const useDownload = () => {
     }
   };
 
-  const loadCustomMaps = (maps) => {
-    maps.map(async (map) => {
+  // A My Maps map is kept only if its tiles are found on the custom endpoint; one that isn't is left out on its own
+  const loadCustomMaps = async (maps) => {
+    await Promise.all(maps.map(async (map) => {
+      if (!map.id) {
+        console.warn('Skipping custom map with no id', map);
+        return;
+      }
       const mapId = normalizeCustomMapId(map.id, map.source);
       let providerInfo = MAP_PROVIDERS[map.source];
-      if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
-        if (!isEmpty(endpoint) && isSelected) {
-          let tileEndpoint = endpoint.replace('/db', '/strabo_mymaps_check/');
-          if (await testCustomMapUrl(tileEndpoint + map.id)) {
-            tileEndpoint = endpoint.replace('/db', '/geotiff/tiles/');
-            providerInfo = {...providerInfo, url: [tileEndpoint]};
-          }
-          else throw Error('Invalid IP address');
+      if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS && !isEmpty(endpoint) && isSelected) {
+        if (!await testCustomMapUrl(endpoint.replace('/db', '/strabo_mymaps_check/') + map.id)) {
+          console.warn(map.id + ': My Maps map not found on the custom endpoint', map);
+          dispatch(addedStatusMessage(`Custom Map Not Loaded: ${map.title || map.id}`));
+          return;
         }
+        providerInfo = {...providerInfo, url: [endpoint.replace('/db', '/geotiff/tiles/')]};
       }
       const customMap = {
         ...map,
@@ -280,7 +343,7 @@ const useDownload = () => {
       };
       console.log(customMap.id + ': Loaded Custom Map', customMap);
       customMapsToSave = {...customMapsToSave, [customMap.id]: customMap};
-    });
+    }));
   };
 
   /* Exported Functions */
@@ -312,10 +375,14 @@ const useDownload = () => {
   // Download + merge the given server datasets' spots, then (when applyProject is set) fetch and apply
   // the project properties. Callers pass only datasets that are safe to overwrite (no pending local edits).
   const applyServerDownloads = async (staleDatasets, {applyProject = false} = {}) => {
+    // A download can replace the open project while this is fetching, and what was fetched belongs to the old one
+    const projectId = project.id;
+    const isSameProjectOpen = () => store.getState().project.project?.id === projectId;
     if (staleDatasets.length) {
-      resetDownloadState();
-      await doGetDatasetSpots(staleDatasets, encodedLogin);
-      dispatch(addedSpotsFromServer(spotsToSave));
+      const buffer = {datasets: {}, spots: []};
+      await doGetDatasetSpots(staleDatasets, encodedLogin, buffer);
+      if (!isSameProjectOpen()) return;
+      dispatch(addedSpotsFromServer(buffer.spots));
       // Re-read live pending ids: a local edit may have queued one of these while downloading.
       const livePendingIds = store.getState().connections.pendingUploadDatasetIds.map(String);
       const appliedBaseTimestamps = {};
@@ -327,12 +394,14 @@ const useDownload = () => {
           dispatch(addedDatasetFromServer({
             ...serverDataset,
             modified_timestamp: timestamp,
-            ...(datasetsObjToSave[serverDataset.id] || {}),
+            ...(buffer.datasets[serverDataset.id] || {}),
           }));
           // Local now matches the server for this dataset - record it as the new base.
           appliedBaseTimestamps[serverDataset.id] = timestamp;
         });
       if (!isEmpty(appliedBaseTimestamps)) dispatch(setLastSyncedDatasetTimestamps(appliedBaseTimestamps));
+      // Loads don't flag a device save (listenerMiddleware), but a pull lands in the open project, so save it too
+      dispatch(setLocalSaveNeeded());
     }
 
     // Check for missing images when something downloaded or a prior attempt left some pending
@@ -369,13 +438,15 @@ const useDownload = () => {
     // (not before the upload) and re-check live sync-needed state so an edit that landed during the
     // uploads/downloads above isn't clobbered.
     if (applyProject) {
-      const serverProject = await getProject(project.id, encodedLogin);
+      const serverProject = await getProject(projectId, encodedLogin);
       const liveProject = store.getState().project.project;
-      if (serverProject && serverProject.modified_timestamp >= liveProject.modified_timestamp
+      if (serverProject && isSameProjectOpen() && serverProject.modified_timestamp >= liveProject.modified_timestamp
         && !store.getState().connections.isProjectSyncNeeded) {
         dispatch(addedProjectFromServer(serverProject));
         // Local now matches the server for the project - record it as the new base.
         dispatch(setLastSyncedProjectTimestamp(serverProject.modified_timestamp));
+        // Applied every cycle the server's copy is no older, so a save only when it brought something new
+        if (!isEqual(store.getState().project.project, liveProject)) dispatch(setLocalSaveNeeded());
       }
     }
   };
@@ -438,23 +509,38 @@ const useDownload = () => {
       // native present and dismiss at once and trips UIViewControllerHierarchyInconsistency (Sentry STRABOSPOT-2-6JN).
       // Let it finish dismissing first.
       if (Platform.OS === 'ios') await new Promise(resolve => setTimeout(resolve, MODAL_TRANSITION_DELAY));
+      // Saved before the status modal opens, so a failure's question never shows over it
+      const {hasFailed, hasSaved} = await autoSaveNow();
+      if (hasFailed && !await confirmDownloadWithoutBackup()) return false;
       dispatch(setIsStatusMessagesModalVisible(true));
       dispatch(setLoadingStatus({view: 'modal', bool: true}));
+      if (hasSaved) dispatch(addedStatusMessage('Saved a backup of the current project to the device.'));
+      if (hasFailed) dispatch(addedStatusMessage('Could not save a backup of the current project to the device.'));
       dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
-      await downloadProject(selectedProject, encodedLoginScoped);
-      await downloadDatasets(selectedProject, encodedLoginScoped);
+      const projectResponse = await downloadProject(selectedProject, encodedLoginScoped);
+      const datasetSelection = await downloadDatasets(selectedProject, encodedLoginScoped);
+      await downloadLinkedSampleData(encodedLoginScoped);
       console.log('Download Complete! Spots Downloaded!');
       dispatch(addedStatusMessage('------------------'));
-      dispatch(addedSpotsFromServer(spotsToSave));
-      dispatch(addedDatasets(datasetsObjToSave));
-      dispatch(addedCustomMapsFromBackup(customMapsToSave));
+      // The open project is replaced only now, so a download that fails partway leaves it as it was
+      if (!isEmpty(project)) clearProject();
+      // Reset before loading, so a change made below (a dataset for a project with none) stays flagged
       dispatch(resetSyncState());
+      dispatch(addedProjectFromServer(projectResponse));
       // Seed the base for every downloaded dataset and the project: local now matches the server exactly.
+      dispatch(setLastSyncedProjectTimestamp(store.getState().project.project.modified_timestamp));
       dispatch(setLastSyncedDatasetTimestamps(
         Object.fromEntries(Object.values(datasetsObjToSave).map(d => [d.id, d.modified_timestamp])),
       ));
-      dispatch(setLastSyncedProjectTimestamp(store.getState().project.project.modified_timestamp));
+      dispatch(addedSpotsFromServer(spotsToSave));
+      dispatch(addedDatasets(datasetsObjToSave));
+      // Made here for a project with none, so dispatched as a change to save rather than loaded
+      if (datasetSelection.newDataset) dispatch(addedDataset(datasetSelection.newDataset));
+      dispatch(setActiveDatasetsMultiple(datasetSelection.activeDatasetIds));
+      dispatch(setTargetDataset(datasetSelection.targetDatasetId));
+      dispatch(addedCustomMapsFromBackup(customMapsToSave));
       dispatch(addedStatusMessage('Complete!'));
+      return true;
     }
     catch (err) {
       console.error('Error Initializing Download.', err);

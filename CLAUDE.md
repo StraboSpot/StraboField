@@ -14,15 +14,32 @@ Guidance for Claude Code when working in this repository.
 
 ## Critical / Non-obvious (read first)
 
-- **Android `compileSdkVersion` must be 36** — `react-native-screens` pulls in `androidx.core:core-ktx:1.17.0` which
-  requires SDK 36. Set in `android/app/build.gradle`.
+- **Android `compileSdkVersion` is 37** (`targetSdkVersion` stays 36) — the RN 0.88 template value. Set in
+  `android/build.gradle`.
 - **Run `npm run bundle:android` before every PlayStore deploy** — it bundles JS and removes duplicate resources;
   skipping it breaks the build.
-- **`@rnmapbox/maps` bridgeless patch** — requires `RCTBridge!` → `RCTBridge?` with a URLSession fallback in
-  `RNMBXImageQueue`, applied via `patches/@rnmapbox+maps+10.3.1.patch`. Rename the patch when upgrading Mapbox.
+- **`@rnmapbox/maps` bridgeless patch** — upstream bails out with "bridge is nil" when there's no bridge; the patch
+  makes the image-fetch path take `RCTBridge?` and falls back to URLSession in `RNMBXImageQueue`, applied via
+  `patches/@rnmapbox+maps+10.3.11.patch`. **Regenerate (don't just rename) the patch when upgrading Mapbox**, then
+  confirm `npx patch-package` shows ✔ for it — a renamed 10.3.0 patch silently failed on 10.3.1.
+- **Mapbox is held at `@rnmapbox/maps` 10.3.11 / SDK 11.23.1** — newer iOS SDKs make online raster basemap tiles blank
+  to white or grey and redraw, mostly while zooming. Device tests: 11.23.1 clean; 11.28.4, 11.31.1, 11.33.1 and 11.34.1
+  flicker, and `raster-fade-duration: 0` doesn't help. It's the SDK, not the wrapper (10.3.1 on 11.33.1 flickers too), and
+  the regression starts somewhere in 11.24–11.28. rnmapbox ≥ 10.3.12 needs SDK 11.33, so it can't be upgraded yet.
+  `ios/Podfile` pins the SDK; Android uses the wrapper's default. Re-test on an iOS device before upgrading. Blurry tiles
+  that sharpen are normal; white or grey blocks are the bug.
+- **Library patches carry RN 0.88 fixes** — removed APIs (`InteractionManager`, `StyleSheet.absoluteFillObject`) and
+  legacy headers are patched in `@rn-vui/base`, `react-native-draggable-flatlist` and
+  `@rnmapbox/maps`. `absoluteFillObject` fails silently (the spread is empty), so check for it when adding libraries.
+  Before regenerating a patch, delete the package's `android/build` and `android/.cxx` or patch-package includes the
+  build output.
+- **After an RN bump, check `React-Core-prebuilt` in `Podfile.lock`** — `pod install` can leave it on the old version
+  (fails with a missing `module.modulemap`). Fix: delete `Pods/React-Core-prebuilt` and its `Pods/Local Podspecs` json,
+  then run `pod update React-Core-prebuilt`.
 - **Releases: tag on `master` after merge, with a `v` prefix** (e.g. `v2.29.1`) — never tag on the rc branch, never
   hand-write the changelog. See [Release Process](#release-process-rc--master).
-- **Package manager is Yarn 4.13.0** (install with `yarn`); npm-script names below run fine via `npm run` or `yarn`.
+- **Package manager is Yarn 4** (exact version pinned by `packageManager` in `package.json`; install with `yarn`);
+  npm-script names below run fine via `npm run` or `yarn`.
 - **Ids: UUIDs inside `spot.properties`, numbers only for the server's keys** — never lengthen `getNewId`'s output
   and never do arithmetic on an id. Samples are the one exception: a sample id is also a Spot id, so it stays
   numeric. See the Ids paragraph under [Architecture](#architecture).
@@ -72,6 +89,7 @@ node scripts/install-hooks.js   # install git hooks (CLAUDE.md auto-update)
 
 # Run
 npm run ios | android | web            # dev
+npm run ios:fresh | android:fresh      # dev after clearing Metro's cache (Babel/dep/patch changes)
 npm run ios-sim                        # iPad Pro simulator
 npm run ios-release | android-release  # release mode
 npm run web-deploy                     # production web build
@@ -99,10 +117,10 @@ npm run remove:packages    # clean node_modules + iOS Pods
 **Required config files** (project root, gitignored):
 
 - `env.json` — app **runtime** keys, bundled into the app so **public keys only**:
-  `{"mapbox_access_token": "...", "orcid_client_id": "...", "Error_reporting_DSN": "..."}`. Anything imported under
+  `{"mapbox_access_token": "...", "Error_reporting_DSN": "..."}`. Anything imported under
   `src/` gets inlined into the web/Metro bundles, so never put secrets here.
 - `secrets.json` — **build-time** secrets, read only by `scripts/` (never imported under `src/`, so never bundled):
-  `sentry_organization_auth_token`, `orcid_client_secret`, `android_keystore`, `rockd_access_token`.
+  `sentry_organization_auth_token`, `android_keystore`, `rockd_access_token`.
 - `dev-test-logins.js` — `export const USERNAME_TEST / PASSWORD_TEST`
 
 **Two helper scripts to know:**
@@ -118,6 +136,7 @@ npm run remove:packages    # clean node_modules + iOS Pods
 - **Nesting** — parent/child spot hierarchy via `properties.nesting`.
 - **Feature type** — the category/schema a spot's measurements follow.
 - **Tag** — cross-cutting label linking spots (lives in projects.slice).
+- **Memo** — what the UI calls a report; code and data (`project.reports`) say report.
 
 ## Why It's Built This Way
 
@@ -158,7 +177,7 @@ rc merge) — see [RELEASE.md](RELEASE.md)**, or print them with `npm run start-
 backend via REST. Entry points: `index.js` (mobile), `index.web.js` (web). Web bundles via `webpack.config.js`; mobile
 via `metro.config.js`.
 
-- **Feature modules** — **42 self-contained feature modules** under `/src/modules/`, each with UI components, a
+- **Feature modules** — **43 self-contained feature modules** under `/src/modules/`, each with UI components, a
   `.slice.js` Redux slice, `use[Feature].js` hooks, constants, and `.web.js` platform overrides. Core: `spots/` (the
   central data model), `maps/`, `compass/`, `project/`, `form/` (dynamic form engine), `notebook-panel/`.
 - **State** — Redux Toolkit, 10 slices (`spots`, `projects` (largest), `maps`, `offlineMaps`, `userProfile`, `compass`,
@@ -231,7 +250,7 @@ track sync state. Check network via `ConnectionStatus` before any server call.
 
 ## Code Style
 
-ESLint (`.eslintrc.js`) enforces: single quotes; Stroustrup braces (else/catch on new line); import order (React/RN →
+ESLint (`eslint.config.js`) enforces: single quotes; Stroustrup braces (else/catch on new line); import order (React/RN →
 external → internal, alphabetical); alphabetized JSX props and StyleSheet keys; no unused vars (except function args).
 Run `npm run lint:fix` before committing.
 
@@ -243,14 +262,14 @@ suffixes; `.web.js` for web overrides.
 
 ## Dependencies
 
-- React 19.2.3 + React Native 0.84.1
-- Redux Toolkit 2.12.0 + Redux Persist 6.0.0
+- React 19.3.0 + React Native 0.88.1
+- Redux Toolkit 2.14.0 + Redux Persist 6.0.0
 - React Navigation 7.x
-- Mapbox Maps (@rnmapbox/maps 10.3.1 for native, mapbox-gl 2.x for web)
+- Mapbox Maps (@rnmapbox/maps 10.3.11 for native, mapbox-gl 3.x for web)
 - Formik 2.4.9 - Form management
 - Turf.js 7.x, RNFS, Sentry
 
-**Node version:** >=22.11.0. **Package manager:** Yarn 4.18.0
+**Node version:** >=26.0.0. **Package manager:** Yarn 4.18.1
 
 ## Deployment Checklist
 

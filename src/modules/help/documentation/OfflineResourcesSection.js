@@ -40,7 +40,7 @@ const files = [
   },
 ];
 
-const PdfGuidesSection = ({onPress}) => {
+const OfflineResourcesSection = ({onPress}) => {
   const renderDocumentButton = item => (
     <OutlineButton
       icon={{
@@ -67,4 +67,4 @@ const PdfGuidesSection = ({onPress}) => {
   );
 };
 
-export default PdfGuidesSection;
+export default OfflineResourcesSection;

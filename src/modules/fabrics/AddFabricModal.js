@@ -14,10 +14,9 @@ import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import Form from '../form/Form';
 import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
-import {setModalValues, setModalVisible} from '../home/home.slice';
+import {setActiveModal, setModalValues} from '../home/home.slice';
 import {resolveLabelOnSave} from '../page/featureLabels.helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const AddFabricModal = () => {
@@ -77,7 +76,7 @@ const AddFabricModal = () => {
 
   /* Logic Helpers */
 
-  const closeModal = () => dispatch(setModalVisible({modal: null}));
+  const closeModal = () => dispatch(setActiveModal({modal: null}));
 
   const saveFabric = async () => {
     try {
@@ -87,7 +86,6 @@ const AddFabricModal = () => {
       console.log('Saving fabric data to Spot ...');
       let editedFabricsData = spot.properties.fabrics ? JSON.parse(JSON.stringify(spot.properties.fabrics)) : [];
       editedFabricsData.push({...editedFabricData, id: getNewUUID()});
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: FABRICS_GROUP_KEY, value: editedFabricsData}));
       if (SMALL_SCREEN) closeModal();
     }

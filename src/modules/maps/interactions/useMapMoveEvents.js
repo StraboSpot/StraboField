@@ -28,6 +28,8 @@ const useMapMoveEvents = ({mapRef, onMapMoveEnd}) => {
   const saveMapView = async () => {
     if (currentImageBasemap || stratSection || !mapRef?.current) return;
     const newCenter = await mapRef.current.getCenter();
+    // The map can unmount while its center is being read
+    if (!mapRef.current) return;
     const newZoom = await mapRef.current.getZoom();
     dispatch(setZoom(newZoom));
     setMapView(newCenter, newZoom);

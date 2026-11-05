@@ -35,6 +35,8 @@ jest.mock('@sentry/react-native', () => ({
   setUser: jest.fn(),
   setTag: jest.fn(),
   setContext: jest.fn(),
+  // The render-error half of the real GlobalErrorBoundary; the fatal-error half needs RN's ErrorUtils wiring
+  GlobalErrorBoundary: jest.requireActual('@sentry/react').ErrorBoundary,
 }));
 
 // Remaining native modules with no shipped mock — inert stubs so imports resolve.
@@ -50,6 +52,6 @@ jest.mock('react-native-geolocation-service', () => ({
 }));
 jest.mock('react-native-orientation-director', () => ({}));
 jest.mock('react-native-sound-player', () => ({}));
-jest.mock('react-native-keep-awake', () => ({}));
+jest.mock('@sayem314/react-native-keep-awake', () => ({activateKeepAwake: jest.fn(), deactivateKeepAwake: jest.fn()}));
 jest.mock('react-native-zip-archive', () => ({}));
 jest.mock('react-native-check-version', () => ({}));

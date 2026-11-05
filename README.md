@@ -49,7 +49,7 @@ This is a [**React Native**](https://reactnative.dev) project (iOS, Android, and
 - **Mapbox** — [`@rnmapbox/maps`](https://github.com/rnmapbox/maps) on native, `mapbox-gl` on web
 - **Turf.js** for geospatial operations, **RNFS** for the filesystem, **Sentry** for error reporting
 - **Neo4j** graph database backend, accessed via REST
-- **Node** >= 22.11.0, **Yarn** 4.18.0 (package manager)
+- **Node** >= 22.15.0, **Yarn** 4.18.1 (package manager)
 
 ## Step 1: Getting Started
 
@@ -61,7 +61,6 @@ This is a [**React Native**](https://reactnative.dev) project (iOS, Android, and
 
       {
        "mapbox_access_token": "Your Mapbox public access token",
-       "orcid_client_id": "Your ORCID public client id",
        "Error_reporting_DSN": "Optional Sentry DSN or other error reporting service"
       }
 
@@ -70,7 +69,6 @@ This is a [**React Native**](https://reactnative.dev) project (iOS, Android, and
 
       {
        "sentry_organization_auth_token": "Sentry org auth token (used by npm run setup-sentry / upload-sourcemaps)",
-       "orcid_client_secret": "ORCID client secret",
        "android_keystore": "Android keystore password",
       }
 

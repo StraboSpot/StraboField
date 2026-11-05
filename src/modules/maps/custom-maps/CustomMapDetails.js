@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Platform, ScrollView, Text, TextInput, View} from 'react-native';
+import {Platform, ScrollView, Text, View} from 'react-native';
 
 import {Icon, ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
@@ -20,6 +20,7 @@ import Loading from '../../../shared/ui/Loading';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import overlayStyles from '../../../shared/ui/modals/overlay.styles';
 import SectionDivider from '../../../shared/ui/SectionDivider';
+import TextInput from '../../../shared/ui/TextInput';
 import formStyles from '../../form/form.styles';
 import FormikWrapper from '../../form/FormikWrapper';
 import TextInputField from '../../form/inputs/TextInputField';

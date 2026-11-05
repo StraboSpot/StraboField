@@ -4,7 +4,7 @@ import {isEmpty} from '../../../shared/helpers';
 import TextInputModal from '../../../shared/ui/TextInputModal';
 import useProject from '../useProject';
 
-const DatasetsPage = ({isAddDatasetModalVisible, setIsAddDatasetModalVisible}) => {
+const AddDatasetModal = ({isAddDatasetModalVisible, setIsAddDatasetModalVisible}) => {
   /* Data Hooks */
 
   const {addDataset} = useProject();
@@ -49,4 +49,4 @@ const DatasetsPage = ({isAddDatasetModalVisible, setIsAddDatasetModalVisible}) =
   );
 };
 
-export default DatasetsPage;
+export default AddDatasetModal;

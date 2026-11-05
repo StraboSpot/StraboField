@@ -12,7 +12,7 @@ import {SMALL_SCREEN} from '../../shared/styles.constants';
 import Loading from '../../shared/ui/Loading';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import WarningModal from '../../shared/ui/modals/WarningModal';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
 
 const SampleModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}) => {
   /* Data Hooks */
@@ -92,7 +92,7 @@ const SampleModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation}) => {
         closeModal={() => setIsWarningModalVisible(false)}
         confirmText={'Save Changes'}
         isVisible={isWarningModalVisible}
-        onCancelPress={() => dispatch(setModalVisible({modal: null}))}
+        onCancelPress={() => dispatch(setActiveModal({modal: null}))}
         onConfirmPress={() => saveSample(currentForm)}
         showCloseButton
         title={'Unsaved Changes'}

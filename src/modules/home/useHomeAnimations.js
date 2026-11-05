@@ -11,7 +11,7 @@ import {setIsNotebookPanelVisible, setNotebookPageVisible} from '../notebook-pan
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 
 // Animations for Drawers & Keyboard
-const useHomeAnimations = ({navigation}) => {
+const useHomeAnimations = ({confirmEndMapEditing, isMapEditing, leavePage, navigation}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -75,7 +75,9 @@ const useHomeAnimations = ({navigation}) => {
     setTimeout(() => dispatch(setIsNotebookPanelVisible(false)), 1000);
   };
 
-  const openMainMenuPanel = () => {
+  // Most Spot editing happens in the main menu or the notebook, so a map edit ends before either opens
+  const openMainMenuPanel = async () => {
+    if (isMapEditing() && !await confirmEndMapEditing()) return;
     console.log('Opening Main Menu Panel...');
     dispatch(canceledIntervalDrag());
     dispatch(setIsMainMenuPanelVisible(true));
@@ -83,7 +85,10 @@ const useHomeAnimations = ({navigation}) => {
     animateDrawer(animatedValueLeftSide, MAIN_MENU_WIDTH);
   };
 
-  const openNotebookPanel = (pageView) => {
+  // Opening the notebook on a page leaves any page it already shows
+  const openNotebookPanel = async (pageView) => {
+    if (isMapEditing() && !await confirmEndMapEditing()) return;
+    if (leavePage.hasUnsavedPageChanges() && !await leavePage.confirmLeavePage()) return;
     console.log('Opening Notebook Panel...');
     dispatch(canceledIntervalDrag());
     dispatch(setNotebookPageVisible(pageView || PAGE_KEYS.OVERVIEW));

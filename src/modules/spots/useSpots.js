@@ -28,7 +28,8 @@ import {
 } from './spots.slice';
 import {deepCopyWithNewIds, getNewId, isEmpty, isEqual, isSameId, sleep} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
-import {setModalVisible} from '../home/home.slice';
+import {setActiveModal} from '../home/home.slice';
+import {hasValidCoords} from '../maps/maps.helpers';
 import {
   clearedSpotsInMapExtentIds,
   clearedStratSection,
@@ -44,7 +45,6 @@ import {
   deletedSpotIdFromTags,
   restoredSpotReferences,
   setActiveDatasets,
-  updatedModifiedTimestampsBySpotsIds,
   updatedProject,
   updatedProjectPreference,
 } from '../project/projects.slice';
@@ -55,13 +55,12 @@ const useSpots = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const activeModal = useSelector(state => state.home.activeModal);
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets);
-  const modalVisible = useSelector(state => state.home.modalVisible);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const recentViews = useSelector(state => state.spot.recentViews);
   const reports = useSelector(state => state.project.project?.reports);
-  const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const spots = useSelector(state => state.spot.spots);
   const spotsInMapExtentIds = useSelector(state => state.map.spotsInMapExtentIds);
   const stratSection = useSelector(state => state.map.stratSection);
@@ -102,7 +101,7 @@ const useSpots = () => {
     if (newSpot && preferences.prepend_spot_name_nested_spot
       && (isOnImageBasemap(newSpot) || isOnStratSection(newSpot))) {
       if (isOnImageBasemap(newSpot)) {
-        const parentSpot = getSpotWithThisImageBasemap(newSpot.properties.image_basemap);
+        const parentSpot = getSpotWithThisImage(newSpot.properties.image_basemap);
         newSpotName = parentSpot.properties.name + namePrefix;
       }
       else {
@@ -115,7 +114,7 @@ const useSpots = () => {
     if (newSpot && preferences.restart_num_each_nested_spot
       && (isOnImageBasemap(newSpot) || isOnStratSection(newSpot))) {
       if (isOnImageBasemap(newSpot)) {
-        const parentSpot = getSpotWithThisImageBasemap(newSpot.properties.image_basemap);
+        const parentSpot = getSpotWithThisImage(newSpot.properties.image_basemap);
         const imageBasemaps = getImageBasemapsInSpot(parentSpot);
         const nestedImageBasemapSpots = imageBasemaps.flatMap(i => getAllSpotsOnImageBasemap(i.id));
         spotNumber = nestedImageBasemapSpots.length + 1;
@@ -156,8 +155,8 @@ const useSpots = () => {
 
   // Every Spot whose dataset can make the given Spot read only. Locking always spreads down from the Spot
   // holding an image basemap or strat section to everything mapped on it, since that map is the Spot's own.
-  // It spreads back up only from a strat section, where adding, resizing or reordering an interval shifts
-  // every Spot on the section above or below it - intervals and anything else drawn there alike, see
+  // It spreads back up only from a strat section, where adding or resizing an interval shifts every Spot on
+  // the section above or below it - intervals and anything else drawn there alike, see
   // moveSpotsUpOrDownByPixels - so one locked Spot anywhere on a section locks all of it. Spots sharing an
   // image basemap write nothing to each other, so they never lock each other or the Spot holding the image.
   // Ids already collected end the walk, so maps that somehow reference each other can't loop.
@@ -175,12 +174,12 @@ const useSpots = () => {
     return Object.values(foundSpots);
   };
 
-  // The Spot holding a given image basemap or strat section, generalizing getSpotWithThisImageBasemap and
+  // The Spot holding a given image basemap or strat section, generalizing getSpotWithThisImage and
   // getSpotWithThisStratSection. Takes both ids because the map asked about is sometimes the one on screen
   // and sometimes the one a given Spot sits on, which are not always the same. The geo map has no Spot
   // holding it, hence no id and no result.
   const getSpotWithThisMap = (imageBasemapId, stratSectionId) => {
-    if (imageBasemapId) return getSpotWithThisImageBasemap(imageBasemapId);
+    if (imageBasemapId) return getSpotWithThisImage(imageBasemapId);
     return stratSectionId ? getSpotWithThisStratSection(stratSectionId) : undefined;
   };
 
@@ -251,8 +250,8 @@ const useSpots = () => {
     }
   };
 
-  // Copy Spot to a new Spot omitting specific properties
-  const copySpot = async () => {
+  // Copy a Spot to a new Spot, omitting specific properties
+  const copySpot = async (spotToCopy) => {
     let copiedSpot = {'type': 'Feature'};
     let {
       name,
@@ -269,7 +268,7 @@ const useSpots = () => {
       orientation_data,
       spot_radius,
       ...properties
-    } = selectedSpot.properties;
+    } = spotToCopy.properties;
     copiedSpot.properties = properties;
     // Omit strat_section from copied properties
     if (copiedSpot.properties?.sed?.strat_section) {
@@ -317,7 +316,6 @@ const useSpots = () => {
       newSpots.push(newSpot);
     });
     console.log('Creating', numRandomSpots, 'new random Spots near current location.');
-    dispatch(updatedModifiedTimestampsBySpotsIds([newSpots[0].properties.id]));
     dispatch(addedNewSpotIdsToDataset({datasetId: targetDataset.id, spotIds: newSpots.map(s => s.properties.id)}));
     dispatch(editedOrCreatedSpots(newSpots));
     console.log('Finished creating new random Spot. All Spots: ', spots);
@@ -345,7 +343,7 @@ const useSpots = () => {
       if (!(preferences.restart_num_each_nested_spot && (isOnImageBasemap(newSpot) || isOnStratSection(newSpot)))) {
         updatedPreferences = {...preferences, starting_number_for_spot: spotNumber + 1};
       }
-      if (modalVisible === MODAL_KEYS.SHORTCUTS.SAMPLE) {
+      if (activeModal === MODAL_KEYS.SHORTCUTS.SAMPLE) {
         updatedPreferences = {
           ...(updatedPreferences || preferences),
           starting_sample_number: (Number(preferences.starting_sample_number) || 1) + 1,
@@ -376,7 +374,6 @@ const useSpots = () => {
       return;
     }
     console.log('Creating new Spot:', newSpot);
-    dispatch(updatedModifiedTimestampsBySpotsIds([newSpot.properties.id]));
     dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newSpot.properties.id}));
     dispatch(editedOrCreatedSpot(newSpot));
     console.log('Finished creating new Spot. All Spots: ', spots);
@@ -405,7 +402,7 @@ const useSpots = () => {
     }
 
     spotsToDelete.forEach(spot => removeSpotAndReferences(spot.properties.id));
-    dispatch(setModalVisible({modal: null}));
+    dispatch(setActiveModal({modal: null}));
 
     if (undoSnapshot) {
       toast.show(`Deleted ${spotToDelete.properties.isSample ? 'Sample' : 'Spot'} "${spotToDelete.properties.name}"`, {
@@ -603,7 +600,7 @@ const useSpots = () => {
         return [rootSpot.properties.lng, rootSpot.properties.lat];
       }
       if (isOnGeoMap(rootSpot)) {
-        if (!rootSpot.geometry) return undefined;
+        if (!hasValidCoords(rootSpot)) return undefined;
         return rootSpot.geometry.type === 'Point' ? rootSpot.geometry.coordinates
           : turf.centroid(rootSpot).geometry.coordinates;
       }
@@ -645,9 +642,10 @@ const useSpots = () => {
     return Object.values(getActiveSpotsObj()).filter(spot => spot?.properties?.sed?.strat_section);
   };
 
-  const getSpotWithThisImageBasemap = (imageBasemapId) => {
+  // Any image, basemap or not
+  const getSpotWithThisImage = (imageId) => {
     return Object.values(getActiveSpotsObj()).find((spot) => {
-      const spotFound = spot.properties?.images?.find(image => image.id?.toString() === imageBasemapId?.toString());
+      const spotFound = spot.properties?.images?.find(image => image.id?.toString() === imageId?.toString());
       return spotFound ? spot : undefined;
     });
   };
@@ -679,6 +677,8 @@ const useSpots = () => {
       if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
       if (stratSection) dispatch(clearedStratSection());
     }
+    // The Spot holding the map is searched for in every Dataset, and the map is read straight off it, because
+    // a Dataset turned on here is not active in the store until the next render
     else if (isOnImageBasemap(spot)
       && (!currentImageBasemap || currentImageBasemap.id !== spot.properties.image_basemap)) {
       const isThisImageBasemap = imageBasemap => isSameId(imageBasemap.id, spot.properties.image_basemap);
@@ -763,7 +763,7 @@ const useSpots = () => {
     getSpotsWithKey,
     getSpotsWithSamples,
     getSpotsWithStratSection,
-    getSpotWithThisImageBasemap,
+    getSpotWithThisImage,
     getSpotWithThisSample,
     getSpotWithThisStratSection,
     getVisibleSpots,

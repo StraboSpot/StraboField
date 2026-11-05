@@ -101,6 +101,50 @@ export const getFeatureWithNewVertex = (e, spotEditingCopy) => {
     : addVertexToPolygon(spotEditingCopy, newVertex);
 };
 
+// Closest point to p on the segment a-b, in planar coordinates
+const getClosestPointOnSegment = ([px, py], [ax, ay], [bx, by]) => {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const lengthSquared = dx * dx + dy * dy;
+  const t = lengthSquared === 0 ? 0 : Math.min(1, Math.max(0, ((px - ax) * dx + (py - ay) * dy) / lengthSquared));
+  return [ax + t * dx, ay + t * dy];
+};
+
+// Snap a [lng, lat] onto the nearest vertex of the features within tolerance, else onto their nearest edge, else
+// leave it. toleranceCoord is a [lng, lat] the tolerance away on screen. Distances are in web mercator, which the
+// map draws at one scale, so the tolerance is the same in every direction. A vertex is returned as the feature's
+// own coordinate, so the two Spots share it exactly.
+export const getSnappedCoord = (coord, toleranceCoord, features) => {
+  const point = turf.toMercator(coord);
+  const getDistance = otherPoint => Math.hypot(otherPoint[0] - point[0], otherPoint[1] - point[1]);
+  const tolerance = getDistance(turf.toMercator(toleranceCoord));
+  let closestVertex;
+  let closestVertexDistance = tolerance;
+  let closestEdgePoint;
+  let closestEdgeDistance = tolerance;
+  features.forEach((feature) => {
+    turf.coordEach(feature, (vertex) => {
+      const distance = getDistance(turf.toMercator(vertex));
+      if (distance <= closestVertexDistance) {
+        closestVertex = vertex;
+        closestVertexDistance = distance;
+      }
+    });
+    turf.segmentEach(feature, (segment) => {
+      const [start, end] = turf.getCoords(segment).map(segmentCoord => turf.toMercator(segmentCoord));
+      const edgePoint = getClosestPointOnSegment(point, start, end);
+      const distance = getDistance(edgePoint);
+      if (distance <= closestEdgeDistance) {
+        closestEdgePoint = edgePoint;
+        closestEdgeDistance = distance;
+      }
+    });
+  });
+  if (closestVertex) return [...closestVertex];
+  if (closestEdgePoint) return turf.toWgs84(closestEdgePoint);
+  return coord;
+};
+
 // Larger dimension of a stroke's screen-pixel bounding box. A line is invisible only when BOTH dimensions are
 // tiny, which is what this maximum being tiny means - testing either dimension alone would reject a deliberate
 // straight line, which is wide in one and flat in the other.

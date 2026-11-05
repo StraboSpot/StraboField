@@ -1,5 +1,7 @@
 import Resizer from 'react-image-file-resizer';
 
+import {IMAGE_MAX_UPLOAD_SIZE} from './images.constants';
+
 export const getImageMetaFromWeb = async (imageFile) => {
   const {name} = imageFile;
   const fileExtension = name.split('.').pop();
@@ -33,30 +35,11 @@ export const getSize = (image) => {
   return imageSizeText;
 };
 
-export const resizeFile = async (file, height, width) => {
-  let imageHeight, imageWidth;
-  const max_size = 2000;
-  if (width > height && width > max_size) {
-    imageHeight = max_size * height / width;
-    imageWidth = max_size;
-  }
-  else if (height > max_size) {
-    imageHeight = max_size * width / height;
-    imageWidth = max_size;
-  }
-
+// Web only: takes a browser File from the file input. Native photos are resized in useImageSize instead.
+// Scales the image down to fit within a square box, keeping its proportions, so the longer side ends up at most
+// IMAGE_MAX_UPLOAD_SIZE whichever way the photo is oriented. Images already within that are not enlarged.
+export const resizeFileForWeb = async (file) => {
   return new Promise((resolve) => {
-    Resizer.imageFileResizer(
-      file,
-      imageWidth,
-      imageHeight,
-      'JPEG',
-      100,
-      0,
-      (uri) => {
-        resolve(uri);
-      },
-      'file',
-    );
+    Resizer.imageFileResizer(file, IMAGE_MAX_UPLOAD_SIZE, IMAGE_MAX_UPLOAD_SIZE, 'JPEG', 100, 0, resolve, 'file');
   });
 };

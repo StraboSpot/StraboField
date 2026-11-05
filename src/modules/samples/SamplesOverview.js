@@ -9,7 +9,7 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedSpot} from '../spots/spots.slice';
 
-const SamplesOverview = ({openMainMenuPanel, page}) => {
+const SamplesOverview = ({page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -27,8 +27,8 @@ const SamplesOverview = ({openMainMenuPanel, page}) => {
 
   /* View */
 
-  if (spot.properties?.isSample) return <SampleDetailOverview openMainMenuPanel={openMainMenuPanel}/>;
-  return <SamplesList isShowIGSN onPress={onPressed} onPressEmpty={() => dispatch(setNotebookPageVisible(page.key))}/>;
+  if (spot.properties?.isSample) return <SampleDetailOverview/>;
+  return <SamplesList onPress={onPressed} onPressEmpty={() => dispatch(setNotebookPageVisible(page.key))}/>;
 };
 
 export default SamplesOverview;

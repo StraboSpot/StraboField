@@ -26,14 +26,28 @@ const compileNodeModules = [
 
 // Packages that ship ESM (lib/module has {"type":"module"}), but babel-loader transforms them
 // to CommonJS. This rule overrides the module type so webpack doesn't try to evaluate the
-// CommonJS output as an ES module (which would cause "exports is not defined").
+// CommonJS output as an ES module (which would cause "exports is not defined"). Gesture-handler swallows that error
+// when it probes for reanimated, leaving webpack a cached empty module, so it surfaces later as draggable-flatlist's
+// "Your version of react-native-reanimated is too old".
 const esmLibModuleTypeOverride = {
   test: /\.js$/,
   include: [
     path.resolve(__dirname, 'node_modules/@react-native-async-storage/async-storage/lib/module'),
+    path.resolve(__dirname, 'node_modules/react-native-reanimated/lib/module'),
+    path.resolve(__dirname, 'node_modules/react-native-worklets/lib/module'),
   ],
   type: 'javascript/auto',
 };
+
+// babel-loader's own cache key covers only Babel and the loader, so upgrading a plugin keeps serving what the old one
+// compiled. Stale worklets from before 0.13 crash on web with "inputs is not iterable".
+const babelCacheIdentifier = [
+  '@babel/core',
+  '@react-native/babel-preset',
+  'babel-loader',
+  'react-native-reanimated',
+  'react-native-worklets',
+].map(name => `${name}@${require(`${appDirectory}/node_modules/${name}/package.json`).version}`).join();
 
 const babelLoaderConfiguration = {
   test: /\.(jsx?|tsx?)$/,
@@ -48,6 +62,7 @@ const babelLoaderConfiguration = {
     loader: 'babel-loader',
     options: {
       cacheDirectory: true,
+      cacheIdentifier: babelCacheIdentifier,
       presets,
       plugins: [
         'react-native-web',
@@ -66,18 +81,12 @@ const babelLoaderConfiguration = {
 
 const imageLoaderConfiguration = {
   test: /\.(gif|jpe?g|png|svg)$/,
-  use: {
-    loader: 'url-loader',
-    options: {
-      name: '[name].[ext]',
-      esModule: false,
-    },
-  },
+  type: 'asset/inline',
 };
 
 const ttfLoaderConfiguration = {
   test: /\.ttf$/,
-  loader: 'url-loader', // or directly file-loader
+  type: 'asset/inline',
   include: [
     path.resolve(appDirectory, 'node_modules/react-native-vector-icons'),
   ],

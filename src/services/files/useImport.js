@@ -107,12 +107,22 @@ const useImport = () => {
         console.log('Image Files in Backup:', imageFiles);
         await doesDeviceDirectoryExist(APP_DIRECTORIES.IMAGES);
         if (!isEmpty(imageFiles)) {
-          imageFiles.map(async (image) => {
-            await copyFiles(APP_DIRECTORIES.BACKUP_DIR + fileName + imagesFolderName + '/' + image,
-              APP_DIRECTORIES.IMAGES + image);
-          });
+          let imageFailures = 0;
+          await Promise.all(imageFiles.map(async (image) => {
+            const destination = APP_DIRECTORIES.IMAGES + image;
+            try {
+              // copyFile overwrites on Android but fails on iOS, so clear the destination first.
+              if (await doesDeviceDirExist(destination)) await deleteFromDevice(destination);
+              await copyFiles(APP_DIRECTORIES.BACKUP_DIR + fileName + imagesFolderName + '/' + image, destination);
+            }
+            catch (err) {
+              imageFailures++;
+              console.error('Error importing image', image, err);
+            }
+          }));
           dispatch(removedLastStatusMessage());
-          dispatch(addedStatusMessage('Finished importing image files.'));
+          dispatch(addedStatusMessage(imageFailures === 0 ? 'Finished importing image files.'
+            : `Finished importing image files. ${imageFailures} of ${imageFiles.length} could not be imported.`));
         }
         else {
           dispatch(removedLastStatusMessage());

@@ -34,17 +34,14 @@ const BackupStatusModal = ({isVisible, onClose}) => {
   const isWifiOnlyForImages = useSelector(state => state.connections.isWifiOnlyForImages);
   const pendingUploadDatasetIds = useSelector(state => state.connections.pendingUploadDatasetIds);
   const project = useSelector(state => state.project.project);
-  const saveFrequency = useSelector(state => state.connections.backupFrequency?.save);
-  const syncFrequency = useSelector(state => state.connections.backupFrequency?.sync);
 
   /* Derived Variables */
 
   const isImagesPending = isPendingImagesChanges || isTransferringImages;
   const isUploadPending = isProjectSyncNeeded || pendingUploadDatasetIds.length > 0;
   const isSyncPending = isUploadPending || isImagesPending;
-  const isSaveVisible = !!saveFrequency && (isLocalSaveNeeded || isAutoSaving);
-  // Auto sync still checks the server for downloads with no local changes, so show it whenever it's on.
-  const isSyncVisible = !!syncFrequency;
+  // Uploads and downloads save first even with auto save off, so a running save counts too
+  const isSavePending = isAutoSaving || isLocalSaveNeeded;
   const isImagesOnlyPending = isImagesPending && !isUploadPending && !isAutoSyncing;
   const isConflictPending = conflictedDatasetIds.length > 0;
   const pendingDatasetNames = pendingUploadDatasetIds.map(id => datasets[id]?.name).filter(Boolean);
@@ -80,100 +77,107 @@ const BackupStatusModal = ({isVisible, onClose}) => {
 
   return (
     <ModalWrapper
-      actionTitle={'OK'}
       closeModal={onClose}
       headerTitle={'Auto Backup Status'}
       isVisible={isVisible}
-      onActionPressed={onClose}
       onBackdropPress={onClose}
       onDismiss={handleDismiss}
       overlayStyleOverride={{height: 'auto'}}
+      showActionButton={false}
       showCancelButton={false}
       showCloseButton
     >
-      {isSaveVisible && (
-        <View>
-          <SectionDivider
-            dividerText={isAutoSaving ? 'Saving to Device…' : 'Pending Device Save'}
-            leftIcon={<Icon name={BACKUP_ICON_NAMES.SAVE} size={18} type={ICON_TYPE}/>}
-            subtitle={'All datasets · Excludes images & offline maps'}
-          />
-          <View style={{alignItems: 'center', flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 5}}>
-            <Icon color={PRIMARY_ACCENT_COLOR} name={BACKUP_ICON_NAMES.CLOCK} size={20} type={ICON_TYPE}/>
-            <View style={{flex: 1, paddingLeft: 6}}>
-              <AutoSaveCountdown/>
-            </View>
-            {!isAutoSaving && !!saveFrequency && (
-              <Button
-                buttonStyle={{borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6}}
-                onPress={() => dispatch(setNextAutoSaveTime(Date.now()))}
-                title={'Save Now'}
-                titleStyle={{color: PRIMARY_ACCENT_COLOR, fontSize: SMALL_TEXT_SIZE}}
-                type={'outline'}
-              />
-            )}
+      {/* Both sections always show, saying when auto save or auto sync is off or has nothing to do */}
+      <View>
+        <SectionDivider
+          dividerText={isAutoSaving ? 'Saving to Device…'
+            : isLocalSaveNeeded ? 'Pending Device Save'
+              : 'No Changes to Save'}
+          leftIcon={<Icon name={BACKUP_ICON_NAMES.SAVE} size={18} type={ICON_TYPE}/>}
+          subtitle={'All datasets · Excludes images & offline maps'}
+        />
+        <View style={{alignItems: 'center', flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 5}}>
+          <Icon color={PRIMARY_ACCENT_COLOR} name={BACKUP_ICON_NAMES.CLOCK} size={20} type={ICON_TYPE}/>
+          <View style={{flex: 1, paddingLeft: 6}}>
+            <AutoSaveCountdown/>
           </View>
-          <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
-            {'Project: ' + projectName}
-          </Text>
-          <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
-            {'Datasets: All will be saved'}
-          </Text>
+          {/* Works with auto save off too: the auto save timer runs a time set for now, then schedules nothing */}
+          {!isAutoSaving && isLocalSaveNeeded && (
+            <Button
+              buttonStyle={{borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6}}
+              onPress={() => dispatch(setNextAutoSaveTime(Date.now()))}
+              title={'Save Now'}
+              titleStyle={{color: PRIMARY_ACCENT_COLOR, fontSize: SMALL_TEXT_SIZE}}
+              type={'outline'}
+            />
+          )}
         </View>
-      )}
-      {isSyncVisible && (
-        <View>
-          <SectionDivider
-            dividerText={isAutoSyncing ? 'Syncing with Server…'
-              : isImagesOnlyPending ? 'Pending Image Upload'
-                : 'Pending Server Sync'}
-            leftIcon={(
-              <Icon
-                name={isImagesOnlyPending ? BACKUP_ICON_NAMES.IMAGE : BACKUP_ICON_NAMES.SYNC}
-                size={18}
-                type={ICON_TYPE}
-              />
-            )}
-            subtitle={isImagesOnlyPending ? 'Images only'
-              : isSyncPending ? 'Changed datasets only' : 'No local changes · Will check server for updates'}
-          />
-          <View style={{alignItems: 'center', flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 5}}>
-            <Icon color={PRIMARY_ACCENT_COLOR} name={BACKUP_ICON_NAMES.CLOCK} size={20} type={ICON_TYPE}/>
-            <View style={{flex: 1, paddingLeft: 6}}>
-              <AutoSyncCountdown/>
-            </View>
-            {!isAutoSyncing && isOnline && !!syncFrequency && (
-              <Button
-                buttonStyle={{borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6}}
-                onPress={handleSyncNow}
-                title={'Sync Now'}
-                titleStyle={{color: PRIMARY_ACCENT_COLOR, fontSize: SMALL_TEXT_SIZE}}
-                type={'outline'}
-              />
-            )}
-          </View>
-          {isUploadPending && (
+        {isSavePending ? (
+          <>
             <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
               {'Project: ' + projectName}
             </Text>
+            <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
+              {'Datasets: All will be saved'}
+            </Text>
+          </>
+        ) : (
+          <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
+            {'No changes since the last save'}
+          </Text>
+        )}
+      </View>
+      <View>
+        <SectionDivider
+          dividerText={isAutoSyncing ? 'Syncing with Server…'
+            : isImagesOnlyPending ? 'Pending Image Upload'
+              : 'Pending Server Sync'}
+          leftIcon={(
+            <Icon
+              name={isImagesOnlyPending ? BACKUP_ICON_NAMES.IMAGE : BACKUP_ICON_NAMES.SYNC}
+              size={18}
+              type={ICON_TYPE}
+            />
           )}
-          {pendingDatasetNames.map(name => (
-            <Text key={name} style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
-              {'Dataset: ' + name}
-            </Text>
-          ))}
-          {isSyncPending ? (
-            <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
-              {'Images: ' + (isImagesPending ? 'Pending upload' + (isWifiOnlyForImages ? ' (Wi-Fi only)' : '')
-                : 'None pending upload')}
-            </Text>
-          ) : (
-            <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
-              {'No local changes to upload'}
-            </Text>
+          subtitle={isImagesOnlyPending ? 'Images only'
+            : isSyncPending ? 'Changed datasets only' : 'No local changes · Will check server for updates'}
+        />
+        <View style={{alignItems: 'center', flexDirection: 'row', paddingHorizontal: 10, paddingVertical: 5}}>
+          <Icon color={PRIMARY_ACCENT_COLOR} name={BACKUP_ICON_NAMES.CLOCK} size={20} type={ICON_TYPE}/>
+          <View style={{flex: 1, paddingLeft: 6}}>
+            <AutoSyncCountdown/>
+          </View>
+          {!isAutoSyncing && isOnline && (
+            <Button
+              buttonStyle={{borderRadius: 8, paddingHorizontal: 12, paddingVertical: 6}}
+              onPress={handleSyncNow}
+              title={'Sync Now'}
+              titleStyle={{color: PRIMARY_ACCENT_COLOR, fontSize: SMALL_TEXT_SIZE}}
+              type={'outline'}
+            />
           )}
         </View>
-      )}
+        {isUploadPending && (
+          <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
+            {'Project: ' + projectName}
+          </Text>
+        )}
+        {pendingDatasetNames.map(name => (
+          <Text key={name} style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
+            {'Dataset: ' + name}
+          </Text>
+        ))}
+        {isSyncPending ? (
+          <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
+            {'Images: ' + (isImagesPending ? 'Pending upload' + (isWifiOnlyForImages ? ' (Wi-Fi only)' : '')
+              : 'None pending upload')}
+          </Text>
+        ) : (
+          <Text style={[commonStyles.listItemTitle, {paddingHorizontal: 10, paddingVertical: 8}]}>
+            {'No local changes to upload'}
+          </Text>
+        )}
+      </View>
       {isConflictPending && (
         <View>
           <SectionDivider
@@ -196,9 +200,6 @@ const BackupStatusModal = ({isVisible, onClose}) => {
             />
           </View>
         </View>
-      )}
-      {!isSaveVisible && !isSyncVisible && !isConflictPending && (
-        <Text style={commonStyles.noValueText}>No pending auto backups.</Text>
       )}
       <Text style={[commonStyles.noValueText, {fontSize: SMALL_TEXT_SIZE, paddingHorizontal: 10, paddingTop: 10}]}>
         {'Auto-saves are stored locally on this device and are not uploaded to the server.'}

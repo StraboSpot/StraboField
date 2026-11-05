@@ -3,7 +3,7 @@ import {Platform, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import {getImageMetaFromWeb, getSize, resizeFile} from './image.helpers';
+import {getImageMetaFromWeb, getSize, resizeFileForWeb} from './image.helpers';
 import imageStyles from './image.styles';
 import useImages from './useImages';
 import useUpload from '../../services/files/useUpload';
@@ -65,8 +65,7 @@ const AddImageButtons = ({saveImages}) => {
           const before = getSize(e.target.files[0]);
           console.log('Target size BEFORE resizing', before);
 
-          // setSelectedImageFile(e.target.files[0]);
-          imageToUpload = await resizeFile(e.target.files[0], metaData.height, metaData.width);
+          imageToUpload = await resizeFileForWeb(e.target.files[0]);
           const after = getSize(imageToUpload);
           console.log('Target AFTER resizing', e.target.files[0]);
           console.log('Target size AFTER resizing', after);
@@ -115,7 +114,7 @@ const AddImageButtons = ({saveImages}) => {
     if (Platform.OS !== 'web') {
       const newImages = await getImagesFromCameraRoll();
       console.log('newImages', newImages);
-      saveImages(newImages);
+      if (newImages.length > 0) saveImages(newImages);
       dispatch(setLoadingStatus({view: 'home', bool: false}));
     }
     else {

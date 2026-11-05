@@ -107,14 +107,14 @@ const styles = StyleSheet.create({
     borderColor: themes.MEDIUMGREY,
     borderRadius: 5,
     borderWidth: 0.75,
-    height: 60,
+    minHeight: 60,
     width: '100%',
   },
   formButtonLarge: {
     borderColor: themes.MEDIUMGREY,
     borderRadius: 5,
     borderWidth: 0.75,
-    height: 80,
+    minHeight: 80,
     width: '100%',
   },
   formButtonSelectedTitle: {
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     borderColor: themes.MEDIUMGREY,
     borderRadius: 5,
     borderWidth: 0.75,
-    height: 40,
+    minHeight: 40,
     width: '100%',
   },
   formButtonTitle: {
