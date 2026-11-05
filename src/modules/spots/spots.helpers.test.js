@@ -1,4 +1,4 @@
-import {calculateMissingOrientations, getSpotOrientations} from './spots.helpers';
+import {calculateMissingOrientations, getSpotOrientations, getSpotsCount} from './spots.helpers';
 import {DEFAULT_ORIENTATION_FIELDS} from '../compass/compass.helpers';
 import {THREE_D_STRUCTURE_ORIENTATION_FIELDS} from '../three-d-structures/threeDStructures.constants';
 
@@ -81,5 +81,21 @@ describe('getSpotOrientations', () => {
 
   it('gathers nothing from a Spot holding no such record', () => {
     expect(getSpotOrientations({properties: {name: 'Spot 1'}})).toEqual([]);
+  });
+});
+
+describe('getSpotsCount', () => {
+  const spots = {1: {properties: {id: 1}}, 2: {properties: {id: 2, isSample: true}}};
+
+  it('leaves out the samples', () => {
+    expect(getSpotsCount([1, 2], spots)).toBe(1);
+  });
+
+  it('leaves out a Spot missing from the device', () => {
+    expect(getSpotsCount([1, 3], spots)).toBe(1);
+  });
+
+  it('counts none for a dataset without Spots', () => {
+    expect(getSpotsCount(undefined, spots)).toBe(0);
   });
 });
