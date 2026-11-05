@@ -27,7 +27,6 @@ jest.mock('../src/modules/images/useImageThumbnails', () => () => ({
   areImageThumbnailsLoading: {},
   imageThumbnailURIs: {},
 }));
-jest.mock('../src/modules/project/projects.slice', () => ({updatedModifiedTimestampsBySpotsIds: jest.fn()}));
 jest.mock('../src/modules/spots/spots.slice', () => ({editedSpotProperties: jest.fn()}));
 jest.mock('../src/modules/user/userProfile.slice', () => ({
   addedCheckedInSpotId: jest.fn(),

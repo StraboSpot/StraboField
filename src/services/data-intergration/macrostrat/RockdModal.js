@@ -10,7 +10,6 @@ import ImageThumbnail from '../../../modules/images/ImageThumbnail';
 import {getLocalImageURI} from '../../../modules/images/imageURIs.helpers';
 import useImageSize from '../../../modules/images/useImageSize';
 import useImageThumbnails from '../../../modules/images/useImageThumbnails';
-import {updatedModifiedTimestampsBySpotsIds} from '../../../modules/project/projects.slice';
 import {editedSpotProperties} from '../../../modules/spots/spots.slice';
 import {addedCheckedInSpotId, setMacrostratToken} from '../../../modules/user/userProfile.slice';
 import commonStyles from '../../../shared/common.styles';
@@ -89,7 +88,6 @@ const RockdModal = ({closeModal, isVisible}) => {
 
       console.log('RockdModal check-in SUCCESS', checkInResponse);
       dispatch(addedCheckedInSpotId(selectedSpot.properties.id));
-      dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot.properties.id]));
       dispatch(
         editedSpotProperties({
           field: 'rockd_checkin_id',
