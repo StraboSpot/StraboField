@@ -14,6 +14,10 @@ import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 // The "x.y" a version belongs to; the What's New modal lists only releases in the running one
 const getMinorVersion = version => version.split('.').slice(0, 2).join('.');
 
+// A special test build carries a placeholder version of 100.0.0 or above, which is never pushed. It has the same
+// new features as the newest release in the notes (the first entry), so the What's New modal shows that one's
+const isTestBuildVersion = version => Number(version.split('.')[0]) >= 100;
+
 // Compare two "x.y.z" version strings; returns true if a <= b.
 const isVersionAtMost = (a, b) => {
   const pa = a.split('.').map(Number);
@@ -31,11 +35,13 @@ const About = () => {
   // below the running build (guards against the bundled file getting ahead of the app during an rc). In dev
   // builds, also show the not-yet-shipped release (flagged "unreleased") so we can preview the next version's
   // highlights. Earlier minor versions are on the GitHub releases page.
+  const isTestBuild = isTestBuildVersion(VERSION_NUMBER) && RELEASE_NOTES.length > 0;
+  const notesVersion = isTestBuild ? RELEASE_NOTES[0].version : VERSION_NUMBER;
   const releases = RELEASE_NOTES
-    .map(entry => ({...entry, isUnreleased: !isVersionAtMost(entry.version, VERSION_NUMBER)}))
+    .map(entry => ({...entry, isUnreleased: !isVersionAtMost(entry.version, notesVersion)}))
     .filter(entry => entry.isUnreleased
       ? __DEV__
-      : getMinorVersion(entry.version) === getMinorVersion(VERSION_NUMBER));
+      : getMinorVersion(entry.version) === getMinorVersion(notesVersion));
 
   const hasReleaseNotes = releases.length > 0;
 
@@ -115,6 +121,11 @@ const About = () => {
         showCloseButton
       >
         <View style={styles.releaseNotesContainer}>
+          {isTestBuild && (
+            <Text style={styles.testBuildNote}>
+              All new features are the same as the {notesVersion} build.
+            </Text>
+          )}
           {releases.map(release => (
             <View key={release.version} style={styles.releaseVersionSection}>
               <Text style={styles.releaseSeriesHeading}>

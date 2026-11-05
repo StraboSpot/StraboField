@@ -91,6 +91,12 @@ const styles = StyleSheet.create({
   releaseVersionSection: {
     marginBottom: 16,
   },
+  testBuildNote: {
+    fontSize: MEDIUM_TEXT_SIZE,
+    fontStyle: 'italic',
+    lineHeight: 22,
+    marginBottom: 16,
+  },
   versionRow: {
     alignItems: 'center',
     flexDirection: 'row',
