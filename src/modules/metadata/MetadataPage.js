@@ -13,6 +13,7 @@ import NumberInputField from '../form/inputs/NumberInputField';
 import PageHeader from '../page/PageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 import useProject from '../project/useProject';
+import {getSpotsCount} from '../spots/spots.helpers';
 
 const MetadataPage = ({isReadOnly, page}) => {
   /* Data Hooks */
@@ -20,6 +21,7 @@ const MetadataPage = ({isReadOnly, page}) => {
   const dispatch = useDispatch();
   const datasets = useSelector(state => state.project.datasets);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const spots = useSelector(state => state.spot.spots);
 
   const {isReadOnlyDataset} = useProject();
 
@@ -49,15 +51,12 @@ const MetadataPage = ({isReadOnly, page}) => {
     // A lock at either end blocks the move - the Spot's own isReadOnly disables every row, a read only
     // dataset only its own. rn-vui keeps disabled off the radio it draws, hence the fade
     const isDatasetReadOnly = isReadOnlyDataset(dataset.id);
+    const spotsCount = getSpotsCount(dataset.spotIds, spots);
     return (
       <ListItem containerStyle={commonStyles.listItem} key={dataset.id.toString()}>
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{dataset.name}</ListItem.Title>
-          <ListItem.Subtitle>
-            {dataset.spotIds
-              ? `(${dataset.spotIds.length} spot${dataset.spotIds.length !== 1 ? 's' : ''})`
-              : '(0 spots)'}
-          </ListItem.Subtitle>
+          <ListItem.Subtitle>{`(${spotsCount} spot${spotsCount !== 1 ? 's' : ''})`}</ListItem.Subtitle>
         </ListItem.Content>
         {isDatasetReadOnly && <Icon color={MEDIUMGREY} name={'lock-closed'} type={'ionicon'}/>}
         <ListItem.CheckBox

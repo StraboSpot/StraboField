@@ -24,6 +24,7 @@ import NumberInputField from '../../form/inputs/NumberInputField';
 import TextInputField from '../../form/inputs/TextInputField';
 import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
 import RunQAQC from '../../qaqc/RunQAQC';
+import {getSpotsCount} from '../../spots/spots.helpers';
 import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';
 
@@ -32,6 +33,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const dispatch = useDispatch();
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
+  const spots = useSelector(state => state.spot.spots);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const [neededImagesCount, refreshNeededImagesCount] = useDatasetNeededImagesCount(dataset);
@@ -52,6 +54,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
   const isTarget = targetDatasetId === dataset.id;
+  const spotsCount = getSpotsCount(dataset.spotIds, spots);
 
   /* Event Handlers */
 
@@ -296,8 +299,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   // Dataset Spots Field
   const renderSpotsField = () => {
-    const spotsCount = dataset.spotIds?.length || 0;
-
     return (
       <ListItem containerStyle={commonStyles.listItemFormField}>
         <ListItem.Content>

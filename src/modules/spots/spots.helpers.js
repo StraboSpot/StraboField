@@ -65,6 +65,11 @@ export const getSpotOrientations = (spot) => {
   ];
 };
 
+// How many Spots a dataset holds, as the Spots list counts them: only those on the device, and not the samples,
+// which are Spots in the dataset too but are listed under the Spot they were taken at
+export const getSpotsCount = (spotIds, spots) =>
+  (spotIds || []).filter(id => spots[id] && !spots[id].properties?.isSample).length;
+
 // If feature is mapped on geographical map, not an image basemap or strat section
 export const isLineSpot = spot => spot?.geometry?.type === 'LineString' || spot?.geometry?.type === 'MultiLineString';
 

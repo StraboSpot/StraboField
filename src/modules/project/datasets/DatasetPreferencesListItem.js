@@ -10,6 +10,7 @@ import {truncateText} from '../../../shared/helpers';
 import * as themes from '../../../shared/styles.constants';
 import {PRIMARY_TEXT_COLOR, PRIMARY_TEXT_SIZE, WARNING_COLOR} from '../../../shared/styles.constants';
 import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
+import {getSpotsCount} from '../../spots/spots.helpers';
 import {setReadOnlyDatasetsIds} from '../projects.slice';
 import useProject from '../useProject';
 import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
@@ -20,6 +21,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const dispatch = useDispatch();
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
+  const spots = useSelector(state => state.spot.spots);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const {initializeDownloadImages} = useDownload();
@@ -38,7 +40,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const isActive = activeDatasetsIds.includes(dataset.id);
   const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
   const isTarget = targetDatasetId === dataset.id;
-  const spotsCount = dataset.spotIds?.length || 0;
+  const spotsCount = getSpotsCount(dataset.spotIds, spots);
 
   /* Event Handlers */
 
