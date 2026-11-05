@@ -2,10 +2,11 @@
 export const getReportsAtSpot = (reports, spotId) => (reports || []).filter(r => r.spots?.includes(spotId));
 
 // The memos this user may see. A memo marked only_me is its author's alone. One saved before authorship was
-// recorded names no author, so it falls to whoever owns the project
+// recorded names no author, so it falls to whoever owns the project. The ids may differ in type, so they are
+// compared as strings.
 export const getVisibleReports = (reports, straboUserId, ownerStraboUserId) => (reports || []).filter(
   r => r.report_privacy !== 'only_me'
-    || (r.straboUserId ? r.straboUserId === straboUserId : straboUserId === ownerStraboUserId));
+    || String(r.straboUserId || ownerStraboUserId) === String(straboUserId));
 
 // The memos this user may see, most recently edited first
 export const getReportsToList = (reports, straboUserId, ownerStraboUserId) => getVisibleReports(
