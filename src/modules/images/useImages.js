@@ -114,10 +114,10 @@ const useImages = () => {
     }
   };
 
-  // Get images from Spots and Reports
-  const getAllImages = () => {
+  // Get the images in every memo and in the given Spots, by default all of them
+  const getAllImages = (spotsToSearch = Object.values(spots)) => {
     const images = [];
-    Object.values(spots).forEach(spot => spot?.properties?.images?.map(image => images.push(image)));
+    spotsToSearch.forEach(spot => spot?.properties?.images?.map(image => images.push(image)));
     if (!isEmpty(project.reports)) project.reports.forEach(report => report.images?.map(image => images.push(image)));
     return images;
   };

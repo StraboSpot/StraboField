@@ -13,3 +13,11 @@ export const getDatasetOwnerId = (dataset, projectOwnerId) => !isEmpty(dataset?.
 export const isDatasetReadOnly = (dataset, straboUserId) => !!dataset?.isReadOnly
   || (!isEmpty(dataset?.owner_straboUserId) && !isEmpty(straboUserId)
     && String(dataset.owner_straboUserId) !== String(straboUserId));
+
+// The Spots in the datasets that are not read only to the user
+export const getSpotsInWritableDatasets = (datasets, spots, straboUserId) => {
+  const spotIds = new Set(Object.values(datasets)
+    .filter(dataset => !isDatasetReadOnly(dataset, straboUserId))
+    .flatMap(dataset => dataset.spotIds || []));
+  return Object.values(spots).filter(spot => spotIds.has(spot.properties.id));
+};

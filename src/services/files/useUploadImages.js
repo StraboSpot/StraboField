@@ -9,8 +9,10 @@ import {addedStatusMessage, clearedStatusMessages, setIsProgressModalVisible} fr
 import {getLocalImageURI} from '../../modules/images/imageURIs.helpers';
 import useImages from '../../modules/images/useImages';
 import useImageSize from '../../modules/images/useImageSize';
+import {getSpotsInWritableDatasets} from '../../modules/project/projects.helpers';
 import {removedChangedImageIds, setIsImageTransferring} from '../../modules/project/projects.slice';
 import {isEmpty, toError} from '../../shared/helpers';
+import {store} from '../../store/ConfigureStore';
 import useDevice from '../device/useDevice';
 import useServerRequests from '../network/useServerRequests';
 
@@ -19,7 +21,6 @@ const useUploadImages = () => {
 
   const dispatch = useDispatch();
   const changedImageIds = useSelector(state => state.project.changedImageIds);
-  const spots = useSelector(state => state.spot.spots);
   const user = useSelector(state => state.user);
 
   const {deleteTempImagesFolder, doesDeviceDirExist} = useDevice();
@@ -64,9 +65,13 @@ const useUploadImages = () => {
     let imagesStatus = {};
     try {
       setImageUploadStatusMessage('');
-      console.log('Looking for Images to Upload in Spots...', spots);
+      // Another user's datasets are theirs to upload, so their Spots' images are too. Every memo's images are
+      // checked, whoever wrote the memo.
+      const {project: {datasets}, spot: {spots}, user: {straboUserId}} = store.getState();
+      const spotsToUpload = getSpotsInWritableDatasets(datasets, spots, straboUserId);
+      console.log('Looking for Images to Upload in Spots...', spotsToUpload);
       setImageUploadStatusMessage('Looking for images to upload in spots...');
-      const images = getAllImages();
+      const images = getAllImages(spotsToUpload);
       const imageIds = getImageIds(images);
       setImageUploadStatusMessage('Checking to see if image files are on server...');
       const neededImages = await verifyImagesExistence(imageIds, user.encoded_login);
