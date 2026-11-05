@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {Provider} from 'react-redux';
 import ReactTestRenderer from 'react-test-renderer';
@@ -60,13 +61,15 @@ const openDetail = async ({isEdited, page, spot, selectedAttribute, tabIndex}) =
   let renderer;
   await ReactTestRenderer.act(() => {
     renderer = ReactTestRenderer.create(
-      <SafeAreaProvider
-        initialMetrics={{frame: {x: 0, y: 0, width: 400, height: 800}, insets: {top: 0, bottom: 0, left: 0, right: 0}}}
-      >
-        <Provider store={getStore(spot, selectedAttribute)}>
-          <LeavePageContext.Provider value={leavePage}>{page}</LeavePageContext.Provider>
-        </Provider>
-      </SafeAreaProvider>,
+      <GestureHandlerRootView>
+        <SafeAreaProvider
+          initialMetrics={{frame: {x: 0, y: 0, width: 400, height: 800}, insets: {top: 0, bottom: 0, left: 0, right: 0}}}
+        >
+          <Provider store={getStore(spot, selectedAttribute)}>
+            <LeavePageContext.Provider value={leavePage}>{page}</LeavePageContext.Provider>
+          </Provider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>,
     );
   });
   await settle();

@@ -11,7 +11,6 @@ import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
 import {UNSAVED_CHANGES_CHOICES} from '../../shared/ui/modals/unsavedChanges.constants';
 import useUnsavedChangesPrompt from '../../shared/ui/modals/useUnsavedChangesPrompt';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpots, restoredIntervalDragSnapshot} from '../spots/spots.slice';
 
 // The map mode, and ending a map edit or interval drag before anything else changes a Spot. HomeContainer calls this
@@ -38,13 +37,19 @@ const useMapMode = ({mapComponentRef}) => {
   const endIntervalDrag = (choice) => {
     const {intervalDragChangedSpotIds: movedSpotIds, intervalDragSnapshot} = store.getState().map;
     if (choice === MAP_EDIT_CHOICES.SAVE) {
-      if (!isEmpty(movedSpotIds)) dispatch(updatedModifiedTimestampsBySpotsIds(movedSpotIds));
+      // Saved again as an ordinary edit, which updates the dataset and project timestamps the drag held back
+      const {spots} = store.getState().spot;
+      const movedSpots = movedSpotIds.map(spotId => spots[spotId]).filter(Boolean);
+      if (!isEmpty(movedSpots)) dispatch(editedOrCreatedSpots(movedSpots));
       dispatch(savedIntervalDragReordering());
     }
     else {
       if (!isEmpty(movedSpotIds)) {
         dispatch(restoredIntervalDragSnapshot(intervalDragSnapshot));
-        if (Platform.OS !== 'web') dispatch(editedOrCreatedSpots(intervalDragSnapshot));
+        // Putting the Spots back is no change to their dataset or the project, which the drag never updated
+        if (Platform.OS !== 'web') {
+          dispatch(editedOrCreatedSpots(intervalDragSnapshot, {shouldPropagateTimestamps: false}));
+        }
       }
       dispatch(canceledIntervalDrag());
     }

@@ -25,35 +25,8 @@ setup_permissions([
 ])
 
 $RNMapboxMapsImpl = 'mapbox'
-
-# SentryCrash decodes saved crash reports with KeepPartialObject, so a half-written report can
-# decode to an NSArray. -doctorReport: then calls report[@"crash"] and throws during Sentry
-# startup, on every launch, because the report is never deleted. Discard non-dictionary reports.
-# Upstream (sentry-cocoa main) has the same code; remove this once it's fixed there.
-def patch_sentry_corrupt_report_crash
-  path = File.join(__dir__, 'Pods/Sentry/Sources/SentryCrash/Recording/SentryCrash.m')
-  marker = '// StraboSpot patch: discard non-dictionary crash reports'
-  anchor = [
-    '    if (crashReport == nil) {',
-    '        SENTRY_LOG_ERROR(@"Could not load crash report");',
-    '        return nil;',
-    '    }',
-  ].join("\n")
-  guard = [
-    "    #{marker}",
-    '    if (![crashReport isKindOfClass:[NSDictionary class]]) {',
-    '        SENTRY_LOG_ERROR(@"Crash report %" PRIx64 " is not a dictionary, deleting it", reportID);',
-    '        sentrycrash_deleteReportWithID(reportID);',
-    '        return nil;',
-    '    }',
-  ].join("\n")
-  source = File.read(path)
-  return if source.include?(marker)
-  raise "Sentry patch anchor not found in #{path}; update patch_sentry_corrupt_report_crash in the Podfile" unless source.include?(anchor)
-  File.chmod(0644, path)
-  File.write(path, source.sub(anchor, "#{anchor}\n\n#{guard}"))
-  Pod::UI.puts 'Patched SentryCrash.m to discard non-dictionary crash reports'.green
-end
+# Newer SDKs blank raster basemap tiles while zooming: 11.28.4 and up flicker. See CLAUDE.md before raising this.
+$RNMapboxMapsVersion = '= 11.23.1'
 
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
@@ -85,7 +58,6 @@ target 'StraboSpot2' do
 
       framework_paths = [
         "Pods/MapboxCommon/MapboxCommon.xcframework/ios-arm64/MapboxCommon.framework/MapboxCommon",
-        "Pods/MapboxMobileEvents/MapboxMobileEvents.xcframework/ios-arm64_armv7/MapboxMobileEvents.framework/MapboxMobileEvents",
         "Pods/MapboxCoreMaps/MapboxCoreMaps.xcframework/ios-arm64/MapboxCoreMaps.framework/MapboxCoreMaps",
       ]
 
@@ -100,7 +72,6 @@ target 'StraboSpot2' do
     )
     #__apply_Xcode_14_3_RC_post_install_workaround(installer)
     $RNMapboxMaps.post_install(installer)
-    patch_sentry_corrupt_report_crash
 #       installer.generated_projects.each do |project|
 #         project.targets.each do |target|
 #             target.build_configurations.each do |config|
@@ -125,10 +96,6 @@ target 'StraboSpot2' do
       end
   end
 
-
-pre_install do |installer|
-  fix_mapbox_events(installer)
-end
 
 pre_install do |installer|
     $RNMapboxMaps.pre_install(installer)

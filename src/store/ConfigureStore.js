@@ -5,6 +5,7 @@ import {createMigrate, persistReducer, persistStore} from 'redux-persist';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 
 import listenerMiddleware from './listenerMiddleware';
+import propagateModifiedTimestamps from './propagateModifiedTimestamps';
 import compassSlice from '../modules/compass/compass.slice';
 import connectionsSlice from '../modules/connections/connections.slice';
 import homeSlice from '../modules/home/home.slice';
@@ -183,9 +184,7 @@ const combinedReducers = combineReducers({
   user: userSlice,
 });
 
-const rootReducer = (state, action) => {
-  return combinedReducers(state, action);
-};
+const rootReducer = propagateModifiedTimestamps(combinedReducers);
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
@@ -201,8 +200,7 @@ const defaultMiddlewareOptions = {
 const store = configureStore({
   reducer: persistedReducer,
   middleware: getDefaultMiddleware => __DEV__
-    ? getDefaultMiddleware(defaultMiddlewareOptions)
-      .concat(loggerMiddleware, listenerMiddleware.middleware)
+    ? getDefaultMiddleware(defaultMiddlewareOptions).concat(loggerMiddleware, listenerMiddleware.middleware)
     : getDefaultMiddleware(defaultMiddlewareOptions).concat(listenerMiddleware.middleware),
 });
 

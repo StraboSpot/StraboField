@@ -6,6 +6,16 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 // The placeholder editedSpotImages gives an image that arrives with no title of its own
 const UNTITLED_TITLE = /^Untitled \d+$/;
 
+// A change to a Spot carries the time it was made, so the Spot, the dataset holding it and the project are all
+// given the same one (see propagateModifiedTimestamps). An interval drag turns shouldPropagateTimestamps off, so its
+// Spots move without updating their dataset or the project until the reorder is saved.
+const withModifiedTimestamp = reducer => ({
+  prepare: (payload, {shouldPropagateTimestamps = true} = {}) => (
+    {meta: {shouldPropagateTimestamps: shouldPropagateTimestamps, timestamp: Date.now()}, payload: payload}
+  ),
+  reducer: reducer,
+});
+
 const initialSpotState = {
   intersectedSpotsForTagging: [],
   recentViews: [],
@@ -14,8 +24,11 @@ const initialSpotState = {
   spots: {},
 };
 
+// Every action type of the slice starts with it
+export const SPOT_SLICE_NAME = 'spot';
+
 const spotSlice = createSlice({
-  name: 'spot',
+  name: SPOT_SLICE_NAME,
   initialState: initialSpotState,
   reducers: {
     addedSpotsFromDevice(state, action) {
@@ -43,15 +56,15 @@ const spotSlice = createSlice({
       state.spots = {};
       state.recentViews = [];
     },
-    deletedSpot(state, action) {
+    deletedSpot: withModifiedTimestamp((state, action) => {
       const {[action.payload]: deletedSpot, ...remainingSpots} = state.spots;
       console.log('DELETED Spot:', action.payload, deletedSpot);
       console.log('Remaining Spots:', remainingSpots);
       state.selectedSpot = {};
       state.spots = remainingSpots;
       state.recentViews = state.recentViews.filter(id => id !== action.payload);
-    },
-    deletedSpots(state, action) {
+    }),
+    deletedSpots: withModifiedTimestamp((state, action) => {
       const spotIds = action.payload;     // ids of spots to delete
       const spotIdsStrings = spotIds.map(spotId => spotId.toString());
       const remainingSpotsObj = Object.entries(state.spots).reduce((acc, [key, val]) => {
@@ -60,16 +73,16 @@ const spotSlice = createSlice({
       state.selectedSpot = {};
       state.spots = remainingSpotsObj;
       state.recentViews = state.recentViews.filter(id => !spotIds.includes(id));
-    },
+    }),
     // Drops the selection only if it is still the one given, not one the next page has made since - even of the same
     // feature. original(state), because the draft hands back a stand-in that never matches the dispatched array.
     deselectedAttributes(state, action) {
       if (original(state).selectedAttributes === action.payload) state.selectedAttributes = [];
     },
-    editedOrCreatedSpot(state, action) {
+    editedOrCreatedSpot: withModifiedTimestamp((state, action) => {
       const modifiedSpot = {
         ...action.payload,
-        properties: {...action.payload.properties, modified_timestamp: Date.now()},
+        properties: {...action.payload.properties, modified_timestamp: action.meta.timestamp},
       };
       state.spots = {...state.spots, [modifiedSpot.properties.id]: modifiedSpot};
       console.log('UPDATED Spot:', modifiedSpot, 'in Existing Spots:', state.spots);
@@ -81,10 +94,10 @@ const spotSlice = createSlice({
         state.selectedSpot = modifiedSpot;
         console.log('UPDATED Selected Spot:', state.selectedSpot);
       }
-    },
-    editedOrCreatedSpots(state, action) {
+    }),
+    editedOrCreatedSpots: withModifiedTimestamp((state, action) => {
       const spotsWithTimestamp = action.payload.map(s => (
-        {...s, properties: {...s.properties, modified_timestamp: Date.now()}}
+        {...s, properties: {...s.properties, modified_timestamp: action.meta.timestamp}}
       ));
       const spotsEdited = Object.assign({}, ...spotsWithTimestamp.map(spot => ({[spot.properties.id]: spot})));
       state.spots = {...state.spots, ...spotsEdited};
@@ -96,8 +109,8 @@ const spotSlice = createSlice({
         state.selectedSpot = selectedSpotUpdated;
         console.log('UPDATED Selected Spot:', state.selectedSpot);
       }
-    },
-    editedSpotImage(state, action) {
+    }),
+    editedSpotImage: withModifiedTimestamp((state, action) => {
       const foundSpot = Object.values(state.spots).find((spot) => {
         return spot.properties.images && spot.properties.images.find(image => image.id === action.payload.id);
       });
@@ -105,15 +118,16 @@ const spotSlice = createSlice({
         // Replaced where it sits: the Spot was found by holding this image, so it is always there to replace
         const i = foundSpot.properties.images.findIndex(image => image.id === action.payload.id);
         foundSpot.properties.images.splice(i, 1, action.payload);
+        // The Spot holding the image is the one changed, whichever Spot is selected
+        foundSpot.properties.modified_timestamp = action.meta.timestamp;
         const selectedSpotCopy = isEmpty(state.selectedSpot)
         || state.selectedSpot.properties.id === foundSpot.properties.id ? foundSpot : state.selectedSpot;
         console.log('Edit Image for selectedSpot', selectedSpotCopy);
         state.selectedSpot = selectedSpotCopy;
-        state.selectedSpot.properties.modified_timestamp = Date.now();
         state.spots = {...state.spots, [foundSpot.properties.id]: foundSpot};
       }
-    },
-    editedSpotImages(state, action) {
+    }),
+    editedSpotImages: withModifiedTimestamp((state, action) => {
       // An image saved again under an id the Spot already has replaces the one there rather than joining it.
       // Two of an id is a duplicate the server refuses the whole Spot for, leaving it unable to save at all.
       const updatedIds = action.payload.map(image => image.id);
@@ -149,10 +163,10 @@ const spotSlice = createSlice({
         return {...image, title: 'Untitled ' + untitledNumber};
       });
       state.selectedSpot.properties.images = tempImagesWithTitles;
-      state.selectedSpot.properties.modified_timestamp = Date.now();
+      state.selectedSpot.properties.modified_timestamp = action.meta.timestamp;
       state.spots = {...state.spots, [state.selectedSpot.properties.id]: state.selectedSpot};
-    },
-    editedSpotProperties(state, action) {
+    }),
+    editedSpotProperties: withModifiedTimestamp((state, action) => {
       const {field, value, spotId = state.selectedSpot?.properties?.id} = action.payload;
       if (spotId) {
         const spotToEdit = state.spots[spotId];
@@ -160,13 +174,13 @@ const spotSlice = createSlice({
         if (!spotToEdit) return;
         if (isEmpty(value)) delete spotToEdit.properties[field];
         else spotToEdit.properties[field] = value;
-        spotToEdit.properties.modified_timestamp = Date.now();
+        spotToEdit.properties.modified_timestamp = action.meta.timestamp;
         if (field === 'notes') spotToEdit.properties.notesTimestamp = Date();
         if (spotId.toString() === state?.selectedSpot?.properties?.id.toString()) state.selectedSpot = spotToEdit;
         state.spots = {...state.spots, [spotId]: spotToEdit};
       }
       else throw Error('Missing Spot Id');
-    },
+    }),
     resetSpotState() {
       return initialSpotState;
     },
@@ -178,10 +192,11 @@ const spotSlice = createSlice({
       const selectedSpotRestored = spotsRestored[state.selectedSpot?.properties?.id];
       if (selectedSpotRestored) state.selectedSpot = selectedSpotRestored;
     },
-    restoredSpots(state, action) {
-      // Re-add previously deleted Spots (undo delete) by merging them back in without touching other Spots.
+    // Re-add previously deleted Spots (undo delete) by merging them back in without touching other Spots. They keep
+    // their own timestamps, but their datasets and the project are updated: the delete may already have been sent.
+    restoredSpots: withModifiedTimestamp((state, action) => {
       state.spots = {...state.spots, ...action.payload};
-    },
+    }),
     setIntersectedSpotsForTagging(state, action) {
       state.intersectedSpotsForTagging = action.payload;
     },

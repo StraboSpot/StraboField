@@ -6,12 +6,12 @@ import Geolocation from 'react-native-geolocation-service';
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch} from 'react-redux';
 
+import {getMoreAccuratePosition, isFreshPosition} from './view.helpers';
 import usePermissions from '../../../services/device/usePermissions';
 import {toError} from '../../../shared/helpers';
 import {setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
 import {LOCATION_ACCURACY_TARGET, LOCATION_SETTLE_TIME, LOCATION_TIMEOUT} from '../maps.constants';
-import {getMoreAccuratePosition, isFreshPosition} from './view.helpers';
 
 const LOCATION_PERMISSION_NOT_GRANTED = 'Location permission not granted';
 

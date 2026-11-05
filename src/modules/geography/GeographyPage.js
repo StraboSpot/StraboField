@@ -28,7 +28,6 @@ import useMapView from '../maps/view/useMapView';
 import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {setNotebookPageVisibleToPrev} from '../notebook-panel/notebook.slice';
 import PageHeader from '../page/PageHeader';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedOrCreatedSpot} from '../spots/spots.slice';
 
 const GeographyPage = ({isReadOnly, page}) => {
@@ -90,7 +89,6 @@ const GeographyPage = ({isReadOnly, page}) => {
         }
       }
       const editedSpot = {geometry: geometry, properties: geographyProperties, type: spot.type};
-      dispatch(updatedModifiedTimestampsBySpotsIds([editedSpot.properties.id]));
       dispatch(editedOrCreatedSpot(editedSpot));
       markSaved();
       return true;

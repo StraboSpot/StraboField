@@ -14,12 +14,12 @@ import {PRIMARY_ACCENT_COLOR, SMALL_TEXT_SIZE} from '../../shared/styles.constan
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
 import SwitchWrapper from '../../shared/ui/SwitchWrapper';
 import TextInput from '../../shared/ui/TextInput';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotImage} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
 
 const ImageCard = ({
                      areImageThumbnailsLoading,
+                     deleteImage,
                      image,
                      imageThumbnailURIs,
                      index,
@@ -30,19 +30,17 @@ const ImageCard = ({
                      saveUpdatedImage,
                      setAreImageThumbnailsLoading,
                      setImageThumbnailURIs,
-                     spotWithImage,
                    }) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const spot = useSelector(state => state.spot.selectedSpot);
-  const {isReadOnly: isReadOnlyProject} = useSelector(state => state.project?.project);
+  const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
   const {isInternetReachable, isConnected} = useSelector(state => state.connections.isOnline);
 
   const {downloadImageAndSave} = useDevice();
   const {deleteImageFromSpot, getImageBasemap, setAnnotation} = useImages();
   const {getImageThumbnailURIs} = useImageThumbnails();
-  const {getAllSpotsOnImageBasemap, getSpotWithThisImage} = useSpots();
+  const {getAllSpotsOnImageBasemap, getSpotByImageId} = useSpots();
 
   /* Local State */
 
@@ -73,12 +71,7 @@ const ImageCard = ({
       const updatedImage = {...image, title};
       // Images owned by something other than a Spot (Sample, Memo) are saved through their owner
       if (saveUpdatedImage) saveUpdatedImage(updatedImage);
-      else {
-        // The Spot holding the image, not the selected Spot: the image gallery renames with none selected
-        const spotWithThisImage = getSpotWithThisImage(image.id);
-        dispatch(editedSpotImage(updatedImage));
-        if (spotWithThisImage) dispatch(updatedModifiedTimestampsBySpotsIds([spotWithThisImage.properties.id]));
-      }
+      else dispatch(editedSpotImage(updatedImage));
     }
     if (isEmpty(title)) setTitle(undefined);
     setIsEditing(false);
@@ -122,10 +115,10 @@ const ImageCard = ({
 
   /* Logic Helpers */
 
-  const deleteImage = async () => {
-    console.log('Deleting image from spot', image.id);
-    await deleteImageFromSpot(image.id, spotWithImage || spot);
-    console.log('Deleted image from spot', image.id);
+  // Images owned by something other than a Spot (Sample, Memo) are deleted through their owner
+  const deleteMissingImage = async () => {
+    if (deleteImage) await deleteImage(image);
+    else await deleteImageFromSpot(image.id, getSpotByImageId(image.id));
     setIsMissingImageModalVisible(false);
   };
 
@@ -246,7 +239,7 @@ const ImageCard = ({
         actionTitle={'Delete'}
         headerTitle={'Missing Image on Server!'}
         isVisible={isMissingImageModalVisible}
-        onActionPressed={deleteImage}
+        onActionPressed={deleteMissingImage}
         onCancelPress={() => setIsMissingImageModalVisible(false)}
         overlayStyleOverride={{height: 'auto'}}
         showActionButton={true}

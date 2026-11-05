@@ -12,7 +12,6 @@ import FormikWrapper from '../form/FormikWrapper';
 import useForm from '../form/useForm';
 import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import PageHeader from '../page/PageHeader';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {isLineSpot, isStratInterval} from '../spots/spots.helpers';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -121,7 +120,6 @@ const TraceSurfaceFeaturePage = ({closePage, isReadOnly}) => {
   const saveFeature = (formValues) => {
     console.log('Saving form data to Spot ...');
     const value = !formValues[typeKey] ? {} : isTrace ? {...formValues, 'trace_feature': true} : formValues;
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: featureKey, spotId: spot.properties.id, value: value}));
     markSaved();
     closePage();

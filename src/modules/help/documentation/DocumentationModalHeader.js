@@ -1,9 +1,10 @@
 import React, {useState} from 'react';
 import {FlatList, Platform, Text, TouchableOpacity, View} from 'react-native';
 
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import {Icon} from '@rn-vui/base';
 
 import styles from './documentation.styles';
+import {BLACK} from '../../../shared/styles.constants';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 
 const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPage}) => {
@@ -29,11 +30,11 @@ const DocumentationModalHeader = ({currentPage, totalPages, onClose, onJumpToPag
     <>
       <View style={styles.headerContainer}>
         <TouchableOpacity onPress={onClose} style={styles.closeButtonContainer}>
-          <Ionicons color={'#333'} name={'arrow-back-outline'} size={24}/>
+          <Icon color={BLACK} name={'arrow-back-outline'} size={24} type={'ionicon'}/>
         </TouchableOpacity>
         <Text style={styles.pageText}>{pageHeader}</Text>
         {totalPages > 1 && <TouchableOpacity onPress={() => setPickerVisible(true)}>
-          <Text style={styles.jumpText}>Jump to page</Text>
+          <Text style={styles.jumpText}>Jump to Page</Text>
         </TouchableOpacity>}
       </View>
       <ModalWrapper

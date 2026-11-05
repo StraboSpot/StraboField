@@ -5,7 +5,7 @@ import {ButtonGroup} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import ConfirmOverwriteModal from './ConfirmOverwriteModal';
-import {MAX_SAVES} from '../../../services/files/useAutoSave';
+import {MAX_SAVES_PER_PROJECT} from '../../../services/files/autoSave.helpers';
 import useImport from '../../../services/files/useImport';
 import commonStyles from '../../../shared/common.styles';
 import * as themes from '../../../shared/styles.constants';
@@ -105,7 +105,8 @@ const OpenProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
             paddingHorizontal: 15,
             textAlign: 'center',
           }]}>
-            {`The ${MAX_SAVES} most recent auto saves are kept. Older ones are removed automatically.`}
+            {`The ${MAX_SAVES_PER_PROJECT} most recent auto saves of each project are kept. Older ones are removed`
+              + ' automatically.'}
           </Text>
         )}
         <ProjectList

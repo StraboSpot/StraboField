@@ -9,7 +9,7 @@ import useMapDraw from './useMapDraw';
 import useMapEditVertex from './useMapEditVertex';
 import useMapSelectionModes from './useMapSelectionModes';
 import {isEmpty} from '../../../shared/helpers';
-import {addedNewSpotIdsToDataset, updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
+import {addedNewSpotIdsToDataset} from '../../project/projects.slice';
 import useProject from '../../project/useProject';
 import {clearedSelectedSpots, editedOrCreatedSpots, setSelectedSpot} from '../../spots/spots.slice';
 import useMapFeaturesCalculated from '../features/useMapFeaturesCalculated';
@@ -292,7 +292,6 @@ const useMapEditor = ({
           const datasetId = getSplitLineDatasetId(newSpotId) || targetDataset.id;
           dispatch(addedNewSpotIdsToDataset({datasetId: datasetId, spotIds: [newSpotId]}));
         });
-        dispatch(updatedModifiedTimestampsBySpotsIds(spotIds));
         dispatch(editedOrCreatedSpots(spotsEdited));
       }
     }

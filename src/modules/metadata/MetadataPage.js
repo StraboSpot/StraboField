@@ -27,10 +27,17 @@ const MetadataPage = ({isReadOnly, page}) => {
 
   const metadataFormRef = useRef(null);
 
+  /* Derived Variables */
+
+  // A map edit used to add the Spot to the target dataset as well, so it can show as in more than one. Picking any of
+  // them then moves it there alone.
+  const isInSeveralDatasets = Object.values(datasets)
+    .filter(dataset => dataset.spotIds?.includes(spot.properties.id)).length > 1;
+
   /* Event Handlers */
 
   const handleDatasetChecked = (datasetChecked) => {
-    if (!datasetChecked.spotIds?.includes(spot.properties.id)) {
+    if (!datasetChecked.spotIds?.includes(spot.properties.id) || isInSeveralDatasets) {
       dispatch(movedSpotIdBetweenDatasets({toDatasetId: datasetChecked.id, spotId: spot.properties.id}));
     }
   };

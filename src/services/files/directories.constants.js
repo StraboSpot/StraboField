@@ -37,10 +37,14 @@ const microExportsDir = (isIOS ? documentDir : RNFS.DownloadDirectoryPath + '/St
 
 export const TEMP_IMAGES_DOWNSIZED_DIRECTORY = appDir + '/TempImages';
 
+// Inside the backup directory, beside the manual saves
+export const AUTO_SAVES_FOLDER = 'AutoBackups';
+
 export const APP_DIRECTORIES = {
   // Shared
   ROOT_PATH: documentDir,
   APP_DIR: appDir,
+  AUTO_SAVES: backupDir + AUTO_SAVES_FOLDER + '/',
   BACKUP_DIR: backupDir,
   GLYPHS: glyphsDir,
   IMAGES: imagesDir,

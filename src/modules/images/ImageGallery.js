@@ -71,7 +71,6 @@ const ImageGallery = ({openDatasetsPage, openSpotInNotebook}) => {
         isReadOnlyImages={isReadOnly}
         isThumbnailOnly
         onOpenImage={handleOpenImage}
-        spotWithImage={section.spot}
       />
     );
   };

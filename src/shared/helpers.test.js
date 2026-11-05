@@ -1,4 +1,12 @@
-import {getNewId, getNewUUID, getTimestampFromId, isSameId} from './helpers';
+import {formatFileSize, getNewId, getNewUUID, getTimestampFromId, isSameId} from './helpers';
+
+describe('formatFileSize', () => {
+  it('picks the unit that keeps the number readable', () => {
+    expect(formatFileSize(2048)).toBe('2.0 KB');
+    expect(formatFileSize(5.5 * 1024 * 1024)).toBe('5.5 MB');
+    expect(formatFileSize(1.25 * 1024 * 1024 * 1024)).toBe('1.25 GB');
+  });
+});
 
 // The old generator was a millisecond timestamp plus one random digit, so it had 11 ids per millisecond
 // and any burst of mints - saving several templates at once, copying a Spot's features - repeated one.
@@ -45,6 +53,10 @@ describe('getNewUUID', () => {
     const ids = Array.from({length: 5000}, () => getNewUUID());
     expect(new Set(ids).size).toBe(5000);
     expect(typeof ids[0]).toBe('string');
+  });
+
+  it('is a version 4 UUID in canonical lowercase form', () => {
+    expect(getNewUUID()).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
   });
 });
 

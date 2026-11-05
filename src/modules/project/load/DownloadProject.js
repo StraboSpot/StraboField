@@ -46,9 +46,9 @@ const DownloadProject = ({closeMainMenuPanel, closeNotebookPanel}) => {
     closeNotebookPanel();
     closeConfirmOverwriteModal();
     try {
-      const downloadedDatasets = await initializeDownload(inProjectToDownload);
-      // A duplicate request is ignored and hands back nothing - the download already running owns the follow up
-      if (!downloadedDatasets) return;
+      // Left open when the user cancels, to pick again. A duplicate request is ignored and hands back nothing too -
+      // the download already running owns the follow up
+      if (!await initializeDownload(inProjectToDownload)) return;
       // A collaborator lands on the Datasets page to see what they downloaded. Owning none of it is fine -
       // the project is theirs to read, and a dataset of their own is theirs to add here when they want one
       if (!inProjectToDownload.isOwner && !inProjectToDownload.isReadOnly) {

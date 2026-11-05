@@ -1,5 +1,8 @@
-import projectReducer, {
+import {combineReducers} from '@reduxjs/toolkit';
+
+import projectSliceReducer, {
   addedProjectFromServer,
+  addedTagToSelectedSpot,
   addedTemplates,
   deletedSpotIdFromDataset,
   deletedSpotIdFromDatasets,
@@ -9,11 +12,16 @@ import projectReducer, {
   migrateReportTimestamps,
   movedSpotIdBetweenDatasets,
   setActiveTemplates,
+  setUseContinuousTagging,
   setUseTemplate,
-  updatedModifiedTimestampsBySpotsIds,
   updatedProjectPreference,
 } from './projects.slice';
+import propagateModifiedTimestamps from '../../store/propagateModifiedTimestamps';
 import {MEASUREMENT_TEMPLATE_KEY} from '../templates/templates.constants';
+
+// Through the root reducer wrapper, as in the store, since it is what updates the dataset and project timestamps
+const rootReducer = propagateModifiedTimestamps(combineReducers({project: projectSliceReducer}));
+const projectReducer = (state, action) => rootReducer({project: state}, action).project;
 
 // Spot ids are stored as numbers, but a Spot deleted by a caller holding a string id has to come out just the same
 const spotId = 1756000000001;
@@ -57,6 +65,13 @@ describe('deletedSpotIdFromDatasets', () => {
   it('leaves a dataset without the Spot untouched', () => {
     const {datasets} = projectReducer(getDatasetsState(), deletedSpotIdFromDatasets(spotId.toString()));
     expect(datasets[13]).toEqual(getDatasetsState().datasets[13]);
+  });
+
+  it('leaves a dataset with no Spots yet unmarked', () => {
+    const state = getDatasetsState();
+    state.datasets[14] = {id: 14, modified_timestamp: 1, name: 'Empty'};
+    const {datasets} = projectReducer(state, deletedSpotIdFromDatasets(spotId));
+    expect(datasets[14].modified_timestamp).toBe(1);
   });
 });
 
@@ -136,6 +151,16 @@ describe('movedSpotIdBetweenDatasets', () => {
     expect(datasets[13].spotIds).toEqual([1756000000003, spotId]);
   });
 
+  it('marks both datasets and the project as modified', () => {
+    const state = getDatasetsState();
+    state.datasets[14] = {id: 14, modified_timestamp: 1, name: 'Dataset 3', spotIds: [otherSpotId]};
+    const {datasets, project} = projectReducer(state, movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 13}));
+    expect(datasets[12].modified_timestamp).toBeGreaterThan(1);
+    expect(datasets[13].modified_timestamp).toBeGreaterThan(1);
+    expect(datasets[14].modified_timestamp).toBe(1);
+    expect(project.modified_timestamp).toBeGreaterThan(1);
+  });
+
   // Without the id coercion the Spot lands in the new dataset while staying in the old one
   it('moves the Spot when its id is given as a string', () => {
     const action = movedSpotIdBetweenDatasets({spotId: spotId.toString(), toDatasetId: 13});
@@ -143,33 +168,30 @@ describe('movedSpotIdBetweenDatasets', () => {
     expect(datasets[12].spotIds).toEqual([otherSpotId]);
     expect(datasets[13].spotIds).toEqual([1756000000003, spotId.toString()]);
   });
+
+  // A map edit used to add the Spot to the target dataset too, so picking one of the datasets holding it must leave
+  // it in that one alone
+  it('leaves a Spot that is in two datasets in only the one it is moved to', () => {
+    const state = getDatasetsState();
+    state.datasets[13].spotIds.push(spotId);
+    const {datasets} = projectReducer(state, movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 12}));
+    expect(datasets[12].spotIds).toEqual([otherSpotId, spotId]);
+    expect(datasets[13].spotIds).toEqual([1756000000003]);
+  });
 });
 
-describe('updatedModifiedTimestampsBySpotsIds', () => {
-  const getState = () => ({
-    datasets: {
-      12: {id: 12, modified_timestamp: 1, name: 'Dataset 1', spotIds: [spotId]},
-      13: {id: 13, modified_timestamp: 1, name: 'Dataset 2', spotIds: [1756000000002]},
-    },
-    project: {modified_timestamp: 1},
-  });
-
-  it('marks the dataset holding the Spot as modified, and only that one', () => {
-    const {datasets} = projectReducer(getState(), updatedModifiedTimestampsBySpotsIds([spotId]));
-    expect(datasets[12].modified_timestamp).toBeGreaterThan(1);
-    expect(datasets[13].modified_timestamp).toBe(1);
-  });
-
-  // Spot ids are stored in spotIds as numbers, but callers hand them over both ways
-  it('finds the dataset when the Spot id is given as a string', () => {
-    const {datasets} = projectReducer(getState(), updatedModifiedTimestampsBySpotsIds([spotId.toString()]));
-    expect(datasets[12].modified_timestamp).toBeGreaterThan(1);
-    expect(datasets[13].modified_timestamp).toBe(1);
-  });
-
-  it('marks the project as modified either way', () => {
-    const {project} = projectReducer(getState(), updatedModifiedTimestampsBySpotsIds([spotId]));
+describe('project settings', () => {
+  // The setting is kept on the project and sent to the server, so changing it is a change to the project
+  it('marks the project as modified when continuous tagging is switched', () => {
+    const {project} = projectReducer({project: {modified_timestamp: 1}}, setUseContinuousTagging(true));
+    expect(project.useContinuousTagging).toBe(true);
     expect(project.modified_timestamp).toBeGreaterThan(1);
+  });
+
+  // Only says where the tag being made goes, so opening the tag pages must not mark the project for save or sync
+  it('leaves the project as it was when a tag is set to go on the selected Spot', () => {
+    const {project} = projectReducer({project: {modified_timestamp: 1}}, addedTagToSelectedSpot(true));
+    expect(project.modified_timestamp).toBe(1);
   });
 });
 

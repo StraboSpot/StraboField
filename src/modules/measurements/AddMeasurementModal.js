@@ -32,7 +32,6 @@ import useForm from '../form/useForm';
 import {setActiveModal, setModalValues} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties, setSelectedAttributes} from '../spots/spots.slice';
 import {MEASUREMENT_TEMPLATE_KEY} from '../templates/templates.constants';
 import {
@@ -295,7 +294,6 @@ const AddMeasurementModal = ({onPress, openSpotInNotebook, zoomToCurrentLocation
       // afterwards would blank the page being opened.
       if (isShortcutMeasurement) openSpotInNotebook(spotToUpdate, PAGE_KEYS.MEASUREMENTS);
 
-      dispatch(updatedModifiedTimestampsBySpotsIds([spotToUpdate.properties.id]));
       dispatch(editedSpotProperties({field: 'orientation_data', value: editedMeasurementsData}));
 
       if (isSelectedAttitude) {

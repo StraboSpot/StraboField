@@ -29,7 +29,6 @@ import MeasurementModal from '../form/MeasurementModal';
 import useForm from '../form/useForm';
 import {setActiveModal, setModalValues} from '../home/home.slice';
 import {resolveLabelOnSave} from '../page/featureLabels.helpers';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const formName = EARTHQUAKE_FORM_NAME;
@@ -83,11 +82,9 @@ const AddEarthquakeModal = () => {
       const editedEarthquakeData = resolveLabelOnSave(
         {pageKey: pageKey, values: values, getLabel: getLabel, getLabels: getLabels});
       console.log('Saving earthquake data to Spot ...');
-      let editedEarthquakesData = spot.properties.earthquakes
-        ? JSON.parse(JSON.stringify(spot.properties.earthquakes))
+      let editedEarthquakesData = spot.properties.earthquakes ? JSON.parse(JSON.stringify(spot.properties.earthquakes))
         : [];
       editedEarthquakesData.push({...editedEarthquakeData, id: getNewUUID()});
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: pageKey, value: editedEarthquakesData}));
       if (SMALL_SCREEN) closeModal();
     }

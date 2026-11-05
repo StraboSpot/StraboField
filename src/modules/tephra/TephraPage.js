@@ -17,7 +17,6 @@ import FeatureListItem from '../page/FeatureListItem';
 import PageHeader from '../page/PageHeader';
 import SubpageTabs from '../page/SubpageTabs';
 import useFeatureDetailView from '../page/useFeatureDetailView';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const TephraPage = ({isReadOnly, page}) => {
@@ -70,7 +69,6 @@ const TephraPage = ({isReadOnly, page}) => {
       let editedTephraData = JSON.parse(JSON.stringify(spot.properties.tephra));
       attribute = {...attribute, id: getNewUUID()};
       editedTephraData.splice(i, 1, attribute);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'tephra', value: editedTephraData}));
     }
     setSelectedTypeIndex(0);
@@ -79,7 +77,6 @@ const TephraPage = ({isReadOnly, page}) => {
 
   const updateOrder = () => {
     setIsReorderingActive(false);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'tephra', value: data1}));
   };
 

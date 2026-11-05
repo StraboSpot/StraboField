@@ -4,7 +4,7 @@ import * as Sentry from '@sentry/react-native';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {APP_DIRECTORIES} from './directories.constants';
-import {clearLocalSaveNeeded} from '../../modules/connections/connections.slice';
+import {useAutoSaveNow} from './useAutoSave';
 import {
   addedStatusMessage,
   clearedStatusMessages,
@@ -23,7 +23,6 @@ import {getDatasetOwnerId, isDatasetReadOnly} from '../../modules/project/projec
 import {
   addedDatasets,
   addedProjectFromServer,
-  setActiveDatasets,
   setActiveDatasetsMultiple,
   setTargetDataset,
 } from '../../modules/project/projects.slice';
@@ -32,6 +31,7 @@ import {getSampleMetadata, getStraboSampleFromResponse} from '../../modules/samp
 import {addedSpotsFromServer} from '../../modules/spots/spots.slice';
 import {setUserData} from '../../modules/user/userProfile.slice';
 import {isEmpty, toError} from '../../shared/helpers';
+import alert from '../../shared/ui/alert';
 import {MODAL_TRANSITION_DELAY} from '../../shared/ui/modals/modal.constants';
 import {store} from '../../store/ConfigureStore';
 import useResetState from '../../store/useResetState';
@@ -43,8 +43,6 @@ let datasetsObjToSave = {};
 let imagesDownloadedCount = 0;
 let imagesFailedCount = 0;
 let spotsToSave = [];
-// Stays an array: the capture below is skipped when nothing is active, and downloadDatasets filters it either way
-let prevActiveDatasetsIds = [], prevTargetDatasetId;
 // Read off the downloaded project rather than the one the caller passed - the web auto login starts a
 // download from a bare {id}, so only the server response reliably says whether the project is read only
 let isDownloadedProjectReadOnly = false;
@@ -64,6 +62,7 @@ const useDownload = () => {
   const encodedLogin = useSelector(state => state.user.encoded_login);
   const {endpoint, isSelected} = useSelector(state => state.connections.databaseEndpoint);
 
+  const {autoSaveNow} = useAutoSaveNow();
   const {doesDeviceDirectoryExist, downloadAndSaveProfileImage, downloadImageAndSave} = useDevice();
   const {doesImageExistOnDevice, gatherNeededImages} = useImages();
   const {clearProject} = useResetState();
@@ -83,13 +82,21 @@ const useDownload = () => {
     spotsToSave = [];
     imagesDownloadedCount = 0;
     imagesFailedCount = 0;
-    prevActiveDatasetsIds = [];
-    prevTargetDatasetId = undefined;
     isDownloadedProjectReadOnly = false;
     downloadedProjectOwnerId = undefined;
   };
 
   /* Internal Functions */
+
+  const confirmDownloadWithoutBackup = () => new Promise((resolve) => {
+    alert('Backup Failed',
+      'The current project could not be saved to the device. Downloading will replace it, and any changes not yet'
+      + ' uploaded will be lost.',
+      [
+        {onPress: () => resolve(false), style: 'cancel', text: 'Cancel'},
+        {onPress: () => resolve(true), style: 'destructive', text: 'Download Anyway'},
+      ]);
+  });
 
   const doGetDatasetSpots = async (datasets, encodedLoginScoped) => {
     if (datasets.length >= 1) {
@@ -102,6 +109,7 @@ const useDownload = () => {
     }
   };
 
+  // Returns which datasets to show and which takes new Spots, for initializeDownload to set once everything has arrived
   const downloadDatasets = async (selectedProject, encodedLoginScoped) => {
     try {
       dispatch(addedStatusMessage('Downloading Datasets...'));
@@ -120,26 +128,27 @@ const useDownload = () => {
         ([id, dataset]) => [id, {...dataset, modified_timestamp: dataset.modified_timestamp || Date.now()}]));
       const datasets = Object.values(datasetsObjToSave);
       let isTargetDatasetCleared = false;
+      let datasetSelection;
 
       // Same project re-downloaded — restore active/target from before if they still exist
       if (!isEmpty(project) && project.id === selectedProject.id && datasets.length >= 1) {
         const newDatasetIds = datasets.map(d => d.id);
-        const retainedActiveDatasetIds = prevActiveDatasetsIds.filter(id => newDatasetIds.includes(id));
+        const retainedActiveDatasetIds = (activeDatasetsIds || []).filter(id => newDatasetIds.includes(id));
         const fallbackDataset = datasets.find(isWritableDataset) || datasets[0];
         const activeDatasetIds = isEmpty(retainedActiveDatasetIds) ? [fallbackDataset.id] : retainedActiveDatasetIds;
-        dispatch(setActiveDatasetsMultiple(activeDatasetIds));
         // A target that is not shown would take new Spots out of sight, and a read only one would take Spots that
         // could never be edited, so the previous target is kept only if it is still shown and writable. Otherwise
         // there is none, and which dataset takes new Spots stays the user's choice
-        const prevTargetDataset = datasets.find(d => d.id === prevTargetDatasetId);
-        const isPrevTargetDatasetKept = activeDatasetIds.includes(prevTargetDatasetId) && !!prevTargetDataset
+        const prevTargetDataset = datasets.find(d => d.id === targetDatasetId);
+        const isPrevTargetDatasetKept = activeDatasetIds.includes(targetDatasetId) && !!prevTargetDataset
           && isWritableDataset(prevTargetDataset);
-        dispatch(setTargetDataset(isPrevTargetDatasetKept ? prevTargetDatasetId : undefined));
-        isTargetDatasetCleared = !!prevTargetDatasetId && !isPrevTargetDatasetKept;
+        datasetSelection = {activeDatasetIds, targetDatasetId: isPrevTargetDatasetKept ? targetDatasetId : undefined};
+        isTargetDatasetCleared = !!targetDatasetId && !isPrevTargetDatasetKept;
       }
-      else if (datasets.length >= 1) setFirstWritableActiveAndTarget(datasets);
-      // No else: a project that arrives with no datasets is left with none. clearProject has already emptied
-      // the target, and adding a dataset is the user's own call from the Datasets page
+      else if (datasets.length >= 1) datasetSelection = getFirstWritableSelection(datasets);
+      // A project that arrives with no datasets is left with none. Adding a dataset is the user's own call from the
+      // Datasets page
+      else datasetSelection = {activeDatasetIds: [], targetDatasetId: undefined};
       await doGetDatasetSpots(datasets, encodedLoginScoped);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Downloaded ' + spotsToSave.length + ' Spots\nDownloaded '
@@ -149,6 +158,7 @@ const useDownload = () => {
         dispatch(addedStatusMessage('The previous target dataset was removed or is turned off, so no target '
           + 'dataset is set. Choose one to add new Spots.'));
       }
+      return datasetSelection;
     }
     catch (err) {
       console.error('Error getting datasets:', err);
@@ -190,7 +200,8 @@ const useDownload = () => {
     dispatch(addedStatusMessage(`Downloaded Linked Sample Data for ${fetchedCount} of ${linkedSpots.length} Samples`));
   };
 
-  // Download Project Properties
+  // Download Project Properties, for initializeDownload to save once everything has arrived. Memo images are saved to
+  // the device now, which leaves the open project untouched if the download fails.
   const downloadProject = async (selectedProject, encodedLoginScoped) => {
     try {
       console.log('Downloading Project Properties...');
@@ -198,27 +209,20 @@ const useDownload = () => {
       const projectResponse = await getProject(selectedProject.id, encodedLoginScoped);
       isDownloadedProjectReadOnly = !!projectResponse.isReadOnly;
       downloadedProjectOwnerId = projectResponse.owner_straboUserId;
-      if (!isEmpty(project)) {
-        if (project.id === selectedProject.id) {
-          if (!isEmpty(activeDatasetsIds)) prevActiveDatasetsIds = activeDatasetsIds;
-          if (targetDatasetId) prevTargetDatasetId = targetDatasetId;
-        }
-        clearProject();
-      }
       // Strip before anything downstream reads it — loadCustomMaps spreads the whole map object through.
       if (!isEmpty(projectResponse.other_maps)) {
         projectResponse.other_maps = projectResponse.other_maps.map(stripMapboxToken);
       }
-      dispatch(addedProjectFromServer(projectResponse));
-      if (projectResponse.other_maps && !isEmpty(projectResponse.other_maps)) {
-        loadCustomMaps(projectResponse.other_maps);
-      }
       console.log('Finished Downloading Project Properties.', projectResponse);
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Finished Downloading Project Properties'));
-      if (projectResponse.reports && !isEmpty(projectResponse.reports)) {
+      // Loaded after the message above replaces 'Downloading Project Properties...', or it would replace a map's own
+      if (!isEmpty(projectResponse.other_maps)) await loadCustomMaps(projectResponse.other_maps);
+      // Web shows memo images from the server and has no device storage to save them to
+      if (Platform.OS !== 'web' && !isEmpty(projectResponse.reports)) {
         await downloadReportImages(projectResponse.reports);
       }
+      return projectResponse;
     }
     catch (err) {
       console.error('Error Downloading Project Properties.', err);
@@ -310,23 +314,22 @@ const useDownload = () => {
     }
   };
 
-  const loadCustomMaps = (maps) => {
-    maps.map(async (map) => {
+  // A My Maps map is kept only if its tiles are found on the custom endpoint; one that isn't is left out on its own
+  const loadCustomMaps = async (maps) => {
+    await Promise.all(maps.map(async (map) => {
       if (!map.id) {
         console.warn('Skipping custom map with no id', map);
         return;
       }
       const mapId = normalizeCustomMapId(map.id, map.source);
       let providerInfo = MAP_PROVIDERS[map.source];
-      if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS) {
-        if (!isEmpty(endpoint) && isSelected) {
-          let tileEndpoint = endpoint.replace('/db', '/strabo_mymaps_check/');
-          if (await testCustomMapUrl(tileEndpoint + map.id)) {
-            tileEndpoint = endpoint.replace('/db', '/geotiff/tiles/');
-            providerInfo = {...providerInfo, url: [tileEndpoint]};
-          }
-          else throw Error('Invalid IP address');
+      if (map.source === CUSTOM_MAP_SOURCES.STRABO_MY_MAPS && !isEmpty(endpoint) && isSelected) {
+        if (!await testCustomMapUrl(endpoint.replace('/db', '/strabo_mymaps_check/') + map.id)) {
+          console.warn(map.id + ': My Maps map not found on the custom endpoint', map);
+          dispatch(addedStatusMessage(`Custom Map Not Loaded: ${map.title || map.id}`));
+          return;
         }
+        providerInfo = {...providerInfo, url: [endpoint.replace('/db', '/geotiff/tiles/')]};
       }
       const customMap = {
         ...map,
@@ -336,7 +339,7 @@ const useDownload = () => {
       };
       console.log(customMap.id + ': Loaded Custom Map', customMap);
       customMapsToSave = {...customMapsToSave, [customMap.id]: customMap};
-    });
+    }));
   };
 
   // A read only project makes every dataset in it read only too, as does another user owning it, which are the rules
@@ -344,19 +347,15 @@ const useDownload = () => {
   const isWritableDataset = dataset => !isDownloadedProjectReadOnly
     && !isDatasetReadOnly(dataset, store.getState().user.straboUserId);
 
-  // Sets the first writable dataset as both the active and target dataset
-  const setFirstWritableActiveAndTarget = (datasets) => {
+  // The first writable dataset as both the active and target dataset
+  const getFirstWritableSelection = (datasets) => {
     const firstWritableDataset = datasets.find(isWritableDataset);
     if (firstWritableDataset) {
-      dispatch(setActiveDatasets({bool: true, dataset: firstWritableDataset.id}));
-      dispatch(setTargetDataset(firstWritableDataset.id));
+      return {activeDatasetIds: [firstWritableDataset.id], targetDatasetId: firstWritableDataset.id};
     }
     // Every dataset is read only, so show one but record into none - a read only target would take Spots
     // that could never be edited, and the project is still worth viewing without one
-    else {
-      dispatch(setActiveDatasets({bool: true, dataset: datasets[0].id}));
-      dispatch(setTargetDataset(undefined));
-    }
+    return {activeDatasetIds: [datasets[0].id], targetDatasetId: undefined};
   };
 
   /* Exported Functions */
@@ -407,21 +406,30 @@ const useDownload = () => {
       // native present and dismiss at once and trips UIViewControllerHierarchyInconsistency (Sentry STRABOSPOT-2-6JN).
       // Let it finish dismissing first.
       if (Platform.OS === 'ios') await new Promise(resolve => setTimeout(resolve, MODAL_TRANSITION_DELAY));
+      // Saved before the status modal opens, so a failure's question never shows over it
+      const {hasFailed, hasSaved} = await autoSaveNow();
+      if (hasFailed && !await confirmDownloadWithoutBackup()) return false;
       dispatch(setIsStatusMessagesModalVisible(true));
       dispatch(setLoadingStatus({view: 'modal', bool: true}));
+      if (hasSaved) dispatch(addedStatusMessage('Saved a backup of the current project to the device.'));
+      if (hasFailed) dispatch(addedStatusMessage('Could not save a backup of the current project to the device.'));
       dispatch(addedStatusMessage(`Downloading Project: ${projectName}`));
-      await downloadProject(selectedProject, encodedLoginScoped);
-      await downloadDatasets(selectedProject, encodedLoginScoped);
+      const projectResponse = await downloadProject(selectedProject, encodedLoginScoped);
+      const datasetSelection = await downloadDatasets(selectedProject, encodedLoginScoped);
       await downloadLinkedSampleData(encodedLoginScoped);
       console.log('Download Complete! Spots Downloaded!');
       dispatch(addedStatusMessage('------------------'));
+      // The open project is replaced only now, so a download that fails partway leaves it as it was
+      if (!isEmpty(project)) clearProject();
+      dispatch(addedProjectFromServer(projectResponse));
       dispatch(addedSpotsFromServer(spotsToSave));
       dispatch(addedDatasets(datasetsObjToSave));
+      dispatch(setActiveDatasetsMultiple(datasetSelection.activeDatasetIds));
+      dispatch(setTargetDataset(datasetSelection.targetDatasetId));
       dispatch(addedCustomMapsFromBackup(customMapsToSave));
-      dispatch(clearLocalSaveNeeded());
       dispatch(addedStatusMessage('Complete!'));
-      // Handed back so callers can tell a finished download from the duplicate request that returns nothing
-      return datasetsObjToSave;
+      // Callers tell a finished download from a cancel (false) or the duplicate request (undefined)
+      return true;
     }
     catch (err) {
       console.error('Error Initializing Download.', err);

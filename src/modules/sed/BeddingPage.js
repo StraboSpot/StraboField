@@ -19,7 +19,6 @@ import FeatureListItem from '../page/FeatureListItem';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import useFeatureDetailView from '../page/useFeatureDetailView';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -62,7 +61,6 @@ const BeddingPage = ({isReadOnly, page}) => {
       let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
       attribute = {...attribute, id: getNewUUID()};
       editedSedData[page.key].beds.splice(i, 1, attribute);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     }
     openDetailView(attribute);

@@ -7,7 +7,6 @@ import useDevice from '../../services/device/useDevice';
 import {csvToArray, getNewUUID, urlValidator} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {addedStatusMessage, clearedStatusMessages, setLoadingStatus} from '../home/home.slice';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const useExternalData = () => {
@@ -47,7 +46,6 @@ const useExternalData = () => {
       if (!editedData.tables) editedData.tables = [];
       editedData.tables.push(csvObject);
       console.log(editedData);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'data', value: editedData}));
     }
     catch (err) {
@@ -63,7 +61,6 @@ const useExternalData = () => {
     console.log(CSVcopy);
     const filteredArr = CSVcopy.filter(table => table.id !== tableToDelete.id);
     console.log(filteredArr);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'data', value: {tables: filteredArr, urls: spot.properties.data.urls}}));
   };
 
@@ -72,7 +69,6 @@ const useExternalData = () => {
     console.log(urlCopy);
     const filteredArr = urlCopy.filter(url => url !== urlToDelete);
     console.log(filteredArr);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'data', value: {urls: filteredArr, tables: spot.properties.data.tables}}));
   };
 
@@ -115,7 +111,6 @@ const useExternalData = () => {
     let editedData = spot.properties.data ? JSON.parse(JSON.stringify(spot.properties.data)) : {};
     const urlArrCopy = editedData.urls;
     urlArrCopy.splice(urlToEdit.index, 1, urlToEdit.url);
-    dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
     dispatch(editedSpotProperties({field: 'data', value: editedData}));
   };
 
@@ -130,7 +125,6 @@ const useExternalData = () => {
       if (!savedUrls?.includes(fullURL)) {
         if (!editedData?.urls) editedData.urls = [];
         editedData.urls.push(fullURL.toLowerCase());
-        dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
         dispatch(editedSpotProperties({field: 'data', value: editedData}));
       }
       else {

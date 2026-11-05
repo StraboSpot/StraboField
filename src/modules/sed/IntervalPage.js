@@ -10,7 +10,6 @@ import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePa
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import useSed from '../sed/useSed';
 import {editedSpotProperties} from '../spots/spots.slice';
 
@@ -48,7 +47,6 @@ const IntervalPage = ({isReadOnly, page}) => {
       let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
       editedSedData.character = spot.properties?.sed?.interval_type;
       delete spot.properties?.sed?.interval_type;
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     }
   }, []);

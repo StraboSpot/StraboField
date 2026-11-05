@@ -17,7 +17,6 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {SUPPLEMENTAL_PAGES} from '../page/page.constants';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
 import {editedSpotProperties} from '../spots/spots.slice';
 
 const formName = ['general', 'site_safety'];
@@ -58,7 +57,6 @@ const SiteSafetyPage = ({isReadOnly}) => {
     try {
       const {errors, values: editedSiteSafetyFormData} = await submitAndShowErrors(currentForm);
       const spotId = spot.properties.id;
-      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: 'site_safety', value: editedSiteSafetyFormData, spotId: spotId}));
       markSaved();
       await currentForm.resetForm();

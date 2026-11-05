@@ -24,7 +24,7 @@ import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
 import {LeavePageContext, useUnsavedFormChanges} from '../notebook-panel/LeavePageContext';
 import {setMineralFieldValue} from '../petrology/minerals/minerals.helpers';
 import usePetrology from '../petrology/usePetrology';
-import {addedSampleSpotIdToUpload, updatedModifiedTimestampsBySpotsIds} from '../project/projects.slice';
+import {addedSampleSpotIdToUpload} from '../project/projects.slice';
 import {SAMPLE_IGSN_KEY, SAMPLES_PAGE_URL} from '../samples/samples.constants';
 import sampleStyles from '../samples/samples.styles';
 import {LITHOLOGY_SUBPAGES} from '../sed/sed.constants';
@@ -173,7 +173,6 @@ const FeatureDetail = ({
     else {
       let editedPageData = pageData ? JSON.parse(JSON.stringify(pageData)) : [];
       editedPageData = editedPageData.filter(f => f.id !== selectedFeature.id);
-      dispatch(updatedModifiedTimestampsBySpotsIds([spot.properties.id]));
       dispatch(editedSpotProperties({field: pageKey, value: editedPageData}));
     }
     deleteFeatureTags([selectedFeature]);
@@ -253,7 +252,6 @@ const FeatureDetail = ({
       if (i === -1) editedPageData.push(editedFeatureData);
       else editedPageData.splice(i, 1, editedFeatureData);
       const spotId = spot.properties.id;
-      dispatch(updatedModifiedTimestampsBySpotsIds([spotId]));
       dispatch(editedSpotProperties({field: pageKey, value: editedPageData, spotId: spotId}));
       if (page.key === PAGE_KEYS.SAMPLES && Platform.OS !== 'web') dispatch(addedSampleSpotIdToUpload(spotId));
 

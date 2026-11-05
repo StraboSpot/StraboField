@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Avatar} from '@rn-vui/themed';
+import {Avatar} from '@rn-vui/base';
 
 const AvatarWrapper = ({size, ...props}) => {
   return (

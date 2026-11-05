@@ -7,9 +7,10 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {doesBackupDirectoryExist} from './projects.slice';
 import useProject from './useProject';
+import useDevice from '../../services/device/useDevice';
 import {APP_DIRECTORIES} from '../../services/files/directories.constants';
 import commonStyles from '../../shared/common.styles';
-import {isEmpty} from '../../shared/helpers';
+import {formatFileSize, isEmpty} from '../../shared/helpers';
 import {MEDIUMGREY} from '../../shared/styles.constants';
 import * as themes from '../../shared/styles.constants';
 import OutlineButton from '../../shared/ui/buttons/OutlineButton';
@@ -18,7 +19,8 @@ import ListEmptyText from '../../shared/ui/ListEmptyText';
 import Loading from '../../shared/ui/Loading';
 import useIsConnectionAvailable from '../connections/useConnectionStatus';
 
-const ProjectList = ({backupType, doRefresh, onProjectPress, selectedButtonIndex, source}) => {
+// isDeleteList shows each row's size and ends it in a trash icon, since pressing it deletes rather than opens
+const ProjectList = ({backupType, doRefresh, isDeleteList, onProjectPress, selectedButtonIndex, source}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -26,6 +28,7 @@ const ProjectList = ({backupType, doRefresh, onProjectPress, selectedButtonIndex
 
   const isConnectionAvailable = useIsConnectionAvailable();
   const {getAllDeviceProjects, getAllServerProjects} = useProject();
+  const {getSizeOnDevice} = useDevice();
 
   /* Local State */
 
@@ -74,11 +77,24 @@ const ProjectList = ({backupType, doRefresh, onProjectPress, selectedButtonIndex
     return projects;
   };
 
+  const addSizes = projects => Promise.all(projects.map(async (project) => {
+    try {
+      return {...project, size: await getSizeOnDevice(APP_DIRECTORIES.BACKUP_DIR + project.fileName)};
+    }
+    catch (err) {
+      console.error('Error getting the size of', project.fileName, err);
+      return project;
+    }
+  }));
+
   const getAllProjects = async () => {
     let projectsResponse;
     setLoading(true);
     if (source === 'server') projectsResponse = await getAllServerProjects();
     else if (source === 'device') projectsResponse = await getAllDeviceProjects(APP_DIRECTORIES.BACKUP_DIR);
+    if (isDeleteList && projectsResponse) {
+      projectsResponse = {...projectsResponse, projects: await addSizes(projectsResponse.projects)};
+    }
     if (!projectsResponse) {
       if (source === 'device') {
         dispatch(doesBackupDirectoryExist(false));
@@ -127,9 +143,13 @@ const ProjectList = ({backupType, doRefresh, onProjectPress, selectedButtonIndex
               Updated: {modifiedTimeAndDate}
             </ListItem.Subtitle>
           )}
+          {item.size !== undefined && (
+            <ListItem.Subtitle style={commonStyles.listItemSubtitle}>Size: {formatFileSize(item.size)}</ListItem.Subtitle>
+          )}
         </ListItem.Content>
         {item.isReadOnly && <Icon color={MEDIUMGREY} name={'lock-closed'} size={20} type={'ionicon'}/>}
-        <ListItem.Chevron/>
+        {isDeleteList ? <Icon color={themes.WARNING_COLOR} name={'trash-outline'} size={25} type={'ionicon'}/>
+          : <ListItem.Chevron/>}
       </ListItem>
     );
   };

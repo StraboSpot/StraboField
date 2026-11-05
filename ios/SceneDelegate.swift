@@ -27,18 +27,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-        guard let context = URLContexts.first else { return }
-
-        var options: [UIApplication.OpenURLOptionsKey: Any] = [
-            .openInPlace: context.options.openInPlace
-        ]
-        if let sourceApplication = context.options.sourceApplication {
-            options[.sourceApplication] = sourceApplication
-        }
-        if let annotation = context.options.annotation {
-            options[.annotation] = annotation
-        }
-
-        RCTLinkingManager.application(UIApplication.shared, open: context.url, options: options)
+        // RCTLinkingManager.application(_:open:options:) does nothing in a scene app
+        RCTLinkingManager.scene(scene, openURLContexts: URLContexts)
     }
 }

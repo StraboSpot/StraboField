@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {configureStore} from '@reduxjs/toolkit';
+import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import {Provider} from 'react-redux';
 import ReactTestRenderer from 'react-test-renderer';
 
@@ -9,16 +9,31 @@ import {MAP_MODES} from './maps.constants';
 import mapReducer, {addedIntervalDragChangedSpotIds, startedIntervalDrag} from './maps.slice';
 import useMapMode from './useMapMode';
 import {UNSAVED_CHANGES_CHOICES} from '../../shared/ui/modals/unsavedChanges.constants';
+import propagateModifiedTimestamps from '../../store/propagateModifiedTimestamps';
+import projectReducer from '../project/projects.slice';
 import spotReducer, {editedOrCreatedSpots} from '../spots/spots.slice';
 
 jest.mock('../../services/device/useDeviceOrientation', () => () => ({unlockOrientation: () => {}}));
+
+const intervalBefore = {type: 'Feature', geometry: {type: 'Point', coordinates: [0, 0]}, properties: {id: 1}};
+const intervalAfter = {...intervalBefore, geometry: {type: 'Point', coordinates: [0, 10]}};
+
+// As in the store, so a drag's timestamps are updated the way they are in the app
+const reducer = propagateModifiedTimestamps(
+  combineReducers({map: mapReducer, project: projectReducer, spot: spotReducer}));
+
+// Loaded rather than dispatched, so the interval starts out saved and only what the test does marks anything modified
+const getPreloadedState = () => ({
+  project: {datasets: {12: {id: 12, modified_timestamp: 1, spotIds: [1]}}, project: {id: 1, modified_timestamp: 1}},
+  spot: {selectedSpot: {}, spots: {1: intervalBefore}},
+});
 
 // Whatever is waiting on confirmEndMapEditing goes ahead only when it resolves true. Getting that wrong either runs the
 // action over a live edit, whose Save then overwrites what it changed, or never runs it at all.
 describe('confirmEndMapEditing', () => {
   const renderHook = ({hasPendingEdits}) => {
     const map = {cancelEdits: jest.fn(), hasPendingEdits: () => hasPendingEdits, saveEdits: jest.fn()};
-    const store = configureStore({reducer: {map: mapReducer, spot: spotReducer}});
+    const store = configureStore({preloadedState: getPreloadedState(), reducer: reducer});
     let hookApi;
     const Probe = () => {
       hookApi = useMapMode({mapComponentRef: {current: map}});
@@ -102,16 +117,13 @@ describe('confirmEndMapEditing', () => {
 
   // A drag moves the intervals in the store as it goes, so canceling it has to put the snapshot back
   describe('during an interval drag', () => {
-    const intervalBefore = {type: 'Feature', geometry: {type: 'Point', coordinates: [0, 0]}, properties: {id: 1}};
-    const intervalAfter = {...intervalBefore, geometry: {type: 'Point', coordinates: [0, 10]}};
-
+    // Moves the interval the way useStratSectionCalculations does mid-drag, holding back the timestamps
     const startDragging = ({hasMoved}) => {
       const hook = renderHook({hasPendingEdits: false});
       ReactTestRenderer.act(() => {
-        hook.store.dispatch(editedOrCreatedSpots([intervalBefore]));
         hook.store.dispatch(startedIntervalDrag([intervalBefore]));
         if (hasMoved) {
-          hook.store.dispatch(editedOrCreatedSpots([intervalAfter]));
+          hook.store.dispatch(editedOrCreatedSpots([intervalAfter], {shouldPropagateTimestamps: false}));
           hook.store.dispatch(addedIntervalDragChangedSpotIds([1]));
         }
         hook.getHook().setMapMode(MAP_MODES.INTERVAL_DRAG);
@@ -120,6 +132,29 @@ describe('confirmEndMapEditing', () => {
     };
 
     const getIntervalCoords = store => store.getState().spot.spots[1].geometry.coordinates;
+    const getTimestamps = store => ({
+      dataset: store.getState().project.datasets[12].modified_timestamp,
+      project: store.getState().project.project.modified_timestamp,
+    });
+
+    it('leaves the dataset and project timestamps alone while dragging', () => {
+      const {store} = startDragging({hasMoved: true});
+      expect(getTimestamps(store)).toEqual({dataset: 1, project: 1});
+    });
+
+    it('updates the dataset and project timestamps on Save', async () => {
+      const {getHook, store} = startDragging({hasMoved: true});
+      await callConfirmEndMapEditing(getHook, UNSAVED_CHANGES_CHOICES.SAVE);
+      const {dataset, project} = getTimestamps(store);
+      expect(dataset).toBeGreaterThan(1);
+      expect(project).toBe(dataset);
+    });
+
+    it('leaves the dataset and project timestamps alone on Discard', async () => {
+      const {getHook, store} = startDragging({hasMoved: true});
+      await callConfirmEndMapEditing(getHook, UNSAVED_CHANGES_CHOICES.DISCARD);
+      expect(getTimestamps(store)).toEqual({dataset: 1, project: 1});
+    });
 
     it('ends a drag that moved nothing without asking', async () => {
       const {getHook, store} = startDragging({hasMoved: false});

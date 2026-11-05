@@ -13,7 +13,6 @@ import useMapLocation from '../../maps/view/useMapLocation';
 import {LeavePageContext} from '../../notebook-panel/LeavePageContext';
 import {SHORTCUT_MODALS} from '../../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../../page/pageKeys.constants';
-import {updatedModifiedTimestampsBySpotsIds} from '../../project/projects.slice';
 import SketchModal from '../../sketch/SketchModal';
 import {clearedSelectedSpots, editedSpotImages} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
@@ -31,7 +30,6 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   const isCameraOrientationWarningHidden = useSelector(
     state => state.home.hiddenWarnings[DISMISSIBLE_WARNINGS.CAMERA_ORIENTATION]);
   const preferences = useSelector(state => state.project.project?.preferences) || {};
-  const selectedSpot = useSelector(state => state.spot.selectedSpot);
   const {confirmLeavePage, hasUnsavedPageChanges} = useContext(LeavePageContext);
   const {confirmEndMapEditing, isMapEditing} = useContext(MapEditContext);
 
@@ -80,7 +78,6 @@ const ShortcutButtons = ({openNotebookPanel}) => {
       const newImages = await launchCameraFromNotebook();
       const imagesSavedLength = newImages.length;
       if (imagesSavedLength > 0) {
-        dispatch(updatedModifiedTimestampsBySpotsIds([point.properties.id]));
         dispatch(editedSpotImages(newImages));
         toast.show(
           imagesSavedLength + ' photo' + (imagesSavedLength === 1 ? '' : 's') + ' saved in new Spot '
@@ -108,7 +105,6 @@ const ShortcutButtons = ({openNotebookPanel}) => {
   // 'Sketch Saved!' itself, so there is no toast here - two for the one save read as a glitch.
   const saveImagesToSpot = (newImages) => {
     pendingSketchSpotRef.current = null;
-    dispatch(updatedModifiedTimestampsBySpotsIds([selectedSpot?.properties?.id]));
     dispatch(editedSpotImages(newImages));
     openNotebookPanel(PAGE_KEYS.IMAGES);
   };

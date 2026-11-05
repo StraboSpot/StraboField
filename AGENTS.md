@@ -268,7 +268,7 @@ Form rendering in `/src/modules/form/` with custom field components.
 
 ## Code Style
 
-### ESLint Configuration (`.eslintrc.js`)
+### ESLint Configuration (`eslint.config.js`)
 
 **Key rules enforced:**
 - Single quotes for strings and JSX
@@ -387,13 +387,13 @@ Minimal test coverage currently. Tests in `__tests__/`:
 - React 19.2.3 + React Native 0.84.1
 - Redux Toolkit 2.12.0 + Redux Persist 6.0.0
 - React Navigation 7.x
-- Mapbox Maps (@rnmapbox/maps 10.3.1 for native, mapbox-gl 2.x for web)
+- Mapbox Maps (@rnmapbox/maps 10.3.1 for native, mapbox-gl 3.x for web)
 - Formik 2.4.9 - Form management
 - Turf.js 7.x - Geospatial calculations
 - RNFS - File system access
 - Sentry - Error tracking
 
-**Node version:** >=18 (specified in `package.json`)
+**Node version:** >=26.0.0 (specified in `package.json`)
 
 **Package manager:** Yarn 4.13.0
 
