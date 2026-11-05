@@ -187,16 +187,17 @@ const useServerRequests = () => {
   const uploadImage = (formdata, isProfileImage) => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      xhr.upload.addEventListener('progress', (event) => {
-        console.log(`UPLOAD IS ${Math.floor((event.loaded / event.total) * 100)}% DONE!`);
-        dispatch(updatedProjectTransferProgress(event.loaded / event.total));
-      });
-      xhr.addEventListener('load', () => xhr.status === 404 ? reject(false) : resolve(xhr.response));
-      xhr.addEventListener('error', (err) => {
-        console.error('Error Uploading Image', err);
-        reject(false);
-      });
       const url = `${baseUrl}${isProfileImage ? '/profileImage' : '/image'}`;
+      xhr.upload.addEventListener('progress',
+        event => dispatch(updatedProjectTransferProgress(event.loaded / event.total)));
+      xhr.addEventListener('load', () => {
+        console.log('[Image Upload] Server responded', xhr.status, 'from', url, xhr.response);
+        xhr.status === 404 ? reject(`Server responded 404: ${xhr.response}`) : resolve(xhr.response);
+      });
+      xhr.addEventListener('error', (err) => {
+        console.error('[Image Upload] Network error from', url, err);
+        reject('Network error');
+      });
       xhr.open('POST', url);
       xhr.setRequestHeader('Content-Type', 'multipart/form-data');
       xhr.setRequestHeader('Authorization', `Basic ${encoded_login}`);

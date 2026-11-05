@@ -39,24 +39,14 @@ const useUploadImages = () => {
 
   // Upload the image to server
   const doUploadImage = async (imageId, imageUri, isProfileImage) => {
-    try {
-      setCurrentImage(imageId);
-
-      console.log(': Uploading Image', imageId, '...');
-
-      let formdata = new FormData();
-      formdata.append('image_file', {uri: imageUri, name: 'image.jpg', type: 'image/jpeg'});
-      formdata.append('id', imageId);
-      formdata.append('modified_timestamp', Date.now());
-      const res = await uploadImage(formdata, isProfileImage);
-      console.log('Image Upload Res', res);
-      console.log(': Finished Uploading Image', imageId);
-      dispatch(updatedProjectTransferProgress(0));
-    }
-    catch (err) {
-      console.error('Error Uploading Image', imageId, err);
-      throw Error('Error Uploading Image', imageId, err);
-    }
+    setCurrentImage(imageId);
+    console.log('[Image Upload] Uploading', imageId, 'from', imageUri);
+    let formdata = new FormData();
+    formdata.append('image_file', {uri: imageUri, name: 'image.jpg', type: 'image/jpeg'});
+    formdata.append('id', imageId);
+    formdata.append('modified_timestamp', Date.now());
+    await uploadImage(formdata, isProfileImage);
+    dispatch(updatedProjectTransferProgress(0));
   };
 
   /* Exported Functions */
@@ -69,25 +59,27 @@ const useUploadImages = () => {
       // checked, whoever wrote the memo.
       const {project: {datasets}, spot: {spots}, user: {straboUserId}} = store.getState();
       const spotsToUpload = getSpotsInWritableDatasets(datasets, spots, straboUserId);
-      console.log('Looking for Images to Upload in Spots...', spotsToUpload);
+      console.log(`[Image Upload] User ${straboUserId} can edit ${spotsToUpload.length} of`,
+        `${Object.keys(spots).length} Spots`);
       setImageUploadStatusMessage('Looking for images to upload in spots...');
       const images = getAllImages(spotsToUpload);
       const imageIds = getImageIds(images);
       setImageUploadStatusMessage('Checking to see if image files are on server...');
+      console.log(`[Image Upload] Asking the server which of ${imageIds.length} images it is missing`, imageIds);
       const neededImages = await verifyImagesExistence(imageIds, user.encoded_login);
+      console.log('[Image Upload] Server is missing', neededImages);
       // A sketch update keeps the image's id, so the server reports it as already there
       const changedImages = changedImageIds.filter(id => imageIds.some(i => i.toString() === id.toString()))
         .map(id => id.toString());
+      console.log('[Image Upload] Edited sketches to send again', changedImages);
       const imagesToSend = [...new Set([...neededImages, ...changedImages])];
       setImageUploadStatusMessage(`Checking to see if ${imagesToSend.length} image files are on device...`);
-      console.log('Needed Images from server', neededImages, 'plus changed images', changedImages);
       const {imagesToUpload, imagesNotFoundOnDevice} = await verifyImageExistsOnDevice(imagesToSend, images);
-      console.log('Done verifying images on device', imagesToUpload);
       if (!isEmpty(imagesToUpload)) {
         setImageUploadStatusMessage('Uploading needed images to server...');
         dispatch(setIsImageTransferring(true));
         imagesStatus = await uploadImages(imagesToUpload);
-        console.log('DONE UPLOADING IMAGES');
+        console.log('[Image Upload] Done', imagesStatus);
       }
       else setImageUploadStatusMessage('All images for this project are already on server.');
       if (!isEmpty(imagesNotFoundOnDevice)) {
@@ -121,7 +113,7 @@ const useUploadImages = () => {
         imagesUploadedCount++;
       }
       catch (err) {
-        console.error(`Failed to upload image ${imageProps.id} because ${err.Error}`);
+        console.error('[Image Upload] Failed to upload', imageProps.id, err);
         imagesUploadFailedCount++;
       }
 
@@ -174,7 +166,7 @@ const useUploadImages = () => {
           const imageURI = getLocalImageURI(imageId);
           const isValidImageURI = await doesDeviceDirExist(imageURI);
           if (isValidImageURI) {
-            console.log(`Image ${imageId} EXISTS`);
+            console.log(`[Image Upload] Image ${imageId} found on device`);
             return imagesFound.find((image) => {
               if (image.id.toString() === imageId) {
                 // Versioned, since on iOS resizeImageForUpload decodes through RCTImageLoader's cache
@@ -185,7 +177,7 @@ const useUploadImages = () => {
             });
           }
           else {
-            console.log('Local file not found for image:' + imageId);
+            console.log(`[Image Upload] Image ${imageId} not found on device, so it can't be uploaded`);
             imagesNotFoundOnDevice.push(imageId);
           }
         },

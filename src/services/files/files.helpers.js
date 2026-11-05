@@ -4,7 +4,6 @@ import {getTemplateKeys, getTemplateList, setTemplateList} from '../../modules/t
 export const getImageIds = (images) => {
   const imageIds = [];
   images.forEach(image => imageIds.push(image.id));
-  console.log(imageIds);
   return imageIds;
 };
 
