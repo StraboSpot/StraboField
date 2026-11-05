@@ -213,21 +213,20 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
   };
 
   const renderImageUploadStatusText = () => {
-    if (uploadState === 'complete') {
-      return (
-        <View style={uploadModalStyles.imageTotalUploadContainer}>
-          <Text>Images uploaded successfully: {imageUploadStatus.success || 0}</Text>
-        </View>
-      );
-    }
-    else if (uploadState === 'error') {
-      return (
-        <View style={uploadModalStyles.imageTotalUploadContainer}>
-          <Text>Images uploaded successfully: {imageUploadStatus.success || 0}</Text>
-          <Text>Images Failed: {imageUploadStatus.failed || 0}</Text>
-        </View>
-      );
-    }
+    if (uploadState !== 'complete' && uploadState !== 'error') return;
+    // Nothing is counted when no image needed uploading
+    const {failed = 0, success = 0} = imageUploadStatus;
+    return (
+      <View style={uploadModalStyles.imageTotalUploadContainer}>
+        {success + failed === 0 ? <Text>No images needed uploading</Text>
+          : (
+            <>
+              <Text>Images uploaded successfully: {success}</Text>
+              {failed > 0 && <Text>Images failed: {failed}</Text>}
+            </>
+          )}
+      </View>
+    );
   };
 
   const renderInitialUploadView = () => (
