@@ -254,6 +254,14 @@ const RELEASE_NOTES = [
             commit: '2d1d07250',
           },
           {
+            text: 'Image upload results: an upload with no new images says none needed uploading instead of 0 uploaded, and a completed upload lists any images that failed',
+            commit: 'c073ae400',
+          },
+          {
+            text: 'Dataset Spot counts: a dataset counts only the Spots its Spots page shows, leaving out samples and Spots missing from the device',
+            commit: 'c90690b98',
+          },
+          {
             text: 'Macrostrat unit info: drawn above the home screen buttons',
             commit: '099d2bff1',
           },
