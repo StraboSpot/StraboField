@@ -10,6 +10,7 @@ import TextInput from './TextInput';
 
 const TextInputModal = ({
                           autoCapitalize,
+                          autocorrect,
                           buttonText,
                           children,
                           dialogTitle,
@@ -47,6 +48,7 @@ const TextInputModal = ({
         <Input
           InputComponent={TextInput}
           autoCapitalize={autoCapitalize || 'none'}
+          autoCorrect={autocorrect || false}
           // enterKeyHint={'done'}
           errorMessage={errorMessage}
           inputContainerStyle={overlayStyles.inputContainer}
