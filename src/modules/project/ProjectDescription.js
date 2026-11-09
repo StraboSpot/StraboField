@@ -17,6 +17,7 @@ const ProjectDescription = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
   const project = useSelector(state => state.project.project);
 
   const {getLabel, hasErrors, validateForm} = useForm();
@@ -103,6 +104,7 @@ const ProjectDescription = () => {
           <Form
             {...formProps}
             formName={PROJECT_DESCRIPTION_FORM_NAME}
+            isReadOnly={isReadOnlyProject}
             renderInline={true}
             setFieldValueOverride={setFieldValueAndSaveAfterPause}
           />

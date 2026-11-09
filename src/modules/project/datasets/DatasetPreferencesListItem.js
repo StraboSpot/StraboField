@@ -19,6 +19,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
   /* Data Hooks */
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
+  const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
   const spots = useSelector(state => state.spot.spots);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
   const straboUserId = useSelector(state => state.user.straboUserId);
@@ -155,7 +156,8 @@ const DatasetPreferencesListItem = ({dataset}) => {
           {Platform.OS !== 'web' && imagesNeededCount > 0 && renderDownloadImages()}
         </View>
         <View style={{flex: 1, flexDirection: 'column'}}>
-          {renderStateIcon()}
+          {/* A read only project takes no new Spots, so it has no target dataset to choose */}
+          {!isReadOnlyProject && renderStateIcon()}
           {renderIsActiveDatasetSwitch()}
         </View>
       </ListItem>

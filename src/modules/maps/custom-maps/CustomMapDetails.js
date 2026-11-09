@@ -45,6 +45,7 @@ const CustomMapDetails = ({closeMainMenuPanel, zoomToCustomMap}) => {
   const customMapToEdit = useSelector(state => state.map.selectedCustomMapToEdit);
   const {isSelected} = useSelector(state => state.connections.databaseEndpoint);
   const {isInternetReachable} = useSelector(state => state.connections.isOnline);
+  const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const previewedOfflineMapId = useSelector(state => state.offlineMap.previewedOfflineMapId);
 
@@ -236,6 +237,7 @@ const CustomMapDetails = ({closeMainMenuPanel, zoomToCustomMap}) => {
           <ListItem containerStyle={commonStyles.listItemFormField}>
             <ListItem.Content>
               <TextInputField
+                editable={!isReadOnlyProject}
                 isRequired={true}
                 keyboardType={urlKeyboardType}
                 label={'Style URL'}
@@ -248,6 +250,7 @@ const CustomMapDetails = ({closeMainMenuPanel, zoomToCustomMap}) => {
           <ListItem containerStyle={commonStyles.listItemFormField}>
             <ListItem.Content>
               <TextInputField
+                editable={!isReadOnlyProject}
                 isRequired={true}
                 label={'Strabo My Maps ID'}
                 name={'id'}
@@ -333,7 +336,7 @@ const CustomMapDetails = ({closeMainMenuPanel, zoomToCustomMap}) => {
   const renderSidePanelHeader = formProps => (
     <SidePanelHeader
       backButton={() => handleBackPress(formProps)}
-      headerTitle={!isEmpty(customMapToEdit) ? 'Edit Custom Map' : 'Add Custom Map'}
+      headerTitle={isReadOnlyProject ? 'Custom Map' : !isEmpty(customMapToEdit) ? 'Edit Custom Map' : 'Add Custom Map'}
       title={'Custom Maps'}
     />
   );
@@ -342,6 +345,7 @@ const CustomMapDetails = ({closeMainMenuPanel, zoomToCustomMap}) => {
     <ListItem containerStyle={commonStyles.listItemFormField}>
       <ListItem.Content>
         <TextInputField
+          editable={!isReadOnlyProject}
           isRequired={true}
           label={'Custom Map Title'}
           name={'title'}
@@ -372,19 +376,21 @@ const CustomMapDetails = ({closeMainMenuPanel, zoomToCustomMap}) => {
               {isEmpty(customMapToEdit) && renderMapTypeList(formProps)}
               {!isEmpty(formProps.values.source) && renderMapDetails(formProps)}
             </ScrollView>
-            <View style={customMapStyles.bottomButtonsContainer}>
-              <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
-                <View>
-                  {!isEmpty(customMapToEdit) && <DeleteButton onPress={confirmDeleteMap}/>}
+            {!isReadOnlyProject && (
+              <View style={customMapStyles.bottomButtonsContainer}>
+                <View style={{alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between'}}>
+                  <View>
+                    {!isEmpty(customMapToEdit) && <DeleteButton onPress={confirmDeleteMap}/>}
+                  </View>
+                  <ActionButton
+                    // A Map Warper map is uploaded to Strabo MyMaps, never saved from here
+                    disabled={isFormInvalid || formProps.values.source === CUSTOM_MAP_SOURCES.MAP_WARPER}
+                    onPress={() => saveMap(formProps.values)}
+                    title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
+                  />
                 </View>
-                <ActionButton
-                  // A Map Warper map is uploaded to Strabo MyMaps, never saved from here
-                  disabled={isFormInvalid || formProps.values.source === CUSTOM_MAP_SOURCES.MAP_WARPER}
-                  onPress={() => saveMap(formProps.values)}
-                  title={!isEmpty(customMapToEdit) ? 'Update' : 'Save'}
-                />
               </View>
-            </View>
+            )}
           </View>
 
           {/* Modal */}

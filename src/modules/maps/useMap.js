@@ -16,6 +16,7 @@ const useMap = () => {
   const dispatch = useDispatch();
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const customMaps = useSelector(state => state.map.customMaps);
+  const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
   const store = useStore();
 
   const {getMyMapsBboxCoords} = useMapCoords();
@@ -37,6 +38,8 @@ const useMap = () => {
     console.log('Storing bbox for custom map', mapId, bbox);
     const updatedCustomMap = {...customMap, bbox: bbox};
     dispatch(updateCustomMap(updatedCustomMap));
+    // A read only project's maps keep their extent on this device only
+    if (isReadOnlyProject) return;
     dispatch(updatedProject(
       {field: 'other_maps', value: Object.values({...latestCustomMaps, [mapId]: updatedCustomMap})}));
   };

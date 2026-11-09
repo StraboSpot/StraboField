@@ -26,6 +26,7 @@ const TagsList = ({activeFilters = [], tagsSorted, type}) => {
   console.log('Rendering TagsList...');
 
   const dispatch = useDispatch();
+  const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
   const spotsInMapExtentIds = useSelector(state => state.map.spotsInMapExtentIds);
   const tags = useSelector(state => state.project.project?.tags) || [];
   const useContinuousTagging = useSelector(state => state.project.project?.useContinuousTagging);
@@ -104,7 +105,7 @@ const TagsList = ({activeFilters = [], tagsSorted, type}) => {
         }}
       >
         <TagColorIcon color={tag.color}/>
-        {useContinuousTagging && (
+        {useContinuousTagging && !isReadOnlyProject && (
           <ListItem.CheckBox
             checked={tag.continuousTagging}
             onPress={() => toggleContinuousTagging(tag)}

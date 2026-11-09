@@ -307,7 +307,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
         {renderImagesField()}
         <GovernanceFields isReadOnly={isReadOnly} ownerEmail={dataset.owner_email} ownerName={dataset.owner_name}/>
         <RunQAQC dataset={dataset}/>
-        {Platform.OS === 'web' && renderDeleteDatasetButton()}
+        {Platform.OS === 'web' && !isReadOnly && renderDeleteDatasetButton()}
       </FormFlatList>
 
       {/* Child Modal */}

@@ -18,6 +18,7 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   /* Data Hooks */
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
+  const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
   const {targetDatasetId} = useSelector(state => state.project);
   const spots = useSelector(state => state.spot.spots);
   const straboUserId = useSelector(state => state.user.straboUserId);
@@ -65,15 +66,18 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
           </ListItem.Subtitle>
         </ListItem.Content>
 
-        <Icon
-          color={checked ? themes.PRIMARY_ACCENT_COLOR : isActive || isReadOnly ? themes.MEDIUMGREY
-            : themes.SECONDARY_BACKGROUND_COLOR}
-          disabled={!isActive || isReadOnly}
-          disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
-          name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
-          onPress={() => toggleTargetDataset(dataset.id)}
-          type={'ionicon'}
-        />
+        {/* A read only project takes no new Spots, so it has no target dataset to choose */}
+        {!isReadOnlyProject && (
+          <Icon
+            color={checked ? themes.PRIMARY_ACCENT_COLOR : isActive || isReadOnly ? themes.MEDIUMGREY
+              : themes.SECONDARY_BACKGROUND_COLOR}
+            disabled={!isActive || isReadOnly}
+            disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
+            name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
+            onPress={() => toggleTargetDataset(dataset.id)}
+            type={'ionicon'}
+          />
+        )}
 
         <ListItem.Chevron/>
       </ListItem>

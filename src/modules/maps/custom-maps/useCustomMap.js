@@ -30,6 +30,7 @@ const useCustomMap = () => {
   const currentBasemap = useSelector(state => state.map.currentBasemap);
   const customDatabaseEndpoint = useSelector(state => state.connections.databaseEndpoint);
   const customMaps = useSelector(state => state.map.customMaps);
+  const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
   const project = useSelector(state => state.project.project);
 
   const {setBasemap} = useMap();
@@ -185,7 +186,8 @@ const useCustomMap = () => {
     const customMapsCopy = {...customMaps, [updatedCustomMap.id]: updatedCustomMap};
     console.log('Updated Custom Maps:', customMapsCopy);
     dispatch(updateCustomMap(updatedCustomMap));
-    dispatch(updatedProject({field: 'other_maps', value: Object.values(customMapsCopy)}));
+    // A read only project's maps can still be switched on and faded for viewing, but only on this device
+    if (!isReadOnlyProject) dispatch(updatedProject({field: 'other_maps', value: Object.values(customMapsCopy)}));
   };
 
   return {

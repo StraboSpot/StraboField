@@ -27,6 +27,7 @@ import {
 import useMapLocation from '../maps/view/useMapLocation';
 import {LeavePageContext} from '../notebook-panel/LeavePageContext';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
+import {setTargetDataset} from '../project/projects.slice';
 import useProject from '../project/useProject';
 import {clearedSelectedSpots, setIntersectedSpotsForTagging} from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
@@ -107,6 +108,12 @@ const useHome = ({
   useEffect(() => {
     if (!isDragIntervalMode && mapMode === MAP_MODES.INTERVAL_DRAG) setMapMode(MAP_MODES.VIEW);
   }, [isDragIntervalMode]);
+
+  // A read only project has no target dataset. One set while the project could still be edited is left saved on the
+  // device, so it is cleared however the project was opened - downloaded, loaded from a backup or restored at launch.
+  useEffect(() => {
+    if (isReadOnlyProject && !isEmpty(targetDatasetId)) dispatch(setTargetDataset(undefined));
+  }, [isReadOnlyProject, targetDatasetId]);
 
   useEffect(() => {
     if (!isEditModeUnavailable || mapMode !== MAP_MODES.EDIT) return;

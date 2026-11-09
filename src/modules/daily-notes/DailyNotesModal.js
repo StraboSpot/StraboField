@@ -18,6 +18,7 @@ const DailyNotesModal = ({closeModal, dailyNote}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
   const projectDescription = useSelector(state => state.project.project?.description);
 
   /* Local State */
@@ -66,12 +67,14 @@ const DailyNotesModal = ({closeModal, dailyNote}) => {
   const renderDailyNotesModal = () => {
     return (
       <ModalWrapper
+        cancelTitle={isReadOnlyProject ? 'Close' : undefined}
         headerTitle={'Daily Notes'}
         onActionPressed={() => saveNote(formRef?.current?.values)}
         onCancelPress={closeModal}
         onDeletePress={deleteNoteConfirm}
         overlayStyleOverride={{height: 'auto'}}
-        showDeleteButton={!isEmpty(dailyNote)}
+        showActionButton={!isReadOnlyProject}
+        showDeleteButton={!isEmpty(dailyNote) && !isReadOnlyProject}
       >
         <FormikWrapper
           initialValues={initialValues}
@@ -92,6 +95,7 @@ const DailyNotesModal = ({closeModal, dailyNote}) => {
               <ListItem.Content>
                 <TextInputField
                   appearance={'multiline'}
+                  editable={!isReadOnlyProject}
                   label={'Notes'}
                   name={'notes'}
                 />

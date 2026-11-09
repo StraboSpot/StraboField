@@ -30,6 +30,7 @@ const Tags = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
   const listFilters = useSelector(state => state.mainMenu.listFilters);
   const listSorts = useSelector(state => state.mainMenu.listSorts);
   const tags = useSelector(state => state.project.project?.tags) || [];
@@ -93,7 +94,7 @@ const Tags = ({
 
   return (
     <View style={{flex: 1}}>
-      <AddButton onPress={addTag} title={addButtonTitle}/>
+      {!isReadOnlyProject && <AddButton onPress={addTag} title={addButtonTitle}/>}
       {!isEmpty(tags) && (
         <>
           <TagQuery

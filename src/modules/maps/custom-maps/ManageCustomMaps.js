@@ -24,6 +24,7 @@ const ManageCustomMaps = ({zoomToCustomMap, zoomToOfflineMapTiles}) => {
   /* Data Hooks */
 
   const customMaps = useSelector(state => state.map.customMaps);
+  const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
   const offlineMaps = useSelector(state => state.offlineMap.offlineMaps);
   const {isSelected, endpoint} = useSelector(state => state.connections.databaseEndpoint);
 
@@ -99,7 +100,7 @@ const ManageCustomMaps = ({zoomToCustomMap, zoomToOfflineMapTiles}) => {
 
   return (
     <>
-      <AddButton onPress={() => getCustomMapDetails({})} title={'Add New Custom Map'}/>
+      {!isReadOnlyProject && <AddButton onPress={() => getCustomMapDetails({})} title={'Add New Custom Map'}/>}
       <SectionDivider
         dividerText={'Custom Maps'}
         subtitle={isSelected ? `Endpoint: ${endpoint.replace('/db', '')}` : undefined}
