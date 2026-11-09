@@ -18,13 +18,18 @@ const TextInput = ({ref, ...props}) => {
   return (
     <>
       <RNTextInput inputAccessoryViewID={doneBarId} ref={ref} {...props}/>
-      <InputAccessoryView nativeID={doneBarId}>
-        <View style={styles.keyboardDoneBar}>
-          <Pressable hitSlop={10} onPress={Keyboard.dismiss}>
-            <Text style={styles.keyboardDoneText}>Dismiss</Text>
-          </Pressable>
-        </View>
-      </InputAccessoryView>
+      {/* On the new architecture the InputAccessoryView leaves an empty, absolutely positioned, screen-sized view in
+       the layout (its children move to the keyboard's accessory). Rendered after the input it covers it and swallows
+       the taps that should focus it, so it sits in a zero-size, untouchable box. */}
+      <View pointerEvents={'none'} style={styles.keyboardDoneBarHost}>
+        <InputAccessoryView nativeID={doneBarId}>
+          <View style={styles.keyboardDoneBar}>
+            <Pressable hitSlop={10} onPress={Keyboard.dismiss}>
+              <Text style={styles.keyboardDoneText}>Dismiss</Text>
+            </Pressable>
+          </View>
+        </InputAccessoryView>
+      </View>
     </>
   );
 };
