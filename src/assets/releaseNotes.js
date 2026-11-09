@@ -139,7 +139,7 @@ const RELEASE_NOTES = [
             commit: '86e7b3ef7',
           },
           {
-            text: 'Done bar on iOS: text fields have a Done button above the keyboard',
+            text: 'Dismiss bar on iPhone: text fields have a Dismiss button above the keyboard to hide it',
             commit: '1eca1289a',
             platforms: ['ios'],
           },
