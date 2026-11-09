@@ -26,7 +26,7 @@ NOTEBOOK & FORMS
 • Unsaved changes prompt: leaving a notebook page with unsaved changes, by any route, asks whether to Discard, Keep Editing, or Save
 • Save when changed: Save stays disabled until something on the form has changed
 • Trace & surface features: a Trace Feature or Surface Feature section on the Overview replaces the switch, opening its form as a subpage
-• Done bar on iOS: text fields have a Done button above the keyboard
+• Dismiss bar on iPhone: text fields have a Dismiss button above the keyboard to hide it
 • Read-only forms: read-only forms no longer fill in defaults or offer to save
 
 SEDIMENTARY

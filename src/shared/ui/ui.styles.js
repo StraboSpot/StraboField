@@ -92,6 +92,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     paddingVertical: 10,
   },
+  keyboardDoneBarHost: {
+    height: 0,
+    overflow: 'hidden',
+    position: 'absolute',
+    width: 0,
+  },
   keyboardDoneText: {
     color: themes.PRIMARY_ACCENT_COLOR,
     fontSize: themes.PRIMARY_TEXT_SIZE,
