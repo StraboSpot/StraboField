@@ -33,7 +33,8 @@ const IntervalPage = ({isReadOnly, page}) => {
 
   /* Derived Variables */
 
-  const character = spot.properties?.sed?.character || undefined;
+  // An interval saved before character replaced interval_type, and read only so never moved over, keeps it there
+  const character = spot.properties?.sed?.character || spot.properties?.sed?.interval_type || undefined;
   const interval = spot.properties?.sed?.interval || {};
 
   /* Side Effects */
@@ -43,10 +44,11 @@ const IntervalPage = ({isReadOnly, page}) => {
     // console.log('Spot:', spot);
     // console.log('Interval:', interval);
     // console.log('Character:', character);
-    if (spot.properties?.sed?.interval_type) {
+    // A read only interval is shown as it is, never moved over
+    if (!isReadOnly && spot.properties?.sed?.interval_type) {
       let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
-      editedSedData.character = spot.properties?.sed?.interval_type;
-      delete spot.properties?.sed?.interval_type;
+      editedSedData.character = editedSedData.interval_type;
+      delete editedSedData.interval_type;
       dispatch(editedSpotProperties({field: 'sed', value: editedSedData}));
     }
   }, []);

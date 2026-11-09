@@ -57,7 +57,8 @@ const BeddingPage = ({isReadOnly, page}) => {
 
   const editAttribute = async (attribute, i) => {
     if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
-    if (!attribute.id) {
+    // A read only bed is opened without one, to get its id once it can be saved
+    if (!attribute.id && !isReadOnly) {
       let editedSedData = JSON.parse(JSON.stringify(spot.properties.sed));
       attribute = {...attribute, id: getNewUUID()};
       editedSedData[page.key].beds.splice(i, 1, attribute);

@@ -14,7 +14,7 @@ import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {hasSedRockData} from '../sed/sed.helpers';
 import {editedSpotProperties} from '../spots/spots.slice';
 
-const FeatureOverviewList = ({page}) => {
+const FeatureOverviewList = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -28,7 +28,8 @@ const FeatureOverviewList = ({page}) => {
   /* Event Handlers */
 
   const onItemPressed = (item, i) => {
-    if (isSed && !item.id && page.key !== PAGE_KEYS.STRAT_SECTION && page.key !== PAGE_KEYS.INTERVAL) {
+    // A read only record is opened without one, to get its id once it can be saved
+    if (isSed && !item.id && !isReadOnly && page.key !== PAGE_KEYS.STRAT_SECTION && page.key !== PAGE_KEYS.INTERVAL) {
       addIdForSS1ImportedSedData(item, i);
     }
     else openFeatureInNotebook(dispatch, page.key, item);
