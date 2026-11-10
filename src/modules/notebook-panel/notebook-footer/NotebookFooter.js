@@ -88,6 +88,7 @@ const NotebookFooter = ({openPage, isReadOnly, isRichSample, registerGetValues, 
                 key={key}
                 onPress={() => openPage(key)}
                 source={getPageIcon(key)}
+                testID={`notebook-footer-${key}`}
               />
             ))}
             <ClearButton

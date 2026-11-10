@@ -83,6 +83,7 @@ const TextInputField = ({
         placeholderTextColor={themes.MEDIUMGREY}
         scrollEnabled={appearance === 'full' ? isFocused : true}
         style={getInputStyle()}
+        testID={name}
         value={value || ''}
       />
       {errors[name] && <Text style={formStyles.fieldError}>{errors[name]}</Text>}

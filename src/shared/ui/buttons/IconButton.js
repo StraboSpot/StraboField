@@ -12,6 +12,7 @@ const IconButton = ({
                       onPress,
                       source,
                       style,
+                      testID,
                     }) => {
 
   return (
@@ -20,6 +21,7 @@ const IconButton = ({
       onLongPress={onLongPress}
       onPress={onPress}
       style={style}
+      testID={testID}
     >
       <Image
         containerStyle={containerStyle}

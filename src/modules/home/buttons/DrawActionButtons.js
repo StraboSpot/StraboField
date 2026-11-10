@@ -66,23 +66,27 @@ const DrawActionButtons = ({clickHandler, mapMode, openMainMenuPanel}) => {
             onPress={handlePointPressed}
             source={getImageSource(MAP_MODES.DRAW.POINT)}
             style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
+            testID={'draw-point-button'}
           />
           <IconButton
             onLongPress={handleLineLongPressed}
             onPress={handleLinePressed}
             source={getImageSource(MAP_MODES.DRAW.LINE)}
             style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
+            testID={'draw-line-button'}
           />
           <IconButton
             onLongPress={handlePolygonLongPressed}
             onPress={handlePolygonPressed}
             source={getImageSource(MAP_MODES.DRAW.POLYGON)}
             style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
+            testID={'draw-polygon-button'}
           />
           <IconButton
             onPress={handleEditShapePressed}
             source={getImageSource(MAP_MODES.EDIT)}
             style={SMALL_SCREEN && homeStyles.iconSpacingSmallScreen}
+            testID={'edit-shape-button'}
           />
         </>
       )}

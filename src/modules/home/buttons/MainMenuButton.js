@@ -23,6 +23,7 @@ const MainMenuButton = ({closeMainMenuPanel, openMainMenuPanel}) => {
       onPress={toggleHomeDrawer}
       source={isMainMenuPanelVisible ? require('../../../assets/icons/HomeButton_pressed.png')
         : require('../../../assets/icons/HomeButton.png')}
+      testID={'main-menu-button'}
     />
   );
 };
