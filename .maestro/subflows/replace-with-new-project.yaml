@@ -1,0 +1,11 @@
+# Project switcher -> New -> Continue: replaces the open local project with a new empty one, ${PROJECT_NAME}.
+appId: org.StraboSpot2
+---
+- runFlow: open-project-switcher.yaml
+- tapOn: "New"
+- tapOn: "Continue"
+- tapOn: { id: "project_name" }
+- inputText: ${PROJECT_NAME}
+- tapOn: "BASIC INFO"   # dismisses the keyboard, which can cover Save New Project in the side panel
+- tapOn: "Save New Project"
+- runFlow: close-side-panels.yaml

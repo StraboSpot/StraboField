@@ -1,0 +1,16 @@
+# Picking a backup to restore asks first; backing out ("Go to Backup Page") must leave the current,
+# newer project untouched.
+appId: org.StraboSpot2
+name: Backing out of a restore keeps current work
+tags: [data-loss, backup]
+---
+- runFlow: ../subflows/start-guest-project.yaml
+- runFlow: ../subflows/add-point-spot.yaml
+- runFlow: { file: ../subflows/save-backup.yaml, env: { BACKUP_NAME: "E2E-bk08", ZIP: "false" } }
+- runFlow: { file: ../subflows/add-point-spot.yaml, env: { X: "60", Y: "55" } }
+- runFlow: ../subflows/open-project-switcher.yaml
+- tapOn: "Open"
+- tapOn: "E2E-bk08"
+- assertVisible: "Overwrite Project .*\\?"
+- tapOn: "Go to Backup Page"
+- runFlow: { file: ../subflows/assert-dataset-spot-count.yaml, env: { COUNT: "2" } }

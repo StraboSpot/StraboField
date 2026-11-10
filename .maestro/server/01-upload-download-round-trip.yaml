@@ -1,0 +1,24 @@
+# A project uploaded to the server comes back complete: wipe it locally, download it, and the Spot and its
+# note are all there. Uses the signed-in account on the simulator; creates one E2E-* project on the server.
+appId: org.StraboSpot2
+name: Upload then download returns the Spot and note
+tags: [server, data-loss]
+---
+- evalScript: ${output.name = 'E2E-' + new Date().toISOString().replace(/[-:T]/g, '').slice(4, 12) + '-rt'}
+- runFlow: { file: ../subflows/start-signed-in-project.yaml, env: { PROJECT_NAME: "${output.name}" } }
+- runFlow: ../subflows/add-point-spot.yaml
+- runFlow: { file: ../subflows/add-note.yaml, env: { NOTE: "Round-trip note SRV-01" } }
+- runFlow: ../subflows/upload-project.yaml
+# Replace the local copy with an empty, never-uploaded scratch project, so only the server holds the data.
+- runFlow: { file: ../subflows/start-signed-in-project.yaml, env: { PROJECT_NAME: "E2E-scratch" } }
+- runFlow: { file: ../subflows/assert-dataset-spot-count.yaml, env: { COUNT: "0" } }
+- runFlow: { file: ../subflows/open-server-project.yaml, env: { PROJECT_NAME: "${output.name}" } }
+- tapOn: "Overwrite Project"
+# The download Status dialog's progress text isn't exposed to accessibility; its button is.
+- extendedWaitUntil:
+    visible: "Show Datasets"
+    timeout: 120000
+- tapOn: { point: "93%,9%" }   # the Status dialog's close (X)
+- runFlow: { file: ../subflows/assert-dataset-spot-count.yaml, env: { COUNT: "1" } }
+- runFlow: { file: ../subflows/open-spot-from-list.yaml, env: { SPOT: "01" } }
+- assertVisible: "Round-trip note SRV-01"

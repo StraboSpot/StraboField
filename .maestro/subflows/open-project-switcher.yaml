@@ -1,0 +1,20 @@
+# Main menu -> the swap icon next to the project name -> "StraboField Projects" (New / Download / Open / Import).
+appId: org.StraboSpot2
+---
+- runFlow: close-side-panels.yaml
+- tapOn: { id: "main-menu-button" }
+- runFlow:
+    when:
+      visible: { id: "switch-project-button" }
+    commands:
+      - tapOn: { id: "switch-project-button" }
+      - waitForAnimationToEnd
+- runFlow:
+    # Builds from before the switch-project-button testID: the icon sits at the menu header's right edge.
+    when:
+      notVisible: "StraboField Projects"
+    commands:
+      - tapOn: { point: "68%,12%" }
+- extendedWaitUntil:
+    visible: "LOAD A PROJECT"
+    timeout: 10000

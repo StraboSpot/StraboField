@@ -1,0 +1,31 @@
+# Get back to the bare map screen, from the main menu, any menu sub-panel
+# (Datasets, Backup, ...; their headers read "Project: <name>"), the project switcher pages, or the Notebook tab.
+appId: org.StraboSpot2
+---
+- repeat:
+    while:
+      notVisible: "About this map"
+    times: 4
+    commands:
+      - runFlow:
+          when:
+            visible: "MANAGE PROJECT.*"
+          commands:
+            - tapOn: { id: "main-menu-button" }
+      - runFlow:
+          when:
+            visible: "Project: .*"
+          commands:
+            - tapOn: { id: "main-menu-button" }
+      - runFlow:
+          when:
+            visible: "(My )?StraboField Projects"   # project switcher and its Open/Delete/Download pages
+          commands:
+            - tapOn: { id: "main-menu-button" }
+      - runFlow:
+          when:
+            notVisible: "MANAGE PROJECT.*"
+          commands:
+            - tapOn: "Map"
+      - waitForAnimationToEnd
+- assertVisible: "About this map"   # the draw buttons also need a target dataset, which a restore leaves unset

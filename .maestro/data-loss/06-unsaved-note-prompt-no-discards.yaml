@@ -1,0 +1,17 @@
+# Same as 05 but answering No: the typed note is discarded and the Spot itself is kept.
+appId: org.StraboSpot2
+name: Unsaved note + leave page + No discards only the note
+tags: [data-loss]
+---
+- runFlow: ../subflows/start-guest-project.yaml
+- runFlow: ../subflows/add-point-spot.yaml
+- tapOn: { id: "notebook-footer-notes" }
+- tapOn: { id: "note" }
+- inputText: "Prompt-no E2E-06"
+- tapOn: "Map"
+- assertVisible: "Unsaved Changes"
+- tapOn: "No"
+- tapOn: "Notebook"
+# The Notebook reopens on the (now empty) Notes page.
+- assertNotVisible: "Prompt-no E2E-06"
+- runFlow: { file: ../subflows/assert-dataset-spot-count.yaml, env: { COUNT: "1" } }

@@ -1,0 +1,11 @@
+# Project switcher -> Download -> tap ${PROJECT_NAME} in the server list. Stops at the overwrite confirmation.
+appId: org.StraboSpot2
+---
+- runFlow: open-project-switcher.yaml
+- tapOn: "Download"
+- extendedWaitUntil:
+    visible: "${PROJECT_NAME}"
+    timeout: 60000
+- tapOn: "${PROJECT_NAME}"
+# The dialog title names the CURRENT local project that would be replaced.
+- assertVisible: "Overwrite Project .*\\?"

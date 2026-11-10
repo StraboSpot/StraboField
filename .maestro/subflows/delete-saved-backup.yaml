@@ -1,0 +1,10 @@
+# Project switcher -> Delete -> ${BACKUP_NAME}: removes that saved folder from ProjectBackups (not any zip).
+appId: org.StraboSpot2
+---
+- runFlow: open-project-switcher.yaml
+- tapOn: "Delete"
+- tapOn: "${BACKUP_NAME}"
+- tapOn: "Delete"
+- assertVisible: "${BACKUP_NAME} has been deleted"
+- tapOn: "Ok"
+- runFlow: close-side-panels.yaml

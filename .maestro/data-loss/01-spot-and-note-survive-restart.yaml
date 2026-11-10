@@ -1,0 +1,18 @@
+# A Spot and its note must still be there after the app is killed and relaunched.
+appId: org.StraboSpot2
+name: Spot and note survive a force-quit
+tags: [data-loss, smoke]
+---
+- runFlow: ../subflows/start-guest-project.yaml
+- runFlow: ../subflows/add-point-spot.yaml
+- runFlow:
+    file: ../subflows/add-note.yaml
+    env: { NOTE: "Fractured sandstone E2E-01" }
+- assertVisible: "Fractured sandstone E2E-01"
+- runFlow: ../subflows/force-quit-and-relaunch.yaml
+- runFlow:
+    file: ../subflows/assert-dataset-spot-count.yaml
+    env: { COUNT: "1" }
+- tapOn: "Notebook"
+- assertVisible: "01"
+- assertVisible: "Fractured sandstone E2E-01"

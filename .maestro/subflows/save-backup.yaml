@@ -1,0 +1,27 @@
+# Main menu -> Backup -> "Save" (folder in ProjectBackups) or, with ZIP=true, "Save & Zip" (also writes
+# Distribution/<name>.zip, visible in the Files app). Names the backup ${BACKUP_NAME} (letters, digits, -).
+appId: org.StraboSpot2
+---
+- runFlow: close-side-panels.yaml
+- tapOn: { id: "main-menu-button" }
+- tapOn: "Backup"
+- runFlow:
+    when:
+      true: ${ZIP == 'true'}
+    commands:
+      - tapOn: "Save & Zip"
+- runFlow:
+    when:
+      true: ${ZIP != 'true'}
+    commands:
+      - tapOn: "Save"
+- tapOn: "\\d{4}-\\d{2}-\\d{2}_.*"   # the prefilled date-stamped file name
+- eraseText: 80
+- inputText: ${BACKUP_NAME}
+- tapOn: "Include in Backup"        # dismisses the keyboard, which covers the Save buttons
+- tapOn: "${ZIP == 'true' ? 'Save & Zip' : 'Save'}"
+- extendedWaitUntil:
+    visible: "Project Saved.*"
+    timeout: 60000
+- tapOn: "Close"
+- runFlow: close-side-panels.yaml
