@@ -290,7 +290,24 @@ Version lives in `package.json`, `android/app/build.gradle`, and `ios/StraboSpot
 
 ## Testing
 
-Minimal coverage. Jest + React Native preset; basic App render test in `__tests__/`. Run `npm test`.
+Jest 30 + `@react-native/jest-preset`, ~50 test files. Run `npm test`, or `npx jest <path>` for one file. **Not run in
+CI** — nothing catches a failing test unless someone runs it.
+
+- **Where tests live** — next to the code as `[name].test.js` (helpers, slices, hooks) for anything new; `__tests__/`
+  holds the App render test and older cross-cutting tests.
+- **What's covered** — mostly pure helpers, Redux slices (`spots`, `projects`, `offlineMaps`) and hooks (`useSpots`,
+  `useMapEditor`, `useForm`, `useDownload`, the leave-page / unsaved-changes gates), plus
+  `propagateModifiedTimestamps` and a `page.constants` load-order guard. No E2E, sync/upload contract, or
+  persisted-state migration tests yet.
+- **Rendering** — `react-test-renderer`, not Testing Library. Render a hook probe first, then `act` on it: an `act`
+  nested in the render's own `act` leaves the probe unrendered.
+- **Native modules** — stubbed globally in `jest/setup.js` (library mocks where they exist: Mapbox, gesture handler,
+  NetInfo, permissions, Sentry, …) and `jest/mocks/`; `moduleNameMapper` in `jest.config.js` covers RNFS and binary
+  assets. A new native library that throws at import needs a stub there, or the App render test fails.
+- **`transformIgnorePatterns: []`** — all of `node_modules` is transformed (many ESM-only deps), so the first run is
+  slow.
+- **To prove a test catches a regression**, run it against the old code from `git show HEAD:<file>` rather than
+  checking out over the working tree.
 
 ## References
 
