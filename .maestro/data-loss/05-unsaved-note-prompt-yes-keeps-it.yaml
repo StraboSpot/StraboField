@@ -1,5 +1,5 @@
 # A geologist types a note and leaves for the Map without tapping Save. The app asks
-# "Unsaved Changes - save before continuing?". Answering Yes must keep the note, through a relaunch too.
+# "Unsaved Changes" (Yes on master, Save on 2.33+). Saving must keep the note, through a relaunch too.
 appId: org.StraboSpot2
 name: Unsaved note + leave page + Yes keeps the note
 tags: [data-loss]
@@ -11,7 +11,17 @@ tags: [data-loss]
 - inputText: "Prompt-yes E2E-05"
 - tapOn: "Map"
 - assertVisible: "Unsaved Changes"
-- tapOn: "Yes"
+# master asks "save before continuing?" Yes/No; 2.33+ asks Discard / Keep Editing / Save.
+- runFlow:
+    when:
+      visible: "Keep Editing"
+    commands:
+      - tapOn: { text: "Save", rightOf: "Keep Editing" }
+- runFlow:
+    when:
+      visible: "Yes"
+    commands:
+      - tapOn: "Yes"
 - runFlow: ../subflows/force-quit-and-relaunch.yaml
 - tapOn: "Notebook"
 - assertVisible: "Prompt-yes E2E-05"

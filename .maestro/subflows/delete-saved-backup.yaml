@@ -5,6 +5,6 @@ appId: org.StraboSpot2
 - tapOn: "Delete"
 - tapOn: "${BACKUP_NAME}"
 - tapOn: "Delete"
-- assertVisible: "${BACKUP_NAME} has been deleted"
+- assertVisible: "(${BACKUP_NAME} has been deleted|Deleted ${BACKUP_NAME})"   # master | 2.33+
 - tapOn: "Ok"
 - runFlow: close-side-panels.yaml

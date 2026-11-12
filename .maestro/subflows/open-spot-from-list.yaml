@@ -1,8 +1,7 @@
 # Main menu -> Spots -> tap Spot ${SPOT}; its notebook opens.
 appId: org.StraboSpot2
 ---
-- runFlow: close-side-panels.yaml
-- tapOn: { id: "main-menu-button" }
+- runFlow: open-main-menu.yaml
 - tapOn: "Spots"
 - tapOn: "${SPOT}"
 - assertVisible: "Spot Overview"

@@ -1,0 +1,13 @@
+# From the map, open the main menu and wait until it is really open (a tap right after a screen
+# transition can be dropped, so retry).
+appId: org.StraboSpot2
+---
+- runFlow: close-side-panels.yaml
+- repeat:
+    while:
+      notVisible: "MANAGE PROJECT.*"
+    times: 3
+    commands:
+      - tapOn: { id: "main-menu-button" }
+      - waitForAnimationToEnd
+- assertVisible: "MANAGE PROJECT.*"

@@ -80,6 +80,20 @@ Prefer `testID`s over screen coordinates or display text. Added for these tests:
 
 `IconButton` now passes `testID` through, so other icon buttons only need the prop.
 
+## Branch compatibility
+
+The flows run on both `master` (2.32.x) and `rc-2.33.x`, which differ in a few places the flows handle:
+
+- The unsaved-changes prompt is Yes/No on 2.32 and Discard / Keep Editing / Save on 2.33 (flows 05, 06).
+- The delete confirmation reads "X has been deleted" on 2.32 and "Deleted X" on 2.33 (`delete-saved-backup`).
+- On 2.33 a side panel's header is one accessibility element (", Backup, Project: X") that is also its back button,
+  and the map's "About this map" label stays in the tree under open panels. `close-side-panels` detects the panels
+  themselves, and `open-project-switcher` never taps a header.
+- A tap right after a screen transition can be dropped, so `open-main-menu` retries until the menu is open.
+
+Merging this branch into `rc-2.33.x` conflicts in `MainMenuButton.js` (moved from `home/buttons/` to `home/` on
+2.33): keep RC's `../../assets/...` image paths and add `testID={'main-menu-button'}`.
+
 ## Caveats
 
 - **Release builds upload to Sentry.** The Xcode bundle phase hardcodes `export SENTRY_DISABLE_AUTO_UPLOAD=false`

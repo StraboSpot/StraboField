@@ -1,8 +1,7 @@
 # Open Main Menu -> Datasets and check the Default dataset holds ${COUNT} Spots, then close the panels.
 appId: org.StraboSpot2
 ---
-- runFlow: close-side-panels.yaml
-- tapOn: { id: "main-menu-button" }
+- runFlow: open-main-menu.yaml
 - tapOn: "Datasets.*"
 - assertVisible: "Spots: ${COUNT}.*"
 - runFlow: close-side-panels.yaml

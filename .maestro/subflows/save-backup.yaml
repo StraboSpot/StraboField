@@ -2,8 +2,7 @@
 # Distribution/<name>.zip, visible in the Files app). Names the backup ${BACKUP_NAME} (letters, digits, -).
 appId: org.StraboSpot2
 ---
-- runFlow: close-side-panels.yaml
-- tapOn: { id: "main-menu-button" }
+- runFlow: open-main-menu.yaml
 - tapOn: "Backup"
 - runFlow:
     when:

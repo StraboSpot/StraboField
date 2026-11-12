@@ -10,7 +10,17 @@ tags: [data-loss]
 - inputText: "Prompt-no E2E-06"
 - tapOn: "Map"
 - assertVisible: "Unsaved Changes"
-- tapOn: "No"
+# master asks "save before continuing?" Yes/No; 2.33+ asks Discard / Keep Editing / Save.
+- runFlow:
+    when:
+      visible: "Keep Editing"
+    commands:
+      - tapOn: ".*Discard"
+- runFlow:
+    when:
+      visible: "No"
+    commands:
+      - tapOn: "No"
 - tapOn: "Notebook"
 # The Notebook reopens on the (now empty) Notes page.
 - assertNotVisible: "Prompt-no E2E-06"
