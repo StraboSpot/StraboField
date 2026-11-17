@@ -1,0 +1,31 @@
+# Project switcher -> Import -> pick Distribution/${ZIP_NAME}.zip in the iOS file picker -> Unzip and Save.
+# The picker remembers its last folder; otherwise browse On My iPhone > StraboField > Distribution.
+appId: org.StraboSpot2
+---
+- runFlow: open-project-switcher.yaml
+- tapOn: "Import"
+- extendedWaitUntil:
+    visible: "Cancel"
+    timeout: 15000
+- runFlow:
+    when:
+      notVisible: "${ZIP_NAME}.zip, .*"
+    commands:
+      - tapOn: "Browse"
+      - tapOn: "On My iPhone"
+      - tapOn: "StraboField, .*"
+      - waitForAnimationToEnd
+      - tapOn: "Distribution, .*"
+      - waitForAnimationToEnd
+- tapOn: "${ZIP_NAME}.zip, .*"
+- assertVisible: ".*Selected Project to Import:.*${ZIP_NAME}.zip.*"
+- tapOn: "Unzip and Save"
+- runFlow:
+    when:
+      visible: "File Exists"
+    commands:
+      - tapOn: "Continue"
+- extendedWaitUntil:
+    visible: "Project has been saved to the app.*"
+    timeout: 60000
+- runFlow: close-side-panels.yaml

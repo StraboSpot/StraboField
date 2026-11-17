@@ -1,0 +1,8 @@
+# On an open Spot notebook: write ${NOTE} on the Notes page and save it.
+appId: org.StraboSpot2
+---
+- tapOn: { id: "notebook-footer-notes" }
+- tapOn: { id: "note" }
+- eraseText: 200
+- inputText: ${NOTE}
+- tapOn: "Save"

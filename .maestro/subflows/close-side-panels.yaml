@@ -1,0 +1,36 @@
+# Get back to the bare map screen from the main menu, any menu sub-panel (Datasets, Backup, ...; their headers
+# read "Project: <name>"), the project switcher pages, or the Notebook tab. The map's "About this map" label
+# can stay in the accessibility tree under an open panel, so detect the panels themselves.
+appId: org.StraboSpot2
+---
+- repeat:
+    times: 4
+    commands:
+      - runFlow:
+          when:
+            visible: "MANAGE PROJECT.*"
+          commands:
+            - tapOn: { id: "main-menu-button" }
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            visible: ".*Project: .*"
+          commands:
+            - tapOn: { id: "main-menu-button" }
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            visible: ".*StraboField Projects"   # project switcher and its Open/Delete/Download pages
+          commands:
+            - tapOn: { id: "main-menu-button" }
+            - waitForAnimationToEnd
+      - runFlow:
+          when:
+            notVisible: "About this map"            # Notebook tab showing
+          commands:
+            - tapOn: "Map"
+            - waitForAnimationToEnd
+- assertNotVisible: "MANAGE PROJECT.*"
+- assertNotVisible: ".*Project: .*"
+- assertNotVisible: ".*StraboField Projects"
+- assertVisible: "About this map"   # the draw buttons also need a target dataset, which a restore leaves unset

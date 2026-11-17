@@ -80,6 +80,7 @@ const MainMenuPanelHeader = ({onOverflowMenuPress}) => {
             name={'swap-horizontal'}
             onPress={() => dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS}))}
             size={25}
+            testID={'switch-project-button'}
             type={'ionicon'}
           />
         </View>

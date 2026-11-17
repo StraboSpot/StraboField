@@ -1,0 +1,18 @@
+# Local work that was never uploaded must not be silently replaced by the (older) server copy:
+# downloading shows the "NOT NEWER" warning, and backing out keeps the local Spots.
+appId: org.StraboSpot2
+name: Download warns before overwriting newer local work
+tags: [server, data-loss]
+---
+- evalScript: ${output.name = 'E2E-' + new Date().toISOString().replace(/[-:T]/g, '').slice(4, 12) + '-gd'}
+- runFlow: { file: ../subflows/start-signed-in-project.yaml, env: { PROJECT_NAME: "${output.name}" } }
+- runFlow: ../subflows/add-point-spot.yaml
+- runFlow: ../subflows/upload-project.yaml
+# New local work after the upload.
+- runFlow: { file: ../subflows/add-point-spot.yaml, env: { X: "60", Y: "55" } }
+- runFlow: { file: ../subflows/assert-dataset-spot-count.yaml, env: { COUNT: "2" } }
+- runFlow: { file: ../subflows/open-server-project.yaml, env: { PROJECT_NAME: "${output.name}" } }
+- assertVisible: ".*NOT NEWER than the current project.*"
+- tapOn: "Go to Backup Page"
+- assertVisible: "Upload"
+- runFlow: { file: ../subflows/assert-dataset-spot-count.yaml, env: { COUNT: "2" } }

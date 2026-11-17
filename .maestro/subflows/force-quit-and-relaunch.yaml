@@ -1,0 +1,8 @@
+# Kill the app process (like iOS killing it in the background, or a crash) and start it again.
+appId: org.StraboSpot2
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: { id: "main-menu-button" }
+    timeout: 30000

@@ -1,0 +1,7 @@
+# Drop a point Spot on the map at ${X},${Y} (screen %). The new Spot's notebook opens.
+appId: org.StraboSpot2
+---
+- runFlow: close-side-panels.yaml
+- tapOn: { id: "draw-point-button" }
+- tapOn: { point: "${X || 30}%,${Y || 40}%" }
+- assertVisible: "Spot Overview"

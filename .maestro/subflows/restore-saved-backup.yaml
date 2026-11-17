@@ -1,0 +1,13 @@
+# Project switcher -> Open -> ${BACKUP_NAME} -> Overwrite Project. Replaces the open project with the backup.
+appId: org.StraboSpot2
+---
+- runFlow: open-project-switcher.yaml
+- tapOn: "Open"
+- tapOn: "${BACKUP_NAME}"
+- assertVisible: "Overwrite Project .*\\?"
+- tapOn: "Overwrite Project"
+- extendedWaitUntil:
+    visible: "Show Datasets"
+    timeout: 60000
+- tapOn: { point: "93%,9%" }   # the Status dialog's close (X)
+- runFlow: close-side-panels.yaml

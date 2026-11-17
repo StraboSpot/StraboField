@@ -1,0 +1,19 @@
+# Export to a zip (what users email or AirDrop between devices), then lose everything but the zip:
+# the open project is replaced with an empty one and the saved backup folder is deleted. Importing the
+# zip through the iOS file picker and opening it must bring the Spot and note back.
+appId: org.StraboSpot2
+name: Zip export then import restores the Spot and note
+tags: [data-loss, backup]
+---
+- runFlow: ../subflows/start-guest-project.yaml
+- runFlow: ../subflows/add-point-spot.yaml
+- runFlow: { file: ../subflows/add-note.yaml, env: { NOTE: "Zipped note ZP-09" } }
+- runFlow: { file: ../subflows/save-backup.yaml, env: { BACKUP_NAME: "E2Ezip09", ZIP: "true" } }
+- runFlow: { file: ../subflows/replace-with-new-project.yaml, env: { PROJECT_NAME: "E2E-empty" } }
+- runFlow: { file: ../subflows/assert-dataset-spot-count.yaml, env: { COUNT: "0" } }
+- runFlow: { file: ../subflows/delete-saved-backup.yaml, env: { BACKUP_NAME: "E2Ezip09" } }
+- runFlow: { file: ../subflows/import-zip.yaml, env: { ZIP_NAME: "E2Ezip09" } }
+- runFlow: { file: ../subflows/restore-saved-backup.yaml, env: { BACKUP_NAME: "E2Ezip09" } }
+- runFlow: { file: ../subflows/assert-dataset-spot-count.yaml, env: { COUNT: "1" } }
+- runFlow: { file: ../subflows/open-spot-from-list.yaml, env: { SPOT: "01" } }
+- assertVisible: "Zipped note ZP-09"

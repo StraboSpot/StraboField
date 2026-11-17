@@ -138,6 +138,7 @@ const NotebookFooter = ({
                 key={key}
                 onPress={() => openPage(key)}
                 source={getPageIcon(key)}
+                testID={`notebook-footer-${key}`}
               />
             ))}
             <ClearButton
