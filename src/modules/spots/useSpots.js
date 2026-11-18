@@ -23,6 +23,7 @@ import {
   deletedSpot,
   editedOrCreatedSpot,
   editedOrCreatedSpots,
+  editedSpotProperties,
   restoredSpots,
   setSelectedSpot,
 } from './spots.slice';
@@ -49,7 +50,7 @@ import {
   updatedProjectPreference,
 } from '../project/projects.slice';
 import useProject from '../project/useProject';
-import {getRichSamples, getSampleParent} from '../samples/samples.helpers';
+import {getRichSamples, getSampleParent, getSamplesWithout} from '../samples/samples.helpers';
 import useTags from '../tags/useTags';
 
 const useSpots = () => {
@@ -368,6 +369,18 @@ const useSpots = () => {
     return newSpot;
   };
 
+  // Ahead of deleting a dataset, does what deleting each of its Spots would to samples filed across its edge: their
+  // samples filed elsewhere are deleted with them, and parents filed elsewhere lose their stubs for samples in it. So
+  // no sample is left without a parent, and no parent keeps a stub for a sample that is gone.
+  // Takes what getSamplesSplitByDataset found, which the caller has already worked out to check and to confirm.
+  const deleteSamplesSplitByDataset = ({parentsToUnlink, samplesToDelete}) => {
+    samplesToDelete.forEach(sampleSpot => removeSpotAndReferences(sampleSpot.properties.id));
+    parentsToUnlink.forEach(({parentSpot, sampleIds}) => {
+      const samples = getSamplesWithout(parentSpot, sampleIds);
+      dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, spotId: parentSpot.properties.id, value: samples}));
+    });
+  };
+
   // Whether the Spot was deleted. The delete modal has already said why not, through checkIsSafeDelete, but nothing in a
   // read only dataset may change whichever way the delete arrives.
   const deleteSpot = (spotToDelete) => {
@@ -499,6 +512,22 @@ const useSpots = () => {
     return Object.values(spots).reduce((acc, s) => {
       return s.properties?.strat_section_id?.toString() === stratSectionId?.toString() ? [...acc, s] : acc;
     }, []);
+  };
+
+  // Why deleting a dataset would change a read only Spot in another dataset, or null if it wouldn't. The dataset's
+  // samples filed elsewhere are deleted with it, and parents filed elsewhere lose their stubs for samples in it.
+  // Takes what getSamplesSplitByDataset found for the dataset.
+  const getDatasetDeleteReadOnlyMessage = ({parentsToUnlink, samplesToDelete}) => {
+    if (!isAnythingReadOnly) return null;
+    const readOnlySample = samplesToDelete.find(isSpotReadOnly);
+    if (readOnlySample) {
+      return `Sample ${readOnlySample.properties.name}, taken at a Spot in this dataset, is read only.`;
+    }
+    const readOnlyParent = parentsToUnlink.find(({parentSpot}) => isSpotReadOnly(parentSpot))?.parentSpot;
+    if (readOnlyParent) {
+      return `Spot ${readOnlyParent.properties.name}, which a Sample in this dataset was taken from, is read only.`;
+    }
+    return null;
   };
 
   // Get Active Spots (not Samples) with Valid Geometry
@@ -743,6 +772,7 @@ const useSpots = () => {
     copySpot,
     createRandomSpots,
     createSpot,
+    deleteSamplesSplitByDataset,
     deleteSpot,
     discardSpot,
     getActiveImageBasemaps,
@@ -752,6 +782,7 @@ const useSpots = () => {
     getAllIntervalSpotsOnStratSection,
     getAllSpotsOnImageBasemap,
     getAllSpotsOnStratSection,
+    getDatasetDeleteReadOnlyMessage,
     getMappableSpots,
     getNewSpotName,
     getReadOnlyDeleteMessage,

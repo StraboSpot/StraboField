@@ -24,7 +24,9 @@ import NumberInputField from '../../form/inputs/NumberInputField';
 import TextInputField from '../../form/inputs/TextInputField';
 import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
 import RunQAQC from '../../qaqc/RunQAQC';
+import {getSamplesSplitByDataset} from '../../samples/samples.helpers';
 import {getSpotsCount} from '../../spots/spots.helpers';
+import useSpots from '../../spots/useSpots';
 import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';
 
@@ -38,6 +40,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const {initializeDownloadImages} = useDownload();
   const {destroyDataset, isReadOnlyDataset, isTargetDataset} = useProject();
+  const {deleteSamplesSplitByDataset, getDatasetDeleteReadOnlyMessage} = useSpots();
   const toast = useToast();
 
   /* Local State */
@@ -79,11 +82,18 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const initializeDeleteDataset = async () => {
     setIsDeleteConfirmModalVisible(false);
-    if (isReadOnly) return;  // Delete is disabled for a read only dataset
+    // Worked out before the delete, from the Spots as they were. The samples and parents it names are all filed in
+    // other datasets, so the delete leaves them in place.
+    const samplesSplitByDataset = getSamplesSplitByDataset(dataset, spots);
+    // The confirmation offers no Delete when this is set, and says why. A read only dataset never gets that far.
+    if (isReadOnly || getDatasetDeleteReadOnlyMessage(samplesSplitByDataset)) return;
     if (dataset && dataset.id) {
-      // A delete that fails has said why, and the view stays open
+      // Samples across the dataset's edge are tidied up only once it is gone, so a delete that fails leaves them be.
+      // It has said why, and the view stays open.
       const isDeleted = await destroyDataset(dataset.id);
-      if (isDeleted) closeDetailView();
+      if (!isDeleted) return;
+      deleteSamplesSplitByDataset(samplesSplitByDataset);
+      closeDetailView();
     }
     else console.error('Target dataset or id is undefined!');
   };
@@ -104,21 +114,44 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Render Functions */
 
   const renderDeleteConfirmationModal = () => {
+    // Samples filed apart from their parents across this dataset's edge, which an old bug could leave
+    const samplesSplitByDataset = getSamplesSplitByDataset(dataset, spots);
+    const {parentsToUnlink, samplesToDelete} = samplesSplitByDataset;
+    const readOnlyMessage = getDatasetDeleteReadOnlyMessage(samplesSplitByDataset);
     return (
       <DeleteConformationDialogBox
         headerTitle={'Confirm Delete!'}
         isVisible={isDeleteConfirmModalVisible}
         onActionPressed={initializeDeleteDataset}
         onCancelPress={() => setIsDeleteConfirmModalVisible(false)}
+        showActionButton={!readOnlyMessage}
       >
-        <Text style={{textAlign: 'center'}}>Are you sure you want to delete Dataset
-          {dataset && dataset.name && <Text>{'\n' + dataset.name}</Text>}?
-        </Text>
-        <Text style={overlayStyles.statusMessageText}>
-          This will
-          <Text style={commonStyles.importantText}> ERASE </Text>
-          everything in this dataset including Spots, images, and all other data!
-        </Text>
+        {readOnlyMessage ? <Text style={{textAlign: 'center'}}>Unable to delete Dataset.{'\n'}{readOnlyMessage}</Text>
+          : (
+            <>
+              <Text style={{textAlign: 'center'}}>Are you sure you want to delete Dataset
+                {dataset && dataset.name && <Text>{'\n' + dataset.name}</Text>}?
+              </Text>
+              <Text style={overlayStyles.statusMessageText}>
+                This will permanently
+                <Text style={commonStyles.importantText}> DELETE </Text>
+                {`${spotsCount} ${spotsCount === 1 ? 'Spot' : 'Spots'} in this dataset, along with their Samples and `
+                  + 'images. This can\'t be undone.'}
+              </Text>
+              {!isEmpty(samplesToDelete) && (
+                <Text style={overlayStyles.statusMessageText}>
+                  {`${samplesToDelete.length} ${samplesToDelete.length === 1 ? 'Sample' : 'Samples'} filed in other `
+                    + 'datasets, taken at Spots in this one, will be deleted with it.'}
+                </Text>
+              )}
+              {!isEmpty(parentsToUnlink) && (
+                <Text style={overlayStyles.statusMessageText}>
+                  {`${parentsToUnlink.length} ${parentsToUnlink.length === 1 ? 'Spot' : 'Spots'} in other datasets `
+                    + 'will lose the Samples taken at them that are filed in this one.'}
+                </Text>
+              )}
+            </>
+          )}
       </DeleteConformationDialogBox>
     );
   };

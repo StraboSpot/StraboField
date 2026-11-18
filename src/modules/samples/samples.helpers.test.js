@@ -6,6 +6,7 @@ import {
   getSampleMetadata,
   getSampleParent,
   getSamplesLinkedTo,
+  getSamplesSplitByDataset,
   getSamplesWithout,
   getSampleTitle,
   getSpotIdsToMove,
@@ -239,6 +240,44 @@ describe('getSamplesLinkedTo', () => {
   it('finds the other samples linked to the same StraboSamples sample', () => {
     expect(getSamplesLinkedTo(spots, 'x', 1)).toEqual([{id: 3, strabosamples_id: 'x'}]);
     expect(getSamplesLinkedTo(spots, 'y', 1)).toEqual([]);
+  });
+});
+
+// Only an old bug could file a sample apart from its parent, which is what a dataset delete has to tidy up
+describe('getSamplesSplitByDataset', () => {
+  it('finds nothing when every sample is filed with its parent', () => {
+    const dataset = {id: 12, spotIds: [parentId, sampleId, otherSampleId]};
+    expect(getSamplesSplitByDataset(dataset, familySpots)).toEqual({parentsToUnlink: [], samplesToDelete: []});
+  });
+
+  it('deletes the samples, filed elsewhere, of a Spot in the dataset', () => {
+    const dataset = {id: 12, spotIds: [parentId, sampleId]};
+    expect(getSamplesSplitByDataset(dataset, familySpots))
+      .toEqual({parentsToUnlink: [], samplesToDelete: [otherSampleSpot]});
+  });
+
+  it('unlinks a parent filed elsewhere from each of its samples in the dataset, once', () => {
+    const dataset = {id: 13, spotIds: [sampleId, otherSampleId.toString()]};
+    expect(getSamplesSplitByDataset(dataset, familySpots)).toEqual({
+      parentsToUnlink: [{parentSpot: parent, sampleIds: [sampleId, otherSampleId]}],
+      samplesToDelete: [],
+    });
+  });
+
+  // The sample in the dataset goes off its parent, and its own sample, filed elsewhere, goes with it
+  it('deletes a nested sample filed elsewhere, and leaves out a parent being deleted anyway', () => {
+    expect(getSamplesSplitByDataset({id: 13, spotIds: [sampleId]}, nestedSpots)).toEqual({
+      parentsToUnlink: [{parentSpot: parent, sampleIds: [sampleId]}],
+      samplesToDelete: [nestedSampleSpot],
+    });
+    // The nested sample's parent is in the dataset, so it isn't unlinked from a Spot that is going anyway
+    expect(getSamplesSplitByDataset({id: 13, spotIds: [sampleId, nestedSampleId]}, nestedSpots).parentsToUnlink)
+      .toEqual([{parentSpot: parent, sampleIds: [sampleId]}]);
+  });
+
+  it('skips a Spot the dataset lists that is missing from the device', () => {
+    expect(getSamplesSplitByDataset({id: 12, spotIds: [1756000000099]}, familySpots))
+      .toEqual({parentsToUnlink: [], samplesToDelete: []});
   });
 });
 

@@ -45,9 +45,10 @@ const makeStore = ({project, spot}) => configureStore({
   reducer: {project: projectReducer, spot: spotReducer, user: userReducer},
 });
 
-// Each delete sends the project too, so sent all at once, whichever landed last would set the project's timestamp,
-// and a failure could be covered by the next request's toast
-describe('deleting a dataset, then Spots, then editing on web', () => {
+// Deleting a dataset deletes its samples filed in other datasets too, one request each, and takes their stubs off
+// parents filed elsewhere. Sent all at once, whichever landed last would set the project's timestamp, and a failure
+// could be covered by the next request's toast.
+describe('deleting a dataset and its split samples on web', () => {
   const sampleIds = [1756000000031, 1756000000032];
   const parentId = 1756000000041;
   const parent = {properties: {id: parentId, name: 'Spot 10', samples: [{id: 1756000000042}]}, type: 'Feature'};
@@ -59,7 +60,7 @@ describe('deleting a dataset, then Spots, then editing on web', () => {
     uploadProjectDatasetsSpots.mockClear();
   });
 
-  it('deletes the Spots only after the dataset, one at a time, then sends the edit', async () => {
+  it('deletes the samples only after the dataset, one at a time, then unlinks the parents', async () => {
     const store = makeStore({
       project: {
         activeDatasetsIds: [12, 13, 14],

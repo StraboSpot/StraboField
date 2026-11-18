@@ -11,6 +11,7 @@ import connectionsReducer from '../connections/connections.slice';
 import homeReducer from '../home/home.slice';
 import mapReducer from '../maps/maps.slice';
 import projectReducer from '../project/projects.slice';
+import {getSamplesSplitByDataset} from '../samples/samples.helpers';
 import userReducer from '../user/userProfile.slice';
 
 // A real toast keeps a timer running past the end of the test, and what matters here is only whether one was shown
@@ -74,6 +75,9 @@ describe('deleting with read only datasets', () => {
     return {deleteSpot: deleteSpot, getState: store.getState, spotsApi: spotsApi};
   };
 
+  // As DatasetDetail asks, with what getSamplesSplitByDataset found for the dataset
+  const getSplit = datasetId => getSamplesSplitByDataset(splitDatasets[datasetId], familySpots);
+
   it('won\'t delete a Spot whose sample is in a read only dataset', () => {
     const {deleteSpot, getState, spotsApi} = renderSpotsApi(splitDatasets, [13]);
     expect(spotsApi.checkIsSafeDelete(parent)).toMatch(/Sample 1 is read only/);
@@ -114,6 +118,34 @@ describe('deleting with read only datasets', () => {
     expect(deleteSpot(parent)).toBe(false);
     expect(getState().spot.spots).toEqual(familySpots);
     expect(getState().project.datasets).toEqual(datasets);
+  });
+
+  // Deleting the parent's dataset deletes the sample filed elsewhere, as deleting the parent would
+  it('deletes, ahead of a dataset delete, the samples of its Spots filed elsewhere', () => {
+    const {getState, spotsApi} = renderSpotsApi(splitDatasets, []);
+    expect(spotsApi.getDatasetDeleteReadOnlyMessage(getSplit(12))).toBeNull();
+    ReactTestRenderer.act(() => spotsApi.deleteSamplesSplitByDataset(getSplit(12)));
+    expect(getState().spot.spots[sampleId]).toBeUndefined();
+    expect(getState().project.datasets[13].spotIds).toEqual([]);
+    expect(getState().spot.spots[parentId]).toEqual(parent);
+  });
+
+  // Deleting the sample's dataset takes its stub off the parent, as deleting the sample would
+  it('takes off, ahead of a dataset delete, the stubs a parent filed elsewhere keeps for its samples', () => {
+    const {getState, spotsApi} = renderSpotsApi(splitDatasets, []);
+    ReactTestRenderer.act(() => spotsApi.deleteSamplesSplitByDataset(getSplit(13)));
+    expect(getState().spot.spots[parentId].properties.samples).toBeUndefined();
+    expect(getState().project.datasets[12].spotIds).toEqual([parentId]);
+  });
+
+  it('won\'t delete a dataset whose Spot has a read only sample filed elsewhere', () => {
+    const {spotsApi} = renderSpotsApi(splitDatasets, [13]);
+    expect(spotsApi.getDatasetDeleteReadOnlyMessage(getSplit(12))).toMatch(/Sample Sample 1, .* is read only/);
+  });
+
+  it('won\'t delete a dataset holding a sample whose read only parent is filed elsewhere', () => {
+    const {spotsApi} = renderSpotsApi(splitDatasets, [12]);
+    expect(spotsApi.getDatasetDeleteReadOnlyMessage(getSplit(13))).toMatch(/Spot Spot 08, .* is read only/);
   });
 
   it('deletes a Spot and its sample when nothing they are in is read only', () => {

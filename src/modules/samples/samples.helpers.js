@@ -83,6 +83,39 @@ export const getSamplesLinkedTo = (spots, strabosamplesId, fieldSampleId) => Obj
   ),
 );
 
+// The samples filed apart from their parents across a dataset's edge, which deleting the dataset has to deal with as
+// deleting each of its Spots would. Only an old bug, which filed a new sample in the target dataset rather than its
+// parent's, could split them up.
+//   samplesToDelete - samples of the dataset's Spots that are filed elsewhere, at any depth. They go with their parent.
+//   parentsToUnlink - Spots filed elsewhere whose samples are in the dataset, each with the ids of those samples, as
+//                     its stubs for them have to come off. A parent being deleted anyway is left out.
+// Ids are compared as strings throughout, as a dataset or a stub can hold one as a string. A dataset can hold
+// thousands of Spots, so each lookup is built once rather than scanned for every Spot.
+export const getSamplesSplitByDataset = (dataset, spots) => {
+  const datasetSpotIds = new Set((dataset.spotIds || []).map(String));
+  const datasetSpots = [...datasetSpotIds].map(spotId => spots[spotId]).filter(Boolean);
+  const samplesToDelete = Object.values(Object.fromEntries(datasetSpots
+    .flatMap(spot => getRichSamples(spot, spots))
+    .filter(sampleSpot => !datasetSpotIds.has(String(sampleSpot.properties.id)))
+    .map(sampleSpot => [sampleSpot.properties.id, sampleSpot])));
+  const deletedSpotIds = new Set(
+    [...datasetSpotIds, ...samplesToDelete.map(sampleSpot => String(sampleSpot.properties.id))]);
+  // Each sample's parent: the Spot whose samples list it, leaving out the Sample Spot's stub for itself
+  const parentsBySampleId = {};
+  Object.values(spots).forEach(spot => spot.properties.samples?.forEach((sample) => {
+    if (!isSameId(sample.id, spot.properties.id)) parentsBySampleId[sample.id] = spot;
+  }));
+  const parentsById = {};
+  datasetSpots.filter(spot => spot.properties.isSample).forEach((sampleSpot) => {
+    const parentSpot = parentsBySampleId[sampleSpot.properties.id];
+    if (!parentSpot || deletedSpotIds.has(String(parentSpot.properties.id))) return;
+    const parentId = parentSpot.properties.id;
+    parentsById[parentId] = parentsById[parentId] || {parentSpot: parentSpot, sampleIds: []};
+    parentsById[parentId].sampleIds.push(sampleSpot.properties.id);
+  });
+  return {parentsToUnlink: Object.values(parentsById), samplesToDelete: samplesToDelete};
+};
+
 // A parent's samples with those of the given ids taken off, as deleting them leaves it. Compared with isSameId, as a
 // stub can hold its id as a string.
 export const getSamplesWithout = (parentSpot, sampleIds) => (parentSpot.properties.samples || [])

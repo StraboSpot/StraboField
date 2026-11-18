@@ -157,14 +157,10 @@ const moveSpotToDatasetListener = async (action, listenerApi) => {
   }
 };
 
-// Dataset and Spot deletes go to the server one at a time, in the order they were made. Deleting a Spot also deletes
-// its Sample Spots, one request each, and every one of those sends the project too - sent all at once, whichever
-// landed last would set the project's timestamp, and a failure could be covered over by the next request's toast.
-// Each request is still built from the state at its own change; only the sending waits.
-// Deletes queued together share one toast, up from the first one's start to the last one's end: the toast library
-// builds each change from a list that can be a frame old, so a toast per request, each put up as the last is marked
-// saved, could bring an earlier 'Saving changes...' back and leave it there. The outcome is reported once the last
-// one ends, saying how many failed, as the rest of the batch is saved.
+// Deletes go to the server one at a time, in order. Deleting a Spot or a dataset can send a request per sample, each
+// also sending the project, so sent all at once, whichever landed last would set the project's timestamp.
+// Deletes queued together share one toast, as the toast library can bring back a stale 'Saving changes...' when
+// several are updated in quick succession. Once the last one ends, it says how many failed.
 const queueServerDelete = (send) => {
   if (!deleteBatch) deleteBatch = {errors: [], pendingCount: 0, totalCount: 0};
   const batch = deleteBatch;
@@ -280,10 +276,8 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
   }
   const jsonToSend = JSON.parse(JSON.stringify(objectToSend));
 
-  // Sent only once any deletes made before it are, as it sends the project too, and an edit made after a delete must
-  // not overtake it. Saves don't queue behind each other, so with no delete pending an edit goes straight out. The
-  // wait is bounded: every request a delete sends has the network layer's timeout, and a failed one still lets the
-  // queue move on.
+  // Waits for any delete made before it, as it sends the project too and must not overtake one. With no delete
+  // pending it goes straight out, and every delete request times out, so the wait is bounded.
   await serverDeletes;
 
   // Shown only once there is something to send. Toast.show puts the toast up on the next frame, so a Toast.hideAll
