@@ -36,6 +36,15 @@
       android:supportsRtl="true"
       tools:replace="android:appComponentFactory"
       android:appComponentFactory="whateverString">
+    <!-- expo-updates: the runtime version is the native fingerprint computed at build time, so an OTA update only
+         reaches builds with matching native code. Trial on EAS Update (@strabospot/strabofield), "preview" channel;
+         swap the URL for our own server once it's up. -->
+    <meta-data android:name="expo.modules.updates.ENABLED" android:value="true"/>
+    <meta-data android:name="expo.modules.updates.EXPO_RUNTIME_VERSION" android:value="file:fingerprint"/>
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATE_URL" android:value="https://u.expo.dev/21b380cb-2cd0-48a9-b147-9f44668281c9"/>
+    <meta-data android:name="expo.modules.updates.UPDATES_CONFIGURATION_REQUEST_HEADERS_KEY" android:value="{&quot;expo-channel-name&quot;:&quot;preview&quot;}"/>
     <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

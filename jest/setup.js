@@ -55,3 +55,4 @@ jest.mock('react-native-sound-player', () => ({}));
 jest.mock('@sayem314/react-native-keep-awake', () => ({activateKeepAwake: jest.fn(), deactivateKeepAwake: jest.fn()}));
 jest.mock('react-native-zip-archive', () => ({}));
 jest.mock('react-native-check-version', () => ({}));
+jest.mock('expo-updates', () => ({useUpdates: () => ({isUpdatePending: false}), reloadAsync: jest.fn()}));

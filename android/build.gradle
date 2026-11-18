@@ -19,6 +19,8 @@ buildscript {
     }
 }
 
+// Exposes kotlin/ksp/SDK versions to Expo modules (keeps the ext values above; picks the KSP matching kotlinVersion)
+apply plugin: "expo-root-project"
 apply plugin: "com.facebook.react.rootproject"
 
 allprojects {
