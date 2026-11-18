@@ -1,21 +1,41 @@
 import {configureStore} from '@reduxjs/toolkit';
+import {Toast} from 'react-native-toast-notifications';
 
 import listenerMiddleware from './listenerMiddleware.web';
-import projectReducer, {movedSpotIdBetweenDatasets} from '../modules/project/projects.slice';
-import spotReducer, {editedSpotImage, editedSpotProperties} from '../modules/spots/spots.slice';
+import projectReducer, {deletedDataset, movedSpotIdBetweenDatasets} from '../modules/project/projects.slice';
+import spotReducer, {deletedSpot, editedSpotImage, editedSpotProperties} from '../modules/spots/spots.slice';
 import userReducer from '../modules/user/userProfile.slice';
-import {moveSpotToDataset, uploadProjectDatasetsSpots} from '../services/network/serverRequests.web';
+import {
+  deleteDataset,
+  moveSpotToDataset,
+  updateProject,
+  uploadProjectDatasetDeleteSpot,
+  uploadProjectDatasetsSpots,
+} from '../services/network/serverRequests.web';
 
 jest.mock('react-native-toast-notifications', () => ({
   Toast: {hideAll: jest.fn(), show: jest.fn(), update: jest.fn()},
 }));
 jest.mock('../services/network/serverRequests.web', () => ({
-  moveSpotToDataset: jest.fn(() => Promise.resolve({})),
+  deleteDataset: jest.fn(),
+  moveSpotToDataset: jest.fn(),
+  updateProject: jest.fn(),
+  uploadProjectDatasetDeleteSpot: jest.fn(),
   uploadProjectDatasetsSpots: jest.fn(() => Promise.resolve({})),
 }));
 
-// Lets every promise waiting on a settled request run on
+// Lets every promise waiting on a settled request run on. A save waits its turn behind any deletes, even when there
+// are none, so nothing is sent within the dispatch itself.
 const flushPromises = () => new Promise(resolve => jest.requireActual('timers').setImmediate(resolve));
+
+// A request that stays open until the test settles it, so what is sent meanwhile can be seen
+const holdOpen = (mock) => {
+  let settle;
+  mock.mockImplementationOnce(() => new Promise((resolve) => {
+    settle = resolve;
+  }));
+  return () => settle({});
+};
 
 // A store with the listeners in place, so what a dispatch sends to the (mocked) server can be seen
 const makeStore = ({project, spot}) => configureStore({
@@ -25,32 +45,141 @@ const makeStore = ({project, spot}) => configureStore({
   reducer: {project: projectReducer, spot: spotReducer, user: userReducer},
 });
 
+// Each delete sends the project too, so sent all at once, whichever landed last would set the project's timestamp,
+// and a failure could be covered by the next request's toast
+describe('deleting a dataset, then Spots, then editing on web', () => {
+  const sampleIds = [1756000000031, 1756000000032];
+  const parentId = 1756000000041;
+  const parent = {properties: {id: parentId, name: 'Spot 10', samples: [{id: 1756000000042}]}, type: 'Feature'};
+
+  beforeEach(() => {
+    [deleteDataset, updateProject, uploadProjectDatasetDeleteSpot].forEach(mock => mock.mockReset());
+    updateProject.mockResolvedValue({});
+    uploadProjectDatasetDeleteSpot.mockResolvedValue({});
+    uploadProjectDatasetsSpots.mockClear();
+  });
+
+  it('deletes the Spots only after the dataset, one at a time, then sends the edit', async () => {
+    const store = makeStore({
+      project: {
+        activeDatasetsIds: [12, 13, 14],
+        datasets: {12: {id: 12, spotIds: []}, 13: {id: 13, spotIds: sampleIds}, 14: {id: 14, spotIds: [parentId]}},
+        project: {id: 1},
+      },
+      spot: {recentViews: [], selectedSpot: {}, spots: {[parentId]: parent}},
+    });
+    const settleDatasetDelete = holdOpen(deleteDataset);
+    const settleFirstSampleDelete = holdOpen(uploadProjectDatasetDeleteSpot);
+
+    store.dispatch(deletedDataset(12));
+    sampleIds.forEach(sampleId => store.dispatch(deletedSpot(sampleId)));
+    store.dispatch(editedSpotProperties({field: 'samples', spotId: parentId, value: []}));
+    await flushPromises();
+    expect(deleteDataset).toHaveBeenCalledTimes(1);
+    expect(uploadProjectDatasetDeleteSpot).not.toHaveBeenCalled();
+    expect(uploadProjectDatasetsSpots).not.toHaveBeenCalled();
+
+    settleDatasetDelete();
+    await flushPromises();
+    expect(updateProject).toHaveBeenCalledTimes(1);
+    expect(uploadProjectDatasetDeleteSpot.mock.calls.map(([sent]) => sent.spotId)).toEqual([sampleIds[0]]);
+    expect(uploadProjectDatasetsSpots).not.toHaveBeenCalled();
+
+    settleFirstSampleDelete();
+    await flushPromises();
+    expect(uploadProjectDatasetDeleteSpot.mock.calls.map(([sent]) => sent.spotId)).toEqual(sampleIds);
+    expect(uploadProjectDatasetsSpots).toHaveBeenCalledTimes(1);
+  });
+});
+
+// A Spot's samples go with it, a request each. Each with a toast of its own, the toast library could bring an earlier
+// 'Saving changes...' back as the next went up, and leave it there.
+describe('deleting a Spot and its samples on web', () => {
+  const spotIds = [1756000000061, 1756000000062, 1756000000063];
+
+  const deleteSpots = async () => {
+    const store = makeStore({
+      project: {datasets: {12: {id: 12, spotIds: []}}, project: {id: 1}},
+      spot: {recentViews: [], selectedSpot: {}, spots: {}},
+    });
+    spotIds.forEach(spotId => store.dispatch(deletedSpot(spotId)));
+    await flushPromises();
+  };
+
+  beforeEach(() => {
+    [Toast.show, Toast.update, uploadProjectDatasetDeleteSpot].forEach(mock => mock.mockReset());
+    Toast.show.mockReturnValue('toast-1');
+  });
+
+  it('shows one toast for them all, saved once the last is', async () => {
+    uploadProjectDatasetDeleteSpot.mockResolvedValue({});
+    await deleteSpots();
+    expect(uploadProjectDatasetDeleteSpot).toHaveBeenCalledTimes(3);
+    expect(Toast.show).toHaveBeenCalledTimes(1);
+    expect(Toast.update.mock.calls).toEqual([['toast-1', 'Changes saved.', expect.anything()]]);
+  });
+
+  // The rest of them are saved, so it says how many weren't
+  it('counts the deletes that failed rather than marking them all saved', async () => {
+    uploadProjectDatasetDeleteSpot.mockResolvedValue({}).mockRejectedValueOnce(new Error('Server error'));
+    await deleteSpots();
+    expect(uploadProjectDatasetDeleteSpot).toHaveBeenCalledTimes(3);
+    expect(Toast.update.mock.calls).toEqual([['toast-1', '1 of 3 deletes NOT saved. Server error', expect.anything()]]);
+  });
+
+  it('says none were saved when every delete failed', async () => {
+    uploadProjectDatasetDeleteSpot.mockRejectedValue(new Error('Server error'));
+    await deleteSpots();
+    expect(Toast.update.mock.calls).toEqual([['toast-1', 'Changes NOT saved. Server error', expect.anything()]]);
+  });
+});
+
+// A delete sends the project as it stood then, so a move it overtook would have the project's timestamp taken back
 describe('moving a Spot on web', () => {
   const spotId = 1756000000051;
 
-  const moveSpot = async (readOnlyDatasetsIds) => {
+  beforeEach(() => {
+    [deleteDataset, moveSpotToDataset, updateProject].forEach(mock => mock.mockReset());
+    updateProject.mockResolvedValue({});
+    moveSpotToDataset.mockResolvedValue({});
+  });
+
+  it('moves a Spot only after a delete made before it', async () => {
+    const store = makeStore({
+      project: {
+        activeDatasetsIds: [12, 13, 14],
+        datasets: {12: {id: 12, spotIds: []}, 13: {id: 13, spotIds: [spotId]}, 14: {id: 14, spotIds: []}},
+        project: {id: 1, modified_timestamp: 1},
+        readOnlyDatasetsIds: [],
+      },
+      spot: {recentViews: [], selectedSpot: {}, spots: {}},
+    });
+    const settleDatasetDelete = holdOpen(deleteDataset);
+
+    store.dispatch(deletedDataset(12));
+    store.dispatch(movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 14}));
+    await flushPromises();
+    expect(moveSpotToDataset).not.toHaveBeenCalled();
+
+    settleDatasetDelete();
+    await flushPromises();
+    expect(updateProject).toHaveBeenCalledTimes(1);
+    expect(moveSpotToDataset.mock.calls.map(([sentSpotId, toDatasetId]) => [sentSpotId, toDatasetId]))
+      .toEqual([[spotId, 14]]);
+  });
+
+  // The reducer leaves a read only dataset alone, so the server must too
+  it('sends nothing when the move is out of a read only dataset', async () => {
     const store = makeStore({
       project: {
         datasets: {13: {id: 13, spotIds: [spotId]}, 14: {id: 14, spotIds: []}},
         project: {id: 1, modified_timestamp: 1},
-        readOnlyDatasetsIds: readOnlyDatasetsIds,
+        readOnlyDatasetsIds: [13],
       },
       spot: {recentViews: [], selectedSpot: {}, spots: {}},
     });
     store.dispatch(movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 14}));
     await flushPromises();
-  };
-
-  beforeEach(() => moveSpotToDataset.mockClear());
-
-  it('sends a move the reducer made', async () => {
-    await moveSpot([]);
-    expect(moveSpotToDataset).toHaveBeenCalledTimes(1);
-  });
-
-  // The reducer leaves a read only dataset alone, so the server must too
-  it('sends nothing when the move is out of a read only dataset', async () => {
-    await moveSpot([13]);
     expect(moveSpotToDataset).not.toHaveBeenCalled();
   });
 });
