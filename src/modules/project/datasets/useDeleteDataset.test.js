@@ -35,11 +35,11 @@ const tag = {id: 't1', name: 'Tag 1', spots: [parentId, otherSpotId]};
 
 beforeEach(() => mockToastShow.mockClear());
 
-const renderDeleteDatasetApi = (readOnlyDatasetsIds) => {
+const renderDeleteDatasetApi = (readOnlyDatasetsIds, {map = {}, spots = familySpots} = {}) => {
   const store = configureStore({
     preloadedState: {
       home: {activeModal: null, hiddenWarnings: {}, loading: {home: false}},
-      map: {spotsInMapExtentIds: []},
+      map: {spotsInMapExtentIds: [], ...map},
       project: {
         activeDatasetsIds: [12, 13],
         datasets: splitDatasets,
@@ -47,7 +47,7 @@ const renderDeleteDatasetApi = (readOnlyDatasetsIds) => {
         readOnlyDatasetsIds: readOnlyDatasetsIds,
         selectedTag: {},
       },
-      spot: {recentViews: [], selectedAttributes: [], selectedSpot: {}, spots: familySpots},
+      spot: {recentViews: [], selectedAttributes: [], selectedSpot: {}, spots: spots},
     },
     reducer: {
       connections: connectionsReducer,
@@ -149,4 +149,43 @@ it('won\'t delete a dataset when that would change a read only Spot filed elsewh
   expect(state.spot.spots).toEqual(familySpots);
   expect(state.project.datasets).toEqual(splitDatasets);
   expect(mockToastShow).toHaveBeenCalledWith(expect.stringContaining('Unable to delete Dataset 1'), expect.anything());
+});
+
+// A map open on the image basemap or strat section of a Spot that goes would be left with nothing holding it
+describe('maps open on a deleted Spot', () => {
+  const stratSectionSettings = {strat_section_id: 1756000000050};
+  const mapHolder = {
+    properties: {...parent.properties, images: [{id: 1756000000040}], sed: {strat_section: stratSectionSettings}},
+    type: 'Feature',
+  };
+  // The image id as the server returns it, a string
+  const imageBasemap = {id: '1756000000040'};
+
+  const deleteDatasetWithMapOpen = (map, spots = {...familySpots, [parentId]: mapHolder}) => {
+    const {deleteDatasetApi, store} = renderDeleteDatasetApi([], {map: map, spots: spots});
+    ReactTestRenderer.act(() => {
+      deleteDatasetApi.deleteDataset(splitDatasets[12]);
+    });
+    return store.getState().map;
+  };
+
+  it('closes an image basemap held by a Spot in the deleted dataset', () => {
+    expect(deleteDatasetWithMapOpen({currentImageBasemap: imageBasemap}).currentImageBasemap).toBeUndefined();
+  });
+
+  it('closes a strat section held by a Spot in the deleted dataset', () => {
+    expect(deleteDatasetWithMapOpen({stratSection: stratSectionSettings}).stratSection).toBeUndefined();
+  });
+
+  // The sample filed in the other dataset goes with its parent, so whatever it holds goes too
+  it('closes an image basemap held by a sample deleted with the dataset', () => {
+    const sampleWithMap = {properties: {...sample.properties, images: [{id: 1756000000040}]}};
+    const map = deleteDatasetWithMapOpen({currentImageBasemap: imageBasemap}, {...familySpots, [sampleId]: sampleWithMap});
+    expect(map.currentImageBasemap).toBeUndefined();
+  });
+
+  it('leaves open an image basemap held by a Spot that stays', () => {
+    const map = deleteDatasetWithMapOpen({currentImageBasemap: {id: 'other image'}});
+    expect(map.currentImageBasemap).toEqual({id: 'other image'});
+  });
 });

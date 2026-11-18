@@ -1,7 +1,8 @@
 import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
-import {isEmpty} from '../../../shared/helpers';
+import {isEmpty, isSameId} from '../../../shared/helpers';
+import {clearedStratSection, setCurrentImageBasemap} from '../../maps/maps.slice';
 import {getSamplesSplitByDataset} from '../../samples/samples.helpers';
 import {deletedSpots} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
@@ -16,14 +17,26 @@ const useDeleteDataset = () => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const datasets = useSelector(state => state.project.datasets);
   const spots = useSelector(state => state.spot.spots);
+  const stratSection = useSelector(state => state.map.stratSection);
 
   const {isAnythingReadOnly, isReadOnlyDataset} = useProject();
   const {deleteSamplesSplitByDataset, isSpotReadOnly} = useSpots();
   const toast = useToast();
 
   /* Internal Functions */
+
+  // An image basemap or strat section open on the map whose Spot is about to go would be left with no Spot holding it,
+  // so it is closed, as turning a dataset off does
+  const closeMapsHeldBySpots = (spotsToDelete) => {
+    const isImageBasemapHeld = spot => spot.properties.images?.some(image => isSameId(image.id, currentImageBasemap.id));
+    const isStratSectionHeld = spot => isSameId(spot.properties.sed?.strat_section?.strat_section_id,
+      stratSection.strat_section_id);
+    if (currentImageBasemap && spotsToDelete.some(isImageBasemapHeld)) dispatch(setCurrentImageBasemap(undefined));
+    if (stratSection && spotsToDelete.some(isStratSectionHeld)) dispatch(clearedStratSection());
+  };
 
   // The dataset as it is now. The one passed in can be a copy taken when its page opened, and the Spots deleted and
   // the samples found across its edge must come from the same list.
@@ -58,6 +71,8 @@ const useDeleteDataset = () => {
       return false;
     }
     const spotIds = getCurrentDataset(dataset).spotIds;
+    const datasetSpots = (spotIds || []).map(id => spots[id]).filter(Boolean);
+    closeMapsHeldBySpots([...datasetSpots, ...samplesSplitByDataset.samplesToDelete]);
     if (!isEmpty(spotIds)) {
       console.log(spotIds.length, 'Spot(s) in Dataset to Delete.');
       // Ahead of the dataset itself, since on web deleting it sends the project to the server as it then is.
