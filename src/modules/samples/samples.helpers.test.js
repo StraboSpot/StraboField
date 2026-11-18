@@ -1,10 +1,12 @@
 import {
   canMoveSampleToDataset,
+  getLegacySamples,
   getLinkedSample,
   getRichSamples,
   getSampleDifferences,
   getSampleMetadata,
   getSampleParent,
+  getSamplesDeletedWithSpotMessage,
   getSamplesLinkedTo,
   getSamplesSplitByDataset,
   getSamplesWithout,
@@ -60,6 +62,22 @@ describe('canMoveSampleToDataset', () => {
     const isSplit = isSplitFromParent(sampleSpot, parent, together);
     expect(canMoveSampleToDataset(isSplit, parent, together[12])).toBe(false);
     expect(canMoveSampleToDataset(isSplit, parent, together[14])).toBe(false);
+  });
+});
+
+describe('getLegacySamples', () => {
+  it('finds the records kept whole on a Spot, leaving out the stubs for its Sample Spots', () => {
+    const spot = {properties: {id: parentId, samples: [sample, {id: sampleId}]}};
+    expect(getLegacySamples(spot)).toEqual([sample]);
+  });
+
+  it('leaves out a Sample Spot\'s record of itself', () => {
+    expect(getLegacySamples(richSample)).toEqual([]);
+    expect(getLegacySamples(sampleWithNested)).toEqual([]);
+  });
+
+  it('finds nothing on a Spot without samples', () => {
+    expect(getLegacySamples({properties: {id: parentId}})).toEqual([]);
   });
 });
 
@@ -227,6 +245,34 @@ describe('getSampleParent', () => {
 
   it('finds the Sample Spot a sample of a sample was taken from', () => {
     expect(getSampleParent(nestedSampleSpot, nestedSpots)).toBe(sampleWithNested);
+  });
+});
+
+describe('getSamplesDeletedWithSpotMessage', () => {
+  const sampleNamed = name => ({properties: {id: name, isSample: true, samples: [{id: name, sample_id_name: name}]}});
+
+  it('says nothing for a Spot without samples', () => {
+    expect(getSamplesDeletedWithSpotMessage([])).toBeNull();
+  });
+
+  // A legacy sample is named from its own record, a Sample Spot from the record it keeps of itself
+  it('names legacy samples and Sample Spots alike', () => {
+    expect(getSamplesDeletedWithSpotMessage([sample, sampleNamed('JG-2')]))
+      .toBe('Its 2 Samples (JG-1, JG-2) will be deleted with it.');
+  });
+
+  it('names a single sample', () => {
+    expect(getSamplesDeletedWithSpotMessage([sampleNamed('JG-1')])).toBe('Its Sample JG-1 will be deleted with it.');
+  });
+
+  it('counts and names a few samples', () => {
+    expect(getSamplesDeletedWithSpotMessage(['JG-1', 'JG-2', 'JG-3'].map(sampleNamed)))
+      .toBe('Its 3 Samples (JG-1, JG-2, JG-3) will be deleted with it.');
+  });
+
+  it('names only the first few of many', () => {
+    expect(getSamplesDeletedWithSpotMessage(['JG-1', 'JG-2', 'JG-3', 'JG-4', 'JG-5'].map(sampleNamed)))
+      .toBe('Its 5 Samples (JG-1, JG-2, JG-3 and 2 more) will be deleted with it.');
   });
 });
 

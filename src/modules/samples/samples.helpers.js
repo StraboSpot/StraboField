@@ -8,6 +8,11 @@ import {isSpotIdInDataset} from '../spots/spots.helpers';
 export const canMoveSampleToDataset = (isSplit, parentSpot, dataset) =>
   isSplit && isSpotIdInDataset(dataset, parentSpot.properties.id);
 
+// The samples kept as records on a Spot, rather than as {id} stubs for its Sample Spots. A Sample Spot has none: the
+// one record it keeps is its own.
+export const getLegacySamples = spot => (spot.properties?.isSample ? []
+  : (spot.properties?.samples || []).filter(sample => !isSampleStub(sample)));
+
 // A Field sample linked to a StraboSamples sample, taking the StraboSamples value for each of the keys picked and
 // keeping its own everywhere else. The sample keeps its own id, which is what the Spot and its parent know it by -
 // the link lives only in strabosamples_id.
@@ -74,6 +79,17 @@ export const getSampleMetadata = sample => sample.properties?.isSample
 export const getSampleParent = (sampleSpot, spots) => Object.values(spots).find(
   spot => !isSameId(spot.properties.id, sampleSpot.properties.id)
     && spot.properties.samples?.some(sample => isSameId(sample.id, sampleSpot.properties.id)));
+
+// Tells the user which samples will be deleted along with a Spot, naming the first few, or null if there are none.
+// Takes legacy samples and Sample Spots alike, as the Samples page lists both.
+export const getSamplesDeletedWithSpotMessage = (samples, maxNamed = 3) => {
+  if (isEmpty(samples)) return null;
+  if (samples.length === 1) return `Its Sample ${getSampleTitle(samples[0])} will be deleted with it.`;
+  const names = samples.slice(0, maxNamed).map(getSampleTitle).join(', ');
+  const moreCount = samples.length - maxNamed;
+  const namesText = moreCount > 0 ? `${names} and ${moreCount} more` : names;
+  return `Its ${samples.length} Samples (${namesText}) will be deleted with it.`;
+};
 
 // The other Field samples in the project already linked to this StraboSamples sample. Only one of them can own the
 // link - the last one uploaded wins - so the user is warned before a second is linked.

@@ -15,6 +15,13 @@ import WarningModal from '../../../shared/ui/modals/WarningModal';
 import {setLoadingStatus} from '../../home/home.slice';
 import useStratSection from '../../maps/strat-section/useStratSection';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
+import {messages} from '../../page/ui/Messages';
+import {
+  getLegacySamples,
+  getRichSamples,
+  getSamplesDeletedWithSpotMessage,
+  getSampleTitle,
+} from '../../samples/samples.helpers';
 import useSamples from '../../samples/useSamples';
 import {isOnGeoMap} from '../../spots/spots.helpers';
 import useSpots from '../../spots/useSpots';
@@ -27,17 +34,19 @@ const NotebookMenu = ({
                         isNotebookMenuVisible,
                         isReadOnly,
                         isSample,
+                        selectedSample,
                         zoomToSpots,
                       }) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const spot = useSelector(state => state.spot.selectedSpot);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
+  const spot = useSelector(state => state.spot.selectedSpot);
+  const spots = useSelector(state => state.spot.spots);
   const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const navigation = useNavigation();
-  const {deleteRichSample} = useSamples();
+  const {deleteLegacySample, deleteRichSample} = useSamples();
   const {checkIsSafeDelete, copySpot, deleteSpot, isSpotOnReadOnlyMap, isStratInterval} = useSpots();
   const {deleteInterval} = useStratSection();
 
@@ -60,6 +69,8 @@ const NotebookMenu = ({
     ...(!isSample ? [{key: 'rockd', title: 'Send Spot to Rockd'}] : []),
     ...(!SMALL_SCREEN ? [{key: 'close', title: 'Close Notebook'}] : []),
   ];
+  // A legacy sample is a record on its Spot rather than a Spot of its own, so Delete takes out only the record
+  const legacySample = !spot.properties?.isSample && !isEmpty(selectedSample) ? selectedSample : undefined;
 
   /* Event Handlers */
 
@@ -96,13 +107,19 @@ const NotebookMenu = ({
       setErrorMessage('');
       setIsDeleteSpotModalVisible(false);
     }
+    // The Spot stays selected, so nothing else closes the prompt
+    else if (legacySample) {
+      deleteLegacySample(legacySample);
+      setIsDeleteSpotModalVisible(false);
+    }
     else if (spot.properties?.isSample) deleteRichSample(spot);
     else if (isStratInterval(spot)) deleteInterval(spot);
     else deleteSpot(spot);
   };
 
+  // checkIsSafeDelete guards deleting the Spot, which a legacy sample's delete leaves in place
   const deleteSelectedSpot = () => {
-    const safeDeleteMessage = checkIsSafeDelete(spot);
+    const safeDeleteMessage = !legacySample && checkIsSafeDelete(spot);
     if (safeDeleteMessage) setErrorMessage(safeDeleteMessage);
     setIsDeleteSpotModalVisible(true);
   };
@@ -130,13 +147,23 @@ const NotebookMenu = ({
   };
 
   const renderDeleteMessage = () => {
+    if (errorMessage) return <Text>Unable to delete {type}.{'\n'}{errorMessage}</Text>;
+    // With the IGSN warning the sample's own page gives
+    if (legacySample) {
+      return (
+        <Text>
+          Are you sure you want to delete Sample: {getSampleTitle(legacySample)}?
+          {!!legacySample.isOnMySesar && `\n\n${messages.delete.title}: ${messages.delete.message}`}
+        </Text>
+      );
+    }
+    // Its legacy samples go with it, and so do its Sample Spots
+    const samplesMessage = getSamplesDeletedWithSpotMessage([...getLegacySamples(spot), ...getRichSamples(spot, spots)]);
     return (
-      errorMessage ? <Text>Unable to delete spot.{'\n'}{errorMessage}</Text>
-        : (
-          <Text>
-            Are you sure you want to delete {isSample ? 'Sample' : 'Spot'}: {spot.properties.name}?
-          </Text>
-        )
+      <Text>
+        Are you sure you want to delete {type}: {spot.properties.name}?
+        {samplesMessage && `\n${samplesMessage}`}
+      </Text>
     );
   };
 

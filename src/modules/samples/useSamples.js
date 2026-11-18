@@ -32,6 +32,7 @@ import {
   setSelectedSpot,
 } from '../spots/spots.slice';
 import useSpots from '../spots/useSpots';
+import useTags from '../tags/useTags';
 import {setUserData} from '../user/userProfile.slice';
 
 const useSamples = () => {
@@ -47,6 +48,7 @@ const useSamples = () => {
   const {getDatasetIdFromSpotId, getTargetDatasetFromId} = useProject();
   const {getProfile} = useServerRequests();
   const {deleteSpot, getRootSpotGeoCoords, isSpotReadOnly} = useSpots();
+  const {deleteFeatureTags} = useTags();
   const toast = useToast();
 
   /* Internal Functions */
@@ -170,6 +172,21 @@ const useSamples = () => {
     return newEnrichedSample;
   };
 
+  // A legacy sample is a record on the selected Spot, so only the record is taken out, as its own page's Delete does.
+  // Its tags go with it, and clearing the selected attributes closes its page.
+  const deleteLegacySample = (sampleToDelete) => {
+    if (isSpotReadOnly(selectedSpot)) {
+      toast.show('This Spot is read only, so its Sample can\'t be deleted.', {placement: 'top', type: 'warning'});
+      return;
+    }
+    console.log('Deleting legacy Sample', sampleToDelete, 'from Spot', selectedSpot);
+    const updatedSamples = getSamplesWithout(selectedSpot, [sampleToDelete.id]);
+    dispatch(
+      editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: updatedSamples, spotId: selectedSpot.properties.id}));
+    deleteFeatureTags([sampleToDelete]);
+    dispatch(setSelectedAttributes([]));
+  };
+
   // The parent's stub is only taken off once the sample is gone. deleteSpot refuses when a read only dataset holds
   // either of them, and the parent then has to be left as it is. The parent is found as deleteSpot's read only check
   // finds it, so the Spot it guards is the one edited, even when that parent is itself a sample.
@@ -255,6 +272,7 @@ const useSamples = () => {
 
   return {
     createRichSample,
+    deleteLegacySample,
     deleteRichSample,
     getSelectedSample,
     getSelectedSampleGeometry,

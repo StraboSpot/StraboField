@@ -29,7 +29,7 @@ beforeEach(() => mockToastShow.mockClear());
 
 // The hook's functions are exercised through a probe component holding a real store - what matters is the state
 // they leave behind, not which actions they dispatched to get there.
-const renderSamplesApi = ({datasets, readOnlyDatasetsIds, spots}) => {
+const renderSamplesApi = ({datasets, readOnlyDatasetsIds, selectedAttributes = [], selectedSpot = {}, spots, tags = []}) => {
   const store = configureStore({
     preloadedState: {
       home: {activeModal: null, hiddenWarnings: {}, loading: {home: false}},
@@ -37,13 +37,13 @@ const renderSamplesApi = ({datasets, readOnlyDatasetsIds, spots}) => {
       project: {
         activeDatasetsIds: [12, 13],
         datasets: datasets,
-        project: {reports: [], tags: []},
+        project: {reports: [], tags: tags},
         readOnlyDatasetsIds: readOnlyDatasetsIds,
         sampleSpotIdsToUpload: [],
         selectedTag: {},
         targetDatasetId: 13,
       },
-      spot: {recentViews: [], selectedAttributes: [], selectedSpot: {}, spots: spots},
+      spot: {recentViews: [], selectedAttributes: selectedAttributes, selectedSpot: selectedSpot, spots: spots},
     },
     reducer: {
       connections: connectionsReducer,
@@ -138,6 +138,42 @@ describe('createRichSample', () => {
     expect(state.spot.spots[parentId]).toEqual(emptySampleSpot);
     expect(state.project.datasets[12].spotIds).toEqual([parentId]);
     expect(mockToastShow).toHaveBeenCalledWith(expect.stringContaining('another Sample'), expect.anything());
+  });
+});
+
+// A legacy sample is a record kept whole on its Spot, so deleting it must leave the Spot, as the sample's own page does
+describe('deleteLegacySample', () => {
+  const otherSample = {id: 1756000000003, sample_id_name: 'Sample 2'};
+  const parentWithSamples = {...parent, properties: {...parent.properties, samples: [sample, otherSample]}};
+  const tag = {features: {[parentId]: [sampleId]}, id: 't1', name: 'Tag 1', spots: [parentId]};
+
+  const deleteLegacySample = (readOnlyDatasetsIds = []) => {
+    const {samplesApi, store} = renderSamplesApi({
+      datasets: {12: {id: 12, spotIds: [parentId]}},
+      readOnlyDatasetsIds: readOnlyDatasetsIds,
+      selectedAttributes: [sample],
+      selectedSpot: parentWithSamples,
+      spots: {[parentId]: parentWithSamples},
+      tags: [tag],
+    });
+    ReactTestRenderer.act(() => samplesApi.deleteLegacySample(sample));
+    return store.getState();
+  };
+
+  it('takes only the sample out of its Spot, and its tags with it', () => {
+    const state = deleteLegacySample();
+    expect(state.spot.spots[parentId].properties.samples).toEqual([otherSample]);
+    expect(state.spot.spots[parentId].properties.name).toBe('Spot 08');
+    expect(state.project.datasets[12].spotIds).toEqual([parentId]);
+    expect(state.project.project.tags[0].features).toBeUndefined();
+    expect(state.spot.selectedAttributes).toEqual([]);
+  });
+
+  it('leaves the sample on a Spot in a read only dataset', () => {
+    const state = deleteLegacySample([12]);
+    expect(state.spot.spots[parentId]).toEqual(parentWithSamples);
+    expect(state.project.project.tags).toEqual([tag]);
+    expect(mockToastShow).toHaveBeenCalledWith(expect.stringContaining('read only'), expect.anything());
   });
 });
 
