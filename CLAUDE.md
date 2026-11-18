@@ -208,7 +208,8 @@ It is a millisecond timestamp × 10 that steps past the last id issued, so a bur
 sample's id as `properties.id`, then registers it with `addedNewSpotIdToDataset`. Both save paths in
 `useSampleModal.js` and the legacy conversion in `NotebookFooter.js` go through it, so the id is always one of the
 server's keys. The parent Spot keeps only a `{id}` stub in `properties.samples`, and that id is the entire parent/child
-linkage — `useNesting.js` resolves the child as `spots[sampleId]` and `getSpotWithThisSample` walks back the other way.
+linkage — `useNesting.js` resolves the child as `spots[sampleId]` and `getSampleParent` (`samples.helpers.js`) walks back
+the other way.
 
 Records already in the field keep their old numeric ids, so ids are permanently mixed. That needs no coercion by itself
 — an id's type is stable per record — but **never do arithmetic on an id**: sorting tags by `b.id - a.id` silently
