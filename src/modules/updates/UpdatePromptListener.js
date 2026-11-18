@@ -1,21 +1,38 @@
 import {useEffect, useRef} from 'react';
+import {AppState} from 'react-native';
 
 import * as Updates from 'expo-updates';
 
 import alert from '../../shared/ui/alert';
 import {persistor} from '../../store/ConfigureStore';
 
-// Headless listener (mounted in App.js). expo-updates downloads an OTA update in the background at launch and only
-// switches to it on the next cold start, which in practice means the launch after next. Once a download has finished,
-// offer to restart into it now. "Later" leaves it for the next launch and doesn't ask again this session, so nobody is
-// nagged in the middle of recording a Spot.
+// The launch check covers a cold start; after that, look again on returning to the app at most this often
+export const FOREGROUND_CHECK_INTERVAL_MS = 30 * 60 * 1000;
+
+// Headless listener (mounted in App.js). expo-updates checks for an OTA update only at launch, but iOS and Android
+// keep a backgrounded app suspended rather than closing it, so a launch can be days away. So check again whenever the
+// app comes back to the foreground, and once an update has downloaded, offer to restart into it now. "Later" leaves
+// it for the next launch and doesn't ask again about that update, so nobody is nagged in the middle of recording a
+// Spot; a newer update published later is offered in turn.
 const UpdatePromptListener = () => {
-  const {isUpdatePending} = Updates.useUpdates();
-  const hasPromptedRef = useRef(false);
+  const {downloadedUpdate, isUpdatePending} = Updates.useUpdates();
+  const promptedUpdateIdRef = useRef(undefined);
+  const lastCheckedRef = useRef(Date.now());
 
   useEffect(() => {
-    if (!isUpdatePending || hasPromptedRef.current) return;
-    hasPromptedRef.current = true;
+    if (!Updates.isEnabled) return;   // Off in debug builds, which load JS from Metro
+    const subscription = AppState.addEventListener('change', (appState) => {
+      if (appState !== 'active' || Date.now() - lastCheckedRef.current < FOREGROUND_CHECK_INTERVAL_MS) return;
+      lastCheckedRef.current = Date.now();
+      downloadNewUpdate();
+    });
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
+    const updateId = downloadedUpdate?.updateId;
+    if (!isUpdatePending || promptedUpdateIdRef.current === updateId) return;
+    promptedUpdateIdRef.current = updateId;
     alert('Update Ready',
       'A new version of StraboField has been downloaded. Restart now to start using it?\n\n'
       + 'Finish any edits you have open first.',
@@ -24,9 +41,20 @@ const UpdatePromptListener = () => {
         {text: 'Restart', onPress: restartIntoUpdate},
       ],
     );
-  }, [isUpdatePending]);
+  }, [downloadedUpdate, isUpdatePending]);
 
   return null;
+};
+
+// Downloading sets isUpdatePending, which brings up the prompt above
+export const downloadNewUpdate = async () => {
+  try {
+    const {isAvailable} = await Updates.checkForUpdateAsync();
+    if (isAvailable) await Updates.fetchUpdateAsync();
+  }
+  catch (err) {
+    console.warn('Could not check for an OTA update (offline?)', err);   // Expected in the field; try next time
+  }
 };
 
 export const restartIntoUpdate = async () => {
