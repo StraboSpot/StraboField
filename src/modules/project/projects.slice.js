@@ -94,6 +94,9 @@ const projectSlice = createSlice({
     addedProject(state, action) {
       state.project = normalizeProject(action.payload);
     },
+    addedProjectDescription(state, action) {
+      state.project = action.payload;
+    },
     // The selected tag is a copy the tag pages save from, so it is swapped for the server's merged copy too, or
     // the next save writes it back over the merge
     addedProjectFromServer(state, action) {
@@ -101,9 +104,6 @@ const projectSlice = createSlice({
       if (!isEmpty(state.selectedTag)) {
         state.selectedTag = state.project.tags?.find(tag => tag.id === state.selectedTag.id) || {};
       }
-    },
-    addedProjectDescription(state, action) {
-      state.project = action.payload;
     },
     // A memo holds its own tag ids, so tagging one from the tag's own page writes to the memo. Mapped in place,
     // since an edited memo has to stay where it is in the list
@@ -150,7 +150,9 @@ const projectSlice = createSlice({
     deletedDataset(state, action) {
       const {[action.payload]: deletedDataset, ...datasetsList} = state.datasets;  // Delete key with action.id from object
       state.datasets = datasetsList;
-      state.activeDatasetsIds = state.activeDatasetsIds.filter(activeDatasetId => activeDatasetId !== action.payload);
+      // Compared with isSameId, as a dataset id can be held as a string
+      state.activeDatasetsIds = state.activeDatasetsIds.filter(
+        activeDatasetId => !isSameId(activeDatasetId, action.payload));
     },
     deletedSpotIdFromDataset(state, action) {
       const {datasetId, spotId} = action.payload;
@@ -266,10 +268,12 @@ const projectSlice = createSlice({
       if (reports) state.project.reports = reports;
       if (tags) state.project.tags = tags;
     },
+    // Compared with isSameId, as a dataset id can be held as a string
     setActiveDatasets(state, action) {
       const {bool, dataset} = action.payload;
-      if (bool) state.activeDatasetsIds = [...new Set([...state.activeDatasetsIds, dataset])];
-      else state.activeDatasetsIds = state.activeDatasetsIds.filter(id => id !== dataset);
+      const isActive = state.activeDatasetsIds.some(id => isSameId(id, dataset));
+      if (bool && !isActive) state.activeDatasetsIds = [...state.activeDatasetsIds, dataset];
+      else if (!bool) state.activeDatasetsIds = state.activeDatasetsIds.filter(id => !isSameId(id, dataset));
     },
     setActiveDatasetsMultiple(state, action) {
       const datasetIds = action.payload;
@@ -277,7 +281,7 @@ const projectSlice = createSlice({
       // Which datasets are shown says nothing about where new Spots belong, and the first of them could well
       // be read only. Drop a target that is no longer among them rather than substituting one - having no
       // target at all is a state the app handles
-      if (!datasetIds.includes(state.targetDatasetId)) state.targetDatasetId = undefined;
+      if (!datasetIds.some(id => isSameId(id, state.targetDatasetId))) state.targetDatasetId = undefined;
     },
     setActiveTemplates(state, action) {
       const {key, templates} = action.payload;

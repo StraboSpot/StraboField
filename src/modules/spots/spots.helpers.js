@@ -1,4 +1,4 @@
-import {isEmpty} from '../../shared/helpers';
+import {isEmpty, isSameId} from '../../shared/helpers';
 import {DEFAULT_ORIENTATION_FIELDS} from '../compass/compass.helpers';
 import {EARTHQUAKE_ORIENTATION_FIELDS} from '../geomorph/geomorph.constants';
 import {THREE_D_STRUCTURE_ORIENTATION_FIELDS} from '../three-d-structures/threeDStructures.constants';
@@ -23,6 +23,10 @@ export const calculateMissingOrientations = (orientation, orientationFields) => 
   });
   return isOrientationEdited;
 };
+
+// The dataset holding the Spot, from datasets given as an object keyed by id or as a list. Undefined if none does.
+export const getDatasetWithSpotId = (datasets, spotId) => Object.values(datasets).find(
+  dataset => isSpotIdInDataset(dataset, spotId));
 
 export const getImageBasemapsInSpot = (spot) => {
   return spot.properties.images && spot.properties.images.reduce((acc, image) => {
@@ -70,9 +74,9 @@ export const getSpotOrientations = (spot) => {
 export const getSpotsCount = (spotIds, spots) =>
   (spotIds || []).filter(id => spots[id] && !spots[id].properties?.isSample).length;
 
-// If feature is mapped on geographical map, not an image basemap or strat section
 export const isLineSpot = spot => spot?.geometry?.type === 'LineString' || spot?.geometry?.type === 'MultiLineString';
 
+// If feature is mapped on geographical map, not an image basemap or strat section
 export const isOnGeoMap = (feature) => {
   if (isEmpty(feature)) return false;
   return !feature.properties.image_basemap && !feature.properties.strat_section_id;
@@ -99,6 +103,9 @@ export const isOnStratSection = feature => feature.properties?.strat_section_id;
 // A GeometryCollection is counted as a polygon, as it is everywhere else the app sorts Spots by shape
 export const isPolygonSpot = spot => spot?.geometry?.type === 'Polygon' || spot?.geometry?.type === 'MultiPolygon'
   || spot?.geometry?.type === 'GeometryCollection';
+
+// Compared with isSameId, as a dataset can hold a Spot's id as a string
+export const isSpotIdInDataset = (dataset, spotId) => !!dataset.spotIds?.some(id => isSameId(id, spotId));
 
 export const isStratInterval = (spot) => {
   return spot?.properties?.strat_section_id && spot?.properties?.surface_feature?.surface_feature_type === 'strat_interval';

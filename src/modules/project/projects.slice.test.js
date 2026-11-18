@@ -4,6 +4,7 @@ import projectSliceReducer, {
   addedProjectFromServer,
   addedTagToSelectedSpot,
   addedTemplates,
+  deletedDataset,
   deletedSpotIdFromDataset,
   deletedSpotIdFromDatasets,
   deletedSpotIdFromReports,
@@ -11,6 +12,8 @@ import projectSliceReducer, {
   deletedTemplate,
   migrateReportTimestamps,
   movedSpotIdBetweenDatasets,
+  setActiveDatasets,
+  setActiveDatasetsMultiple,
   setActiveTemplates,
   setUseContinuousTagging,
   setUseTemplate,
@@ -33,6 +36,73 @@ const getDatasetsState = () => ({
     13: {id: 13, modified_timestamp: 1, name: 'Dataset 2', spotIds: [1756000000003]},
   },
   project: {modified_timestamp: 1},
+});
+
+// A dataset id can be held as a string, as after a download, and must still be known for the same dataset
+describe('active datasets', () => {
+  it('turns off a dataset held by its id as a string', () => {
+    const state = {activeDatasetsIds: ['12', 13]};
+    const {activeDatasetsIds} = projectReducer(state, setActiveDatasets({bool: false, dataset: 12}));
+    expect(activeDatasetsIds).toEqual([13]);
+  });
+
+  it('turns on a dataset already held by its id as a string without adding it twice', () => {
+    const state = {activeDatasetsIds: ['12']};
+    const {activeDatasetsIds} = projectReducer(state, setActiveDatasets({bool: true, dataset: 12}));
+    expect(activeDatasetsIds).toEqual(['12']);
+  });
+
+  it('keeps the target when it is still shown, known by its id as a string', () => {
+    const state = {activeDatasetsIds: [12], targetDatasetId: '12'};
+    expect(projectReducer(state, setActiveDatasetsMultiple([12, 13])).targetDatasetId).toBe('12');
+  });
+
+  it('stops showing a deleted dataset held by its id as a string', () => {
+    const state = {...getDatasetsState(), activeDatasetsIds: ['12', 13]};
+    const {activeDatasetsIds, datasets} = projectReducer(state, deletedDataset(12));
+    expect(datasets[12]).toBeUndefined();
+    expect(activeDatasetsIds).toEqual([13]);
+  });
+
+  it('drops the target when it is no longer shown', () => {
+    const state = {activeDatasetsIds: [12], targetDatasetId: 12};
+    expect(projectReducer(state, setActiveDatasetsMultiple([13])).targetDatasetId).toBeUndefined();
+  });
+});
+
+describe('addedProjectFromServer', () => {
+  // The whole point of the rename living in normalizeProject: memos arriving from the server are upgraded
+  // before anything reads them, so the memo list sorts on one field name
+  it('renames memo timestamps on a project coming from the server', () => {
+    const incoming = {
+      id: 1, modified_timestamp: 1,
+      reports: [{id: 'r1', name: 'Old Memo', updated_timestamp: 1756000000000}],
+    };
+    const {project} = projectReducer({project: {}}, addedProjectFromServer(incoming));
+    expect(project.reports[0].modified_timestamp).toBe(1756000000000);
+    expect(project.reports[0]).not.toHaveProperty('updated_timestamp');
+  });
+
+  // The selected tag is a copy, and the tag pages save from it. Left as it was, it would write the tag back over
+  // whatever the server merged into it.
+  it('replaces the selected tag with the server\'s copy of it', () => {
+    const state = {project: {tags: [{id: 't1', spots: [spotId]}]}, selectedTag: {id: 't1', spots: [spotId]}};
+    const incoming = {id: 1, tags: [{id: 't1', spots: [spotId, otherSpotId]}]};
+    const {selectedTag} = projectReducer(state, addedProjectFromServer(incoming));
+    expect(selectedTag).toEqual({id: 't1', spots: [spotId, otherSpotId]});
+  });
+
+  it('clears the selected tag when the server no longer has it', () => {
+    const state = {project: {tags: [{id: 't1'}]}, selectedTag: {id: 't1'}};
+    const {selectedTag} = projectReducer(state, addedProjectFromServer({id: 1, tags: [{id: 't2'}]}));
+    expect(selectedTag).toEqual({});
+  });
+
+  it('leaves no tag selected when none was', () => {
+    const state = {project: {}, selectedTag: {}};
+    const {selectedTag} = projectReducer(state, addedProjectFromServer({id: 1, tags: [{id: 't1'}]}));
+    expect(selectedTag).toEqual({});
+  });
 });
 
 describe('deletedSpotIdFromDataset', () => {
@@ -143,6 +213,62 @@ describe('deletedSpotIdFromTags', () => {
   });
 });
 
+// Memos used to stamp their edit time as updated_timestamp while the rest of the project called it
+// modified_timestamp. Both ways in - the server and a file import through normalizeProject, and the device
+// through the store's persist migration - rename it, so no read site has to know the old name.
+describe('migrateReportTimestamps', () => {
+  const stamp = 1756000000000;
+
+  it('renames an old memo timestamp and drops the old key', () => {
+    const [report] = migrateReportTimestamps([{id: 'r1', name: 'Memo', updated_timestamp: stamp}]);
+    expect(report.modified_timestamp).toBe(stamp);
+    expect(report).not.toHaveProperty('updated_timestamp');
+  });
+
+  it('leaves a memo that already has the new name alone', () => {
+    const [report] = migrateReportTimestamps([{id: 'r1', modified_timestamp: stamp, name: 'Memo'}]);
+    expect(report.modified_timestamp).toBe(stamp);
+  });
+
+  // Whichever wrote last, the new name wins and the stale one goes rather than both surviving
+  it('keeps the new name when a memo somehow carries both', () => {
+    const [report] = migrateReportTimestamps(
+      [{id: 'r1', modified_timestamp: stamp, name: 'Memo', updated_timestamp: 1}]);
+    expect(report.modified_timestamp).toBe(stamp);
+    expect(report).not.toHaveProperty('updated_timestamp');
+  });
+
+  it('leaves a memo with no timestamp at all untouched', () => {
+    const [report] = migrateReportTimestamps([{id: 'r1', name: 'Memo'}]);
+    expect(report).toEqual({id: 'r1', name: 'Memo'});
+  });
+
+  it('takes a project with no reports without complaining', () => {
+    expect(migrateReportTimestamps(undefined)).toBeUndefined();
+  });
+});
+
+// The store's persist migration hands whatever is on the device to this, and a throw there makes redux-persist
+// rehydrate the project slice as undefined - so it has to survive every shape, not just the expected one
+describe('migrateReportTimestamps on malformed data', () => {
+  it('survives an empty slot in the list', () => {
+    expect(() => migrateReportTimestamps([null, undefined, {id: 'r1'}])).not.toThrow();
+  });
+
+  it('leaves an empty slot as it found it', () => {
+    expect(migrateReportTimestamps([null, {id: 'r1', updated_timestamp: 1}])).toEqual(
+      [null, {id: 'r1', modified_timestamp: 1}]);
+  });
+
+  it('survives a memo whose timestamp is not a number', () => {
+    expect(() => migrateReportTimestamps([{id: 'r1', updated_timestamp: 'not a date'}])).not.toThrow();
+  });
+
+  it('takes an empty list', () => {
+    expect(migrateReportTimestamps([])).toEqual([]);
+  });
+});
+
 describe('movedSpotIdBetweenDatasets', () => {
   it('moves the Spot to the dataset it is given', () => {
     const action = movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 13});
@@ -192,136 +318,6 @@ describe('project settings', () => {
   it('leaves the project as it was when a tag is set to go on the selected Spot', () => {
     const {project} = projectReducer({project: {modified_timestamp: 1}}, addedTagToSelectedSpot(true));
     expect(project.modified_timestamp).toBe(1);
-  });
-});
-
-describe('updatedProjectPreference', () => {
-  const getState = () => ({
-    project: {
-      modified_timestamp: 1,
-      preferences: {spot_prefix: 'Spot ', starting_number_for_spot: 7, warn_on_dupe_spot_name: true},
-    },
-  });
-
-  it('sets the preference it is given', () => {
-    const {project} = projectReducer(getState(), updatedProjectPreference({key: 'starting_number_for_spot', value: 8}));
-    expect(project.preferences.starting_number_for_spot).toBe(8);
-  });
-
-  // The point of having this alongside updatedProject, which replaces the whole preferences object
-  it('leaves every other preference as it was', () => {
-    const {project} = projectReducer(getState(), updatedProjectPreference({key: 'starting_number_for_spot', value: 8}));
-    expect(project.preferences.spot_prefix).toBe('Spot ');
-    expect(project.preferences.warn_on_dupe_spot_name).toBe(true);
-  });
-
-  // discardSpot hands back a Spot number that was unset before the Spot took it
-  it('takes undefined as a value, so an unset preference can be restored to unset', () => {
-    const state = projectReducer(getState(), updatedProjectPreference({key: 'starting_number_for_spot', value: 8}));
-    const {project} = projectReducer(state, updatedProjectPreference({key: 'starting_number_for_spot'}));
-    expect(project.preferences.starting_number_for_spot).toBeUndefined();
-    expect(project.preferences.spot_prefix).toBe('Spot ');
-  });
-
-  it('adds preferences to a project that has none', () => {
-    const {project} = projectReducer({project: {modified_timestamp: 1}}, updatedProjectPreference({key: 'a', value: 1}));
-    expect(project.preferences).toEqual({a: 1});
-  });
-
-  it('marks the project as modified', () => {
-    const {project} = projectReducer(getState(), updatedProjectPreference({key: 'starting_number_for_spot', value: 8}));
-    expect(project.modified_timestamp).toBeGreaterThan(1);
-  });
-});
-
-// Memos used to stamp their edit time as updated_timestamp while the rest of the project called it
-// modified_timestamp. Both ways in - the server and a file import through normalizeProject, and the device
-// through the store's persist migration - rename it, so no read site has to know the old name.
-describe('migrateReportTimestamps', () => {
-  const stamp = 1756000000000;
-
-  it('renames an old memo timestamp and drops the old key', () => {
-    const [report] = migrateReportTimestamps([{id: 'r1', name: 'Memo', updated_timestamp: stamp}]);
-    expect(report.modified_timestamp).toBe(stamp);
-    expect(report).not.toHaveProperty('updated_timestamp');
-  });
-
-  it('leaves a memo that already has the new name alone', () => {
-    const [report] = migrateReportTimestamps([{id: 'r1', modified_timestamp: stamp, name: 'Memo'}]);
-    expect(report.modified_timestamp).toBe(stamp);
-  });
-
-  // Whichever wrote last, the new name wins and the stale one goes rather than both surviving
-  it('keeps the new name when a memo somehow carries both', () => {
-    const [report] = migrateReportTimestamps(
-      [{id: 'r1', modified_timestamp: stamp, name: 'Memo', updated_timestamp: 1}]);
-    expect(report.modified_timestamp).toBe(stamp);
-    expect(report).not.toHaveProperty('updated_timestamp');
-  });
-
-  it('leaves a memo with no timestamp at all untouched', () => {
-    const [report] = migrateReportTimestamps([{id: 'r1', name: 'Memo'}]);
-    expect(report).toEqual({id: 'r1', name: 'Memo'});
-  });
-
-  it('takes a project with no reports without complaining', () => {
-    expect(migrateReportTimestamps(undefined)).toBeUndefined();
-  });
-});
-
-describe('addedProjectFromServer', () => {
-  // The whole point of the rename living in normalizeProject: memos arriving from the server are upgraded
-  // before anything reads them, so the memo list sorts on one field name
-  it('renames memo timestamps on a project coming from the server', () => {
-    const incoming = {
-      id: 1, modified_timestamp: 1,
-      reports: [{id: 'r1', name: 'Old Memo', updated_timestamp: 1756000000000}],
-    };
-    const {project} = projectReducer({project: {}}, addedProjectFromServer(incoming));
-    expect(project.reports[0].modified_timestamp).toBe(1756000000000);
-    expect(project.reports[0]).not.toHaveProperty('updated_timestamp');
-  });
-
-  // The selected tag is a copy, and the tag pages save from it. Left as it was, it would write the tag back over
-  // whatever the server merged into it.
-  it('replaces the selected tag with the server\'s copy of it', () => {
-    const state = {project: {tags: [{id: 't1', spots: [spotId]}]}, selectedTag: {id: 't1', spots: [spotId]}};
-    const incoming = {id: 1, tags: [{id: 't1', spots: [spotId, otherSpotId]}]};
-    const {selectedTag} = projectReducer(state, addedProjectFromServer(incoming));
-    expect(selectedTag).toEqual({id: 't1', spots: [spotId, otherSpotId]});
-  });
-
-  it('clears the selected tag when the server no longer has it', () => {
-    const state = {project: {tags: [{id: 't1'}]}, selectedTag: {id: 't1'}};
-    const {selectedTag} = projectReducer(state, addedProjectFromServer({id: 1, tags: [{id: 't2'}]}));
-    expect(selectedTag).toEqual({});
-  });
-
-  it('leaves no tag selected when none was', () => {
-    const state = {project: {}, selectedTag: {}};
-    const {selectedTag} = projectReducer(state, addedProjectFromServer({id: 1, tags: [{id: 't1'}]}));
-    expect(selectedTag).toEqual({});
-  });
-});
-
-// The store's persist migration hands whatever is on the device to this, and a throw there makes redux-persist
-// rehydrate the project slice as undefined - so it has to survive every shape, not just the expected one
-describe('migrateReportTimestamps on malformed data', () => {
-  it('survives an empty slot in the list', () => {
-    expect(() => migrateReportTimestamps([null, undefined, {id: 'r1'}])).not.toThrow();
-  });
-
-  it('leaves an empty slot as it found it', () => {
-    expect(migrateReportTimestamps([null, {id: 'r1', updated_timestamp: 1}])).toEqual(
-      [null, {id: 'r1', modified_timestamp: 1}]);
-  });
-
-  it('survives a memo whose timestamp is not a number', () => {
-    expect(() => migrateReportTimestamps([{id: 'r1', updated_timestamp: 'not a date'}])).not.toThrow();
-  });
-
-  it('takes an empty list', () => {
-    expect(migrateReportTimestamps([])).toEqual([]);
   });
 });
 
@@ -421,6 +417,45 @@ describe('template reducers', () => {
   it('marks the project as modified on a delete, like the other template reducers do', () => {
     const state = getState({notes: {templates: [note], active: [note], isInUse: true}});
     const {project} = projectReducer(state, deletedTemplate({key: 'notes', template: note}));
+    expect(project.modified_timestamp).toBeGreaterThan(1);
+  });
+});
+
+describe('updatedProjectPreference', () => {
+  const getState = () => ({
+    project: {
+      modified_timestamp: 1,
+      preferences: {spot_prefix: 'Spot ', starting_number_for_spot: 7, warn_on_dupe_spot_name: true},
+    },
+  });
+
+  it('sets the preference it is given', () => {
+    const {project} = projectReducer(getState(), updatedProjectPreference({key: 'starting_number_for_spot', value: 8}));
+    expect(project.preferences.starting_number_for_spot).toBe(8);
+  });
+
+  // The point of having this alongside updatedProject, which replaces the whole preferences object
+  it('leaves every other preference as it was', () => {
+    const {project} = projectReducer(getState(), updatedProjectPreference({key: 'starting_number_for_spot', value: 8}));
+    expect(project.preferences.spot_prefix).toBe('Spot ');
+    expect(project.preferences.warn_on_dupe_spot_name).toBe(true);
+  });
+
+  // discardSpot hands back a Spot number that was unset before the Spot took it
+  it('takes undefined as a value, so an unset preference can be restored to unset', () => {
+    const state = projectReducer(getState(), updatedProjectPreference({key: 'starting_number_for_spot', value: 8}));
+    const {project} = projectReducer(state, updatedProjectPreference({key: 'starting_number_for_spot'}));
+    expect(project.preferences.starting_number_for_spot).toBeUndefined();
+    expect(project.preferences.spot_prefix).toBe('Spot ');
+  });
+
+  it('adds preferences to a project that has none', () => {
+    const {project} = projectReducer({project: {modified_timestamp: 1}}, updatedProjectPreference({key: 'a', value: 1}));
+    expect(project.preferences).toEqual({a: 1});
+  });
+
+  it('marks the project as modified', () => {
+    const {project} = projectReducer(getState(), updatedProjectPreference({key: 'starting_number_for_spot', value: 8}));
     expect(project.modified_timestamp).toBeGreaterThan(1);
   });
 });

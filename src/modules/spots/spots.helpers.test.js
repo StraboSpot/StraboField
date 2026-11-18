@@ -1,4 +1,10 @@
-import {calculateMissingOrientations, getSpotOrientations, getSpotsCount} from './spots.helpers';
+import {
+  calculateMissingOrientations,
+  getDatasetWithSpotId,
+  getSpotOrientations,
+  getSpotsCount,
+  isSpotIdInDataset,
+} from './spots.helpers';
 import {DEFAULT_ORIENTATION_FIELDS} from '../compass/compass.helpers';
 import {THREE_D_STRUCTURE_ORIENTATION_FIELDS} from '../three-d-structures/threeDStructures.constants';
 
@@ -53,6 +59,19 @@ describe('calculateMissingOrientations', () => {
   });
 });
 
+describe('getDatasetWithSpotId', () => {
+  const datasets = {12: {id: 12, spotIds: [1]}, 13: {id: 13, spotIds: ['2']}};
+
+  it('finds the dataset holding a Spot by its id as a string, from an object or a list', () => {
+    expect(getDatasetWithSpotId(datasets, 2)).toBe(datasets[13]);
+    expect(getDatasetWithSpotId(Object.values(datasets), 2)).toBe(datasets[13]);
+  });
+
+  it('finds nothing for a Spot no dataset holds', () => {
+    expect(getDatasetWithSpotId(datasets, 3)).toBeUndefined();
+  });
+});
+
 describe('getSpotOrientations', () => {
   const spot = {
     properties: {
@@ -97,5 +116,15 @@ describe('getSpotsCount', () => {
 
   it('counts none for a dataset without Spots', () => {
     expect(getSpotsCount(undefined, spots)).toBe(0);
+  });
+});
+
+describe('isSpotIdInDataset', () => {
+  it('finds a Spot the dataset holds by its id as a string', () => {
+    expect(isSpotIdInDataset({id: 12, spotIds: ['1756000000001']}, 1756000000001)).toBe(true);
+  });
+
+  it('finds nothing in a dataset without Spots', () => {
+    expect(isSpotIdInDataset({id: 12}, 1756000000001)).toBe(false);
   });
 });

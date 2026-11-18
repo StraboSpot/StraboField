@@ -32,14 +32,12 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
   const spots = useSelector(state => state.spot.spots);
-  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
   const [neededImagesCount, refreshNeededImagesCount] = useDatasetNeededImagesCount(dataset);
 
   const {initializeDownloadImages} = useDownload();
-  const {destroyDataset} = useProject();
+  const {destroyDataset, isReadOnlyDataset, isTargetDataset} = useProject();
   const toast = useToast();
 
   /* Local State */
@@ -52,8 +50,8 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   /* Derived Variables */
 
-  const isReadOnly = readOnlyDatasetsIds.includes(dataset.id);
-  const isTarget = targetDatasetId === dataset.id;
+  const isReadOnly = isReadOnlyDataset(dataset.id);
+  const isTarget = isTargetDataset(dataset.id);
   const spotsCount = getSpotsCount(dataset.spotIds, spots);
 
   /* Event Handlers */
@@ -70,12 +68,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
 
   const onToggleReadOnly = () => dispatch(setReadOnlyDatasetsIds(dataset.id));
-
-  // The header sits outside the form, so it needs the name as it is typed to say whether there is anything to save
-  const setFieldValueAndTrackName = (name, value) => {
-    nameFormRef.current.setFieldValue(name, value);
-    setDatasetName(value);
-  };
 
   /* Logic Helpers */
 
@@ -95,13 +87,17 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     else console.error('Target dataset or id is undefined!');
   };
 
-  const isDisabled = id => targetDatasetId && targetDatasetId === id;
-
   const saveDataset = () => {
     let datasetCopy = JSON.parse(JSON.stringify(dataset));
     datasetCopy = {...datasetCopy, name: datasetName};
     dispatch(updatedDatasetProperties(datasetCopy));
     closeDetailView();
+  };
+
+  // The header sits outside the form, so it needs the name as it is typed to say whether there is anything to save
+  const setFieldValueAndTrackName = (name, value) => {
+    nameFormRef.current.setFieldValue(name, value);
+    setDatasetName(value);
   };
 
   /* Render Functions */
@@ -131,13 +127,13 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     return (
       <View style={{paddingBottom: 10}}>
         <DeleteButton
-          disabled={!isDisabled(dataset.id)}
+          disabled={isTarget}
           onPress={handleDeletePressed}
           title={'Delete Dataset'}
         />
-        {isDisabled(dataset.id) && (
+        {isTarget && (
           <Text style={[commonStyles.importantText, {paddingHorizontal: 30}]}>
-            *{dataset.name} can not be deleted while still set as the target (starred) dataset.
+            {dataset.name} can not be deleted while still set as the target (starred) dataset.
           </Text>
         )}
       </View>
