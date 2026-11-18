@@ -514,22 +514,6 @@ const useSpots = () => {
     }, []);
   };
 
-  // Why deleting a dataset would change a read only Spot in another dataset, or null if it wouldn't. The dataset's
-  // samples filed elsewhere are deleted with it, and parents filed elsewhere lose their stubs for samples in it.
-  // Takes what getSamplesSplitByDataset found for the dataset.
-  const getDatasetDeleteReadOnlyMessage = ({parentsToUnlink, samplesToDelete}) => {
-    if (!isAnythingReadOnly) return null;
-    const readOnlySample = samplesToDelete.find(isSpotReadOnly);
-    if (readOnlySample) {
-      return `Sample ${readOnlySample.properties.name}, taken at a Spot in this dataset, is read only.`;
-    }
-    const readOnlyParent = parentsToUnlink.find(({parentSpot}) => isSpotReadOnly(parentSpot))?.parentSpot;
-    if (readOnlyParent) {
-      return `Spot ${readOnlyParent.properties.name}, which a Sample in this dataset was taken from, is read only.`;
-    }
-    return null;
-  };
-
   // Get Active Spots (not Samples) with Valid Geometry
   const getMappableSpots = () => {
     const allSpotsCopyFiltered = Object.values(getActiveSpotsObj()).filter((spot) => {
@@ -782,7 +766,6 @@ const useSpots = () => {
     getAllIntervalSpotsOnStratSection,
     getAllSpotsOnImageBasemap,
     getAllSpotsOnStratSection,
-    getDatasetDeleteReadOnlyMessage,
     getMappableSpots,
     getNewSpotName,
     getReadOnlyDeleteMessage,

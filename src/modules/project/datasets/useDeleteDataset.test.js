@@ -32,7 +32,7 @@ const splitDatasets = {
 
 beforeEach(() => mockToastShow.mockClear());
 
-const deleteDataset = async (datasetId, readOnlyDatasetsIds) => {
+const renderDeleteDatasetApi = (readOnlyDatasetsIds) => {
   const store = configureStore({
     preloadedState: {
       home: {activeModal: null, hiddenWarnings: {}, loading: {home: false}},
@@ -55,20 +55,46 @@ const deleteDataset = async (datasetId, readOnlyDatasetsIds) => {
       user: userReducer,
     },
   });
-  let deleteDatasetFn;
+  let deleteDatasetApi;
   const Probe = () => {
-    deleteDatasetFn = useDeleteDataset();
+    deleteDatasetApi = useDeleteDataset();
     return null;
   };
   ReactTestRenderer.act(() => {
     ReactTestRenderer.create(<Provider store={store}><Probe/></Provider>);
   });
+  return {deleteDatasetApi: deleteDatasetApi, store: store};
+};
+
+const deleteDataset = async (datasetId, readOnlyDatasetsIds) => {
+  const {deleteDatasetApi, store} = renderDeleteDatasetApi(readOnlyDatasetsIds);
   let isDeleted;
   await ReactTestRenderer.act(async () => {
-    isDeleted = await deleteDatasetFn(splitDatasets[datasetId]);
+    isDeleted = await deleteDatasetApi.deleteDataset(splitDatasets[datasetId]);
   });
   return {isDeleted: isDeleted, state: store.getState()};
 };
+
+const getDatasetDeleteCheck = (datasetId, readOnlyDatasetsIds) =>
+  renderDeleteDatasetApi(readOnlyDatasetsIds).deleteDatasetApi.getDatasetDeleteCheck(splitDatasets[datasetId]);
+
+// What the confirmation names, worked out before anything is deleted
+it('names the samples a delete would take from other datasets, and the parents it would unlink', () => {
+  expect(getDatasetDeleteCheck(12, [])).toEqual({parentsToUnlink: [], readOnlyMessage: null, samplesToDelete: [sample]});
+  expect(getDatasetDeleteCheck(13, [])).toEqual({
+    parentsToUnlink: [{parentSpot: parent, sampleIds: [sampleId]}],
+    readOnlyMessage: null,
+    samplesToDelete: [],
+  });
+});
+
+it('says why a dataset whose Spot has a read only sample filed elsewhere can\'t be deleted', () => {
+  expect(getDatasetDeleteCheck(12, [13]).readOnlyMessage).toMatch(/Sample Sample 1, .* is read only/);
+});
+
+it('says why a dataset holding a sample whose read only parent is filed elsewhere can\'t be deleted', () => {
+  expect(getDatasetDeleteCheck(13, [12]).readOnlyMessage).toMatch(/Spot Spot 08, .* is read only/);
+});
 
 // Deleting the parent's dataset deletes the sample filed elsewhere, as deleting the parent would
 it('deletes a dataset together with the samples of its Spots filed elsewhere', async () => {

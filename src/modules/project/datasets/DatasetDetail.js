@@ -25,9 +25,7 @@ import NumberInputField from '../../form/inputs/NumberInputField';
 import TextInputField from '../../form/inputs/TextInputField';
 import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
 import RunQAQC from '../../qaqc/RunQAQC';
-import {getSamplesSplitByDataset} from '../../samples/samples.helpers';
 import {getSpotsCount} from '../../spots/spots.helpers';
-import useSpots from '../../spots/useSpots';
 import {setReadOnlyDatasetsIds, updatedDatasetProperties} from '../projects.slice';
 import useProject from '../useProject';
 
@@ -39,10 +37,9 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const [neededImagesCount, refreshNeededImagesCount, imagesCount] = useDatasetNeededImagesCount(dataset);
 
-  const deleteDataset = useDeleteDataset();
+  const {deleteDataset, getDatasetDeleteCheck} = useDeleteDataset();
   const {initializeDownloadImages} = useDownload();
   const {isReadOnlyDataset, isTargetDataset} = useProject();
-  const {getDatasetDeleteReadOnlyMessage} = useSpots();
   const toast = useToast();
 
   /* Local State */
@@ -105,9 +102,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const renderDeleteConfirmationModal = () => {
     // Samples filed apart from their parents across this dataset's edge, which an old bug could leave
-    const samplesSplitByDataset = getSamplesSplitByDataset(dataset, spots);
-    const {parentsToUnlink, samplesToDelete} = samplesSplitByDataset;
-    const readOnlyMessage = getDatasetDeleteReadOnlyMessage(samplesSplitByDataset);
+    const {parentsToUnlink, readOnlyMessage, samplesToDelete} = getDatasetDeleteCheck(dataset);
     return (
       <DeleteConformationDialogBox
         headerTitle={'Confirm Delete!'}

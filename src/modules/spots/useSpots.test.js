@@ -75,7 +75,7 @@ describe('deleting with read only datasets', () => {
     return {deleteSpot: deleteSpot, getState: store.getState, spotsApi: spotsApi};
   };
 
-  // As DatasetDetail asks, with what getSamplesSplitByDataset found for the dataset
+  // As useDeleteDataset asks, with what getSamplesSplitByDataset found for the dataset
   const getSplit = datasetId => getSamplesSplitByDataset(splitDatasets[datasetId], familySpots);
 
   it('won\'t delete a Spot whose sample is in a read only dataset', () => {
@@ -123,7 +123,6 @@ describe('deleting with read only datasets', () => {
   // Deleting the parent's dataset deletes the sample filed elsewhere, as deleting the parent would
   it('deletes, ahead of a dataset delete, the samples of its Spots filed elsewhere', () => {
     const {getState, spotsApi} = renderSpotsApi(splitDatasets, []);
-    expect(spotsApi.getDatasetDeleteReadOnlyMessage(getSplit(12))).toBeNull();
     ReactTestRenderer.act(() => spotsApi.deleteSamplesSplitByDataset(getSplit(12)));
     expect(getState().spot.spots[sampleId]).toBeUndefined();
     expect(getState().project.datasets[13].spotIds).toEqual([]);
@@ -136,16 +135,6 @@ describe('deleting with read only datasets', () => {
     ReactTestRenderer.act(() => spotsApi.deleteSamplesSplitByDataset(getSplit(13)));
     expect(getState().spot.spots[parentId].properties.samples).toBeUndefined();
     expect(getState().project.datasets[12].spotIds).toEqual([parentId]);
-  });
-
-  it('won\'t delete a dataset whose Spot has a read only sample filed elsewhere', () => {
-    const {spotsApi} = renderSpotsApi(splitDatasets, [13]);
-    expect(spotsApi.getDatasetDeleteReadOnlyMessage(getSplit(12))).toMatch(/Sample Sample 1, .* is read only/);
-  });
-
-  it('won\'t delete a dataset holding a sample whose read only parent is filed elsewhere', () => {
-    const {spotsApi} = renderSpotsApi(splitDatasets, [12]);
-    expect(spotsApi.getDatasetDeleteReadOnlyMessage(getSplit(13))).toMatch(/Spot Spot 08, .* is read only/);
   });
 
   it('deletes a Spot and its sample when nothing they are in is read only', () => {
