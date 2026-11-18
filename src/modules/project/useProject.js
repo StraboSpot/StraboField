@@ -125,7 +125,10 @@ const useProject = () => {
     try {
       if (datasets && datasets[id] && datasets[id].spotIds) {
         console.log(datasets[id].spotIds.length, 'Spot(s) in Dataset to Delete.');
-        dispatch(deletedSpots(datasets[id].spotIds));     // ToDo Need to delete images for deleted Spots
+        // The Spots' image files are kept on purpose. Auto saves, and saves made without images, hold no image
+        // files and take them from the shared images folder when restored, so deleting them here would lose any
+        // never uploaded from a restore of the project as it was before this delete.
+        dispatch(deletedSpots(datasets[id].spotIds));
       }
       dispatch(deletedDataset(id));
       return true;
