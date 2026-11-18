@@ -6,6 +6,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
+import useDeleteDataset from './useDeleteDataset';
 import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/helpers';
@@ -38,9 +39,10 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const [neededImagesCount, refreshNeededImagesCount, imagesCount] = useDatasetNeededImagesCount(dataset);
 
+  const deleteDataset = useDeleteDataset();
   const {initializeDownloadImages} = useDownload();
-  const {destroyDataset, isReadOnlyDataset, isTargetDataset} = useProject();
-  const {deleteSamplesSplitByDataset, getDatasetDeleteReadOnlyMessage} = useSpots();
+  const {isReadOnlyDataset, isTargetDataset} = useProject();
+  const {getDatasetDeleteReadOnlyMessage} = useSpots();
   const toast = useToast();
 
   /* Local State */
@@ -82,20 +84,8 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const initializeDeleteDataset = async () => {
     setIsDeleteConfirmModalVisible(false);
-    // Worked out before the delete, from the Spots as they were. The samples and parents it names are all filed in
-    // other datasets, so the delete leaves them in place.
-    const samplesSplitByDataset = getSamplesSplitByDataset(dataset, spots);
-    // The confirmation offers no Delete when this is set, and says why. A read only dataset never gets that far.
-    if (isReadOnly || getDatasetDeleteReadOnlyMessage(samplesSplitByDataset)) return;
-    if (dataset && dataset.id) {
-      // Samples across the dataset's edge are tidied up only once it is gone, so a delete that fails leaves them be.
-      // It has said why, and the view stays open.
-      const isDeleted = await destroyDataset(dataset.id);
-      if (!isDeleted) return;
-      deleteSamplesSplitByDataset(samplesSplitByDataset);
-      closeDetailView();
-    }
-    else console.error('Target dataset or id is undefined!');
+    // A delete that fails has said why, and the view stays open
+    if (await deleteDataset(dataset)) closeDetailView();
   };
 
   const saveDataset = () => {
