@@ -4,6 +4,7 @@ import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.cons
 import {getNewId, isEmpty, isEqual, isSameId} from '../../shared/helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 import {canMoveSpotIdsToDataset, isReadOnlyDatasetId, isSpotIdInDataset} from '../spots/spots.helpers';
+import {deletedSpot, deletedSpots} from '../spots/spots.slice';
 import {
   deleteTemplateKey,
   getActiveTemplateList,
@@ -33,6 +34,49 @@ const normalizeProject = (project) => {
   if (!project.useContinuousTagging) project.useContinuousTagging = false;
   if (project.reports) project.reports = migrateReportTimestamps(project.reports);
   return project;
+};
+
+// A Spot deleted, however that came about, takes its id out of the datasets, tags and memos holding it in the same
+// dispatch, so none of them is left pointing at a Spot that is gone. Matched as strings, as isSameId does, through a
+// Set, since a dataset delete takes all its Spots at once and there can be thousands. The tags and memos changed take
+// the delete's own time, which is what the datasets and project are given too.
+const removeDeletedSpotIds = (state, spotIds, timestamp) => {
+  const deletedSpotIds = new Set(spotIds.map(String));
+  const isDeletedId = id => deletedSpotIds.has(String(id));
+  // Only the datasets holding a Spot are written, so the rest are not marked modified
+  Object.values(state.datasets).forEach((dataset) => {
+    if (dataset.spotIds?.some(isDeletedId)) dataset.spotIds = dataset.spotIds.filter(id => !isDeletedId(id));
+  });
+  if (!isEmpty(state.project.reports)) {
+    state.project.reports = state.project.reports.map((report) => {
+      let updatedReport = JSON.parse(JSON.stringify(report));
+      if (updatedReport.spots?.some(isDeletedId)) {
+        updatedReport.spots = updatedReport.spots.filter(id => !isDeletedId(id));
+        if (isEmpty(updatedReport.spots)) delete updatedReport.spots;
+        updatedReport.modified_timestamp = timestamp;
+      }
+      return updatedReport;
+    });
+  }
+  if (!isEmpty(state.project.tags)) {
+    const updatedTags = state.project.tags.map((tag) => {
+      let updatedTag = JSON.parse(JSON.stringify(tag));
+      if (updatedTag.spots?.some(isDeletedId)) {
+        updatedTag.spots = updatedTag.spots.filter(id => !isDeletedId(id));
+        if (isEmpty(updatedTag.spots)) delete updatedTag.spots;
+        updatedTag.modified_timestamp = timestamp;
+      }
+      const deletedFeatureSpotIds = Object.keys(updatedTag.features || {}).filter(isDeletedId);
+      if (!isEmpty(deletedFeatureSpotIds)) {
+        deletedFeatureSpotIds.forEach(spotId => delete updatedTag.features[spotId]);
+        if (isEmpty(updatedTag.features)) delete updatedTag.features;
+        updatedTag.modified_timestamp = timestamp;
+      }
+      return updatedTag;
+    });
+    state.project.tags = updatedTags;
+    state.selectedTag = updatedTags.find(tag => tag.id === state.selectedTag?.id) || {};
+  }
 };
 
 const initialProjectState = {
@@ -160,58 +204,6 @@ const projectSlice = createSlice({
       const dataset = state.datasets[datasetId];
       const updatedSpotIds = dataset.spotIds.filter(id => !isSameId(id, spotId));
       state.datasets = {...state.datasets, [datasetId]: {...dataset, spotIds: updatedSpotIds}};
-    },
-    deletedSpotIdFromDatasets(state, action) {
-      const spotId = action.payload;
-      // Only the datasets holding the Spot are written, so the rest are not marked modified
-      Object.values(state.datasets).forEach((dataset) => {
-        if (dataset.spotIds?.some(id => isSameId(id, spotId))) {
-          dataset.spotIds = dataset.spotIds.filter(id => !isSameId(id, spotId));
-        }
-      });
-    },
-    // All the Spots deleted at once, as a dataset delete is, matched as strings as isSameId does. A Set, since a
-    // dataset can hold thousands.
-    deletedSpotIdsFromReports(state, action) {
-      const deletedSpotIds = new Set(action.payload.map(String));
-      const isDeletedId = id => deletedSpotIds.has(String(id));
-      if (!isEmpty(state.project.reports)) {
-        const updatedReports = state.project.reports.map((report) => {
-          let updatedReport = JSON.parse(JSON.stringify(report));
-          if (updatedReport.spots?.some(isDeletedId)) {
-            updatedReport.spots = updatedReport.spots.filter(id => !isDeletedId(id));
-            if (isEmpty(updatedReport.spots)) delete updatedReport.spots;
-            updatedReport.modified_timestamp = Date.now();
-          }
-          return updatedReport;
-        });
-        state.project.reports = updatedReports;
-      }
-    },
-    // All the Spots deleted at once, matched as deletedSpotIdsFromReports does
-    deletedSpotIdsFromTags(state, action) {
-      const deletedSpotIds = new Set(action.payload.map(String));
-      const isDeletedId = id => deletedSpotIds.has(String(id));
-      if (!isEmpty(state.project.tags)) {
-        const timestamp = Date.now();
-        const updatedTags = state.project.tags.map((tag) => {
-          let updatedTag = JSON.parse(JSON.stringify(tag));
-          if (updatedTag.spots?.some(isDeletedId)) {
-            updatedTag.spots = updatedTag.spots.filter(id => !isDeletedId(id));
-            if (isEmpty(updatedTag.spots)) delete updatedTag.spots;
-            updatedTag.modified_timestamp = timestamp;
-          }
-          const deletedFeatureSpotIds = Object.keys(updatedTag.features || {}).filter(isDeletedId);
-          if (!isEmpty(deletedFeatureSpotIds)) {
-            deletedFeatureSpotIds.forEach(spotId => delete updatedTag.features[spotId]);
-            if (isEmpty(updatedTag.features)) delete updatedTag.features;
-            updatedTag.modified_timestamp = timestamp;
-          }
-          return updatedTag;
-        });
-        state.project.tags = updatedTags;
-        state.selectedTag = updatedTags.find(tag => tag.id === state.selectedTag?.id) || {};
-      }
     },
     deletedTagIdFromReports(state, action) {
       const tagId = action.payload;
@@ -361,6 +353,9 @@ const projectSlice = createSlice({
     builder.addCase(setNotebookPageVisible, (state) => {
       state.isMultipleFeaturesTaggingEnabled = false;
     });
+    builder.addCase(deletedSpot, (state, action) => (
+      removeDeletedSpotIds(state, [action.payload], action.meta.timestamp)));
+    builder.addCase(deletedSpots, (state, action) => removeDeletedSpotIds(state, action.payload, action.meta.timestamp));
   },
 });
 
@@ -382,9 +377,6 @@ export const {
   addedTemplates,
   deletedDataset,
   deletedSpotIdFromDataset,
-  deletedSpotIdFromDatasets,
-  deletedSpotIdsFromReports,
-  deletedSpotIdsFromTags,
   deletedTagIdFromReports,
   deletedTemplate,
   doesBackupDirectoryExist,

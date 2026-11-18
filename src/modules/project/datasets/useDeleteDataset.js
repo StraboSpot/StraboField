@@ -6,13 +6,12 @@ import {clearedStratSection, setCurrentImageBasemap} from '../../maps/maps.slice
 import {getSamplesSplitByDataset} from '../../samples/samples.helpers';
 import {deletedSpots} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
-import {deletedDataset, deletedSpotIdsFromReports, deletedSpotIdsFromTags} from '../projects.slice';
+import {deletedDataset} from '../projects.slice';
 import useProject from '../useProject';
 
-// Deleting a dataset does what deleting each of its Spots would: they come out of the tags and memos holding them,
-// and samples filed across its edge go with them, so no sample is left without a parent and no parent keeps a stub
-// for a sample that is gone. Those samples are worked out from the Spots as they are before the delete, and a delete
-// refused for being read only leaves them be.
+// Deleting a dataset does what deleting each of its Spots would: samples filed across its edge go with them, so no
+// sample is left without a parent and no parent keeps a stub for a sample that is gone. Those samples are worked out
+// from the Spots as they are before the delete, and a delete refused for being read only leaves them be.
 const useDeleteDataset = () => {
   /* Data Hooks */
 
@@ -75,12 +74,11 @@ const useDeleteDataset = () => {
     closeMapsHeldBySpots([...datasetSpots, ...samplesSplitByDataset.samplesToDelete]);
     if (!isEmpty(spotIds)) {
       console.log(spotIds.length, 'Spot(s) in Dataset to Delete.');
-      // Ahead of the dataset itself, since on web deleting it sends the project to the server as it then is.
+      // Ahead of the dataset itself, since on web deleting it sends the project to the server as it then is, and the
+      // Spots take their ids out of the tags and memos holding them as they go.
       // The Spots' image files are kept on purpose. Auto saves, and saves made without images, hold no image
       // files and take them from the shared images folder when restored, so deleting them here would lose any
       // never uploaded from a restore of the project as it was before this delete.
-      dispatch(deletedSpotIdsFromReports(spotIds));
-      dispatch(deletedSpotIdsFromTags(spotIds));
       dispatch(deletedSpots(spotIds));
     }
     dispatch(deletedDataset(dataset.id));

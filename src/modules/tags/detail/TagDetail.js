@@ -51,7 +51,6 @@ const TagDetail = ({
     const parentSpot = getSampleParent(spot, spots);
     if (!parentSpot) {
       console.error('Couldn\'t find parent Spot. Was this Sample deleted?', spot);
-      // dispatch(deletedSpotIdsFromTags([spotId]));  // Uncomment this to clean up Samples
       return acc;
     }
     const parentSpotId = parentSpot.properties.id;

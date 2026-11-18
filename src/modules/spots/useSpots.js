@@ -41,9 +41,6 @@ import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {
   addedNewSpotIdsToDataset,
   addedNewSpotIdToDataset,
-  deletedSpotIdFromDatasets,
-  deletedSpotIdsFromReports,
-  deletedSpotIdsFromTags,
   restoredSpotReferences,
   setActiveDatasets,
   updatedProject,
@@ -168,13 +165,6 @@ const useSpots = () => {
   const getSpotWithThisMap = (imageBasemapId, stratSectionId) => {
     if (imageBasemapId) return getSpotWithThisImage(imageBasemapId);
     return stratSectionId ? getSpotWithThisStratSection(stratSectionId) : undefined;
-  };
-
-  const removeSpotAndReferences = (spotId) => {
-    dispatch(deletedSpotIdsFromReports([spotId]));
-    dispatch(deletedSpotIdsFromTags([spotId]));
-    dispatch(deletedSpotIdFromDatasets(spotId));
-    dispatch(deletedSpot(spotId));
   };
 
   const undoDeleteSpot = (undoSnapshot) => {
@@ -369,12 +359,12 @@ const useSpots = () => {
     return newSpot;
   };
 
-  // Ahead of deleting a dataset, does what deleting each of its Spots would to samples filed across its edge: their
+  // With a dataset deleted, does what deleting each of its Spots would to samples filed across its edge: their
   // samples filed elsewhere are deleted with them, and parents filed elsewhere lose their stubs for samples in it. So
   // no sample is left without a parent, and no parent keeps a stub for a sample that is gone.
   // Takes what getSamplesSplitByDataset found, which the caller has already worked out to check and to confirm.
   const deleteSamplesSplitByDataset = ({parentsToUnlink, samplesToDelete}) => {
-    samplesToDelete.forEach(sampleSpot => removeSpotAndReferences(sampleSpot.properties.id));
+    samplesToDelete.forEach(sampleSpot => dispatch(deletedSpot(sampleSpot.properties.id)));
     parentsToUnlink.forEach(({parentSpot, sampleIds}) => {
       const samples = getSamplesWithout(parentSpot, sampleIds);
       dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, spotId: parentSpot.properties.id, value: samples}));
@@ -410,7 +400,8 @@ const useSpots = () => {
       };
     }
 
-    spotsToDelete.forEach(spot => removeSpotAndReferences(spot.properties.id));
+    // One at a time, as on web each is sent to the server on its own. Its datasets, tags and memos let it go with it.
+    spotsToDelete.forEach(spot => dispatch(deletedSpot(spot.properties.id)));
     dispatch(setActiveModal({modal: null}));
 
     if (undoSnapshot) {
@@ -430,7 +421,7 @@ const useSpots = () => {
   // safe to hand back only because callers hold the screen meanwhile, so nothing else can have claimed it.
   const discardSpot = (spotToDiscard, spotNumberToRestore) => {
     console.log('Discarding unused Spot ID', spotToDiscard.properties.id, '...');
-    removeSpotAndReferences(spotToDiscard.properties.id);
+    dispatch(deletedSpot(spotToDiscard.properties.id));
     dispatch(updatedProjectPreference({key: 'starting_number_for_spot', value: spotNumberToRestore}));
     dispatch(clearedSelectedSpots());
   };

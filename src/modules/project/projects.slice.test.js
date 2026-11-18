@@ -6,9 +6,6 @@ import projectSliceReducer, {
   addedTemplates,
   deletedDataset,
   deletedSpotIdFromDataset,
-  deletedSpotIdFromDatasets,
-  deletedSpotIdsFromReports,
-  deletedSpotIdsFromTags,
   deletedTemplate,
   migrateReportTimestamps,
   movedSpotIdBetweenDatasets,
@@ -22,6 +19,7 @@ import projectSliceReducer, {
   updatedProjectPreference,
 } from './projects.slice';
 import propagateModifiedTimestamps from '../../store/propagateModifiedTimestamps';
+import spotSliceReducer, {deletedSpot, deletedSpots} from '../spots/spots.slice';
 import {MEASUREMENT_TEMPLATE_KEY} from '../templates/templates.constants';
 
 // Through the root reducer wrapper, as in the store, since it is what updates the dataset and project timestamps
@@ -120,113 +118,156 @@ describe('deletedSpotIdFromDataset', () => {
   });
 });
 
-describe('deletedSpotIdFromDatasets', () => {
-  it('takes the Spot out of the dataset holding it', () => {
-    const {datasets} = projectReducer(getDatasetsState(), deletedSpotIdFromDatasets(spotId));
-    expect(datasets[12].spotIds).toEqual([otherSpotId]);
-    expect(datasets[12].modified_timestamp).toBeGreaterThan(1);
+// A Spot deleted takes its id out of whatever in the project holds it, in the same dispatch
+describe('deleting Spots', () => {
+  // Through the Spot slice too, since a Spot delete is its action, and with the Spots there to delete
+  const spotsRootReducer = propagateModifiedTimestamps(
+    combineReducers({project: projectSliceReducer, spot: spotSliceReducer}));
+  const spotsToDelete = [spotId, otherSpotId, 1756000000003].reduce(
+    (acc, id) => ({...acc, [id]: {properties: {id: id}, type: 'Feature'}}), {});
+  const deleteSpots = (state, action) => spotsRootReducer(
+    {project: state, spot: {recentViews: [], selectedSpot: {}, spots: spotsToDelete}}, action).project;
+
+  describe('from datasets', () => {
+    it('takes the Spot out of the dataset holding it', () => {
+      const {datasets} = deleteSpots(getDatasetsState(), deletedSpot(spotId));
+      expect(datasets[12].spotIds).toEqual([otherSpotId]);
+      expect(datasets[12].modified_timestamp).toBeGreaterThan(1);
+    });
+
+    it('takes the Spot out when its id is given as a string', () => {
+      const {datasets} = deleteSpots(getDatasetsState(), deletedSpot(spotId.toString()));
+      expect(datasets[12].spotIds).toEqual([otherSpotId]);
+      expect(datasets[12].modified_timestamp).toBeGreaterThan(1);
+    });
+
+    // A dataset the Spot was never in must not be marked modified, or it gets uploaded for nothing
+    it('leaves a dataset without the Spot untouched', () => {
+      const {datasets} = deleteSpots(getDatasetsState(), deletedSpot(spotId.toString()));
+      expect(datasets[13]).toEqual(getDatasetsState().datasets[13]);
+    });
+
+    it('leaves a dataset with no Spots yet unmarked', () => {
+      const state = getDatasetsState();
+      state.datasets[14] = {id: 14, modified_timestamp: 1, name: 'Empty'};
+      const {datasets} = deleteSpots(state, deletedSpot(spotId));
+      expect(datasets[14].modified_timestamp).toBe(1);
+    });
+
+    // An id left behind in a dataset after its Spot went, which the dataset delete allows for
+    it('marks the dataset modified when the id deleted has no Spot left', () => {
+      const state = getDatasetsState();
+      state.datasets[14] = {id: 14, modified_timestamp: 1, name: 'Dangling', spotIds: [1756000000009]};
+      const {datasets, project} = deleteSpots(state, deletedSpots([1756000000009]));
+      expect(datasets[14].spotIds).toEqual([]);
+      expect(datasets[14].modified_timestamp).toBeGreaterThan(1);
+      expect(project.modified_timestamp).toBe(datasets[14].modified_timestamp);
+    });
+
+    it('takes several Spots out of their datasets at once', () => {
+      const {datasets} = deleteSpots(getDatasetsState(), deletedSpots([spotId, '1756000000003']));
+      expect(datasets[12].spotIds).toEqual([otherSpotId]);
+      expect(datasets[13].spotIds).toEqual([]);
+    });
   });
 
-  it('takes the Spot out when its id is given as a string', () => {
-    const {datasets} = projectReducer(getDatasetsState(), deletedSpotIdFromDatasets(spotId.toString()));
-    expect(datasets[12].spotIds).toEqual([otherSpotId]);
-    expect(datasets[12].modified_timestamp).toBeGreaterThan(1);
+  describe('from memos', () => {
+    const getState = () => ({
+      datasets: {},
+      project: {
+        modified_timestamp: 1,
+        reports: [
+          {id: 'r1', name: 'Report 1', spots: [spotId, otherSpotId]},
+          {id: 'r2', name: 'Report 2', spots: [otherSpotId]},
+        ],
+      },
+    });
+
+    it('takes the Spot out of the memo holding it, leaving the others alone', () => {
+      const {project} = deleteSpots(getState(), deletedSpot(spotId));
+      expect(project.reports[0].spots).toEqual([otherSpotId]);
+      expect(project.reports[1].spots).toEqual([otherSpotId]);
+    });
+
+    it('takes the Spot out when its id is given as a string', () => {
+      const {project} = deleteSpots(getState(), deletedSpot(spotId.toString()));
+      expect(project.reports[0].spots).toEqual([otherSpotId]);
+    });
+
+    it('drops spots entirely when the Spot was the only one, string id or not', () => {
+      const state = {
+        datasets: {},
+        project: {modified_timestamp: 1, reports: [{id: 'r1', name: 'Report 1', spots: [spotId]}]},
+      };
+      const {project} = deleteSpots(state, deletedSpot(spotId.toString()));
+      expect(project.reports[0].spots).toBeUndefined();
+      expect(project.reports[0].modified_timestamp).toBeGreaterThan(1);
+    });
+
+    // As a dataset delete does, with all its Spots in the one action
+    it('takes several Spots out at once', () => {
+      const {project} = deleteSpots(getState(), deletedSpots([spotId, otherSpotId.toString()]));
+      expect(project.reports[0].spots).toBeUndefined();
+      expect(project.reports[1].spots).toBeUndefined();
+    });
   });
 
-  // A dataset the Spot was never in must not be marked modified, or it gets uploaded for nothing
-  it('leaves a dataset without the Spot untouched', () => {
-    const {datasets} = projectReducer(getDatasetsState(), deletedSpotIdFromDatasets(spotId.toString()));
-    expect(datasets[13]).toEqual(getDatasetsState().datasets[13]);
-  });
-
-  it('leaves a dataset with no Spots yet unmarked', () => {
-    const state = getDatasetsState();
-    state.datasets[14] = {id: 14, modified_timestamp: 1, name: 'Empty'};
-    const {datasets} = projectReducer(state, deletedSpotIdFromDatasets(spotId));
-    expect(datasets[14].modified_timestamp).toBe(1);
-  });
-});
-
-describe('deletedSpotIdsFromReports', () => {
-  const getState = () => ({
-    project: {
-      modified_timestamp: 1,
-      reports: [
-        {id: 'r1', name: 'Report 1', spots: [spotId, otherSpotId]},
-        {id: 'r2', name: 'Report 2', spots: [otherSpotId]},
-      ],
-    },
-  });
-
-  it('takes the Spot out of the report holding it, leaving the others alone', () => {
-    const {project} = projectReducer(getState(), deletedSpotIdsFromReports([spotId]));
-    expect(project.reports[0].spots).toEqual([otherSpotId]);
-    expect(project.reports[1].spots).toEqual([otherSpotId]);
-  });
-
-  it('takes the Spot out when its id is given as a string', () => {
-    const {project} = projectReducer(getState(), deletedSpotIdsFromReports([spotId.toString()]));
-    expect(project.reports[0].spots).toEqual([otherSpotId]);
-  });
-
-  it('drops spots entirely when the Spot was the only one, string id or not', () => {
-    const state = {project: {modified_timestamp: 1, reports: [{id: 'r1', name: 'Report 1', spots: [spotId]}]}};
-    const {project} = projectReducer(state, deletedSpotIdsFromReports([spotId.toString()]));
-    expect(project.reports[0].spots).toBeUndefined();
-    expect(project.reports[0].modified_timestamp).toBeGreaterThan(1);
-  });
-
-  // As a dataset delete does, with all its Spots in the one action
-  it('takes several Spots out at once', () => {
-    const {project} = projectReducer(getState(), deletedSpotIdsFromReports([spotId, otherSpotId.toString()]));
-    expect(project.reports[0].spots).toBeUndefined();
-    expect(project.reports[1].spots).toBeUndefined();
-  });
-});
-
-describe('deletedSpotIdsFromTags', () => {
-  const getState = () => ({
-    project: {
-      modified_timestamp: 1,
-      tags: [
-        {features: {[spotId]: ['f1'], [otherSpotId]: ['f2']}, id: 't1', name: 'Tag 1', spots: [spotId, otherSpotId]},
-        {id: 't2', name: 'Tag 2', spots: [otherSpotId]},
-      ],
-    },
-    selectedTag: {},
-  });
-
-  it('takes the Spot out of the tag holding it, leaving the others alone', () => {
-    const {project} = projectReducer(getState(), deletedSpotIdsFromTags([spotId]));
-    expect(project.tags[0].spots).toEqual([otherSpotId]);
-    expect(project.tags[1].spots).toEqual([otherSpotId]);
-  });
-
-  it('takes the Spot out when its id is given as a string', () => {
-    const {project} = projectReducer(getState(), deletedSpotIdsFromTags([spotId.toString()]));
-    expect(project.tags[0].spots).toEqual([otherSpotId]);
-  });
-
-  it('takes the Spot out of the tag features either way', () => {
-    const {project} = projectReducer(getState(), deletedSpotIdsFromTags([spotId.toString()]));
-    expect(project.tags[0].features).toEqual({[otherSpotId]: ['f2']});
-  });
-
-  it('drops spots entirely when the Spot was the only one, string id or not', () => {
-    const state = {
-      project: {modified_timestamp: 1, tags: [{id: 't1', name: 'Tag 1', spots: [spotId]}]},
+  describe('from tags', () => {
+    const getState = () => ({
+      datasets: {},
+      project: {
+        modified_timestamp: 1,
+        tags: [
+          {features: {[spotId]: ['f1'], [otherSpotId]: ['f2']}, id: 't1', name: 'Tag 1', spots: [spotId, otherSpotId]},
+          {id: 't2', name: 'Tag 2', spots: [otherSpotId]},
+        ],
+      },
       selectedTag: {},
-    };
-    const {project} = projectReducer(state, deletedSpotIdsFromTags([spotId.toString()]));
-    expect(project.tags[0].spots).toBeUndefined();
-  });
+    });
 
-  // As a dataset delete does, with all its Spots in the one action
-  it('takes several Spots out of the tags and their features at once', () => {
-    const {project} = projectReducer(getState(), deletedSpotIdsFromTags([spotId, otherSpotId.toString()]));
-    expect(project.tags[0].spots).toBeUndefined();
-    expect(project.tags[0].features).toBeUndefined();
-    expect(project.tags[1].spots).toBeUndefined();
+    it('takes the Spot out of the tag holding it, leaving the others alone', () => {
+      const {project} = deleteSpots(getState(), deletedSpot(spotId));
+      expect(project.tags[0].spots).toEqual([otherSpotId]);
+      expect(project.tags[1].spots).toEqual([otherSpotId]);
+    });
+
+    it('takes the Spot out when its id is given as a string', () => {
+      const {project} = deleteSpots(getState(), deletedSpot(spotId.toString()));
+      expect(project.tags[0].spots).toEqual([otherSpotId]);
+    });
+
+    // One change carries one time, so a tag or memo is never newer than the project holding it
+    it('gives the tags and memos changed the delete\'s own time, as the project is given', () => {
+      const state = {...getState(), project: {...getState().project, reports: [{id: 'r1', spots: [spotId]}]}};
+      const action = deletedSpot(spotId);
+      const {project} = deleteSpots(state, action);
+      expect(project.tags[0].modified_timestamp).toBe(action.meta.timestamp);
+      expect(project.reports[0].modified_timestamp).toBe(action.meta.timestamp);
+      expect(project.modified_timestamp).toBe(action.meta.timestamp);
+    });
+
+    it('takes the Spot out of the tag features either way', () => {
+      const {project} = deleteSpots(getState(), deletedSpot(spotId.toString()));
+      expect(project.tags[0].features).toEqual({[otherSpotId]: ['f2']});
+    });
+
+    it('drops spots entirely when the Spot was the only one, string id or not', () => {
+      const state = {
+        datasets: {},
+        project: {modified_timestamp: 1, tags: [{id: 't1', name: 'Tag 1', spots: [spotId]}]},
+        selectedTag: {},
+      };
+      const {project} = deleteSpots(state, deletedSpot(spotId.toString()));
+      expect(project.tags[0].spots).toBeUndefined();
+    });
+
+    // As a dataset delete does, with all its Spots in the one action
+    it('takes several Spots out of the tags and their features at once', () => {
+      const {project} = deleteSpots(getState(), deletedSpots([spotId, otherSpotId.toString()]));
+      expect(project.tags[0].spots).toBeUndefined();
+      expect(project.tags[0].features).toBeUndefined();
+      expect(project.tags[1].spots).toBeUndefined();
+    });
   });
 });
 

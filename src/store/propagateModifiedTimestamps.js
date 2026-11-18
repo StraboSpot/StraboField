@@ -34,16 +34,20 @@ const updateTimestamps = (nextState, datasetIds, timestamp) => {
 
 // Spot changes carry the time they were made (withModifiedTimestamp in spots.slice). It compares the Spots before
 // and after rather than reading the payload, because several actions find their Spot from the selected one. A Spot
-// in no dataset yet, such as the new half of a line split during map editing, updates the project alone.
+// in no dataset yet, such as the new half of a line split during map editing, updates the project alone. A deleted
+// Spot has already left its datasets by then (the project slice takes it out in the same dispatch), so the datasets
+// that changed are updated too, even when the id deleted was one with no Spot left to delete.
 const updateAfterSpotAction = (state, nextState, action) => {
   const {shouldPropagateTimestamps, timestamp} = action.meta || {};
   if (!timestamp || !shouldPropagateTimestamps) return nextState;
   const changedSpotIds = getChangedKeys(state.spot.spots, nextState.spot.spots);
-  if (isEmpty(changedSpotIds)) return nextState;
-  const datasetIds = Object.keys(nextState.project.datasets).filter(datasetId => (
+  const changedDatasetIds = getChangedKeys(state.project.datasets, nextState.project.datasets);
+  const isProjectChanged = state.project.project !== nextState.project.project;
+  if (isEmpty(changedSpotIds) && isEmpty(changedDatasetIds) && !isProjectChanged) return nextState;
+  const datasetIdsHoldingSpots = Object.keys(nextState.project.datasets).filter(datasetId => (
     nextState.project.datasets[datasetId].spotIds?.some(id => changedSpotIds.some(spotId => isSameId(id, spotId)))
   ));
-  return updateTimestamps(nextState, datasetIds, timestamp);
+  return updateTimestamps(nextState, [...new Set([...datasetIdsHoldingSpots, ...changedDatasetIds])], timestamp);
 };
 
 // Datasets live in the project slice, so this covers both: a dataset changed updates it and the project, and a dataset
