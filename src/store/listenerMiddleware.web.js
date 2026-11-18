@@ -244,9 +244,14 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
   }
   // Spot Updated
   else if (action.type.includes('spot/')) {
-    // Get Spot
-    const spotId = action.payload?.properties?.id || newState.spot.selectedSpot.properties.id;
+    // Get Spot - editedSpotProperties can edit a Spot other than the selected one (a sample's parent, edited after
+    // the sample's delete has cleared the selection). An image edit identifies only the image, and changes whichever
+    // Spot holds it.
+    const spotId = editedSpotImage.match(action) ? Object.values(newState.spot.spots).find(
+      spot => spot.properties.images?.some(image => image.id === action.payload.id))?.properties.id
+      : action.payload?.properties?.id || action.payload?.spotId || newState.spot.selectedSpot?.properties?.id;
     const spot = newState.spot.spots[spotId];
+    if (!spot) return;
 
     // Get dataset for spot
     let dataset = datasets.find(d => d.spotIds?.some(id => isSameId(id, spotId)));
