@@ -157,7 +157,7 @@ describe('moving a Spot on web', () => {
     const settleDatasetDelete = holdOpen(deleteDataset);
 
     store.dispatch(deletedDataset(12));
-    store.dispatch(movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 14}));
+    store.dispatch(movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId: 14}));
     await flushPromises();
     expect(moveSpotToDataset).not.toHaveBeenCalled();
 
@@ -178,9 +178,26 @@ describe('moving a Spot on web', () => {
       },
       spot: {recentViews: [], selectedSpot: {}, spots: {}},
     });
-    store.dispatch(movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 14}));
+    store.dispatch(movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId: 14}));
     await flushPromises();
     expect(moveSpotToDataset).not.toHaveBeenCalled();
+  });
+
+  // The server moves one Spot per call, so a Spot and its samples are sent one after another
+  it('sends each Spot in the move, the Spot first and then its samples', async () => {
+    const sampleId = 1756000000052;
+    const store = makeStore({
+      project: {
+        datasets: {13: {id: 13, spotIds: [spotId, sampleId]}, 14: {id: 14, spotIds: []}},
+        project: {id: 1, modified_timestamp: 1},
+        readOnlyDatasetsIds: [],
+      },
+      spot: {recentViews: [], selectedSpot: {}, spots: {}},
+    });
+    store.dispatch(movedSpotIdBetweenDatasets({spotIds: [spotId, sampleId], toDatasetId: 14}));
+    await flushPromises();
+    expect(moveSpotToDataset.mock.calls.map(([sentSpotId, toDatasetId]) => [sentSpotId, toDatasetId]))
+      .toEqual([[spotId, 14], [sampleId, 14]]);
   });
 });
 

@@ -3,7 +3,7 @@ import {createSlice} from '@reduxjs/toolkit';
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
 import {getNewId, isEmpty, isEqual, isSameId} from '../../shared/helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
-import {canMoveSpotIdsToDataset, isReadOnlyDatasetId} from '../spots/spots.helpers';
+import {canMoveSpotIdsToDataset, isReadOnlyDatasetId, isSpotIdInDataset} from '../spots/spots.helpers';
 import {
   deleteTemplateKey,
   getActiveTemplateList,
@@ -244,16 +244,18 @@ const projectSlice = createSlice({
       state.downloadsDirectory = action.payload;
     },
     movedSpotIdBetweenDatasets(state, action) {
-      const {toDatasetId, spotId} = action.payload;
+      const {spotIds, toDatasetId} = action.payload;
       // Nothing is moved into or out of a read only dataset, whatever the caller asked for. The web listener asks the
       // same question before sending the move to the server.
-      if (!canMoveSpotIdsToDataset([spotId], toDatasetId, state.datasets, state.readOnlyDatasetsIds)) return;
-      // Only the datasets whose Spots change are written, so the rest are not marked modified
+      if (!canMoveSpotIdsToDataset(spotIds, toDatasetId, state.datasets, state.readOnlyDatasetsIds)) return;
+      // Only the datasets whose Spots change are written, so the rest are not marked modified. A Spot already in the
+      // dataset it is moved to keeps its place there, rather than going to the end and marking the dataset modified.
       Object.entries(state.datasets).forEach(([datasetId, dataset]) => {
-        const remainingSpotIds = dataset.spotIds?.filter(id => !isSameId(id, spotId)) || [];
-        const updatedSpotIds = datasetId === toDatasetId.toString() ? [...remainingSpotIds, spotId]
-          : remainingSpotIds;
-        if (!isEqual(dataset.spotIds || [], updatedSpotIds)) dataset.spotIds = updatedSpotIds;
+        const currentSpotIds = dataset.spotIds || [];
+        const updatedSpotIds = datasetId === toDatasetId.toString()
+          ? [...currentSpotIds, ...spotIds.filter(spotId => !isSpotIdInDataset(dataset, spotId))]
+          : currentSpotIds.filter(id => !spotIds.some(spotId => isSameId(id, spotId)));
+        if (!isEqual(currentSpotIds, updatedSpotIds)) dataset.spotIds = updatedSpotIds;
       });
     },
     removedChangedImageIds(state, action) {

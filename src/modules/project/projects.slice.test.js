@@ -273,7 +273,7 @@ describe('migrateReportTimestamps on malformed data', () => {
 
 describe('movedSpotIdBetweenDatasets', () => {
   it('moves the Spot to the dataset it is given', () => {
-    const action = movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 13});
+    const action = movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId: 13});
     const {datasets} = projectReducer(getDatasetsState(), action);
     expect(datasets[12].spotIds).toEqual([otherSpotId]);
     expect(datasets[13].spotIds).toEqual([1756000000003, spotId]);
@@ -282,7 +282,8 @@ describe('movedSpotIdBetweenDatasets', () => {
   it('marks both datasets and the project as modified', () => {
     const state = getDatasetsState();
     state.datasets[14] = {id: 14, modified_timestamp: 1, name: 'Dataset 3', spotIds: [otherSpotId]};
-    const {datasets, project} = projectReducer(state, movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 13}));
+    const action = movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId: 13});
+    const {datasets, project} = projectReducer(state, action);
     expect(datasets[12].modified_timestamp).toBeGreaterThan(1);
     expect(datasets[13].modified_timestamp).toBeGreaterThan(1);
     expect(datasets[14].modified_timestamp).toBe(1);
@@ -291,7 +292,7 @@ describe('movedSpotIdBetweenDatasets', () => {
 
   // Without the id coercion the Spot lands in the new dataset while staying in the old one
   it('moves the Spot when its id is given as a string', () => {
-    const action = movedSpotIdBetweenDatasets({spotId: spotId.toString(), toDatasetId: 13});
+    const action = movedSpotIdBetweenDatasets({spotIds: [spotId.toString()], toDatasetId: 13});
     const {datasets} = projectReducer(getDatasetsState(), action);
     expect(datasets[12].spotIds).toEqual([otherSpotId]);
     expect(datasets[13].spotIds).toEqual([1756000000003, spotId.toString()]);
@@ -302,25 +303,80 @@ describe('movedSpotIdBetweenDatasets', () => {
   it('leaves a Spot that is in two datasets in only the one it is moved to', () => {
     const state = getDatasetsState();
     state.datasets[13].spotIds.push(spotId);
-    const {datasets} = projectReducer(state, movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 12}));
-    expect(datasets[12].spotIds).toEqual([otherSpotId, spotId]);
+    const {datasets} = projectReducer(state, movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId: 12}));
+    expect(datasets[12]).toEqual(getDatasetsState().datasets[12]);
     expect(datasets[13].spotIds).toEqual([1756000000003]);
+  });
+
+  // A Spot's samples are Spots of their own, so they go along with it, wherever each one was
+  it('moves every Spot it is given, from whichever datasets hold them', () => {
+    const sampleSpotId = 1756000000004;
+    const state = getDatasetsState();
+    state.datasets[14] = {id: 14, modified_timestamp: 1, name: 'Dataset 3', spotIds: [sampleSpotId]};
+    const action = movedSpotIdBetweenDatasets({spotIds: [spotId, otherSpotId, sampleSpotId], toDatasetId: 13});
+    const {datasets} = projectReducer(state, action);
+    expect(datasets[12].spotIds).toEqual([]);
+    expect(datasets[13].spotIds).toEqual([1756000000003, spotId, otherSpotId, sampleSpotId]);
+    expect(datasets[14].spotIds).toEqual([]);
+  });
+
+  // Given in an order other than the dataset's, which must not reorder it
+  it('leaves a dataset alone when the Spots are already in it', () => {
+    const action = movedSpotIdBetweenDatasets({spotIds: [otherSpotId, spotId.toString()], toDatasetId: 12});
+    const {datasets} = projectReducer(getDatasetsState(), action);
+    expect(datasets[12]).toEqual(getDatasetsState().datasets[12]);
+  });
+
+  // A sample can already be in the dataset its parent is moved to
+  it('adds only the Spots not already in the dataset, keeping its order', () => {
+    const state = getDatasetsState();
+    state.datasets[13].spotIds.push(otherSpotId);
+    const action = movedSpotIdBetweenDatasets({spotIds: [spotId, otherSpotId], toDatasetId: 13});
+    const {datasets} = projectReducer(state, action);
+    expect(datasets[12].spotIds).toEqual([]);
+    expect(datasets[13].spotIds).toEqual([1756000000003, otherSpotId, spotId]);
   });
 
   // Whatever the caller asks for, nothing in a read only dataset changes - not even its timestamp
   it('moves nothing into a read only dataset', () => {
     const state = {...getDatasetsState(), readOnlyDatasetsIds: [13]};
-    const {datasets} = projectReducer(state, movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 13}));
+    const {datasets} = projectReducer(state, movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId: 13}));
     expect(datasets).toEqual(getDatasetsState().datasets);
+  });
+
+  // A sample already split off into a read only dataset can't move, and moving its parent alone would split them
+  // further, so the parent stays too
+  it('moves nothing when one of the Spots is in a read only dataset', () => {
+    const sampleSpotId = 1756000000004;
+    const state = {...getDatasetsState(), readOnlyDatasetsIds: [14]};
+    state.datasets[14] = {id: 14, modified_timestamp: 1, name: 'Dataset 3', spotIds: [sampleSpotId]};
+    const action = movedSpotIdBetweenDatasets({spotIds: [spotId, sampleSpotId], toDatasetId: 13});
+    const {datasets} = projectReducer(state, action);
+    expect(datasets).toEqual(state.datasets);
   });
 
   // A Spot left in two datasets by the old map-edit bug can't be taken out of one that is read only
   it('leaves a Spot alone when a read only dataset also holds it', () => {
     const state = {...getDatasetsState(), readOnlyDatasetsIds: [13]};
     state.datasets[13].spotIds.push(spotId);
-    const {datasets} = projectReducer(state, movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 12}));
+    const {datasets} = projectReducer(state, movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId: 12}));
     expect(datasets[13].spotIds).toEqual([1756000000003, spotId]);
     expect(datasets[13].modified_timestamp).toBe(1);
+  });
+});
+
+describe('project settings', () => {
+  // The setting is kept on the project and sent to the server, so changing it is a change to the project
+  it('marks the project as modified when continuous tagging is switched', () => {
+    const {project} = projectReducer({project: {modified_timestamp: 1}}, setUseContinuousTagging(true));
+    expect(project.useContinuousTagging).toBe(true);
+    expect(project.modified_timestamp).toBeGreaterThan(1);
+  });
+
+  // Only says where the tag being made goes, so opening the tag pages must not mark the project for save or sync
+  it('leaves the project as it was when a tag is set to go on the selected Spot', () => {
+    const {project} = projectReducer({project: {modified_timestamp: 1}}, addedTagToSelectedSpot(true));
+    expect(project.modified_timestamp).toBe(1);
   });
 });
 
@@ -346,21 +402,6 @@ describe('target and read only datasets', () => {
     const readOnlyState = projectReducer(state, setReadOnlyDatasetsIds(13));
     expect(readOnlyState.readOnlyDatasetsIds).toEqual([13]);
     expect(projectReducer(readOnlyState, setReadOnlyDatasetsIds(13)).readOnlyDatasetsIds).toEqual([]);
-  });
-});
-
-describe('project settings', () => {
-  // The setting is kept on the project and sent to the server, so changing it is a change to the project
-  it('marks the project as modified when continuous tagging is switched', () => {
-    const {project} = projectReducer({project: {modified_timestamp: 1}}, setUseContinuousTagging(true));
-    expect(project.useContinuousTagging).toBe(true);
-    expect(project.modified_timestamp).toBeGreaterThan(1);
-  });
-
-  // Only says where the tag being made goes, so opening the tag pages must not mark the project for save or sync
-  it('leaves the project as it was when a tag is set to go on the selected Spot', () => {
-    const {project} = projectReducer({project: {modified_timestamp: 1}}, addedTagToSelectedSpot(true));
-    expect(project.modified_timestamp).toBe(1);
   });
 });
 

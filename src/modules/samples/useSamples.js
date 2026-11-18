@@ -43,7 +43,7 @@ const useSamples = () => {
   const straboUserId = useSelector(state => state.user?.straboUserId);
 
   const {getProfile} = useServerRequests();
-  const {getTargetDatasetFromId} = useProject();
+  const {getDatasetIdFromSpotId, getTargetDatasetFromId} = useProject();
   const {deleteSpot, getRootSpotGeoCoords} = useSpots();
   const toast = useToast();
 
@@ -87,10 +87,11 @@ const useSamples = () => {
   // Create new Sample Spot
   // The geometry is the parent's location unless one is given, as it is when linking takes StraboSamples'
   const createRichSample = (spot, selectedSample, sampleImages = [], geometry = getSampleGeometry(spot)) => {
-    // Nowhere to file the new Sample Spot without a target, so stop before anything is created rather than
-    // leaving one behind in no dataset
-    const targetDataset = getTargetDatasetFromId();
-    if (isEmpty(targetDataset)) {
+    // The Sample Spot goes in its parent's dataset, which needn't be the target - the target may have been switched
+    // since the parent was made. The target is only the fallback for a parent not yet in any dataset. Nowhere to
+    // file it without either, so stop before anything is created rather than leaving one behind in no dataset.
+    const datasetId = getDatasetIdFromSpotId(spot.properties.id) ?? getTargetDatasetFromId()?.id;
+    if (isEmpty(datasetId)) {
       toast.show('No Target Dataset. A target dataset needs to be set before creating a Sample.',
         {placement: 'top', type: 'warning'});
       return;
@@ -117,7 +118,7 @@ const useSamples = () => {
     };
 
     console.log('Creating new Enriched Sample:', newEnrichedSample);
-    dispatch(addedNewSpotIdToDataset({datasetId: targetDataset.id, spotId: newEnrichedSample.properties.id}));
+    dispatch(addedNewSpotIdToDataset({datasetId: datasetId, spotId: newEnrichedSample.properties.id}));
     dispatch(editedOrCreatedSpot(newEnrichedSample));
     if (Platform.OS !== 'web') dispatch(addedSampleSpotIdToUpload(newEnrichedSample.properties.id));
 

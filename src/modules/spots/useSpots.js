@@ -49,6 +49,7 @@ import {
   updatedProjectPreference,
 } from '../project/projects.slice';
 import useProject from '../project/useProject';
+import {getRichSamples} from '../samples/samples.helpers';
 import useTags from '../tags/useTags';
 
 const useSpots = () => {
@@ -135,22 +136,6 @@ const useSpots = () => {
       spot => !deletedSpotIds.includes(spot.properties.id)
         && spot.properties.samples?.some(sample => deletedSpotIds.includes(sample.id)),
     );
-  };
-
-  // Collect every rich-sample Spot nested under a Spot (recursively), so a delete + its undo cover them all.
-  const getRichSampleSpots = (spotToDelete) => {
-    const collected = {};
-    const collect = (spot) => {
-      spot.properties?.samples?.forEach((sample) => {
-        const sampleSpot = spots[sample.id];
-        if (sampleSpot && sample.id !== spotToDelete.properties.id && !collected[sample.id]) {
-          collected[sample.id] = sampleSpot;
-          collect(sampleSpot);
-        }
-      });
-    };
-    collect(spotToDelete);
-    return Object.values(collected);
   };
 
   // Every Spot whose dataset can make the given Spot read only. Locking always spreads down from the Spot
@@ -383,7 +368,7 @@ const useSpots = () => {
   const deleteSpot = (spotToDelete) => {
     const spotId = spotToDelete.properties.id;
     console.log('Deleting Spot ID', spotId, '...');
-    const spotsToDelete = [spotToDelete, ...getRichSampleSpots(spotToDelete)];
+    const spotsToDelete = [spotToDelete, ...getRichSamples(spotToDelete, spots)];
 
     // Undo is native-only: web syncs deletes to the server immediately, so a local-only undo would be misleading.
     // Capture the pre-delete state BEFORE dispatching so the toast's undo can restore it verbatim.

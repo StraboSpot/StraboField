@@ -121,7 +121,7 @@ const intervalDragModeEndedListener = async (action, listenerApi) => {
   }
 };
 
-// Move one Spot from a one Dataset to Another
+// Move Spots from one Dataset to another - a Spot together with its sample Spots. The server moves one Spot per call.
 const moveSpotToDatasetListener = async (action, listenerApi) => {
   console.log('Action:', action, 'Moving Spot to Dataset:', action.payload);
 
@@ -130,9 +130,9 @@ const moveSpotToDatasetListener = async (action, listenerApi) => {
 
   // Only a move the reducer made, leaving every read only dataset as it is on the server too. Asked of the state
   // before the move, which is what the reducer was given.
-  const {toDatasetId, spotId} = action.payload;
+  const {spotIds, toDatasetId} = action.payload;
   const {datasets, readOnlyDatasetsIds} = listenerApi.getOriginalState().project;
-  if (!canMoveSpotIdsToDataset([spotId], toDatasetId, datasets, readOnlyDatasetsIds)) return;
+  if (isEmpty(spotIds) || !canMoveSpotIdsToDataset(spotIds, toDatasetId, datasets, readOnlyDatasetsIds)) return;
 
   const encodedLogin = newState.user.encoded_login;
   const modifiedTimestamp = newState.project.project.modified_timestamp;
@@ -145,8 +145,10 @@ const moveSpotToDatasetListener = async (action, listenerApi) => {
   let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
 
   try {
-    const resJSON = await moveSpotToDataset(spotId, toDatasetId, modifiedTimestamp, encodedLogin);
-    console.log('moved Spot to Dataset resJSON', resJSON);
+    for (const spotId of spotIds) {
+      const resJSON = await moveSpotToDataset(spotId, toDatasetId, modifiedTimestamp, encodedLogin);
+      console.log('moved Spot to Dataset resJSON', resJSON);
+    }
 
     Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
   }

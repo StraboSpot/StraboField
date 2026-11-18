@@ -1,16 +1,21 @@
 import {
+  canMoveSampleToDataset,
   getLinkedSample,
+  getRichSamples,
   getSampleDifferences,
   getSampleMetadata,
   getSampleParent,
   getSamplesLinkedTo,
-  getStraboSampleFromResponse,
   getSampleTitle,
+  getSpotIdsToMove,
+  getStraboSampleFromResponse,
   getUnlinkedSample,
   isLinkedToFieldSpot,
   isLinkedToOtherFieldSpot,
   isSampleStub,
+  isSplitFromParent,
 } from './samples.helpers';
+import {canMoveSpotIdsToDataset} from '../spots/spots.helpers';
 
 const sample = {id: 's1', sample_id_name: 'JG-1'};
 const richSample = {
@@ -34,54 +39,89 @@ const sampleWithNested = {
 const nestedSampleSpot = {properties: {id: nestedSampleId, isSample: true, samples: [{id: nestedSampleId}]}};
 const nestedSpots = {...familySpots, [sampleId]: sampleWithNested, [nestedSampleId]: nestedSampleSpot};
 
-describe('getSampleMetadata', () => {
-  it('gives back a sample kept on its parent Spot as it is', () => {
-    expect(getSampleMetadata(sample)).toBe(sample);
+describe('canMoveSampleToDataset', () => {
+  const datasets = {
+    12: {id: 12, spotIds: [parentId]},
+    13: {id: 13, spotIds: [sampleId]},
+    14: {id: 14, spotIds: []},
+  };
+
+  it('lets a sample split from its parent go back only to its parent\'s dataset', () => {
+    const isSplit = isSplitFromParent(sampleSpot, parent, datasets);
+    expect(canMoveSampleToDataset(isSplit, parent, datasets[12])).toBe(true);
+    expect(canMoveSampleToDataset(isSplit, parent, datasets[13])).toBe(false);
+    expect(canMoveSampleToDataset(isSplit, parent, datasets[14])).toBe(false);
   });
 
-  it('reaches into a rich sample for the record the Spot holds', () => {
-    expect(getSampleMetadata(richSample).sample_id_name).toBe('JG-2');
-  });
-
-  it('falls back to the Spot id for a rich sample whose record has gone', () => {
-    const emptyRichSample = {properties: {id: 1756000000002, isSample: true}};
-    expect(getSampleMetadata(emptyRichSample)).toEqual({id: 1756000000002});
-  });
-});
-
-// A label is filled in with sample_id_name on save, so the two read the same until someone types over it
-describe('getSampleParent', () => {
-  it('finds the Spot whose samples list it, rather than the Sample Spot itself', () => {
-    expect(getSampleParent(sampleSpot, familySpots)).toBe(parent);
-  });
-
-  it('finds the parent of a sample listed by a string id', () => {
-    const stringParent = {properties: {id: parentId, samples: [{id: sampleId.toString()}]}};
-    expect(getSampleParent(sampleSpot, {[parentId]: stringParent, [sampleId]: sampleSpot})).toBe(stringParent);
-  });
-
-  it('finds nothing for a sample no Spot lists', () => {
-    expect(getSampleParent(sampleSpot, {[sampleId]: sampleSpot})).toBeUndefined();
-  });
-
-  it('finds the Sample Spot a sample of a sample was taken from', () => {
-    expect(getSampleParent(nestedSampleSpot, nestedSpots)).toBe(sampleWithNested);
+  it('lets a sample kept with its parent go nowhere on its own', () => {
+    const together = {12: {id: 12, spotIds: [parentId, sampleId]}, 14: {id: 14, spotIds: []}};
+    const isSplit = isSplitFromParent(sampleSpot, parent, together);
+    expect(canMoveSampleToDataset(isSplit, parent, together[12])).toBe(false);
+    expect(canMoveSampleToDataset(isSplit, parent, together[14])).toBe(false);
   });
 });
 
-describe('getSampleTitle', () => {
-  it('names a sample by the name it was given when it has no label of its own', () => {
-    expect(getSampleTitle(sample)).toBe('JG-1');
-    expect(getSampleTitle(richSample)).toBe('JG-2');
+describe('getLinkedSample', () => {
+  const strabosample = {
+    id: 'ab12cd34-ef56-4a78-9b01-23456789abcd',
+    name: 'Basalt core BC-14',
+    igsn: null,
+    description: 'Cored from the flow top',
+    display_sample_type: 'intact_rock',
+  };
+  const fieldSample = {id: 1, sample_id_name: 'BC-14 field', sample_notes: 'Kept', material_type: 'sediment'};
+
+  it('takes the StraboSamples values picked and keeps the rest', () => {
+    expect(getLinkedSample(fieldSample, strabosample, ['sample_id_name', 'sample_description'])).toEqual({
+      id: 1,
+      strabosamples_id: 'ab12cd34-ef56-4a78-9b01-23456789abcd',
+      sample_id_name: 'Basalt core BC-14',
+      sample_description: 'Cored from the flow top',
+      sample_notes: 'Kept',
+      material_type: 'sediment',
+    });
   });
 
-  it('prefers a label typed over that name', () => {
-    expect(getSampleTitle({...sample, label: 'Big pluton, north face'})).toBe('Big pluton, north face');
+  it('compares and takes the label as well as the name', () => {
+    const differences = getSampleDifferences({...fieldSample, label: 'BC-14 field'}, strabosample);
+    expect(differences.find(d => d.key === 'label')).toEqual(
+      {key: 'label', fieldValue: 'BC-14 field', strabosamplesValue: 'Basalt core BC-14'});
+    expect(getLinkedSample({...fieldSample, label: 'BC-14 field'}, strabosample, ['label']).label)
+      .toBe('Basalt core BC-14');
   });
 
-  it('falls back to the Spot name, then to Unknown', () => {
-    expect(getSampleTitle({properties: {id: 1, isSample: true, name: 'JG-3'}})).toBe('JG-3');
-    expect(getSampleTitle({})).toBe('Unknown');
+  it('never takes an empty StraboSamples value', () => {
+    expect(getLinkedSample(fieldSample, strabosample, ['Sample_IGSN', 'sample_notes']).sample_notes).toBe('Kept');
+  });
+
+  it('keeps a numeric StraboSamples id as a string', () => {
+    expect(getLinkedSample({id: 1}, {id: 17794148544769}).strabosamples_id).toBe('17794148544769');
+    expect(getLinkedSample({id: 1}, {id: '0017794148544769'}).strabosamples_id).toBe('0017794148544769');
+  });
+});
+
+// Delete and the dataset move both go through this to take a Spot's rich samples along with it
+describe('getRichSamples', () => {
+  it('collects samples nested at any depth', () => {
+    expect(getRichSamples(parent, nestedSpots)).toEqual([sampleWithNested, nestedSampleSpot, otherSampleSpot]);
+  });
+
+  it('leaves out the rich sample it starts from, which lists itself among its own samples', () => {
+    expect(getRichSamples(sampleWithNested, nestedSpots)).toEqual([nestedSampleSpot]);
+  });
+
+  it('leaves out the rich sample it starts from when it lists itself by a string id', () => {
+    const stringSelf = {properties: {id: sampleId, isSample: true, samples: [{id: sampleId.toString()}]}};
+    expect(getRichSamples(stringSelf, {[sampleId]: stringSelf})).toEqual([]);
+  });
+
+  it('skips a sample stub with no Spot behind it', () => {
+    expect(getRichSamples(parent, {[parentId]: parent})).toEqual([]);
+  });
+
+  it('returns nothing for a Spot without samples', () => {
+    const spot = {properties: {id: parentId}, type: 'Feature'};
+    expect(getRichSamples(spot, {[parentId]: spot})).toEqual([]);
   });
 });
 
@@ -154,55 +194,37 @@ describe('getSampleDifferences for location', () => {
   });
 });
 
-describe('getLinkedSample', () => {
-  const strabosample = {
-    id: 'ab12cd34-ef56-4a78-9b01-23456789abcd',
-    name: 'Basalt core BC-14',
-    igsn: null,
-    description: 'Cored from the flow top',
-    display_sample_type: 'intact_rock',
-  };
-  const fieldSample = {id: 1, sample_id_name: 'BC-14 field', sample_notes: 'Kept', material_type: 'sediment'};
-
-  it('takes the StraboSamples values picked and keeps the rest', () => {
-    expect(getLinkedSample(fieldSample, strabosample, ['sample_id_name', 'sample_description'])).toEqual({
-      id: 1,
-      strabosamples_id: 'ab12cd34-ef56-4a78-9b01-23456789abcd',
-      sample_id_name: 'Basalt core BC-14',
-      sample_description: 'Cored from the flow top',
-      sample_notes: 'Kept',
-      material_type: 'sediment',
-    });
+describe('getSampleMetadata', () => {
+  it('gives back a sample kept on its parent Spot as it is', () => {
+    expect(getSampleMetadata(sample)).toBe(sample);
   });
 
-  it('compares and takes the label as well as the name', () => {
-    const differences = getSampleDifferences({...fieldSample, label: 'BC-14 field'}, strabosample);
-    expect(differences.find(d => d.key === 'label')).toEqual(
-      {key: 'label', fieldValue: 'BC-14 field', strabosamplesValue: 'Basalt core BC-14'});
-    expect(getLinkedSample({...fieldSample, label: 'BC-14 field'}, strabosample, ['label']).label)
-      .toBe('Basalt core BC-14');
+  it('reaches into a rich sample for the record the Spot holds', () => {
+    expect(getSampleMetadata(richSample).sample_id_name).toBe('JG-2');
   });
 
-  it('never takes an empty StraboSamples value', () => {
-    expect(getLinkedSample(fieldSample, strabosample, ['Sample_IGSN', 'sample_notes']).sample_notes).toBe('Kept');
-  });
-
-  it('keeps a numeric StraboSamples id as a string', () => {
-    expect(getLinkedSample({id: 1}, {id: 17794148544769}).strabosamples_id).toBe('17794148544769');
-    expect(getLinkedSample({id: 1}, {id: '0017794148544769'}).strabosamples_id).toBe('0017794148544769');
+  it('falls back to the Spot id for a rich sample whose record has gone', () => {
+    const emptyRichSample = {properties: {id: 1756000000002, isSample: true}};
+    expect(getSampleMetadata(emptyRichSample)).toEqual({id: 1756000000002});
   });
 });
 
-describe('isSampleStub', () => {
-  it('knows the placeholder a parent Spot keeps from a sample', () => {
-    expect(isSampleStub({id: 1})).toBe(true);
-    expect(isSampleStub({id: 1, sample_id_name: 'A'})).toBe(false);
+describe('getSampleParent', () => {
+  it('finds the Spot whose samples list it, rather than the Sample Spot itself', () => {
+    expect(getSampleParent(sampleSpot, familySpots)).toBe(parent);
   });
-});
 
-describe('getUnlinkedSample', () => {
-  it('drops the link and nothing else', () => {
-    expect(getUnlinkedSample({id: 1, strabosamples_id: 'x', sample_id_name: 'A'})).toEqual({id: 1, sample_id_name: 'A'});
+  it('finds the parent of a sample listed by a string id', () => {
+    const stringParent = {properties: {id: parentId, samples: [{id: sampleId.toString()}]}};
+    expect(getSampleParent(sampleSpot, {[parentId]: stringParent, [sampleId]: sampleSpot})).toBe(stringParent);
+  });
+
+  it('finds nothing for a sample no Spot lists', () => {
+    expect(getSampleParent(sampleSpot, {[sampleId]: sampleSpot})).toBeUndefined();
+  });
+
+  it('finds the Sample Spot a sample of a sample was taken from', () => {
+    expect(getSampleParent(nestedSampleSpot, nestedSpots)).toBe(sampleWithNested);
   });
 });
 
@@ -216,6 +238,52 @@ describe('getSamplesLinkedTo', () => {
   it('finds the other samples linked to the same StraboSamples sample', () => {
     expect(getSamplesLinkedTo(spots, 'x', 1)).toEqual([{id: 3, strabosamples_id: 'x'}]);
     expect(getSamplesLinkedTo(spots, 'y', 1)).toEqual([]);
+  });
+});
+
+// A label is filled in with sample_id_name on save, so the two read the same until someone types over it
+describe('getSampleTitle', () => {
+  it('names a sample by the name it was given when it has no label of its own', () => {
+    expect(getSampleTitle(sample)).toBe('JG-1');
+    expect(getSampleTitle(richSample)).toBe('JG-2');
+  });
+
+  it('prefers a label typed over that name', () => {
+    expect(getSampleTitle({...sample, label: 'Big pluton, north face'})).toBe('Big pluton, north face');
+  });
+
+  it('falls back to the Spot name, then to Unknown', () => {
+    expect(getSampleTitle({properties: {id: 1, isSample: true, name: 'JG-3'}})).toBe('JG-3');
+    expect(getSampleTitle({})).toBe('Unknown');
+  });
+});
+
+describe('getSpotIdsToMove', () => {
+  it('moves a Spot\'s samples along with it', () => {
+    expect(getSpotIdsToMove(parent, familySpots)).toEqual([parentId, sampleId, otherSampleId]);
+  });
+
+  it('moves only the Spot when it has no samples', () => {
+    const spot = {properties: {id: parentId}, type: 'Feature'};
+    expect(getSpotIdsToMove(spot, {[parentId]: spot})).toEqual([parentId]);
+  });
+
+  // The parent, the split Sample and the Sample's own sample each in a dataset of their own, as only an old bug could
+  // leave them. The Sample can only go back to its parent's dataset, and its sample goes with it unless that is held.
+  it('takes a split Sample\'s own samples back to its parent\'s dataset with it', () => {
+    const datasets = {
+      12: {id: 12, spotIds: [parentId]},
+      13: {id: 13, spotIds: [sampleId]},
+      14: {id: 14, spotIds: [nestedSampleId]},
+    };
+    const isSplit = isSplitFromParent(sampleWithNested, parent, datasets);
+    expect(canMoveSampleToDataset(isSplit, parent, datasets[12])).toBe(true);
+    expect(canMoveSampleToDataset(isSplit, parent, datasets[14])).toBe(false);
+
+    const spotIdsToMove = getSpotIdsToMove(sampleWithNested, nestedSpots);
+    expect(spotIdsToMove).toEqual([sampleId, nestedSampleId]);
+    expect(canMoveSpotIdsToDataset(spotIdsToMove, 12, datasets, [])).toBe(true);
+    expect(canMoveSpotIdsToDataset(spotIdsToMove, 12, datasets, [14])).toBe(false);
   });
 });
 
@@ -239,6 +307,12 @@ describe('getStraboSampleFromResponse', () => {
     const microData = {thin_sections: [{id: 1}]};
     expect(getStraboSampleFromResponse({sample: {id: 'a', micro_data: null}, micro_data: microData}).micro_data)
       .toBe(microData);
+  });
+});
+
+describe('getUnlinkedSample', () => {
+  it('drops the link and nothing else', () => {
+    expect(getUnlinkedSample({id: 1, strabosamples_id: 'x', sample_id_name: 'A'})).toEqual({id: 1, sample_id_name: 'A'});
   });
 });
 
@@ -273,5 +347,28 @@ describe('isLinkedToOtherFieldSpot', () => {
     const strabosample = {subsystem_links: [{subsystem: 'field', reference_id: '17570006372284'}]};
     expect(isLinkedToOtherFieldSpot(strabosample, [17570006372284, 17715350147590])).toBe(false);
     expect(isLinkedToOtherFieldSpot(strabosample, [17715350147590])).toBe(true);
+  });
+});
+
+describe('isSampleStub', () => {
+  it('knows the placeholder a parent Spot keeps from a sample', () => {
+    expect(isSampleStub({id: 1})).toBe(true);
+    expect(isSampleStub({id: 1, sample_id_name: 'A'})).toBe(false);
+  });
+});
+
+describe('isSplitFromParent', () => {
+  it('is split when the sample is in a dataset its parent isn\'t', () => {
+    const datasets = {12: {id: 12, spotIds: [parentId]}, 13: {id: 13, spotIds: [sampleId]}};
+    expect(isSplitFromParent(sampleSpot, parent, datasets)).toBe(true);
+  });
+
+  it('is not split when the two share a dataset, one held as a string', () => {
+    const datasets = {12: {id: 12, spotIds: [parentId, sampleId.toString()]}, 13: {id: 13, spotIds: []}};
+    expect(isSplitFromParent(sampleSpot, parent, datasets)).toBe(false);
+  });
+
+  it('is not split without a parent', () => {
+    expect(isSplitFromParent(sampleSpot, undefined, {13: {id: 13, spotIds: [sampleId]}})).toBe(false);
   });
 });
