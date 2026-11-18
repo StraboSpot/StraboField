@@ -2,6 +2,7 @@ import {
   getLinkedSample,
   getSampleDifferences,
   getSampleMetadata,
+  getSampleParent,
   getSamplesLinkedTo,
   getStraboSampleFromResponse,
   getSampleTitle,
@@ -15,6 +16,23 @@ const sample = {id: 's1', sample_id_name: 'JG-1'};
 const richSample = {
   properties: {id: 1756000000001, isSample: true, name: 'JG-2', samples: [{id: 's2', sample_id_name: 'JG-2'}]},
 };
+
+// A Sample Spot and its parent, which lists it by an {id} stub. A Sample Spot lists itself in its own samples.
+const parentId = 1756000000011;
+const sampleId = 1756000000012;
+const otherSampleId = 1756000000013;
+const parent = {properties: {id: parentId, samples: [{id: sampleId}, {id: otherSampleId}]}, type: 'Feature'};
+const sampleSpot = {properties: {id: sampleId, isSample: true, samples: [{id: sampleId}]}};
+const otherSampleSpot = {properties: {id: otherSampleId, isSample: true, samples: [{id: otherSampleId}]}};
+const familySpots = {[parentId]: parent, [sampleId]: sampleSpot, [otherSampleId]: otherSampleSpot};
+
+// The same family with a sample of a sample, which its parent - the first sample - lists alongside itself
+const nestedSampleId = 1756000000014;
+const sampleWithNested = {
+  properties: {id: sampleId, isSample: true, samples: [{id: sampleId}, {id: nestedSampleId}]},
+};
+const nestedSampleSpot = {properties: {id: nestedSampleId, isSample: true, samples: [{id: nestedSampleId}]}};
+const nestedSpots = {...familySpots, [sampleId]: sampleWithNested, [nestedSampleId]: nestedSampleSpot};
 
 describe('getSampleMetadata', () => {
   it('gives back a sample kept on its parent Spot as it is', () => {
@@ -32,6 +50,25 @@ describe('getSampleMetadata', () => {
 });
 
 // A label is filled in with sample_id_name on save, so the two read the same until someone types over it
+describe('getSampleParent', () => {
+  it('finds the Spot whose samples list it, rather than the Sample Spot itself', () => {
+    expect(getSampleParent(sampleSpot, familySpots)).toBe(parent);
+  });
+
+  it('finds the parent of a sample listed by a string id', () => {
+    const stringParent = {properties: {id: parentId, samples: [{id: sampleId.toString()}]}};
+    expect(getSampleParent(sampleSpot, {[parentId]: stringParent, [sampleId]: sampleSpot})).toBe(stringParent);
+  });
+
+  it('finds nothing for a sample no Spot lists', () => {
+    expect(getSampleParent(sampleSpot, {[sampleId]: sampleSpot})).toBeUndefined();
+  });
+
+  it('finds the Sample Spot a sample of a sample was taken from', () => {
+    expect(getSampleParent(nestedSampleSpot, nestedSpots)).toBe(sampleWithNested);
+  });
+});
+
 describe('getSampleTitle', () => {
   it('names a sample by the name it was given when it has no label of its own', () => {
     expect(getSampleTitle(sample)).toBe('JG-1');

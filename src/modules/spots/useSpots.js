@@ -633,10 +633,6 @@ const useSpots = () => {
     return Object.values(getActiveSpotsObj()).filter(spot => !isEmpty(spot.properties[key]));
   };
 
-  const getSpotsWithSamples = () => {
-    return Object.values(spots).filter(spot => !spot.properties?.isSample && !isEmpty(spot.properties.samples));
-  };
-
   // Get all active Spots that contain a strat section
   const getSpotsWithStratSection = () => {
     return Object.values(getActiveSpotsObj()).filter(spot => spot?.properties?.sed?.strat_section);
@@ -648,11 +644,6 @@ const useSpots = () => {
       const spotFound = spot.properties?.images?.find(image => image.id?.toString() === imageId?.toString());
       return spotFound ? spot : undefined;
     });
-  };
-
-  // Get the Spot that Contains a Specific Sample Given the ID of the Sample
-  const getSpotWithThisSample = (sampleId) => {
-    return getSpotsWithSamples().find(spot => spot?.properties?.samples?.find(sample => sample.id === sampleId));
   };
 
   // Get the Spot that Contains a Specific Strat Section Given the ID of the Strat Section
@@ -761,10 +752,8 @@ const useSpots = () => {
     getSpotsByIds,
     getSpotsInMapExtent,
     getSpotsWithKey,
-    getSpotsWithSamples,
     getSpotsWithStratSection,
     getSpotWithThisImage,
-    getSpotWithThisSample,
     getSpotWithThisStratSection,
     getVisibleSpots,
     handleSpotSelected,

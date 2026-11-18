@@ -6,20 +6,24 @@ import {Provider} from 'react-redux';
 import ReactTestRenderer from 'react-test-renderer';
 
 import useMapFeatures from './useMapFeatures';
+import spotReducer from '../../spots/spots.slice';
 import mapReducer from '../maps.slice';
 
 jest.mock('../../spots/useSpots', () => () => ({
   getMappableSpots: () => [mockParentSpot, mockOtherSpot],
-  getSpotWithThisSample: sampleId => (sampleId === mockSampleSpot.properties.id ? mockParentSpot : undefined),
 }));
 
 // jest.mock factories may only read variables prefixed with mock
 const mockParentSpot = turf.point([-105, 40], {id: 1, samples: [{id: 3}]});
 const mockOtherSpot = turf.point([-104, 41], {id: 2});
-const mockSampleSpot = turf.point([-105, 40], {id: 3, isSample: true});
+// A Sample Spot lists itself among its own samples
+const mockSampleSpot = turf.point([-105, 40], {id: 3, isSample: true, samples: [{id: 3}]});
 
 const renderHook = () => {
-  const store = configureStore({reducer: {map: mapReducer}});
+  const store = configureStore({
+    preloadedState: {spot: {spots: {1: mockParentSpot, 2: mockOtherSpot, 3: mockSampleSpot}}},
+    reducer: {map: mapReducer, spot: spotReducer},
+  });
   let hookApi;
   const Probe = () => {
     hookApi = useMapFeatures();

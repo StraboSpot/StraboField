@@ -13,6 +13,7 @@ import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import ReportsListItem from '../../reports/ReportsListItem';
+import {getSampleParent} from '../../samples/samples.helpers';
 import SamplesSectionList from '../../samples/SamplesSectionList';
 import SpotsListItem from '../../spots/SpotsListItem';
 import useSpots from '../../spots/useSpots';
@@ -34,20 +35,12 @@ const TagDetail = ({
   const selectedTag = useSelector(state => state.project.selectedTag);
   const spots = useSelector(state => state.spot.spots);
 
-  const {getSpotById, getSpotWithThisSample, isSpotReadOnly} = useSpots();
+  const {getSpotById, isSpotReadOnly} = useSpots();
   const {getAllTaggedFeatures, getFeatureDisplayComponent, getReportsWithThisTag} = useTags();
 
   /* Derived Variables */
 
   const isGeologicUnit = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS;
-  const spotsLabel = isGeologicUnit ? 'Spots With\nGeologic Unit' : 'Tagged Spots';
-  const samplesLabel = isGeologicUnit ? 'Samples W/Geologic Unit' : 'Tagged Samples';
-
-  // Gathered here rather than inside the lists, so each heading can count exactly what its section goes on to show
-  const taggedSpotsIds = selectedTag.spots?.filter(
-    spotId => spots[spotId] && !spots[spotId].properties.isSample) || [];
-  const taggedFeatures = getAllTaggedFeatures(selectedTag);
-  const taggedReports = getReportsWithThisTag(selectedTag);
 
   // The tagged samples, grouped under the Spot each was taken at, which is how the section list wants them. Only
   // a sample that has become a Spot of its own can carry a tag: one still held inside its Spot is tagged only in
@@ -55,7 +48,7 @@ const TagDetail = ({
   const sampleSpots = selectedTag.spots?.reduce((acc, spotId) => {
     const spot = spots[spotId];
     if (!spot?.properties?.isSample) return acc;
-    const parentSpot = getSpotWithThisSample(spotId);
+    const parentSpot = getSampleParent(spot, spots);
     if (!parentSpot) {
       console.error('Couldn\'t find parent Spot. Was this Sample deleted?', spot);
       // dispatch(deletedSpotIdFromTags(spotId));  // Uncomment this to clean up Samples
@@ -68,7 +61,14 @@ const TagDetail = ({
     : Object.keys(sampleSpots).map(parentId => (
       {title: spots[parentId].properties.name, data: sampleSpots[parentId], spot: spots[parentId]}
     ));
+  const samplesLabel = isGeologicUnit ? 'Samples W/Geologic Unit' : 'Tagged Samples';
+  const spotsLabel = isGeologicUnit ? 'Spots With\nGeologic Unit' : 'Tagged Spots';
+  const taggedFeatures = getAllTaggedFeatures(selectedTag);
+  const taggedReports = getReportsWithThisTag(selectedTag);
   const taggedSamplesCount = sampleSections.reduce((acc, section) => acc + section.data.length, 0);
+  // Gathered here rather than inside the lists, so each heading can count exactly what its section goes on to show
+  const taggedSpotsIds = selectedTag.spots?.filter(
+    spotId => spots[spotId] && !spots[spotId].properties.isSample) || [];
 
   /* Logic Helpers */
 

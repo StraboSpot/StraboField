@@ -1,11 +1,17 @@
 import {SAMPLE_LOCATION_KEY, SAMPLE_LOCATION_MAX_DECIMALS, STRABOSAMPLES_FIELD_MAP} from './samples.constants';
-import {isEmpty, isEqual} from '../../shared/helpers';
+import {isEmpty, isEqual, isSameId} from '../../shared/helpers';
 
 // A sample is either a record kept on its parent Spot or a rich sample, which is a Spot of its own holding that
 // record. Everything about the sample itself lives in the record either way.
 export const getSampleMetadata = sample => sample.properties?.isSample
   ? sample.properties.samples?.[0] ?? {id: sample.properties.id}
   : sample;
+
+// The Spot a Sample Spot was taken from: the one whose samples list it. The Sample Spot itself is left out, as it lists
+// itself in its own samples, so for a sample of a sample this is another Sample Spot.
+export const getSampleParent = (sampleSpot, spots) => Object.values(spots).find(
+  spot => !isSameId(spot.properties.id, sampleSpot.properties.id)
+    && spot.properties.samples?.some(sample => isSameId(sample.id, sampleSpot.properties.id)));
 
 // What a sample is called in a list: the label if it has one, and otherwise the name it was given. A label is
 // filled in with that name on save, so the two read the same until someone types over it. A rich sample's Spot
