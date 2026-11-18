@@ -47,36 +47,28 @@ const removeDeletedSpotIds = (state, spotIds, timestamp) => {
   Object.values(state.datasets).forEach((dataset) => {
     if (dataset.spotIds?.some(isDeletedId)) dataset.spotIds = dataset.spotIds.filter(id => !isDeletedId(id));
   });
-  if (!isEmpty(state.project.reports)) {
-    state.project.reports = state.project.reports.map((report) => {
-      let updatedReport = JSON.parse(JSON.stringify(report));
-      if (updatedReport.spots?.some(isDeletedId)) {
-        updatedReport.spots = updatedReport.spots.filter(id => !isDeletedId(id));
-        if (isEmpty(updatedReport.spots)) delete updatedReport.spots;
-        updatedReport.modified_timestamp = timestamp;
-      }
-      return updatedReport;
-    });
-  }
-  if (!isEmpty(state.project.tags)) {
-    const updatedTags = state.project.tags.map((tag) => {
-      let updatedTag = JSON.parse(JSON.stringify(tag));
-      if (updatedTag.spots?.some(isDeletedId)) {
-        updatedTag.spots = updatedTag.spots.filter(id => !isDeletedId(id));
-        if (isEmpty(updatedTag.spots)) delete updatedTag.spots;
-        updatedTag.modified_timestamp = timestamp;
-      }
-      const deletedFeatureSpotIds = Object.keys(updatedTag.features || {}).filter(isDeletedId);
-      if (!isEmpty(deletedFeatureSpotIds)) {
-        deletedFeatureSpotIds.forEach(spotId => delete updatedTag.features[spotId]);
-        if (isEmpty(updatedTag.features)) delete updatedTag.features;
-        updatedTag.modified_timestamp = timestamp;
-      }
-      return updatedTag;
-    });
-    state.project.tags = updatedTags;
-    state.selectedTag = updatedTags.find(tag => tag.id === state.selectedTag?.id) || {};
-  }
+  // Only a memo or tag holding a Spot is written, so the rest, and whatever shows them, are left as they were. A tag
+  // holds Spots in its features too, keyed by Spot id.
+  const removeFrom = (record) => {
+    if (!record) return;
+    const isSpotHeld = record.spots?.some(isDeletedId);
+    const deletedFeatureSpotIds = Object.keys(record.features || {}).filter(isDeletedId);
+    if (!isSpotHeld && isEmpty(deletedFeatureSpotIds)) return;
+    if (isSpotHeld) {
+      record.spots = record.spots.filter(id => !isDeletedId(id));
+      if (isEmpty(record.spots)) delete record.spots;
+    }
+    if (!isEmpty(deletedFeatureSpotIds)) {
+      deletedFeatureSpotIds.forEach(spotId => delete record.features[spotId]);
+      if (isEmpty(record.features)) delete record.features;
+    }
+    record.modified_timestamp = timestamp;
+  };
+  state.project.reports?.forEach(removeFrom);
+  state.project.tags?.forEach(removeFrom);
+  // The tag pages save from this copy, so it is cleaned as a record of its own, whatever the project's copy holds. A
+  // new tag being added has no id yet and holds no Spots, so it is left be.
+  removeFrom(state.selectedTag);
 };
 
 const initialProjectState = {

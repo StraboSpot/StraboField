@@ -246,6 +246,34 @@ describe('deleting Spots', () => {
       expect(project.modified_timestamp).toBe(action.meta.timestamp);
     });
 
+    // Rewritten, they would re-render whatever shows them for nothing
+    it('leaves the tags and memos not holding the Spot as they were', () => {
+      const state = {...getState(), project: {...getState().project, reports: [{id: 'r1', spots: [otherSpotId]}]}};
+      const {project} = deleteSpots(state, deletedSpot(spotId));
+      expect(project.tags[1]).toBe(state.project.tags[1]);
+      expect(project.reports).toBe(state.project.reports);
+    });
+
+    it('takes the Spot out of the selected tag too, which the tag pages save from', () => {
+      const state = {...getState(), selectedTag: getState().project.tags[0]};
+      const {selectedTag} = deleteSpots(state, deletedSpot(spotId));
+      expect(selectedTag.spots).toEqual([otherSpotId]);
+      expect(selectedTag.features).toEqual({[otherSpotId]: ['f2']});
+    });
+
+    // Its copy can hold a Spot the project's no longer does, and the next save from it would write the Spot back
+    it('takes the Spot out of the selected tag even when the project\'s copy does not hold it', () => {
+      const state = {...getState(), selectedTag: {id: 't2', name: 'Tag 2', spots: [spotId, otherSpotId]}};
+      const {selectedTag} = deleteSpots(state, deletedSpot(spotId));
+      expect(selectedTag.spots).toEqual([otherSpotId]);
+    });
+
+    // Adding a tag selects it, with no id, before it is saved, and it must not be lost to a Spot deleted meanwhile
+    it('leaves a new tag being added alone', () => {
+      const newTag = {type: 'concept'};
+      expect(deleteSpots({...getState(), selectedTag: newTag}, deletedSpot(spotId)).selectedTag).toBe(newTag);
+    });
+
     it('takes the Spot out of the tag features either way', () => {
       const {project} = deleteSpots(getState(), deletedSpot(spotId.toString()));
       expect(project.tags[0].features).toEqual({[otherSpotId]: ['f2']});
