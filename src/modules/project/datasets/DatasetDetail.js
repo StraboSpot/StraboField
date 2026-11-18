@@ -36,7 +36,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   const dispatch = useDispatch();
   const spots = useSelector(state => state.spot.spots);
 
-  const [neededImagesCount, refreshNeededImagesCount] = useDatasetNeededImagesCount(dataset);
+  const [neededImagesCount, refreshNeededImagesCount, imagesCount] = useDatasetNeededImagesCount(dataset);
 
   const {initializeDownloadImages} = useDownload();
   const {destroyDataset, isReadOnlyDataset, isTargetDataset} = useProject();
@@ -182,8 +182,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   // Dataset Images Field
   const renderImagesField = () => {
-    const imagesCount = dataset?.images?.imageIds?.length || 0;
-
     return (
       <>
         <ListItem containerStyle={commonStyles.listItemFormField}>

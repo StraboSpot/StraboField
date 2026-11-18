@@ -41,6 +41,12 @@ export const getImageBasemapsInSpot = (spot) => {
   }, []) || [];
 };
 
+// How many images the Spots a dataset lists hold, counted from the Spots on the device so it stays right as Spots and
+// images are added, moved and deleted. A Sample Spot is counted in the dataset it is filed in, which can differ from
+// its parent's.
+export const getImagesCount = (spotIds, spots) =>
+  (spotIds || []).reduce((count, id) => count + (spots[id]?.properties?.images?.length || 0), 0);
+
 export const getSpotGeometryIconSource = (spot) => {
   if (spot?.geometry?.type === 'Point') {
     if (spot.properties?.image_basemap) return require('../../assets/icons/ImagePoint_pressed.png');

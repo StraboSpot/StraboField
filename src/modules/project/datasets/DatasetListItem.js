@@ -19,12 +19,11 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const spots = useSelector(state => state.spot.spots);
 
-  const [imagesNeededCount] = useDatasetNeededImagesCount(dataset);
+  const [imagesNeededCount, , imagesCount] = useDatasetNeededImagesCount(dataset);
   const {isReadOnlyDataset, isTargetDataset, toggleActiveDataset, toggleTargetDataset} = useProject();
 
   /* Derived Variables */
 
-  const imagesCount = dataset?.images?.imageIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
   const isReadOnly = isReadOnlyDataset(dataset.id);
   const isTarget = isTargetDataset(dataset.id);

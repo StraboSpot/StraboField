@@ -2,6 +2,7 @@ import {
   calculateMissingOrientations,
   canMoveSpotIdsToDataset,
   getDatasetWithSpotId,
+  getImagesCount,
   getSpotOrientations,
   getSpotsCount,
   isAnySpotIdInReadOnlyDataset,
@@ -127,6 +128,32 @@ describe('getSpotOrientations', () => {
 
   it('gathers nothing from a Spot holding no such record', () => {
     expect(getSpotOrientations({properties: {name: 'Spot 1'}})).toEqual([]);
+  });
+});
+
+describe('getImagesCount', () => {
+  const spots = {
+    1: {properties: {id: 1, images: [{id: 11}, {id: 12}]}},
+    2: {properties: {id: 2, images: [{id: 21}], isSample: true}},
+    3: {properties: {id: 3}},
+  };
+
+  it('counts the images on the Spots the dataset lists, Sample Spots included', () => {
+    expect(getImagesCount([1, 2, 3], spots)).toBe(3);
+  });
+
+  // The sample's images go with the dataset it is filed in, not its parent's
+  it('counts a sample filed in another dataset there, not with its parent', () => {
+    expect(getImagesCount([1, 3], spots)).toBe(2);
+    expect(getImagesCount([2], spots)).toBe(1);
+  });
+
+  it('leaves out a Spot missing from the device', () => {
+    expect(getImagesCount([1, 4], spots)).toBe(2);
+  });
+
+  it('counts none for a dataset without Spots', () => {
+    expect(getImagesCount(undefined, spots)).toBe(0);
   });
 });
 

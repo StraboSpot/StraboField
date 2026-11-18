@@ -22,7 +22,7 @@ const DatasetPreferencesListItem = ({dataset}) => {
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const spots = useSelector(state => state.spot.spots);
 
-  const [imagesNeededCount, refreshImagesNeededCount] = useDatasetNeededImagesCount(dataset);
+  const [imagesNeededCount, refreshImagesNeededCount, imagesCount] = useDatasetNeededImagesCount(dataset);
 
   const {initializeDownloadImages} = useDownload();
   const {isReadOnlyDataset, isTargetDataset, toggleActiveDataset, toggleTargetDataset} = useProject();
@@ -34,7 +34,6 @@ const DatasetPreferencesListItem = ({dataset}) => {
 
   /* Derived Variables */
 
-  const imagesCount = dataset?.images?.imageIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
   const isReadOnly = isReadOnlyDataset(dataset.id);
   const isTarget = isTargetDataset(dataset.id);

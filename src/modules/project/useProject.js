@@ -110,9 +110,6 @@ const useProject = () => {
       date: newDate,
       modified_timestamp: modifiedTimeStamp,
       spotIds: [],
-      images: {
-        imageIds: [],
-      },
     };
   };
 

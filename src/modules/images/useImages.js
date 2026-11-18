@@ -90,10 +90,9 @@ const useImages = () => {
   const gatherNeededImages = async (spotsToSearch, dataset) => {
     try {
       let neededImagesIds = [];
-      let imageIds;
       console.log('Gathering Needed Images for dataset', dataset.name, '(' + dataset.id + ') ...');
-      if (dataset?.images?.imageIds) imageIds = dataset.images.imageIds;
-      else imageIds = getAllImagesIds(spotsToSearch);
+      // From the Spots, not the dataset's stored list, which is written only on download and so goes stale
+      const imageIds = getAllImagesIds(spotsToSearch);
 
       if (Platform.OS === 'web') return {imageIds: imageIds};  // Don't care about neededImagesIds on web
       await Promise.all(
@@ -123,13 +122,8 @@ const useImages = () => {
   };
 
   // INTERNAL
-  const getAllImagesIds = (spotsArray) => {
-    let imageIds = [];
-    spotsArray.filter((spot) => {
-      if (spot.properties.images) spot.properties.images.map(image => imageIds.push(image.id));
-    });
-    return imageIds;
-  };
+  const getAllImagesIds = spotsArray => spotsArray.flatMap(
+    spot => (spot.properties.images || []).map(image => image.id));
 
   const getImageBasemap = (image) => {
     dispatch(clearedSelectedSpots());
