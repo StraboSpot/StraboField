@@ -42,8 +42,8 @@ import {
   addedNewSpotIdsToDataset,
   addedNewSpotIdToDataset,
   deletedSpotIdFromDatasets,
-  deletedSpotIdFromReports,
-  deletedSpotIdFromTags,
+  deletedSpotIdsFromReports,
+  deletedSpotIdsFromTags,
   restoredSpotReferences,
   setActiveDatasets,
   updatedProject,
@@ -171,8 +171,8 @@ const useSpots = () => {
   };
 
   const removeSpotAndReferences = (spotId) => {
-    dispatch(deletedSpotIdFromReports(spotId));
-    dispatch(deletedSpotIdFromTags(spotId));
+    dispatch(deletedSpotIdsFromReports([spotId]));
+    dispatch(deletedSpotIdsFromTags([spotId]));
     dispatch(deletedSpotIdFromDatasets(spotId));
     dispatch(deletedSpot(spotId));
   };

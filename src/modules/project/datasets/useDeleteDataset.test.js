@@ -29,6 +29,9 @@ const splitDatasets = {
   12: {id: 12, name: 'Dataset 1', spotIds: [parentId]},
   13: {id: 13, name: 'Dataset 2', spotIds: [sampleId]},
 };
+const otherSpotId = 1756000000099;    // A Spot filed in neither dataset
+const memo = {id: 'r1', name: 'Memo 1', spots: [parentId, otherSpotId]};
+const tag = {id: 't1', name: 'Tag 1', spots: [parentId, otherSpotId]};
 
 beforeEach(() => mockToastShow.mockClear());
 
@@ -40,7 +43,7 @@ const renderDeleteDatasetApi = (readOnlyDatasetsIds) => {
       project: {
         activeDatasetsIds: [12, 13],
         datasets: splitDatasets,
-        project: {reports: [], tags: []},
+        project: {reports: [memo], tags: [tag]},
         readOnlyDatasetsIds: readOnlyDatasetsIds,
         selectedTag: {},
       },
@@ -66,11 +69,12 @@ const renderDeleteDatasetApi = (readOnlyDatasetsIds) => {
   return {deleteDatasetApi: deleteDatasetApi, store: store};
 };
 
-const deleteDataset = async (datasetId, readOnlyDatasetsIds) => {
+// The dataset is passed as the page holding it would, which may be a copy older than the store's
+const deleteDataset = (datasetId, readOnlyDatasetsIds, dataset = splitDatasets[datasetId]) => {
   const {deleteDatasetApi, store} = renderDeleteDatasetApi(readOnlyDatasetsIds);
   let isDeleted;
-  await ReactTestRenderer.act(async () => {
-    isDeleted = await deleteDatasetApi.deleteDataset(splitDatasets[datasetId]);
+  ReactTestRenderer.act(() => {
+    isDeleted = deleteDatasetApi.deleteDataset(dataset);
   });
   return {isDeleted: isDeleted, state: store.getState()};
 };
@@ -97,17 +101,32 @@ it('says why a dataset holding a sample whose read only parent is filed elsewher
 });
 
 // Deleting the parent's dataset deletes the sample filed elsewhere, as deleting the parent would
-it('deletes a dataset together with the samples of its Spots filed elsewhere', async () => {
-  const {isDeleted, state} = await deleteDataset(12, []);
+it('deletes a dataset together with the samples of its Spots filed elsewhere', () => {
+  const {isDeleted, state} = deleteDataset(12, []);
   expect(isDeleted).toBe(true);
   expect(state.project.datasets[12]).toBeUndefined();
   expect(state.spot.spots).toEqual({});
   expect(state.project.datasets[13].spotIds).toEqual([]);
 });
 
+// The page's copy was taken before the parent was filed in the dataset, so only the store's knows of it and its sample
+it('deletes the samples of the Spots the dataset holds now, not when its page opened', () => {
+  const {isDeleted, state} = deleteDataset(12, [], {...splitDatasets[12], spotIds: []});
+  expect(isDeleted).toBe(true);
+  expect(state.spot.spots).toEqual({});
+  expect(state.project.datasets[13].spotIds).toEqual([]);
+});
+
+// They used to be left there, pointing at Spots that were gone
+it('takes the dataset\'s Spots out of the tags and memos holding them', () => {
+  const {state} = deleteDataset(12, []);
+  expect(state.project.project.tags[0].spots).toEqual([otherSpotId]);
+  expect(state.project.project.reports[0].spots).toEqual([otherSpotId]);
+});
+
 // Deleting the sample's dataset takes its stub off the parent, as deleting the sample would
-it('deletes a dataset and takes off the stubs a parent filed elsewhere keeps for its samples', async () => {
-  const {isDeleted, state} = await deleteDataset(13, []);
+it('deletes a dataset and takes off the stubs a parent filed elsewhere keeps for its samples', () => {
+  const {isDeleted, state} = deleteDataset(13, []);
   expect(isDeleted).toBe(true);
   expect(state.project.datasets[13]).toBeUndefined();
   expect(state.spot.spots[sampleId]).toBeUndefined();
@@ -115,18 +134,17 @@ it('deletes a dataset and takes off the stubs a parent filed elsewhere keeps for
   expect(state.project.datasets[12].spotIds).toEqual([parentId]);
 });
 
-// The dataset refuses its own delete. The samples split from it are tidied up only once it is gone, so a delete
-// that fails leaves them be.
-it('leaves a read only dataset and the samples split from it alone', async () => {
-  const {isDeleted, state} = await deleteDataset(12, [12]);
+it('leaves a read only dataset, the samples split from it, and its tags and memos alone', () => {
+  const {isDeleted, state} = deleteDataset(12, [12]);
   expect(isDeleted).toBe(false);
   expect(state.spot.spots).toEqual(familySpots);
   expect(state.project.datasets).toEqual(splitDatasets);
+  expect(state.project.project).toEqual({reports: [memo], tags: [tag]});
   expect(mockToastShow).toHaveBeenCalledWith(expect.stringContaining('read only'), expect.anything());
 });
 
-it('won\'t delete a dataset when that would change a read only Spot filed elsewhere', async () => {
-  const {isDeleted, state} = await deleteDataset(12, [13]);
+it('won\'t delete a dataset when that would change a read only Spot filed elsewhere', () => {
+  const {isDeleted, state} = deleteDataset(12, [13]);
   expect(isDeleted).toBe(false);
   expect(state.spot.spots).toEqual(familySpots);
   expect(state.project.datasets).toEqual(splitDatasets);

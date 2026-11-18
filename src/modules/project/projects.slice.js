@@ -170,13 +170,16 @@ const projectSlice = createSlice({
         }
       });
     },
-    deletedSpotIdFromReports(state, action) {
-      const spotId = action.payload;
+    // All the Spots deleted at once, as a dataset delete is, matched as strings as isSameId does. A Set, since a
+    // dataset can hold thousands.
+    deletedSpotIdsFromReports(state, action) {
+      const deletedSpotIds = new Set(action.payload.map(String));
+      const isDeletedId = id => deletedSpotIds.has(String(id));
       if (!isEmpty(state.project.reports)) {
         const updatedReports = state.project.reports.map((report) => {
           let updatedReport = JSON.parse(JSON.stringify(report));
-          if (updatedReport.spots?.some(id => isSameId(id, spotId))) {
-            updatedReport.spots = updatedReport.spots.filter(id => !isSameId(id, spotId));
+          if (updatedReport.spots?.some(isDeletedId)) {
+            updatedReport.spots = updatedReport.spots.filter(id => !isDeletedId(id));
             if (isEmpty(updatedReport.spots)) delete updatedReport.spots;
             updatedReport.modified_timestamp = Date.now();
           }
@@ -185,19 +188,22 @@ const projectSlice = createSlice({
         state.project.reports = updatedReports;
       }
     },
-    deletedSpotIdFromTags(state, action) {
-      const spotId = action.payload;
+    // All the Spots deleted at once, matched as deletedSpotIdsFromReports does
+    deletedSpotIdsFromTags(state, action) {
+      const deletedSpotIds = new Set(action.payload.map(String));
+      const isDeletedId = id => deletedSpotIds.has(String(id));
       if (!isEmpty(state.project.tags)) {
         const timestamp = Date.now();
         const updatedTags = state.project.tags.map((tag) => {
           let updatedTag = JSON.parse(JSON.stringify(tag));
-          if (updatedTag.spots?.some(id => isSameId(id, spotId))) {
-            updatedTag.spots = updatedTag.spots.filter(id => !isSameId(id, spotId));
+          if (updatedTag.spots?.some(isDeletedId)) {
+            updatedTag.spots = updatedTag.spots.filter(id => !isDeletedId(id));
             if (isEmpty(updatedTag.spots)) delete updatedTag.spots;
             updatedTag.modified_timestamp = timestamp;
           }
-          if (updatedTag.features && updatedTag.features[spotId]) {
-            delete updatedTag.features[spotId];
+          const deletedFeatureSpotIds = Object.keys(updatedTag.features || {}).filter(isDeletedId);
+          if (!isEmpty(deletedFeatureSpotIds)) {
+            deletedFeatureSpotIds.forEach(spotId => delete updatedTag.features[spotId]);
             if (isEmpty(updatedTag.features)) delete updatedTag.features;
             updatedTag.modified_timestamp = timestamp;
           }
@@ -377,8 +383,8 @@ export const {
   deletedDataset,
   deletedSpotIdFromDataset,
   deletedSpotIdFromDatasets,
-  deletedSpotIdFromReports,
-  deletedSpotIdFromTags,
+  deletedSpotIdsFromReports,
+  deletedSpotIdsFromTags,
   deletedTagIdFromReports,
   deletedTemplate,
   doesBackupDirectoryExist,

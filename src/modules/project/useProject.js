@@ -5,7 +5,6 @@ import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.cons
 import {
   addedDataset,
   addedProjectDescription,
-  deletedDataset,
   setActiveDatasets,
   setTargetDataset,
 } from './projects.slice';
@@ -14,13 +13,7 @@ import {AUTO_SAVES_FOLDER} from '../../services/files/directories.constants';
 import useServerRequests from '../../services/network/useServerRequests';
 import {getNewId, isEmpty, isSameId} from '../../shared/helpers';
 import useResetState from '../../store/useResetState';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  removedLastStatusMessage,
-  setIsStatusMessagesModalVisible,
-  setLoadingStatus,
-} from '../home/home.slice';
+import {setLoadingStatus} from '../home/home.slice';
 import {clearedSpotsInMapExtentIds, clearedStratSection, setCurrentImageBasemap} from '../maps/maps.slice';
 import {
   getDatasetWithSpotId,
@@ -28,7 +21,7 @@ import {
   isSpotIdInDataset,
   isSpotIdInReadOnlyDataset,
 } from '../spots/spots.helpers';
-import {clearedSelectedSpots, deletedSpots} from '../spots/spots.slice';
+import {clearedSelectedSpots} from '../spots/spots.slice';
 
 const useProject = () => {
   /* Data Hooks */
@@ -111,37 +104,6 @@ const useProject = () => {
       modified_timestamp: modifiedTimeStamp,
       spotIds: [],
     };
-  };
-
-  // Nothing in a read only dataset may change, so it can't be deleted either. The dataset page disables Delete for
-  // one, but this is the one way in, so it refuses too.
-  // Whether the dataset was deleted, so the caller tidies up around it only once it is gone. Failures are reported
-  // here rather than thrown.
-  const destroyDataset = async (id) => {
-    if (isReadOnlyDataset(id)) {
-      toast.show(`${datasets[id]?.name} is read only, so it can't be deleted.`, {placement: 'top', type: 'warning'});
-      return false;
-    }
-    try {
-      if (datasets && datasets[id] && datasets[id].spotIds) {
-        console.log(datasets[id].spotIds.length, 'Spot(s) in Dataset to Delete.');
-        // The Spots' image files are kept on purpose. Auto saves, and saves made without images, hold no image
-        // files and take them from the shared images folder when restored, so deleting them here would lose any
-        // never uploaded from a restore of the project as it was before this delete.
-        dispatch(deletedSpots(datasets[id].spotIds));
-      }
-      dispatch(deletedDataset(id));
-      return true;
-    }
-    catch (err) {
-      dispatch(setLoadingStatus({view: 'modal', bool: false}));
-      dispatch(setIsStatusMessagesModalVisible(true));
-      dispatch(clearedStatusMessages());
-      console.error('Error Deleting Dataset.');
-      dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Error Deleting Dataset.'));
-      return false;
-    }
   };
 
   const getActiveDatasets = () => {
@@ -290,7 +252,6 @@ const useProject = () => {
     addDataset,
     checkValidDateTime,
     createDataset,
-    destroyDataset,
     getActiveDatasets,
     getAllDeviceProjects,
     getAllServerProjects,

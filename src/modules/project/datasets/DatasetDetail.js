@@ -33,6 +33,8 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  // The dataset given is a copy taken when its page opened, so its Spots are read as they are now
+  const spotIds = useSelector(state => state.project.datasets[dataset.id]?.spotIds) || dataset.spotIds;
   const spots = useSelector(state => state.spot.spots);
 
   const [neededImagesCount, refreshNeededImagesCount, imagesCount] = useDatasetNeededImagesCount(dataset);
@@ -54,7 +56,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const isReadOnly = isReadOnlyDataset(dataset.id);
   const isTarget = isTargetDataset(dataset.id);
-  const spotsCount = getSpotsCount(dataset.spotIds, spots);
+  const spotsCount = getSpotsCount(spotIds, spots);
 
   /* Event Handlers */
 
@@ -79,10 +81,10 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     closeDetailView();
   };
 
-  const initializeDeleteDataset = async () => {
+  const initializeDeleteDataset = () => {
     setIsDeleteConfirmModalVisible(false);
-    // A delete that fails has said why, and the view stays open
-    if (await deleteDataset(dataset)) closeDetailView();
+    // A delete refused has said why, and the view stays open
+    if (deleteDataset(dataset)) closeDetailView();
   };
 
   const saveDataset = () => {
