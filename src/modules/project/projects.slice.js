@@ -3,6 +3,7 @@ import {createSlice} from '@reduxjs/toolkit';
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
 import {getNewId, isEmpty, isEqual, isSameId} from '../../shared/helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import {canMoveSpotIdsToDataset, isReadOnlyDatasetId} from '../spots/spots.helpers';
 import {
   deleteTemplateKey,
   getActiveTemplateList,
@@ -244,6 +245,9 @@ const projectSlice = createSlice({
     },
     movedSpotIdBetweenDatasets(state, action) {
       const {toDatasetId, spotId} = action.payload;
+      // Nothing is moved into or out of a read only dataset, whatever the caller asked for. The web listener asks the
+      // same question before sending the move to the server.
+      if (!canMoveSpotIdsToDataset([spotId], toDatasetId, state.datasets, state.readOnlyDatasetsIds)) return;
       // Only the datasets whose Spots change are written, so the rest are not marked modified
       Object.entries(state.datasets).forEach(([datasetId, dataset]) => {
         const remainingSpotIds = dataset.spotIds?.filter(id => !isSameId(id, spotId)) || [];
@@ -296,17 +300,24 @@ const projectSlice = createSlice({
     setMultipleFeaturesTaggingEnabled(state, action) {
       state.isMultipleFeaturesTaggingEnabled = action.payload;
     },
+    // A read only dataset is never the target, so the target can't be made read only - the target has to be moved off
+    // it first, as the dataset pages' disabled switch says
     setReadOnlyDatasetsIds(state, action) {
-      if (state.readOnlyDatasetsIds?.includes(action.payload)) {
-        state.readOnlyDatasetsIds = state.readOnlyDatasetsIds.filter(r => r !== action.payload);
+      if (isReadOnlyDatasetId(state.readOnlyDatasetsIds, action.payload)) {
+        state.readOnlyDatasetsIds = state.readOnlyDatasetsIds.filter(id => !isSameId(id, action.payload));
       }
-      else state.readOnlyDatasetsIds = [...state.readOnlyDatasetsIds || [], action.payload];
+      else if (!isSameId(state.targetDatasetId, action.payload)) {
+        state.readOnlyDatasetsIds = [...state.readOnlyDatasetsIds || [], action.payload];
+      }
     },
     setSelectedTag(state, action) {
       state.selectedTag = action.payload;
     },
+    // New Spots go into the target, so a read only dataset can't be it. Asking for one leaves no target - a download
+    // picks one without knowing what is read only, and which dataset takes new Spots is then the user's choice.
     setTargetDataset(state, action) {
-      state.targetDatasetId = action.payload;
+      state.targetDatasetId = isReadOnlyDatasetId(state.readOnlyDatasetsIds, action.payload) ? undefined
+        : action.payload;
     },
     setTestingMode(state, action) {
       state.isTestingMode = action.payload;

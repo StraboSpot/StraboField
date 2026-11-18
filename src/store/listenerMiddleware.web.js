@@ -18,6 +18,7 @@ import {
   updatedDatasetProperties,
   updatedProject,
 } from '../modules/project/projects.slice';
+import {canMoveSpotIdsToDataset} from '../modules/spots/spots.helpers';
 import {
   deletedSpot,
   editedOrCreatedSpot,
@@ -114,6 +115,12 @@ const deleteDatasetListener = async (action, listenerApi) => {
 
 // Move one Spot from a one Dataset to Another
 const moveSpotToDatasetListener = async (action, listenerApi) => {
+  // Only a move the reducer made, leaving every read only dataset as it is on the server too. Asked of the state
+  // before the move, which is what the reducer was given.
+  const {toDatasetId, spotId} = action.payload;
+  const {datasets, readOnlyDatasetsIds} = listenerApi.getOriginalState().project;
+  if (!canMoveSpotIdsToDataset([spotId], toDatasetId, datasets, readOnlyDatasetsIds)) return;
+
   Toast.hideAll();
   let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
   console.log('Action:', action, 'Moving Spot to Dataset:', action.payload);
@@ -122,7 +129,6 @@ const moveSpotToDatasetListener = async (action, listenerApi) => {
   console.log('New State:', newState);
 
   const encodedLogin = newState.user.encoded_login;
-  const {toDatasetId, spotId} = action.payload;
   const modifiedTimestamp = newState.project.project.modified_timestamp;
 
   try {

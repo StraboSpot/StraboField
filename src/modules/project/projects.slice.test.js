@@ -15,6 +15,8 @@ import projectSliceReducer, {
   setActiveDatasets,
   setActiveDatasetsMultiple,
   setActiveTemplates,
+  setReadOnlyDatasetsIds,
+  setTargetDataset,
   setUseContinuousTagging,
   setUseTemplate,
   updatedProjectPreference,
@@ -303,6 +305,47 @@ describe('movedSpotIdBetweenDatasets', () => {
     const {datasets} = projectReducer(state, movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 12}));
     expect(datasets[12].spotIds).toEqual([otherSpotId, spotId]);
     expect(datasets[13].spotIds).toEqual([1756000000003]);
+  });
+
+  // Whatever the caller asks for, nothing in a read only dataset changes - not even its timestamp
+  it('moves nothing into a read only dataset', () => {
+    const state = {...getDatasetsState(), readOnlyDatasetsIds: [13]};
+    const {datasets} = projectReducer(state, movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 13}));
+    expect(datasets).toEqual(getDatasetsState().datasets);
+  });
+
+  // A Spot left in two datasets by the old map-edit bug can't be taken out of one that is read only
+  it('leaves a Spot alone when a read only dataset also holds it', () => {
+    const state = {...getDatasetsState(), readOnlyDatasetsIds: [13]};
+    state.datasets[13].spotIds.push(spotId);
+    const {datasets} = projectReducer(state, movedSpotIdBetweenDatasets({spotId: spotId, toDatasetId: 12}));
+    expect(datasets[13].spotIds).toEqual([1756000000003, spotId]);
+    expect(datasets[13].modified_timestamp).toBe(1);
+  });
+});
+
+// New Spots go into the target, so a read only dataset is never it
+describe('target and read only datasets', () => {
+  it('sets a writable dataset as the target', () => {
+    const state = {...getDatasetsState(), readOnlyDatasetsIds: [13]};
+    expect(projectReducer(state, setTargetDataset(12)).targetDatasetId).toBe(12);
+  });
+
+  it('leaves no target when asked for a read only dataset, known by its id as a string', () => {
+    const state = {...getDatasetsState(), readOnlyDatasetsIds: [13], targetDatasetId: 12};
+    expect(projectReducer(state, setTargetDataset('13')).targetDatasetId).toBeUndefined();
+  });
+
+  it('won\'t make the target read only', () => {
+    const state = {...getDatasetsState(), readOnlyDatasetsIds: [], targetDatasetId: 12};
+    expect(projectReducer(state, setReadOnlyDatasetsIds(12)).readOnlyDatasetsIds).toEqual([]);
+  });
+
+  it('makes a dataset that isn\'t the target read only, and writable again', () => {
+    const state = {...getDatasetsState(), readOnlyDatasetsIds: [], targetDatasetId: 12};
+    const readOnlyState = projectReducer(state, setReadOnlyDatasetsIds(13));
+    expect(readOnlyState.readOnlyDatasetsIds).toEqual([13]);
+    expect(projectReducer(readOnlyState, setReadOnlyDatasetsIds(13)).readOnlyDatasetsIds).toEqual([]);
   });
 });
 

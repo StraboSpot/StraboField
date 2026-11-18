@@ -77,12 +77,13 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     closeDetailView();
   };
 
-  const initializeDeleteDataset = () => {
+  const initializeDeleteDataset = async () => {
     setIsDeleteConfirmModalVisible(false);
+    if (isReadOnly) return;  // Delete is disabled for a read only dataset
     if (dataset && dataset.id) {
-      destroyDataset(dataset.id)
-        .then(closeDetailView())
-        .catch(err => console.error('Error deleting dataset', err));
+      // A delete that fails has said why, and the view stays open
+      const isDeleted = await destroyDataset(dataset.id);
+      if (isDeleted) closeDetailView();
     }
     else console.error('Target dataset or id is undefined!');
   };
@@ -127,13 +128,19 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     return (
       <View style={{paddingBottom: 10}}>
         <DeleteButton
-          disabled={isTarget}
+          disabled={isTarget || isReadOnly}
           onPress={handleDeletePressed}
           title={'Delete Dataset'}
         />
         {isTarget && (
           <Text style={[commonStyles.importantText, {paddingHorizontal: 30}]}>
             {dataset.name} can not be deleted while still set as the target (starred) dataset.
+          </Text>
+        )}
+        {/* A target is never read only, so at most one of these notes shows */}
+        {isReadOnly && (
+          <Text style={[commonStyles.importantText, {paddingHorizontal: 30}]}>
+            {dataset.name} can not be deleted while it is read only.
           </Text>
         )}
       </View>

@@ -22,7 +22,12 @@ import {
   setLoadingStatus,
 } from '../home/home.slice';
 import {clearedSpotsInMapExtentIds, clearedStratSection, setCurrentImageBasemap} from '../maps/maps.slice';
-import {getDatasetWithSpotId, isSpotIdInDataset} from '../spots/spots.helpers';
+import {
+  getDatasetWithSpotId,
+  isReadOnlyDatasetId,
+  isSpotIdInDataset,
+  isSpotIdInReadOnlyDataset,
+} from '../spots/spots.helpers';
 import {clearedSelectedSpots, deletedSpots} from '../spots/spots.slice';
 
 const useProject = () => {
@@ -111,13 +116,22 @@ const useProject = () => {
     };
   };
 
+  // Nothing in a read only dataset may change, so it can't be deleted either. The dataset page disables Delete for
+  // one, but this is the one way in, so it refuses too.
+  // Whether the dataset was deleted, so the caller tidies up around it only once it is gone. Failures are reported
+  // here rather than thrown.
   const destroyDataset = async (id) => {
+    if (isReadOnlyDataset(id)) {
+      toast.show(`${datasets[id]?.name} is read only, so it can't be deleted.`, {placement: 'top', type: 'warning'});
+      return false;
+    }
     try {
       if (datasets && datasets[id] && datasets[id].spotIds) {
         console.log(datasets[id].spotIds.length, 'Spot(s) in Dataset to Delete.');
         dispatch(deletedSpots(datasets[id].spotIds));     // ToDo Need to delete images for deleted Spots
       }
       dispatch(deletedDataset(id));
+      return true;
     }
     catch (err) {
       dispatch(setLoadingStatus({view: 'modal', bool: false}));
@@ -126,6 +140,7 @@ const useProject = () => {
       console.error('Error Deleting Dataset.');
       dispatch(removedLastStatusMessage());
       dispatch(addedStatusMessage('Error Deleting Dataset.'));
+      return false;
     }
   };
 
@@ -214,14 +229,13 @@ const useProject = () => {
     return Promise.resolve();
   };
 
-  const isReadOnlyDataset = datasetId => readOnlyDatasetsIds.includes(datasetId);
+  const isReadOnlyDataset = datasetId => isReadOnlyDatasetId(readOnlyDatasetsIds, datasetId);
 
-  // Only the Spot's own dataset. Whether anything else locks it - the Spot holding the map it sits on, or
-  // another Spot on the same strat section - is useSpots' isSpotReadOnly, which is built on this.
-  const isSpotInReadOnlyDataset = (spotId) => {
-    const datasetId = getDatasetIdFromSpotId(spotId);
-    return isReadOnlyDataset(datasetId);
-  };
+  // Only the Spot's own datasets. Whether anything else locks it - the Spot holding the map it sits on, or
+  // another Spot on the same strat section - is useSpots' isSpotReadOnly, which is built on this. Every dataset
+  // holding the Spot is asked, as the reducers and the web listener ask, so a Spot the old map-edit bug left in two
+  // is locked here exactly when a move or delete would be refused.
+  const isSpotInReadOnlyDataset = spotId => isSpotIdInReadOnlyDataset(spotId, datasets, readOnlyDatasetsIds);
 
   // Compared with isSameId, as the reducers compare the target, so a star or switch never disagrees with them
   const isTargetDataset = datasetId => isSameId(targetDatasetId, datasetId);
@@ -256,6 +270,12 @@ const useProject = () => {
         {type: 'normal', animationType: 'slide-in', duration: 3000, placement: 'top'});
       toast.hideAll();
       dispatch(setTargetDataset(undefined));
+    }
+    // The dataset lists disable this already, but the reducer would quietly leave no target, so say so rather than
+    // report a switch
+    else if (isReadOnlyDataset(datasetId)) {
+      toast.show(`${datasets[datasetId].name} is read only, so it can't be the target dataset.`,
+        {placement: 'top', type: 'warning'});
     }
     else {
       const datasetName = datasets[datasetId].name;

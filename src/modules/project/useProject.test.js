@@ -46,6 +46,42 @@ const renderProjectApi = ({project, spot: spotState}) => {
   return {projectApi: projectApi, store: store};
 };
 
+// Nothing in a read only dataset may change, so it can't be deleted - whichever way the delete arrives
+describe('destroyDataset', () => {
+  const destroyDataset = async (readOnlyDatasetsIds) => {
+    const {projectApi, store} = renderProjectApi({
+      project: {
+        activeDatasetsIds: [12],
+        datasets: {12: {id: 12, name: 'Dataset 1', spotIds: [spotId]}},
+        project: {},
+        readOnlyDatasetsIds: readOnlyDatasetsIds,
+      },
+      spot: {recentViews: [], selectedSpot: {}, spots: {[spotId]: spot}},
+    });
+    let isDeleted;
+    await ReactTestRenderer.act(async () => {
+      isDeleted = await projectApi.destroyDataset(12);
+    });
+    return {isDeleted: isDeleted, state: store.getState()};
+  };
+
+  // The caller tidies up around the dataset only once it is gone, so it is told whether it is
+  it('deletes a writable dataset and its Spots, and says so', async () => {
+    const {isDeleted, state} = await destroyDataset([]);
+    expect(isDeleted).toBe(true);
+    expect(state.project.datasets[12]).toBeUndefined();
+    expect(state.spot.spots[spotId]).toBeUndefined();
+  });
+
+  it('leaves a read only dataset and its Spots alone, and says why', async () => {
+    const {isDeleted, state} = await destroyDataset([12]);
+    expect(isDeleted).toBe(false);
+    expect(state.project.datasets[12].spotIds).toEqual([spotId]);
+    expect(state.spot.spots[spotId]).toEqual(spot);
+    expect(mockToastShow).toHaveBeenCalledWith(expect.stringContaining('read only'), expect.anything());
+  });
+});
+
 // A dataset id can be held as a string, as after a download, and must still be known for the same dataset
 describe('toggleActiveDataset', () => {
   const dataset = {id: 12, name: 'Dataset 1', spotIds: [spotId.toString()]};
