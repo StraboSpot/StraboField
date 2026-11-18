@@ -49,7 +49,7 @@ import {
   updatedProjectPreference,
 } from '../project/projects.slice';
 import useProject from '../project/useProject';
-import {getRichSamples} from '../samples/samples.helpers';
+import {getRichSamples, getSampleParent} from '../samples/samples.helpers';
 import useTags from '../tags/useTags';
 
 const useSpots = () => {
@@ -130,11 +130,12 @@ const useSpots = () => {
   };
 
   // Find Spots that reference any of the given ids in their samples array (e.g. a rich sample's parent Spot),
-  // so an undo can also restore the parent -> sample link that deleteRichSample severs.
+  // so an undo can also restore the parent -> sample link that deleteRichSample severs. Compared with isSameId, as
+  // deleteRichSample takes off a stub holding its id as a string too.
   const getReferencingParentSpots = (deletedSpotIds) => {
+    const isDeletedId = id => deletedSpotIds.some(deletedSpotId => isSameId(deletedSpotId, id));
     return Object.values(spots).filter(
-      spot => !deletedSpotIds.includes(spot.properties.id)
-        && spot.properties.samples?.some(sample => deletedSpotIds.includes(sample.id)),
+      spot => !isDeletedId(spot.properties.id) && spot.properties.samples?.some(sample => isDeletedId(sample.id)),
     );
   };
 
@@ -189,6 +190,8 @@ const useSpots = () => {
   /* Exported Functions */
 
   const checkIsSafeDelete = (spotToDelete) => {
+    const readOnlyDeleteMessage = getReadOnlyDeleteMessage(spotToDelete);
+    if (readOnlyDeleteMessage) return readOnlyDeleteMessage;
     // Check if Spot is manually nested - get the first Spot that has this Spot nested manually in spot.properties.nesting
     const spotWithManualNest = Object.values(spots).find(
       spot => spot.properties?.nesting?.includes(spotToDelete.properties.id));
@@ -365,7 +368,15 @@ const useSpots = () => {
     return newSpot;
   };
 
+  // Whether the Spot was deleted. The delete modal has already said why not, through checkIsSafeDelete, but nothing in a
+  // read only dataset may change whichever way the delete arrives.
   const deleteSpot = (spotToDelete) => {
+    const readOnlyDeleteMessage = getReadOnlyDeleteMessage(spotToDelete);
+    if (readOnlyDeleteMessage) {
+      toast.show(`Unable to delete ${spotToDelete.properties.name}. ${readOnlyDeleteMessage}`,
+        {placement: 'top', type: 'warning'});
+      return false;
+    }
     const spotId = spotToDelete.properties.id;
     console.log('Deleting Spot ID', spotId, '...');
     const spotsToDelete = [spotToDelete, ...getRichSamples(spotToDelete, spots)];
@@ -398,6 +409,7 @@ const useSpots = () => {
         type: 'undo',
       });
     }
+    return true;
   };
 
   // Takes back a Spot made ahead of content that never arrived. Unlike deleteSpot it says nothing and offers no
@@ -517,6 +529,22 @@ const useSpots = () => {
   const getNewSpotName = () => {
     const {spotName} = getNewSpotNameObj();
     return spotName;
+  };
+
+  // Why a delete would change a read only Spot, or null if it wouldn't. A Spot's samples are deleted with it, and
+  // deleting a sample takes its stub off its parent, so any of them being read only blocks the delete - whether by its
+  // own dataset or by a Spot that locks it, such as the one holding the map it sits on.
+  const getReadOnlyDeleteMessage = (spotToDelete) => {
+    if (!isAnythingReadOnly) return null;
+    if (isSpotReadOnly(spotToDelete)) return 'It is read only.';
+    const readOnlySample = getRichSamples(spotToDelete, spots).find(isSpotReadOnly);
+    if (readOnlySample) return `Its Sample ${readOnlySample.properties.name} is read only.`;
+    const parentSpot = spotToDelete.properties.isSample && getSampleParent(spotToDelete, spots);
+    if (parentSpot && isSpotReadOnly(parentSpot)) {
+      return `The Spot it was taken from, ${parentSpot.properties.name}, is read only, and deleting the Sample would `
+        + 'change it.';
+    }
+    return null;
   };
 
   // Why a Spot is read only, so the notebook can say more than which dataset to unlock. cause is:
@@ -726,6 +754,7 @@ const useSpots = () => {
     getAllSpotsOnStratSection,
     getMappableSpots,
     getNewSpotName,
+    getReadOnlyDeleteMessage,
     getReadOnlyReason,
     getRecentSpots,
     getRootSpot,

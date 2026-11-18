@@ -6,6 +6,7 @@ import {
   getSampleMetadata,
   getSampleParent,
   getSamplesLinkedTo,
+  getSamplesWithout,
   getSampleTitle,
   getSpotIdsToMove,
   getStraboSampleFromResponse,
@@ -238,6 +239,16 @@ describe('getSamplesLinkedTo', () => {
   it('finds the other samples linked to the same StraboSamples sample', () => {
     expect(getSamplesLinkedTo(spots, 'x', 1)).toEqual([{id: 3, strabosamples_id: 'x'}]);
     expect(getSamplesLinkedTo(spots, 'y', 1)).toEqual([]);
+  });
+});
+
+describe('getSamplesWithout', () => {
+  it('takes off the samples of the given ids, matching a string id, and keeps the rest', () => {
+    expect(getSamplesWithout(parent, [sampleId.toString()])).toEqual([{id: otherSampleId}]);
+  });
+
+  it('gives an empty list for a Spot without samples', () => {
+    expect(getSamplesWithout({properties: {id: parentId}}, [sampleId])).toEqual([]);
   });
 });
 

@@ -8,6 +8,8 @@ import {SAMPLE_LOCATION_KEY, STRABOSAMPLES_LINKED_DATA_KEYS} from './samples.con
 import {
   getLinkedSample,
   getSampleMetadata,
+  getSampleParent,
+  getSamplesWithout,
   getStraboSampleLocation,
   getUnlinkedSample,
   isSampleStub,
@@ -37,14 +39,14 @@ const useSamples = () => {
 
   const dispatch = useDispatch();
   const encodedLogin = useSelector(state => state.user?.encoded_login);
+  const sampleSpotIdsToUpload = useSelector(state => state.project.sampleSpotIdsToUpload);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
-  const sampleSpotIdsToUpload = useSelector(state => state.project.sampleSpotIdsToUpload);
+  const spots = useSelector(state => state.spot.spots);
   const straboUserId = useSelector(state => state.user?.straboUserId);
-
-  const {getProfile} = useServerRequests();
   const {getDatasetIdFromSpotId, getTargetDatasetFromId} = useProject();
-  const {deleteSpot, getRootSpotGeoCoords} = useSpots();
+  const {getProfile} = useServerRequests();
+  const {deleteSpot, getRootSpotGeoCoords, isSpotReadOnly} = useSpots();
   const toast = useToast();
 
   /* Internal Functions */
@@ -65,6 +67,20 @@ const useSamples = () => {
       : turf.centroid(parentSpot).geometry;
   };
 
+  // The user id arrives with the profile, which is only downloaded at sign-in, so a sign-in from before the server
+  // sent it has none. Fetch it rather than make them sign in again.
+  const getStraboUserId = async () => {
+    if (straboUserId) return straboUserId;
+    try {
+      const {straboUserId: fetchedId} = await getProfile(encodedLogin) ?? {};
+      if (fetchedId) dispatch(setUserData({straboUserId: fetchedId}));
+      return fetchedId;
+    }
+    catch (err) {
+      console.error('Error getting the StraboSpot user id', err);
+    }
+  };
+
   // Replace the selected sample's record: the one a rich sample holds, or the one open on its parent Spot
   const saveSelectedSample = (editedSample) => {
     if (selectedSpot.properties.isSample) {
@@ -82,11 +98,28 @@ const useSamples = () => {
     }
   };
 
+  // Keep what StraboMicro and StraboExperimental hold for a linked sample on its Sample Spot, or clear it when none
+  const setLinkedData = (spotId, strabosample = {}) => STRABOSAMPLES_LINKED_DATA_KEYS.forEach(
+    key => dispatch(editedSpotProperties({field: key, value: strabosample[key], spotId: spotId})),
+  );
+
   /* Exported Functions */
 
   // Create new Sample Spot
   // The geometry is the parent's location unless one is given, as it is when linking takes StraboSamples'
   const createRichSample = (spot, selectedSample, sampleImages = [], geometry = getSampleGeometry(spot)) => {
+    // Every way in already hides itself for a read only Spot - whether its own dataset is read only or a Spot that
+    // can lock it is, such as the one holding the map it sits on. Refuse here too rather than rely on the UI alone.
+    if (isSpotReadOnly(spot)) {
+      toast.show('This Spot is read only, so a Sample can\'t be added to it.', {placement: 'top', type: 'warning'});
+      return;
+    }
+    // A Sample is taken from a Spot, never from another Sample, and no way in offers one. Refused here too, so a
+    // Sample Spot missing its own record can't end up with a Sample nested under it instead.
+    if (spot.properties.isSample) {
+      toast.show('A Sample can\'t be added to another Sample.', {placement: 'top', type: 'warning'});
+      return;
+    }
     // The Sample Spot goes in its parent's dataset, which needn't be the target - the target may have been switched
     // since the parent was made. The target is only the fallback for a parent not yet in any dataset. Nowhere to
     // file it without either, so stop before anything is created rather than leaving one behind in no dataset.
@@ -137,6 +170,26 @@ const useSamples = () => {
     return newEnrichedSample;
   };
 
+  // The parent's stub is only taken off once the sample is gone. deleteSpot refuses when a read only dataset holds
+  // either of them, and the parent then has to be left as it is. The parent is found as deleteSpot's read only check
+  // finds it, so the Spot it guards is the one edited, even when that parent is itself a sample.
+  const deleteRichSample = (sampleToDelete) => {
+    const parentSpot = getSampleParent(sampleToDelete, spots);
+    console.log('Deleting Sample', sampleToDelete, 'from Spot', parentSpot);
+    if (!deleteSpot(sampleToDelete)) return;
+    if (parentSpot) {
+      const updatedSamples = getSamplesWithout(parentSpot, [sampleToDelete.properties.id]);
+      let updatedParentSpot = JSON.parse(JSON.stringify(parentSpot));
+      if (isEmpty(updatedSamples)) delete updatedParentSpot.properties[PAGE_KEYS.SAMPLES];
+      else updatedParentSpot.properties[PAGE_KEYS.SAMPLES] = updatedSamples;
+      dispatch(
+        editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: updatedSamples, spotId: parentSpot.properties.id}));
+      dispatch(setSelectedSpot(updatedParentSpot));
+      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
+    }
+    else dispatch(clearedSelectedSpots());
+  };
+
   // The selected sample's record, whether it is a rich sample or a sample kept on its parent Spot
   // A stub on a parent Spot is not a sample of its own, so it is never given back to be linked: filling it in would
   // turn it into a second sample record on the server.
@@ -173,53 +226,6 @@ const useSamples = () => {
     return true;
   };
 
-  // Keep what StraboMicro and StraboExperimental hold for a linked sample on its Sample Spot, or clear it when none
-  const setLinkedData = (spotId, strabosample = {}) => STRABOSAMPLES_LINKED_DATA_KEYS.forEach(
-    key => dispatch(editedSpotProperties({field: key, value: strabosample[key], spotId: spotId})),
-  );
-
-  const unlinkSample = () => {
-    saveSelectedSample(getUnlinkedSample(getSelectedSample()));
-    if (selectedSpot.properties.isSample) setLinkedData(selectedSpot.properties.id);
-  };
-
-  const deleteRichSample = (sampleToDelete, parentSpot) => {
-    console.log('Deleting Sample', sampleToDelete, 'from Spot', parentSpot);
-    if (parentSpot) {
-      const updatedSamples = parentSpot.properties?.samples?.filter(s => s.id !== sampleToDelete.properties.id);
-      let updatedParentSpot = JSON.parse(JSON.stringify(parentSpot));
-      if (isEmpty(updatedSamples)) delete updatedParentSpot.properties[PAGE_KEYS.SAMPLES];
-      else updatedParentSpot.properties[PAGE_KEYS.SAMPLES] = updatedSamples;
-      dispatch(
-        editedSpotProperties({field: PAGE_KEYS.SAMPLES, value: updatedSamples, spotId: parentSpot.properties.id}));
-      deleteSpot(sampleToDelete);
-
-      dispatch(setSelectedSpot(updatedParentSpot));
-      dispatch(setNotebookPageVisible(PAGE_KEYS.OVERVIEW));
-    }
-    else {
-      deleteSpot(sampleToDelete);
-      dispatch(clearedSelectedSpots());
-    }
-  };
-
-  const openUploadedSamplePage = (sampleId, userId = straboUserId) => (
-    Linking.openURL(`${SAMPLES_PATHS.WEB_SAMPLE}${userId}/${sampleId}`));
-
-  // The user id arrives with the profile, which is only downloaded at sign-in, so a sign-in from before the server
-  // sent it has none. Fetch it rather than make them sign in again.
-  const getStraboUserId = async () => {
-    if (straboUserId) return straboUserId;
-    try {
-      const {straboUserId: fetchedId} = await getProfile(encodedLogin) ?? {};
-      if (fetchedId) dispatch(setUserData({straboUserId: fetchedId}));
-      return fetchedId;
-    }
-    catch (err) {
-      console.error('Error getting the StraboSpot user id', err);
-    }
-  };
-
   // IGSNs are minted and sent to SESAR on strabospot.org, which can only work from what has been uploaded there.
   // A guest has no account to upload to. A legacy sample is saved, and so uploaded, as part of its parent Spot, so
   // pass that Spot's id as uploadSpotId.
@@ -239,15 +245,23 @@ const useSamples = () => {
     }
   };
 
+  const openUploadedSamplePage = (sampleId, userId = straboUserId) => (
+    Linking.openURL(`${SAMPLES_PATHS.WEB_SAMPLE}${userId}/${sampleId}`));
+
+  const unlinkSample = () => {
+    saveSelectedSample(getUnlinkedSample(getSelectedSample()));
+    if (selectedSpot.properties.isSample) setLinkedData(selectedSpot.properties.id);
+  };
+
   return {
     createRichSample,
     deleteRichSample,
     getSelectedSample,
     getSelectedSampleGeometry,
     linkSample,
-    unlinkSample,
     openSamplePage,
     openUploadedSamplePage,
+    unlinkSample,
   };
 };
 

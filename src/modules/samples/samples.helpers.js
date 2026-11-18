@@ -83,6 +83,11 @@ export const getSamplesLinkedTo = (spots, strabosamplesId, fieldSampleId) => Obj
   ),
 );
 
+// A parent's samples with those of the given ids taken off, as deleting them leaves it. Compared with isSameId, as a
+// stub can hold its id as a string.
+export const getSamplesWithout = (parentSpot, sampleIds) => (parentSpot.properties.samples || [])
+  .filter(sample => !sampleIds.some(id => isSameId(id, sample.id)));
+
 // What a sample is called in a list: the label if it has one, and otherwise the name it was given. A label is
 // filled in with that name on save, so the two read the same until someone types over it. A rich sample's Spot
 // is named after its sample, which is what the name falls back to for one whose record has gone.

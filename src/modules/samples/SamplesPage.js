@@ -28,19 +28,24 @@ const SamplesPage = ({
   /* Data Hooks */
 
   const dispatch = useDispatch();
-  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const requestedTabKey = useSelector(state => state.notebook.requestedSampleDetailTab);
+  const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
 
   /* Local State */
 
   // The selection as this page last showed it, which is all it may drop as it closes
   const selectedAttributesRef = useRef(selectedAttributes);
-  selectedAttributesRef.current = selectedAttributes;
 
   const [selectedTabKey, setSelectedTabKey] = useState(requestedTabKey ?? SAMPLE_DETAIL_TABS[0].key);
 
   /* Derived Variables */
+
+  selectedAttributesRef.current = selectedAttributes;
+  // A Sample is taken from a Spot, never from another Sample. A Sample Spot only lands here, rather than on its own
+  // record, when that record is missing.
+  const canAddSample = !isReadOnly && !spot.properties?.isSample;
+  const microProjectId = getMicroProjectId(spot.properties?.micro_data);
 
   // For a rich sample the spot itself is the sample, so show its detail immediately rather than
   // waiting for the effect to set selectedSample (which briefly flashes the samples list).
@@ -49,7 +54,6 @@ const SamplesPage = ({
   // Field is always there, and each other app's tab only once its data has been kept on the Sample Spot by linking
   const tabs = SAMPLE_DETAIL_TABS.filter(tab => !tab.dataKey || !isEmpty(spot.properties?.[tab.dataKey]));
   const selectedTab = tabs.find(tab => tab.key === selectedTabKey) ?? tabs[0];
-  const microProjectId = getMicroProjectId(spot.properties?.micro_data);
 
   /* Side Effects */
 
@@ -125,12 +129,12 @@ const SamplesPage = ({
       <PageHeader
         onPressAdd={() => dispatch(setActiveModal({modal: page.key}))}
         pageTitle={page.label}
-        showAddButton={!isReadOnly}
+        showAddButton={canAddSample}
       />
       <SamplesList
         isShowIGSN
         onPress={editSample}
-        onPressEmpty={!isReadOnly && (() => dispatch(setActiveModal({modal: page.key})))}
+        onPressEmpty={canAddSample && (() => dispatch(setActiveModal({modal: page.key})))}
       />
     </View>
   );

@@ -286,7 +286,6 @@ const NotebookHeader = ({
           isReadOnly={isReadOnly}
           isSample={spot.properties.isSample || !isEmpty(selectedSample)}
           overlayStyle={notebookStyles.dialogBoxPosition}
-          parentSpot={parentSpot}
           zoomToSpots={zoomToSpots}
         />
       </>

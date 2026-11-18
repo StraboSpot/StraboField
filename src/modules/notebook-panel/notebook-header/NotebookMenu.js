@@ -27,7 +27,6 @@ const NotebookMenu = ({
                         isNotebookMenuVisible,
                         isReadOnly,
                         isSample,
-                        parentSpot,
                         zoomToSpots,
                       }) => {
   /* Data Hooks */
@@ -97,7 +96,7 @@ const NotebookMenu = ({
       setErrorMessage('');
       setIsDeleteSpotModalVisible(false);
     }
-    else if (spot.properties?.isSample) deleteRichSample(spot, parentSpot);
+    else if (spot.properties?.isSample) deleteRichSample(spot);
     else if (isStratInterval(spot)) deleteInterval(spot);
     else deleteSpot(spot);
   };

@@ -70,13 +70,13 @@ const renderSamplesApi = ({datasets, readOnlyDatasetsIds, spots}) => {
 };
 
 describe('createRichSample', () => {
-  const createRichSample = ({parentSpot = parent} = {}) => {
+  const createRichSample = ({parentSpot = parent, readOnlyDatasetsIds = []} = {}) => {
     const {samplesApi, store} = renderSamplesApi({
       datasets: {
         12: {id: 12, name: 'Dataset 1', spotIds: [parentId]},
         13: {id: 13, name: 'Dataset 2', spotIds: []},
       },
-      readOnlyDatasetsIds: [],
+      readOnlyDatasetsIds: readOnlyDatasetsIds,
       spots: {[parentId]: parentSpot},
     });
     let sampleSpot;
@@ -109,5 +109,92 @@ describe('createRichSample', () => {
     expect(state.spot.spots[sampleId].properties.samples).toEqual([sample]);
     // Taken when the parent was, so it keeps the parent's created date
     expect(sampleSpot.properties.date).toBe('2024-05-01T10:00:00.000Z');
+  });
+
+  it('leaves a legacy sample on a Spot in a read only dataset as it is', () => {
+    const parentWithLegacySample = {...parent, properties: {...parent.properties, samples: [sample]}};
+    const {sampleSpot, state} = createRichSample({parentSpot: parentWithLegacySample, readOnlyDatasetsIds: [12]});
+    expect(sampleSpot).toBeUndefined();
+    expect(state.spot.spots[sampleId]).toBeUndefined();
+    expect(state.spot.spots[parentId].properties.samples).toEqual([sample]);
+    expect(state.project.datasets[12].spotIds).toEqual([parentId]);
+    expect(mockToastShow).toHaveBeenCalledWith(expect.stringContaining('read only'), expect.anything());
+  });
+
+  it('creates nothing for a Spot in a read only dataset', () => {
+    const {sampleSpot, state} = createRichSample({readOnlyDatasetsIds: [12]});
+    expect(sampleSpot).toBeUndefined();
+    expect(state.spot.spots[sampleId]).toBeUndefined();
+    expect(state.project.datasets[12].spotIds).toEqual([parentId]);
+    expect(mockToastShow).toHaveBeenCalledWith(expect.stringContaining('read only'), expect.anything());
+  });
+
+  // A Sample Spot missing its own record once had the Samples modal opened for it, which nested a new Sample under it
+  it('creates nothing under a Sample Spot', () => {
+    const emptySampleSpot = {...parent, properties: {...parent.properties, isSample: true, samples: []}};
+    const {sampleSpot, state} = createRichSample({parentSpot: emptySampleSpot});
+    expect(sampleSpot).toBeUndefined();
+    expect(state.spot.spots[sampleId]).toBeUndefined();
+    expect(state.spot.spots[parentId]).toEqual(emptySampleSpot);
+    expect(state.project.datasets[12].spotIds).toEqual([parentId]);
+    expect(mockToastShow).toHaveBeenCalledWith(expect.stringContaining('another Sample'), expect.anything());
+  });
+});
+
+// Deleting a sample takes its stub off its parent, so the parent's dataset is changed as well as the sample's
+describe('deleteRichSample', () => {
+  const parentWithStub = {...parent, properties: {...parent.properties, samples: [{id: sampleId}]}};
+  const sampleSpot = {properties: {id: sampleId, isSample: true, name: 'Sample 1', samples: [sample]}};
+  const spots = {[parentId]: parentWithStub, [sampleId]: sampleSpot};
+
+  const deleteRichSample = (datasets, readOnlyDatasetsIds, spotsOnDevice = spots, sampleToDelete = sampleSpot) => {
+    const {samplesApi, store} = renderSamplesApi({datasets, readOnlyDatasetsIds, spots: spotsOnDevice});
+    ReactTestRenderer.act(() => samplesApi.deleteRichSample(sampleToDelete));
+    return store.getState();
+  };
+
+  // A sample of a sample: its parent is a Sample Spot, listing it alongside itself, and keeps only its own stub
+  it('takes a nested sample\'s stub off its parent sample', () => {
+    const nestedId = 1756000000014;
+    const sampleWithNested = {
+      properties: {...sampleSpot.properties, samples: [{id: sampleId}, {id: nestedId.toString()}]},
+    };
+    const nested = {properties: {id: nestedId, isSample: true, name: 'Sample 1a', samples: [{id: nestedId}]}};
+    const spotsOnDevice = {...spots, [sampleId]: sampleWithNested, [nestedId]: nested};
+    const datasets = {12: {id: 12, spotIds: [parentId, sampleId, nestedId]}};
+    const state = deleteRichSample(datasets, [], spotsOnDevice, nested);
+    expect(state.spot.spots[nestedId]).toBeUndefined();
+    expect(state.spot.spots[sampleId].properties.samples).toEqual([{id: sampleId}]);
+  });
+
+  it('deletes the sample and takes its stub off the parent', () => {
+    const state = deleteRichSample({12: {id: 12, spotIds: [parentId, sampleId]}, 13: {id: 13, spotIds: []}}, []);
+    expect(state.spot.spots[sampleId]).toBeUndefined();
+    expect(state.spot.spots[parentId].properties.samples).toBeUndefined();
+    expect(state.project.datasets[12].spotIds).toEqual([parentId]);
+  });
+
+  // A stub can hold its id as a string. It is taken off all the same, so Undo has to put it back.
+  it('restores the parent\'s link on Undo when its stub holds the id as a string', () => {
+    const parentWithStringStub = {...parent, properties: {...parent.properties, samples: [{id: sampleId.toString()}]}};
+    const spotsOnDevice = {[parentId]: parentWithStringStub, [sampleId]: sampleSpot};
+    const {samplesApi, store} = renderSamplesApi(
+      {datasets: {12: {id: 12, spotIds: [parentId, sampleId]}}, readOnlyDatasetsIds: [], spots: spotsOnDevice});
+    ReactTestRenderer.act(() => samplesApi.deleteRichSample(sampleSpot));
+    expect(store.getState().spot.spots[parentId].properties.samples).toBeUndefined();
+    const [, {data}] = mockToastShow.mock.calls.find(([, options]) => options?.data?.onUndo);
+    ReactTestRenderer.act(() => data.onUndo());
+    const restoredSpots = store.getState().spot.spots;
+    expect(restoredSpots[sampleId]).toBeDefined();
+    expect(restoredSpots[parentId].properties.samples).toEqual([{id: sampleId.toString()}]);
+  });
+
+  // Only possible where an old bug split the sample off from its parent
+  it('leaves both alone when the parent is in a read only dataset', () => {
+    const datasets = {12: {id: 12, spotIds: [parentId]}, 13: {id: 13, spotIds: [sampleId]}};
+    const state = deleteRichSample(datasets, [12]);
+    expect(state.spot.spots).toEqual(spots);
+    expect(state.project.datasets).toEqual(datasets);
+    expect(mockToastShow).toHaveBeenCalledWith(expect.stringContaining('Unable to delete'), expect.anything());
   });
 });
