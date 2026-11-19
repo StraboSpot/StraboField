@@ -76,7 +76,8 @@ describe('deleting with read only datasets', () => {
   };
 
   // As useDeleteDataset asks, with what getSamplesSplitByDataset found for the dataset
-  const getSplit = datasetId => getSamplesSplitByDataset(splitDatasets[datasetId], familySpots);
+  const getSplit = (datasetId, datasets = splitDatasets) =>
+    getSamplesSplitByDataset(splitDatasets[datasetId], familySpots, datasets);
 
   it('won\'t delete a Spot whose sample is in a read only dataset', () => {
     const {deleteSpot, getState, spotsApi} = renderSpotsApi(splitDatasets, [13]);
@@ -121,7 +122,7 @@ describe('deleting with read only datasets', () => {
   });
 
   // Deleting the parent's dataset deletes the sample filed elsewhere, as deleting the parent would
-  it('deletes, ahead of a dataset delete, the samples of its Spots filed elsewhere', () => {
+  it('deletes, after a dataset delete, the samples of its Spots filed elsewhere', () => {
     const {getState, spotsApi} = renderSpotsApi(splitDatasets, []);
     ReactTestRenderer.act(() => spotsApi.deleteSamplesSplitByDataset(getSplit(12)));
     expect(getState().spot.spots[sampleId]).toBeUndefined();
@@ -129,10 +130,11 @@ describe('deleting with read only datasets', () => {
     expect(getState().spot.spots[parentId]).toEqual(parent);
   });
 
-  // Deleting the sample's dataset takes its stub off the parent, as deleting the sample would
-  it('takes off, ahead of a dataset delete, the stubs a parent filed elsewhere keeps for its samples', () => {
+  // A parent in no dataset leaves its sample nowhere to move to, so deleting the sample's dataset takes its stub off
+  // the parent, as deleting the sample would
+  it('takes off, after a dataset delete, the stubs a parent in no dataset keeps for its samples', () => {
     const {getState, spotsApi} = renderSpotsApi(splitDatasets, []);
-    ReactTestRenderer.act(() => spotsApi.deleteSamplesSplitByDataset(getSplit(13)));
+    ReactTestRenderer.act(() => spotsApi.deleteSamplesSplitByDataset(getSplit(13, {13: splitDatasets[13]})));
     expect(getState().spot.spots[parentId].properties.samples).toBeUndefined();
     expect(getState().project.datasets[12].spotIds).toEqual([parentId]);
   });

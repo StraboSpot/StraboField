@@ -1,6 +1,6 @@
 import {SAMPLE_LOCATION_KEY, SAMPLE_LOCATION_MAX_DECIMALS, STRABOSAMPLES_FIELD_MAP} from './samples.constants';
 import {isEmpty, isEqual, isSameId} from '../../shared/helpers';
-import {isSpotIdInDataset} from '../spots/spots.helpers';
+import {getDatasetWithSpotId, isSpotIdInDataset} from '../spots/spots.helpers';
 
 // A Sample Spot moves only with its parent, or the two would be split across datasets. One already split off can
 // only be put back, into a dataset holding its parent. Takes isSplitFromParent's answer rather than asking it, as a
@@ -99,37 +99,57 @@ export const getSamplesLinkedTo = (spots, strabosamplesId, fieldSampleId) => Obj
   ),
 );
 
-// The samples filed apart from their parents across a dataset's edge, which deleting the dataset has to deal with as
-// deleting each of its Spots would. Only an old bug, which filed a new sample in the target dataset rather than its
-// parent's, could split them up.
+// The samples filed apart from their parents across a dataset's edge, which deleting the dataset has to deal with.
+// Only an old bug, which filed a new sample in the target dataset rather than its parent's, could split them up.
 //   samplesToDelete - samples of the dataset's Spots that are filed elsewhere, at any depth. They go with their parent.
-//   parentsToUnlink - Spots filed elsewhere whose samples are in the dataset, each with the ids of those samples, as
-//                     its stubs for them have to come off. A parent being deleted anyway is left out.
+//   samplesToMove   - Samples in the dataset taken at Spots filed elsewhere, which go to their parent's dataset rather
+//                     than being deleted with this one. Each has the parent, the dataset to go to, and the ids to
+//                     move: its own and those of its samples filed in this dataset.
+//   parentsToUnlink - Spots in no dataset, so with nowhere for their samples in the dataset to go, each with the ids
+//                     of those samples, as its stubs for them have to come off. Every Spot should be in a dataset, so
+//                     this is only a guard against corrupt data, and the confirmation doesn't mention it.
+// A parent being deleted anyway is left out of both of the last two, and its sample in the dataset goes with it.
+// Samples within samples shouldn't exist - the app gives no way to take one - so the handling of deeper levels is only
+// a guard against corrupt data, not something to build on.
 // Ids are compared as strings throughout, as a dataset or a stub can hold one as a string. A dataset can hold
 // thousands of Spots, so each lookup is built once rather than scanned for every Spot.
-export const getSamplesSplitByDataset = (dataset, spots) => {
+export const getSamplesSplitByDataset = (dataset, spots, datasets) => {
   const datasetSpotIds = new Set((dataset.spotIds || []).map(String));
+  const isInDataset = spot => datasetSpotIds.has(String(spot.properties.id));
   const datasetSpots = [...datasetSpotIds].map(spotId => spots[spotId]).filter(Boolean);
-  const samplesToDelete = Object.values(Object.fromEntries(datasetSpots
-    .flatMap(spot => getRichSamples(spot, spots))
-    .filter(sampleSpot => !datasetSpotIds.has(String(sampleSpot.properties.id)))
-    .map(sampleSpot => [sampleSpot.properties.id, sampleSpot])));
-  const deletedSpotIds = new Set(
-    [...datasetSpotIds, ...samplesToDelete.map(sampleSpot => String(sampleSpot.properties.id))]);
   // Each sample's parent: the Spot whose samples list it, leaving out the Sample Spot's stub for itself
   const parentsBySampleId = {};
   Object.values(spots).forEach(spot => spot.properties.samples?.forEach((sample) => {
     if (!isSameId(sample.id, spot.properties.id)) parentsBySampleId[sample.id] = spot;
   }));
+  const splitSamples = datasetSpots.filter(spot => spot.properties.isSample)
+    .map(sampleSpot => ({parentSpot: parentsBySampleId[sampleSpot.properties.id], sampleSpot: sampleSpot}))
+    .filter(({parentSpot}) => parentSpot && !isInDataset(parentSpot))
+    .map(split => ({...split, toDatasetId: getDatasetWithSpotId(datasets, split.parentSpot.properties.id)?.id}));
+  // Those whose parent is in a dataset can go to it. Those whose parent is in none have nowhere to go.
+  const hasDatasetToGoTo = ({toDatasetId}) => toDatasetId !== undefined;
+  const movableSamples = splitSamples.filter(hasDatasetToGoTo)
+    .map(split => ({...split, spotIds: getSpotIdsToMove(split.sampleSpot, spots).filter(id => isInDataset(spots[id]))}));
+  const movableSpotIds = new Set(movableSamples.flatMap(({spotIds}) => spotIds.map(String)));
+  const samplesToDelete = Object.values(Object.fromEntries(datasetSpots
+    .filter(spot => !movableSpotIds.has(String(spot.properties.id)))
+    .flatMap(spot => getRichSamples(spot, spots))
+    .filter(sampleSpot => !isInDataset(sampleSpot))
+    .map(sampleSpot => [sampleSpot.properties.id, sampleSpot])));
+  const deletedSampleIds = new Set(samplesToDelete.map(sampleSpot => String(sampleSpot.properties.id)));
+  const isParentKept = ({parentSpot}) => !deletedSampleIds.has(String(parentSpot.properties.id));
   const parentsById = {};
-  datasetSpots.filter(spot => spot.properties.isSample).forEach((sampleSpot) => {
-    const parentSpot = parentsBySampleId[sampleSpot.properties.id];
-    if (!parentSpot || deletedSpotIds.has(String(parentSpot.properties.id))) return;
-    const parentId = parentSpot.properties.id;
-    parentsById[parentId] = parentsById[parentId] || {parentSpot: parentSpot, sampleIds: []};
-    parentsById[parentId].sampleIds.push(sampleSpot.properties.id);
-  });
-  return {parentsToUnlink: Object.values(parentsById), samplesToDelete: samplesToDelete};
+  splitSamples.filter(split => !hasDatasetToGoTo(split) && isParentKept(split))
+    .forEach(({parentSpot, sampleSpot}) => {
+      const parentId = parentSpot.properties.id;
+      parentsById[parentId] = parentsById[parentId] || {parentSpot: parentSpot, sampleIds: []};
+      parentsById[parentId].sampleIds.push(sampleSpot.properties.id);
+    });
+  return {
+    parentsToUnlink: Object.values(parentsById),
+    samplesToDelete: samplesToDelete,
+    samplesToMove: movableSamples.filter(isParentKept),
+  };
 };
 
 // A parent's samples with those of the given ids taken off, as deleting them leaves it. Compared with isSameId, as a

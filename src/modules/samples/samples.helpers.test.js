@@ -291,39 +291,80 @@ describe('getSamplesLinkedTo', () => {
 
 // Only an old bug could file a sample apart from its parent, which is what a dataset delete has to tidy up
 describe('getSamplesSplitByDataset', () => {
+  const nothingSplit = {parentsToUnlink: [], samplesToDelete: [], samplesToMove: []};
+  // The parent in one dataset and both its samples in another
+  const splitDatasets = {12: {id: 12, spotIds: [parentId]}, 13: {id: 13, spotIds: [sampleId, otherSampleId]}};
+
   it('finds nothing when every sample is filed with its parent', () => {
     const dataset = {id: 12, spotIds: [parentId, sampleId, otherSampleId]};
-    expect(getSamplesSplitByDataset(dataset, familySpots)).toEqual({parentsToUnlink: [], samplesToDelete: []});
+    expect(getSamplesSplitByDataset(dataset, familySpots, {12: dataset})).toEqual(nothingSplit);
   });
 
   it('deletes the samples, filed elsewhere, of a Spot in the dataset', () => {
-    const dataset = {id: 12, spotIds: [parentId, sampleId]};
-    expect(getSamplesSplitByDataset(dataset, familySpots))
-      .toEqual({parentsToUnlink: [], samplesToDelete: [otherSampleSpot]});
+    const datasets = {12: {id: 12, spotIds: [parentId, sampleId]}, 13: {id: 13, spotIds: [otherSampleId]}};
+    expect(getSamplesSplitByDataset(datasets[12], familySpots, datasets))
+      .toEqual({...nothingSplit, samplesToDelete: [otherSampleSpot]});
   });
 
-  it('unlinks a parent filed elsewhere from each of its samples in the dataset, once', () => {
+  it('moves each sample in the dataset to the dataset of its parent filed elsewhere', () => {
     const dataset = {id: 13, spotIds: [sampleId, otherSampleId.toString()]};
-    expect(getSamplesSplitByDataset(dataset, familySpots)).toEqual({
-      parentsToUnlink: [{parentSpot: parent, sampleIds: [sampleId, otherSampleId]}],
-      samplesToDelete: [],
+    expect(getSamplesSplitByDataset(dataset, familySpots, {...splitDatasets, 13: dataset})).toEqual({
+      ...nothingSplit,
+      samplesToMove: [
+        {parentSpot: parent, sampleSpot: sampleSpot, spotIds: [sampleId], toDatasetId: 12},
+        {parentSpot: parent, sampleSpot: otherSampleSpot, spotIds: [otherSampleId], toDatasetId: 12},
+      ],
     });
   });
 
-  // The sample in the dataset goes off its parent, and its own sample, filed elsewhere, goes with it
-  it('deletes a nested sample filed elsewhere, and leaves out a parent being deleted anyway', () => {
-    expect(getSamplesSplitByDataset({id: 13, spotIds: [sampleId]}, nestedSpots)).toEqual({
-      parentsToUnlink: [{parentSpot: parent, sampleIds: [sampleId]}],
-      samplesToDelete: [nestedSampleSpot],
+  // With nowhere to move them, the samples go with the dataset and come off their parent
+  it('unlinks a parent in no dataset from each of its samples in the dataset, once', () => {
+    expect(getSamplesSplitByDataset(splitDatasets[13], familySpots, {13: splitDatasets[13]})).toEqual({
+      ...nothingSplit,
+      parentsToUnlink: [{parentSpot: parent, sampleIds: [sampleId, otherSampleId]}],
     });
-    // The nested sample's parent is in the dataset, so it isn't unlinked from a Spot that is going anyway
-    expect(getSamplesSplitByDataset({id: 13, spotIds: [sampleId, nestedSampleId]}, nestedSpots).parentsToUnlink)
-      .toEqual([{parentSpot: parent, sampleIds: [sampleId]}]);
+  });
+
+  // A sample of the moved sample goes with it when filed in the dataset too, and stays where it is when not
+  it('moves a sample\'s own samples filed in the dataset along with it, and leaves those filed elsewhere', () => {
+    const datasets = {...splitDatasets, 14: {id: 14, spotIds: [nestedSampleId]}};
+    expect(getSamplesSplitByDataset({id: 13, spotIds: [sampleId]}, nestedSpots, datasets)).toEqual({
+      ...nothingSplit,
+      samplesToMove: [{parentSpot: parent, sampleSpot: sampleWithNested, spotIds: [sampleId], toDatasetId: 12}],
+    });
+    const dataset = {id: 13, spotIds: [sampleId, nestedSampleId]};
+    expect(getSamplesSplitByDataset(dataset, nestedSpots, {...splitDatasets, 13: dataset}).samplesToMove).toEqual(
+      [{parentSpot: parent, sampleSpot: sampleWithNested, spotIds: [sampleId, nestedSampleId], toDatasetId: 12}]);
+  });
+
+  // The nested sample's parent is filed elsewhere but deleted with the dataset's Spot it was taken at
+  it('neither moves nor unlinks a sample whose parent is being deleted anyway', () => {
+    const datasets = {12: {id: 12, spotIds: [parentId, nestedSampleId]}, 13: {id: 13, spotIds: [sampleId]}};
+    expect(getSamplesSplitByDataset(datasets[12], nestedSpots, datasets))
+      .toEqual({...nothingSplit, samplesToDelete: [sampleWithNested, otherSampleSpot]});
+  });
+
+  // Samples within samples shouldn't exist, so this is only a guard against corrupt data. The Sample in the dataset
+  // isn't moved, as its parent is deleted, and its own sample filed elsewhere is reached through that parent.
+  it('deletes the samples, filed elsewhere, of a sample deleted along with its parent', () => {
+    const deepestId = 1756000000015;
+    const nestedWithDeepest = {
+      properties: {id: nestedSampleId, isSample: true, samples: [{id: nestedSampleId}, {id: deepestId}]},
+    };
+    const deepestSpot = {properties: {id: deepestId, isSample: true, samples: [{id: deepestId}]}};
+    const spots = {...nestedSpots, [deepestId]: deepestSpot, [nestedSampleId]: nestedWithDeepest};
+    const datasets = {
+      12: {id: 12, spotIds: [parentId, nestedSampleId]},
+      13: {id: 13, spotIds: [sampleId]},
+      14: {id: 14, spotIds: [deepestId]},
+    };
+    expect(getSamplesSplitByDataset(datasets[12], spots, datasets))
+      .toEqual({...nothingSplit, samplesToDelete: [sampleWithNested, deepestSpot, otherSampleSpot]});
   });
 
   it('skips a Spot the dataset lists that is missing from the device', () => {
-    expect(getSamplesSplitByDataset({id: 12, spotIds: [1756000000099]}, familySpots))
-      .toEqual({parentsToUnlink: [], samplesToDelete: []});
+    expect(getSamplesSplitByDataset({id: 12, spotIds: [1756000000099]}, familySpots, splitDatasets))
+      .toEqual(nothingSplit);
   });
 });
 

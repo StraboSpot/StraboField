@@ -1,7 +1,7 @@
 import {configureStore} from '@reduxjs/toolkit';
 import {Toast} from 'react-native-toast-notifications';
 
-import listenerMiddleware from './listenerMiddleware.web';
+import listenerMiddleware, {waitForMovesOutOf} from './listenerMiddleware.web';
 import projectReducer, {deletedDataset, movedSpotIdBetweenDatasets} from '../modules/project/projects.slice';
 import spotReducer, {deletedSpot, editedSpotImage, editedSpotProperties} from '../modules/spots/spots.slice';
 import userReducer from '../modules/user/userProfile.slice';
@@ -139,6 +139,17 @@ describe('deleting a Spot and its samples on web', () => {
 describe('moving a Spot on web', () => {
   const spotId = 1756000000051;
 
+  // Dataset 13 holds the Spots given, to be moved to dataset 14
+  const makeMoveStore = (spotIds = [spotId], readOnlyDatasetsIds = []) => makeStore({
+    project: {
+      activeDatasetsIds: [13, 14],
+      datasets: {13: {id: 13, spotIds: spotIds}, 14: {id: 14, spotIds: []}},
+      project: {id: 1, modified_timestamp: 1},
+      readOnlyDatasetsIds: readOnlyDatasetsIds,
+    },
+    spot: {recentViews: [], selectedSpot: {}, spots: {}},
+  });
+
   beforeEach(() => {
     [deleteDataset, moveSpotToDataset, updateProject].forEach(mock => mock.mockReset());
     updateProject.mockResolvedValue({});
@@ -169,16 +180,86 @@ describe('moving a Spot on web', () => {
       .toEqual([[spotId, 14]]);
   });
 
+  // Deleting a dataset moves its samples out first, and deleted first on the server they would go with it
+  it('deletes a dataset only after a move made before it', async () => {
+    const store = makeMoveStore();
+    const settleMove = holdOpen(moveSpotToDataset);
+
+    store.dispatch(movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId: 14}));
+    store.dispatch(deletedDataset(13));
+    await flushPromises();
+    expect(moveSpotToDataset).toHaveBeenCalledTimes(1);
+    expect(deleteDataset).not.toHaveBeenCalled();
+
+    settleMove();
+    await flushPromises();
+    expect(deleteDataset).toHaveBeenCalledTimes(1);
+  });
+
+  // Deleting a dataset waits on this before deleting anything, as the server still has a Spot whose move failed
+  // where it was
+  it('says, once a move has been sent, whether the server moved the Spots out of the dataset', async () => {
+    const store = makeMoveStore();
+    const moveTo = toDatasetId => store.dispatch(movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId}));
+
+    moveSpotToDataset.mockRejectedValueOnce(new Error('Server error'));
+    moveTo(14);
+    expect(await waitForMovesOutOf('13')).toBe(false);
+    expect(await waitForMovesOutOf(14)).toBe(true);
+
+    // Moved again, and this time the server takes it
+    moveTo(13);
+    moveTo(14);
+    expect(await waitForMovesOutOf(13)).toBe(true);
+  });
+
+  // The server moved the first before failing on the second, so only the second is still where it was
+  it('counts only the Spots not yet moved when a move fails partway', async () => {
+    const sampleId = 1756000000052;
+    const store = makeMoveStore([spotId, sampleId]);
+    moveSpotToDataset.mockResolvedValueOnce({}).mockRejectedValueOnce(new Error('Server error'));
+    store.dispatch(movedSpotIdBetweenDatasets({spotIds: [spotId, sampleId], toDatasetId: 14}));
+    expect(await waitForMovesOutOf(13)).toBe(false);
+
+    // Only the second needs to go again
+    store.dispatch(movedSpotIdBetweenDatasets({spotIds: [sampleId], toDatasetId: 13}));
+    store.dispatch(movedSpotIdBetweenDatasets({spotIds: [sampleId], toDatasetId: 14}));
+    expect(await waitForMovesOutOf(13)).toBe(true);
+  });
+
+  it('waits for a move still being sent', async () => {
+    const store = makeMoveStore();
+    const settleMove = holdOpen(moveSpotToDataset);
+    store.dispatch(movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId: 14}));
+    let isMoved;
+    waitForMovesOutOf(13).then((result) => {
+      isMoved = result;
+    });
+    await flushPromises();
+    expect(isMoved).toBeUndefined();
+    settleMove();
+    await flushPromises();
+    expect(isMoved).toBe(true);
+  });
+
+  // A dataset nothing is being moved out of can be deleted at once, however long the queue's other sends take
+  it('waits for nothing when no move out of the dataset is outstanding', async () => {
+    const store = makeMoveStore();
+    const settleMove = holdOpen(moveSpotToDataset);
+    store.dispatch(movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId: 14}));
+    let isMoved;
+    waitForMovesOutOf(14).then((result) => {
+      isMoved = result;
+    });
+    await flushPromises();
+    expect(isMoved).toBe(true);
+    settleMove();  // Or every send queued in the tests after it would wait on it
+    await flushPromises();
+  });
+
   // The reducer leaves a read only dataset alone, so the server must too
   it('sends nothing when the move is out of a read only dataset', async () => {
-    const store = makeStore({
-      project: {
-        datasets: {13: {id: 13, spotIds: [spotId]}, 14: {id: 14, spotIds: []}},
-        project: {id: 1, modified_timestamp: 1},
-        readOnlyDatasetsIds: [13],
-      },
-      spot: {recentViews: [], selectedSpot: {}, spots: {}},
-    });
+    const store = makeMoveStore([spotId], [13]);
     store.dispatch(movedSpotIdBetweenDatasets({spotIds: [spotId], toDatasetId: 14}));
     await flushPromises();
     expect(moveSpotToDataset).not.toHaveBeenCalled();
@@ -187,14 +268,7 @@ describe('moving a Spot on web', () => {
   // The server moves one Spot per call, so a Spot and its samples are sent one after another
   it('sends each Spot in the move, the Spot first and then its samples', async () => {
     const sampleId = 1756000000052;
-    const store = makeStore({
-      project: {
-        datasets: {13: {id: 13, spotIds: [spotId, sampleId]}, 14: {id: 14, spotIds: []}},
-        project: {id: 1, modified_timestamp: 1},
-        readOnlyDatasetsIds: [],
-      },
-      spot: {recentViews: [], selectedSpot: {}, spots: {}},
-    });
+    const store = makeMoveStore([spotId, sampleId]);
     store.dispatch(movedSpotIdBetweenDatasets({spotIds: [spotId, sampleId], toDatasetId: 14}));
     await flushPromises();
     expect(moveSpotToDataset.mock.calls.map(([sentSpotId, toDatasetId]) => [sentSpotId, toDatasetId]))

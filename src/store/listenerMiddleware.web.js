@@ -41,7 +41,10 @@ import {isEmpty, toError} from '../shared/helpers';
 let pendingDragSpotIds = new Set();
 
 let deleteBatch;  // The deletes queued and not yet finished, which share one toast
-let serverDeletes = Promise.resolve();  // The last delete in queueServerDelete's queue, which the next one waits on
+let serverQueue = Promise.resolve();  // The last delete or move queued, which the next one waits on
+// The Spots moved on the device that the server has yet to move, as the move is still being sent or failed, each with
+// the dataset the server still has it in, by id as a string - see waitForMovesOutOf
+const unmovedSpotDatasetIds = new Map();
 
 const canceledIntervalDragListener = () => {
   pendingDragSpotIds = new Set();
@@ -137,24 +140,32 @@ const moveSpotToDatasetListener = async (action, listenerApi) => {
   const encodedLogin = newState.user.encoded_login;
   const modifiedTimestamp = newState.project.project.modified_timestamp;
 
-  // Sent only once any deletes made before it are, as an edit is: each delete sends the project as it stood then, and
-  // landing after the move would take the project's timestamp back to before it
-  await serverDeletes;
+  // Queued with the deletes. It waits for any made before it, as each delete sends the project as it stood then, and
+  // landing after the move would take the project's timestamp back to before it. One made after it waits for it, as
+  // a dataset deleted straight after a sample is moved out of it would otherwise take the sample with it on the server.
+  // Each counts as still where it was on the server until the server has moved it, as a failed one stays
+  spotIds.forEach((spotId) => {
+    const fromDataset = getDatasetWithSpotId(datasets, spotId);
+    if (fromDataset) unmovedSpotDatasetIds.set(String(spotId), String(fromDataset.id));
+  });
 
-  Toast.hideAll();
-  let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
+  return queueServerSend(async () => {
+    Toast.hideAll();
+    let toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
 
-  try {
-    for (const spotId of spotIds) {
-      const resJSON = await moveSpotToDataset(spotId, toDatasetId, modifiedTimestamp, encodedLogin);
-      console.log('moved Spot to Dataset resJSON', resJSON);
+    try {
+      for (const spotId of spotIds) {
+        const resJSON = await moveSpotToDataset(spotId, toDatasetId, modifiedTimestamp, encodedLogin);
+        console.log('moved Spot to Dataset resJSON', resJSON);
+        unmovedSpotDatasetIds.delete(String(spotId));
+      }
+
+      Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
     }
-
-    Toast.update(toastId, 'Changes saved.', {type: 'success', duration: 3000});
-  }
-  catch (err) {
-    reportSaveError(err, toastId);
-  }
+    catch (err) {
+      reportSaveError(err, toastId);
+    }
+  });
 };
 
 // Deletes go to the server one at a time, in order. Deleting a Spot or a dataset can send a request per sample, each
@@ -166,7 +177,7 @@ const queueServerDelete = (send) => {
   const batch = deleteBatch;
   batch.pendingCount += 1;
   batch.totalCount += 1;
-  const queued = serverDeletes.then(async () => {
+  return queueServerSend(async () => {
     if (!batch.toastId) {
       Toast.hideAll();
       batch.toastId = Toast.show('Saving changes...', {placement: 'bottom', duration: 100000});
@@ -191,8 +202,14 @@ const queueServerDelete = (send) => {
       }
     }
   });
-  // Failures are reported above, but one that throws anyway must not stop every delete after it
-  serverDeletes = queued.catch(() => {
+};
+
+// Sends to the server once every delete and move queued before it has been sent, and holds back any queued after it
+// until it has. Failures are reported by whoever queues the send, but one that throws anyway must not stop every send
+// after it.
+const queueServerSend = (send) => {
+  const queued = serverQueue.then(send);
+  serverQueue = queued.catch(() => {
   });
   return queued;
 };
@@ -276,9 +293,9 @@ const updatedProjectDatasetsSpotsListener = async (action, listenerApi) => {
   }
   const jsonToSend = JSON.parse(JSON.stringify(objectToSend));
 
-  // Waits for any delete made before it, as it sends the project too and must not overtake one. With no delete
-  // pending it goes straight out, and every delete request times out, so the wait is bounded.
-  await serverDeletes;
+  // Waits for any delete or move made before it, as it sends the project too and must not overtake one. With none
+  // pending it goes straight out, and every such request times out, so the wait is bounded.
+  await serverQueue;
 
   // Shown only once there is something to send. Toast.show puts the toast up on the next frame, so a Toast.hideAll
   // on this one runs before it exists and leaves it saying 'Saving changes...' for its full duration.
@@ -352,6 +369,17 @@ const uploadProjectDatasetDeleteSpotListener = (action, listenerApi) => {
     const resJSON = await uploadProjectDatasetDeleteSpot(jsonToSend, encodedLogin);
     console.log('uploadProjectDatasetDeleteSpot resJSON', resJSON);
   });
+};
+
+// Whether the server has every Spot the device has moved out of the dataset moved out of it too, waiting for any such
+// move still being sent. A web move is made on the device first and sent after, and a failed one is left as made
+// there, so the server can still hold a Spot in a dataset the device shows it out of. Deleting the dataset there
+// would delete the Spot with it. With no move out of it outstanding there is nothing to wait for.
+export const waitForMovesOutOf = async (datasetId) => {
+  const isMoveOutOutstanding = () => [...unmovedSpotDatasetIds.values()].includes(String(datasetId));
+  if (!isMoveOutOutstanding()) return true;
+  await serverQueue;
+  return !isMoveOutOutstanding();
 };
 
 // The server keeps one row per id and rejects the whole save when a single command carries the same id twice

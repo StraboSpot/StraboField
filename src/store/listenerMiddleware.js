@@ -31,4 +31,8 @@ listenerMiddleware.startListening({
   },
 });
 
+// Native moves only change the device, and go to the server with the next upload, so there is nothing to wait for.
+// The web version waits for the server.
+export const waitForMovesOutOf = async () => true;
+
 export default listenerMiddleware;

@@ -81,10 +81,10 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     closeDetailView();
   };
 
-  const initializeDeleteDataset = () => {
+  const initializeDeleteDataset = async () => {
     setIsDeleteConfirmModalVisible(false);
     // A delete refused has said why, and the view stays open
-    if (deleteDataset(dataset)) closeDetailView();
+    if (await deleteDataset(dataset)) closeDetailView();
   };
 
   const saveDataset = () => {
@@ -104,7 +104,7 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const renderDeleteConfirmationModal = () => {
     // Samples filed apart from their parents across this dataset's edge, which an old bug could leave
-    const {parentsToUnlink, readOnlyMessage, samplesToDelete} = getDatasetDeleteCheck(dataset);
+    const {readOnlyMessage, samplesToDelete, samplesToMove} = getDatasetDeleteCheck(dataset);
     return (
       <DeleteConformationDialogBox
         headerTitle={'Confirm Delete!'}
@@ -131,10 +131,10 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
                     + 'datasets, taken at Spots in this one, will be deleted with it.'}
                 </Text>
               )}
-              {!isEmpty(parentsToUnlink) && (
+              {!isEmpty(samplesToMove) && (
                 <Text style={overlayStyles.statusMessageText}>
-                  {`${parentsToUnlink.length} ${parentsToUnlink.length === 1 ? 'Spot' : 'Spots'} in other datasets `
-                    + 'will lose the Samples taken at them that are filed in this one.'}
+                  {`${samplesToMove.length} ${samplesToMove.length === 1 ? 'Sample' : 'Samples'} in this dataset, `
+                    + 'taken at Spots in other datasets, will be moved to the dataset of the Spot each was taken from.'}
                 </Text>
               )}
             </>

@@ -360,8 +360,9 @@ const useSpots = () => {
   };
 
   // With a dataset deleted, does what deleting each of its Spots would to samples filed across its edge: their
-  // samples filed elsewhere are deleted with them, and parents filed elsewhere lose their stubs for samples in it. So
-  // no sample is left without a parent, and no parent keeps a stub for a sample that is gone.
+  // samples filed elsewhere are deleted with them, and parents in no dataset, which its samples had nowhere to move
+  // to, lose their stubs for them. So no sample is left without a parent, and no parent keeps a stub for a sample
+  // that is gone.
   // Takes what getSamplesSplitByDataset found, which the caller has already worked out to check and to confirm.
   const deleteSamplesSplitByDataset = ({parentsToUnlink, samplesToDelete}) => {
     samplesToDelete.forEach(sampleSpot => dispatch(deletedSpot(sampleSpot.properties.id)));
