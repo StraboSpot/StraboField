@@ -14,7 +14,15 @@
       }
     },
     "updates": {
-      "url": "https://u.expo.dev/21b380cb-2cd0-48a9-b147-9f44668281c9"
+      "url": "https://strabospot.org/ota/manifest",
+      "codeSigningCertificate": "./certs/certificate.pem",
+      "codeSigningMetadata": {
+        "keyid": "main",
+        "alg": "rsa-v1_5-sha256"
+      },
+      "requestHeaders": {
+        "expo-channel-name": "beta"
+      }
     }
   }
 }
