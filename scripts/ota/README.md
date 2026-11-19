@@ -29,12 +29,15 @@ release.
   `certs/certificate.pem`, and it is built into the app (`ios/StraboSpot2/Expo.plist` and
   `android/app/src/main/AndroidManifest.xml`). Signing happens on your computer when you publish. The server only
   holds the certificate and refuses anything with a signature that doesn't verify.
-- **Channels:** a build that sends the header `expo-channel-name: beta` gets the `beta` channel. A build that
-  sends no header gets `production`. The header is set in `Expo.plist` and `AndroidManifest.xml`.
+- **Channels:** a build that sends no channel header gets `production`, which is what the committed config does,
+  so store, TestFlight and Play testing builds are all on `production`. A build that sends the header
+  `expo-channel-name: beta` gets the `beta` channel.
 
-> **Before a store build, remove the `beta` channel header** from `Expo.plist` (`EXUpdatesRequestHeaders`),
-> `AndroidManifest.xml` (`UPDATES_CONFIGURATION_REQUEST_HEADERS_KEY`) and `app.json` (`updates.requestHeaders`).
-> Otherwise every user is put on the beta channel.
+> **For a beta-channel test build,** add the header locally and don't commit it:
+> `EXUpdatesRequestHeaders` → `{expo-channel-name: beta}` in `Expo.plist`,
+> `expo.modules.updates.UPDATES_CONFIGURATION_REQUEST_HEADERS_KEY` → `{"expo-channel-name":"beta"}` in
+> `AndroidManifest.xml`, and `updates.requestHeaders` in `app.json`. The header changes the runtime version, so
+> publish beta updates from that same checkout. Never ship a store build with it, or every user is put on beta.
 
 ## One-time setup
 

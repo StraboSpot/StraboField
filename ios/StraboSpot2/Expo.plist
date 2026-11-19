@@ -12,11 +12,6 @@
 	<integer>0</integer>
 	<key>EXUpdatesURL</key>
 	<string>https://strabospot.org/ota/manifest</string>
-	<key>EXUpdatesRequestHeaders</key>
-	<dict>
-		<key>expo-channel-name</key>
-		<string>beta</string>
-	</dict>
 	<key>EXUpdatesCodeSigningCertificate</key>
 	<string>-----BEGIN CERTIFICATE-----
 MIIC1zCCAb+gAwIBAgIJGX6gYUWNQNeqMA0GCSqGSIb3DQEBCwUAMBUxEzARBgNV

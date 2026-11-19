@@ -19,9 +19,6 @@
       "codeSigningMetadata": {
         "keyid": "main",
         "alg": "rsa-v1_5-sha256"
-      },
-      "requestHeaders": {
-        "expo-channel-name": "beta"
       }
     }
   }
