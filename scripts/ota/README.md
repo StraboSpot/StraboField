@@ -18,8 +18,13 @@ release.
 - **Offline:** a failed check is silent and is retried next time.
 - **Runtime version:** each build has a runtime version, a fingerprint of its native code. An update only reaches
   builds whose runtime version matches the one it was published for. `npm run ota:publish` works it out for you.
-  `fingerprint.config.js` leaves package.json's `scripts` out of the fingerprint, so editing npm scripts doesn't cut
-  builds off from updates.
+  `fingerprint.config.js` leaves out files that change without the native code changing: package.json's `scripts`,
+  the JS bundles from `npm run bundle:*`, IDE state (`.idea/`, `xcuserdata/`, schemes) and machine-specific files.
+  Before that, running `bundle:android` or having Android Studio open gave an Android build a runtime version no
+  update was published for. `android/app/build.gradle` also forces expo-updates' fingerprint task to rerun on every
+  build; Gradle otherwise kept the first fingerprint it wrote. If a phone gets no updates, compare the runtime
+  version it reports in `npm run ota -- stats` with the one the update was published for. On Android, the APK's
+  value is in `android/app/build/generated/assets/createReleaseUpdatesResources/fingerprint`.
 - **Code signing:** the app only accepts updates signed with our private key. The matching public certificate is
   `certs/certificate.pem`, and it is built into the app (`ios/StraboSpot2/Expo.plist` and
   `android/app/src/main/AndroidManifest.xml`). Signing happens on your computer when you publish. The server only

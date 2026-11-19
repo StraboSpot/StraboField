@@ -151,6 +151,14 @@ configurations.all {
     resolutionStrategy.force "io.legere:pdfiumandroid:1.0.33"
 }
 
+// expo-updates writes the build's runtime version (the native fingerprint) in its create<Variant>UpdatesResources
+// task, which declares no file inputs, so Gradle counts it as up to date and keeps the first fingerprint it ever
+// wrote. A build then reports a stale runtime version that no update is published for, and silently gets none.
+// Always rerun it; it takes a few seconds. iOS reruns its equivalent build phase every time.
+tasks.matching { it.name ==~ /create.*UpdatesResources/ }.configureEach {
+    outputs.upToDateWhen { false }
+}
+
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
