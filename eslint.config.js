@@ -8,8 +8,9 @@ const globals = require('globals');
 module.exports = [
   {
     // dist/ is webpack build output: bundled, minified vendor code, not ours to lint. Flat config lints dotfiles, so
-    // they need excluding too.
-    ignores: ['dist/', '**/.*', '**/.*/'],
+    // they need excluding too. scripts/ota/ota-*.mjs come from the update server's side and are kept as delivered;
+    // dist-ota/ is the OTA export.
+    ignores: ['dist/', 'dist-ota/', 'scripts/ota/ota-*.mjs', '**/.*', '**/.*/'],
   },
   {
     // Before the React Native config so its globals win where the two disagree

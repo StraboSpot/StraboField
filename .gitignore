@@ -104,3 +104,6 @@ WHAT_TO_TEST.txt
 
 # ESLint incremental-lint cache (npm run lint)
 .eslintcache
+
+# OTA update export (npx expo export --output-dir dist-ota); /dist is the web build
+/dist-ota
