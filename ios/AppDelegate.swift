@@ -1,17 +1,22 @@
 import UIKit
+internal import Expo
 import OrientationDirector
 
-@main class AppDelegate: UIResponder, UIApplicationDelegate {
+// ExpoAppDelegate forwards app life-cycle events to Expo modules; ExpoReactNativeFactory lets expo-updates pick the
+// bundle to launch. SceneDelegate stays our own: ExpoAppSceneDelegate needs ExpoReactNativeFactoryProvider, which
+// can't be adopted from this Swift 5 target (Expo is built in Swift 6 mode and the conformance fails to load).
+@main class AppDelegate: ExpoAppDelegate {
+    var window: UIWindow?
     var reactNativeDelegate: ReactNativeDelegate?
     var reactNativeFactory: RCTReactNativeFactory?
 
-    func application(_ application: UIApplication,
+    override func application(_ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
 
         SentryCorruptReportGuard.install()
 
         let delegate = ReactNativeDelegate()
-        let factory = RCTReactNativeFactory(delegate: delegate)
+        let factory = ExpoReactNativeFactory(delegate: delegate)
         delegate.dependencyProvider = RCTAppDependencyProvider()
 
         reactNativeDelegate = delegate
@@ -20,28 +25,17 @@ import OrientationDirector
         ModalStatusBarStyle.install()
 
         // The window and React Native root are created in SceneDelegate
-
-        return true
+        return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
-    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+    override func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
         return SharedOrientationDirectorImpl.shared.supportedInterfaceOrientations
     }
 }
 
 
-// The status bar is view-controller-based (UIViewControllerBasedStatusBarAppearance = YES): under the UIScene
-// lifecycle the app-wide UIApplication calls behind RN's <StatusBar> have no effect. iPhone shows light text over
-// the app's black safe area; iPad keeps it hidden.
-class RootViewController: UIViewController {
-    override var preferredStatusBarStyle: UIStatusBarStyle { .darkContent }
-    override var prefersStatusBarHidden: Bool { UIDevice.current.userInterfaceIdiom == .pad }
-
-    // react-native-screens swizzles UIViewController to defer these to its screen controllers, which default to
-    // dark text in light mode (invisible on black). Keep the decision here.
-    override var childForStatusBarStyle: UIViewController? { nil }
-    override var childForStatusBarHidden: UIViewController? { nil }
-}
+// RootViewController (status bar ownership) lives in modules/strabo-root-view, which hands it to Expo as a React
+// delegate handler; expo-updates creates the root view controller through those handlers, not this delegate.
 
 // Small-screen ModalWrappers are opaque fullscreen RN Modals on a light background, but RN's modal controller just
 // mirrors the style already showing (light), so give fullscreen presentations dark text. Transparent modals are
@@ -63,13 +57,9 @@ enum ModalStatusBarStyle {
 }
 
 
-class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
-    override func createRootViewController() -> UIViewController {
-        RootViewController()
-    }
-
+class ReactNativeDelegate: ExpoReactNativeFactoryDelegate {
     override func sourceURL(for bridge: RCTBridge) -> URL? {
-        self.bundleURL()
+        bridge.bundleURL ?? self.bundleURL()
     }
 
   override func bundleURL() -> URL? {
