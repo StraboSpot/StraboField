@@ -16,6 +16,7 @@ import projectSliceReducer, {
   setTargetDataset,
   setUseContinuousTagging,
   setUseTemplate,
+  updatedProject,
   updatedProjectPreference,
 } from './projects.slice';
 import propagateModifiedTimestamps from '../../store/propagateModifiedTimestamps';
@@ -586,6 +587,21 @@ describe('template reducers', () => {
     const state = getState({notes: {templates: [note], active: [note], isInUse: true}});
     const {project} = projectReducer(state, deletedTemplate({key: 'notes', template: note}));
     expect(project.modified_timestamp).toBeGreaterThan(1);
+  });
+});
+
+describe('updatedProject', () => {
+  it('replaces the selected tag with its copy in the new tag list', () => {
+    const state = {project: {tags: [{id: 't1', name: 'Old'}]}, selectedTag: {id: 't1', name: 'Old'}};
+    const {selectedTag} = projectReducer(state, updatedProject({field: 'tags', value: [{id: 't1', name: 'New'}]}));
+    expect(selectedTag).toEqual({id: 't1', name: 'New'});
+  });
+
+  // The tag detail panel reads selectedTag.type, so it has to be left an object
+  it('clears the selected tag when the new tag list no longer has it', () => {
+    const state = {project: {tags: [{id: 't1'}]}, selectedTag: {id: 't1'}};
+    const {selectedTag} = projectReducer(state, updatedProject({field: 'tags', value: [{id: 't2'}]}));
+    expect(selectedTag).toEqual({});
   });
 });
 
