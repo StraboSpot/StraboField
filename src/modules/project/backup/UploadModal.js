@@ -115,16 +115,7 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
       setUploadImageSuccess(true);
       dispatch(setIsProgressModalVisible(false));
       dispatch(setIsImageTransferring(false));
-      setImageUploadStatus(imageStatus);
-      if (imageStatus.imagesNotFound) {
-        setUploadState('error');
-        setModalTitle('Uploaded With Errors!');
-        setErrorMessage(`There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
-      }
-      else {
-        setUploadState('complete');
-        setModalTitle('All Uploaded!');
-      }
+      showImageUploadResult(imageStatus);
     }
     catch (err) {
       console.error('Error uploading', err);
@@ -140,6 +131,25 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
 
   initiateUploadRef.current = initiateUpload;
 
+  // A failed image counts as an error too, or the upload would end on "All Uploaded!" with the image missing online
+  const showImageUploadResult = (imageStatus) => {
+    setImageUploadStatus(imageStatus);
+    const {failed = 0, imagesNotFound = 0} = imageStatus;
+    const errors = [];
+    // The server still lacks a failed image, so the next upload sends it again
+    if (failed > 0) errors.push(`${failed} image${failed === 1 ? '' : 's'} failed to upload. Upload again to retry.`);
+    if (imagesNotFound > 0) errors.push(`There are ${imagesNotFound} images needed that were not found on this device.`);
+    if (errors.length > 0) {
+      setUploadState('error');
+      setModalTitle('Uploaded With Errors!');
+      setErrorMessage(errors.join('\n\n'));
+    }
+    else {
+      setUploadState('complete');
+      setModalTitle('All Uploaded!');
+    }
+  };
+
   const uploadImagesOnly = async () => {
     if (isUploadInFlightRef.current) {
       return alert('Upload In Progress', 'Please wait for the current upload to finish before starting another.');
@@ -151,16 +161,7 @@ const UploadModal = ({afterUploadActionTitle, autoStart, closeModal, isVisible, 
       setModalTitle('Uploading');
       setUploadState('uploading');
       const imageStatus = await initializeImageUpload();
-      setImageUploadStatus(imageStatus);
-      if (imageStatus.imagesNotFound) {
-        setUploadState('error');
-        setModalTitle('Uploaded With Errors!');
-        setErrorMessage(`There are ${imageStatus.imagesNotFound} images needed that were not found on this device.`);
-      }
-      else {
-        setUploadState('complete');
-        setModalTitle('All Uploaded!');
-      }
+      showImageUploadResult(imageStatus);
     }
     catch (err) {
       console.error('Error uploading', err);
