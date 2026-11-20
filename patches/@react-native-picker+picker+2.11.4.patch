@@ -1,0 +1,34 @@
+diff --git a/node_modules/@react-native-picker/picker/ios/RNCPicker.mm b/node_modules/@react-native-picker/picker/ios/RNCPicker.mm
+index 9a94056..fcc1e9d 100644
+--- a/node_modules/@react-native-picker/picker/ios/RNCPicker.mm
++++ b/node_modules/@react-native-picker/picker/ios/RNCPicker.mm
+@@ -39,9 +39,13 @@
+ 
+ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
+ 
++// Fabric sets every prop on every render. Reloading the rows each time frees the cells a touch in flight is still
++// hit-testing (EXC_BAD_ACCESS in UIPickerColumnView _allVisibleCells), so reload only when something changed.
+ - (void)setItems:(NSArray<NSDictionary *> *)items
+ {
++  if ([_items isEqualToArray:items]) return;
+   _items = [items copy];
++  [self reloadAllComponents];
+   [self setNeedsLayout];
+ }
+ 
+@@ -58,6 +62,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
+ 
+ - (void)setNumberOfLines:(NSInteger)numberOfLines
+ {
++  if (_numberOfLines == numberOfLines) return;
+   _numberOfLines = numberOfLines;
+   [self reloadAllComponents];
+   [self setNeedsLayout];
+@@ -65,6 +70,7 @@ RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
+ 
+ - (void) setFont:(UIFont *)font
+ {
++  if ([_font isEqual:font]) return;
+   _font = font;
+   [self reloadAllComponents];
+   [self setNeedsLayout];
