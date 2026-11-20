@@ -57,8 +57,8 @@ const Tags = ({
 
   /* Derived State */
 
-  const baseTags = useMemo(() => isGeologicUnits ? tags.filter(t => t.type === PAGE_KEYS.GEOLOGIC_UNITS)
-      : tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS),
+  const baseTags = useMemo(() => isGeologicUnits ? tags.filter(t => t.type === TAG_TYPES.GEOLOGIC_UNIT)
+      : tags.filter(t => t.type !== TAG_TYPES.GEOLOGIC_UNIT),
     [isGeologicUnits, tags],
   );
 
@@ -78,7 +78,7 @@ const Tags = ({
 
   /* Logic Helpers */
 
-  const addTag = () => setNewTag(isGeologicUnits ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: TAG_TYPES.CONCEPT});
+  const addTag = () => setNewTag(isGeologicUnits ? {type: TAG_TYPES.GEOLOGIC_UNIT} : {type: TAG_TYPES.CONCEPT});
 
   const setActiveFilters = filters => dispatch(setListFilters({page: pageKey, value: filters}));
 

@@ -6,6 +6,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import TagDetailModal from './detail/TagDetailModal';
+import {TAG_TYPES} from './tags.constants';
 import {getTagTitle} from './tags.helpers';
 import TagsListItem from './TagsListItem';
 import useTags from './useTags';
@@ -23,7 +24,6 @@ import {setActiveModal} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
-import {TAG_TYPES} from '../project/project.constants';
 import {addedTagToSelectedSpot} from '../project/projects.slice';
 
 const TagsChecklist = ({
@@ -81,7 +81,7 @@ const TagsChecklist = ({
   /* Logic Helpers */
 
   const addTag = () => {
-    setNewTag(pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: 'concept'});
+    setNewTag(pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? {type: TAG_TYPES.GEOLOGIC_UNIT} : {type: TAG_TYPES.CONCEPT});
   };
 
   const checkTags = (tag) => {
@@ -99,8 +99,8 @@ const TagsChecklist = ({
   };
 
   const getRelevantTags = () => {
-    return pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? searchTagsByType(PAGE_KEYS.GEOLOGIC_UNITS)
-      : isEmpty(searchText) ? JSON.parse(JSON.stringify(tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS)))
+    return pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? searchTagsByType(TAG_TYPES.GEOLOGIC_UNIT)
+      : isEmpty(searchText) ? JSON.parse(JSON.stringify(tags.filter(t => t.type !== TAG_TYPES.GEOLOGIC_UNIT)))
         : searchTagsByType(searchText);
   };
 
@@ -154,7 +154,7 @@ const TagsChecklist = ({
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
                 <SelectInputField
-                  choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
+                  choices={Object.values(TAG_TYPES).filter(t => t !== TAG_TYPES.GEOLOGIC_UNIT).map(
                     tagType => ({label: getTagLabel(tagType), value: tagType}))}
                   isSingleSelect={true}
                   label={'Tag Type'}

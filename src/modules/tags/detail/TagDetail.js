@@ -11,12 +11,12 @@ import NotebookPageAvatar from '../../../shared/ui/avatars/NotebookPageAvatar';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ListEmptyText from '../../../shared/ui/ListEmptyText';
 import SectionDividerWithRightButton from '../../../shared/ui/SectionDividerWithRightButton';
-import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import ReportsListItem from '../../reports/ReportsListItem';
 import {getSampleParent} from '../../samples/samples.helpers';
 import SamplesSectionList from '../../samples/SamplesSectionList';
 import SpotsListItem from '../../spots/SpotsListItem';
 import useSpots from '../../spots/useSpots';
+import {TAG_TYPES} from '../tags.constants';
 import useTags from '../useTags';
 
 const TagDetail = ({
@@ -40,7 +40,7 @@ const TagDetail = ({
 
   /* Derived Variables */
 
-  const isGeologicUnit = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS;
+  const isGeologicUnit = selectedTag.type === TAG_TYPES.GEOLOGIC_UNIT;
 
   // The tagged samples, grouped under the Spot each was taken at, which is how the section list wants them. Only
   // a sample that has become a Spot of its own can carry a tag: one still held inside its Spot is tagged only in

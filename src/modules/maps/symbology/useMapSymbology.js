@@ -5,6 +5,7 @@ import {getIconImage, getIconRotation, getLabel, getLabelOffset} from './mapSymb
 import {hexToRgb, isEmpty} from '../../../shared/helpers';
 import {MEDIUMGREY, ORANGE} from '../../../shared/styles.constants';
 import {isStratInterval} from '../../spots/spots.helpers';
+import {TAG_TYPES} from '../../tags/tags.constants';
 import useTags from '../../tags/useTags';
 import {GLYPH_FONT} from '../glyphs/glyphs.constants';
 import useStratSectionSymbology from '../strat-section/useStratSectionSymbology';
@@ -323,7 +324,7 @@ const useMapSymbology = () => {
     let color;
     let tagsAtSpot = getTagsAtSpot(feature.properties.id);
     const tagsForColor = tagsAtSpot.filter(tag => tag.type === tagTypeForColor
-      || (tagTypeForColor === 'tag' && tag.type !== 'geologic_unit'));
+      || (tagTypeForColor === 'tag' && tag.type !== TAG_TYPES.GEOLOGIC_UNIT));
     if (!isEmpty(tagsForColor) && tagsForColor[0].color) {
       const rgbColor = hexToRgb(tagsForColor[0].color);
       color = 'rgba(' + rgbColor.r + ', ' + rgbColor.g + ', ' + rgbColor.b + ', 0.4)';

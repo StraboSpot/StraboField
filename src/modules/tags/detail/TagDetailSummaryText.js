@@ -7,6 +7,7 @@ import {TAG_ROCK_UNIT_FIELDS, TAG_SUBTYPE_FIELDS} from './tagDetail.constants';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty, toTitleCase} from '../../../shared/helpers';
 import TagColorIcon from '../color/TagColorIcon';
+import {TAG_TYPES} from '../tags.constants';
 import tagsStyles from '../tags.styles';
 import useTags from '../useTags';
 
@@ -18,7 +19,7 @@ const TagDetailSummaryText = ({onPress}) => {
   /* Derived Variables */
 
   let type = selectedTag.type ? getTagLabel(selectedTag.type) : 'No type specified';
-  if (selectedTag.type === 'other' && selectedTag.other_type) type = selectedTag.other_type;
+  if (selectedTag.type === TAG_TYPES.OTHER && selectedTag.other_type) type = selectedTag.other_type;
   const notes = selectedTag.notes || undefined;
   const rockUnitString = TAG_ROCK_UNIT_FIELDS.map(field => selectedTag[field]).filter(Boolean).join(' / ');
   const subTypeField = TAG_SUBTYPE_FIELDS.find(subtype => selectedTag[subtype]);
