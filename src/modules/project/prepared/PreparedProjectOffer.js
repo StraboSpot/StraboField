@@ -36,7 +36,8 @@ const PreparedProjectOffer = () => {
       alert('Install Prepared Project?',
         `"${getPreparedProjectName(preparedProject)}" has been prepared for your account`
         + ` (${describePackage(preparedProject)}). Download and install it now?\n\n`
-        + 'You can also install it later from StraboField Projects in the main menu.',
+        + 'You can also install it later from Prepared Projects, on the welcome screen or under StraboField'
+        + ' Projects in the main menu.',
         [
           {style: 'cancel', text: 'Not Now'},
           {onPress: () => installPreparedProject(preparedProject), text: 'Install'},

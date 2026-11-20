@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
+import {Platform, Text, View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
@@ -16,6 +16,7 @@ import useResetState from '../../../store/useResetState';
 import {setStatusMessageModalTitle} from '../../home/home.slice';
 import userStyles from '../../user/user.styles';
 import UserProfileAvatar from '../../user/UserProfileAvatar';
+import PreparedProjects from '../prepared/PreparedProjects';
 import projectStyles from '../project.styles';
 
 const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMainMenuPanel}) => {
@@ -108,14 +109,19 @@ const InitialProjectLoadModal = ({closeMainMenuPanel, closeNotebookPanel, openMa
     );
   };
 
+  // Prepared Projects too, so an account signing in with no project open (a field camp's, say) can install one
+  // here rather than only from the main menu, which needs a project open
   const renderLoadProjectButtons = () => {
     return (
-      <LoadProjectButtons
-        onLoadProjectsFromDevice={() => handleOnPress('deviceProjects')}
-        onLoadProjectsFromDownloadsFolder={() => handleOnPress('importProject')}
-        onLoadProjectsFromServer={() => handleOnPress('serverProjects')}
-        onStartNewProject={() => handleOnPress('project')}
-      />
+      <>
+        <LoadProjectButtons
+          onLoadProjectsFromDevice={() => handleOnPress('deviceProjects')}
+          onLoadProjectsFromDownloadsFolder={() => handleOnPress('importProject')}
+          onLoadProjectsFromServer={() => handleOnPress('serverProjects')}
+          onStartNewProject={() => handleOnPress('project')}
+        />
+        {Platform.OS !== 'web' && <PreparedProjects closeMainMenuPanel={closeMainMenuPanel}/>}
+      </>
     );
   };
 
