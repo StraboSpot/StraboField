@@ -33,6 +33,14 @@ export const LOCATION_TIMEOUT = 30000;        // ms - give up if there is no fix
 export const PRESS_BOX_PADDING = 10;
 export const PRESS_BOX_PADDING_PRECISE = 1;
 
+// Which Spot a press on several means, first to last. Points are drawn over lines and lines over polygons, and the
+// larger feature can still be pressed away from the smaller one.
+export const GEOMETRY_TYPES_BY_PRESS_PRIORITY = [
+  ['Point', 'MultiPoint'],
+  ['LineString', 'MultiLineString'],
+  ['Polygon', 'MultiPolygon'],
+];
+
 // Marks a button that saves a map to the device for offline use
 export const DOWNLOAD_ICON = {color: PRIMARY_ACCENT_COLOR, name: 'cloud-download-outline', type: 'ionicon'};
 

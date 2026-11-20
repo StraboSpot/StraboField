@@ -15,7 +15,7 @@ import useMapFeatures from '../features/useMapFeatures';
 import useMapFeaturesCalculated from '../features/useMapFeaturesCalculated';
 import {MapEditContext} from '../MapEditContext';
 import {MAP_MODES} from '../maps.constants';
-import {convertImagePixelsToLatLong} from '../maps.helpers';
+import {convertImagePixelsToLatLong, getSpotMeantAtPress} from '../maps.helpers';
 import {setIntervalDragState} from '../maps.slice';
 import useMap from '../useMap';
 import useMapMeasure from '../useMapMeasure';
@@ -120,8 +120,8 @@ const useMapPressEvents = ({
   //   DRAW -> add a draw feature (freehand line/polygon are handled on release, not here).
   //   VIEW -> select/deselect the Spot under the press:
   //     - Macrostrat basemap -> show the geologic unit info and select a Spot (random when several overlap).
-  //     - Several overlap -> show the picker so the user chooses which to select.
-  //     - Exactly one -> select it.
+  //     - One plainly meant (the only one, or getSpotMeantAtPress's pick of several) -> select it.
+  //     - Several tie -> show the picker so the user chooses which to select.
   //     - None -> select the strat section's own Spot if in one, otherwise deselect.
   //   EDIT -> a vertex under the press is a vertex gesture (editSpot); otherwise switch to another Spot
   //     under the press (picker if several), deselect on empty space, or do nothing if only the edited
@@ -162,6 +162,7 @@ const useMapPressEvents = ({
         // A Macrostrat press is really querying the geology at that point, so use a precise hit (only a
         // Spot directly under the press selects, not a nearby one).
         const spotsFound = await getSpotsAtPress(screenPointX, screenPointY, isMacrostratBasemap);
+        const spotMeant = getSpotMeantAtPress(spotsFound);
         if (isMacrostratBasemap) {
           const currentZoom = await mapRef.current.getZoom();
           setMacrostratLocation(
@@ -172,13 +173,13 @@ const useMapPressEvents = ({
           }
           else clearSelectedSpots();
         }
-        // Let the user pick when several Spots overlap rather than choosing one at random.
+        // Select the Spot the press plainly means, and let the user pick only when several tie.
+        else if (spotMeant) dispatch(setSelectedSpot(spotMeant));
         else if (spotsFound.length > 1) {
           setSpotsAtPress(spotsFound);
           setSpotsAtPressAction({type: 'select'});
           setIsShowSpotsAtPressModal(true);
         }
-        else if (spotsFound.length === 1) dispatch(setSelectedSpot(spotsFound[0]));
         // No Spot hit, but in a strat section: fall back to selecting the section's own Spot.
         else if (stratSection) {
           dispatch(setSelectedSpot(getSpotWithThisStratSection(stratSection.strat_section_id)));

@@ -1,12 +1,14 @@
 import React from 'react';
-import {View} from 'react-native';
+import {Text, View} from 'react-native';
 
+import commonStyles from '../../../shared/common.styles';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import SpotsListItem from '../../spots/SpotsListItem';
+import {getSpotsAtPressInListOrder} from '../maps.helpers';
 
-// Modal shown when a map press overlaps more than one Spot, letting the user pick which one to act
-// on (select in view mode, or choose which to edit on a long press).
+// Modal letting the user pick which of several Spots at a map press to act on: to select, when no one of them is
+// plainly meant (see getSpotMeantAtPress), or to edit, which always asks. Lists the likeliest first.
 const SelectSpotsAtPressModal = ({closeModal, headerTitle, isVisible, onSpotPress, spots}) => {
   /* Event Handlers */
 
@@ -26,8 +28,11 @@ const SelectSpotsAtPressModal = ({closeModal, headerTitle, isVisible, onSpotPres
       showCancelButton={false}
       showCloseButton={true}
     >
+      <Text style={[commonStyles.standardDescriptionText, {padding: 10, textAlign: 'center'}]}>
+        There are {spots.length} Spots at this point on the map.
+      </Text>
       <View>
-        {spots.map((spot, index) => (
+        {getSpotsAtPressInListOrder(spots).map((spot, index) => (
           <React.Fragment key={spot.properties.id.toString()}>
             {index > 0 && <FlatListItemSeparator/>}
             <SpotsListItem
