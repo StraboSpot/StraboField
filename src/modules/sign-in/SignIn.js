@@ -86,7 +86,7 @@ const SignIn = ({navigation}) => {
         <TextInput
           autoCapitalize={'none'}
           onChangeText={val => setPassword(val)}
-          onSubmitEditing={() => signIn(username, password, setUsername, setPassword)}
+          onSubmitEditing={handleSignIn}
           placeholder={'Password'}
           placeholderTextColor={themes.MEDIUMGREY}
           returnKeyType={'go'}
