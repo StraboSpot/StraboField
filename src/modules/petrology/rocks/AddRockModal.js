@@ -49,40 +49,37 @@ const AddRockModal = ({modalKey}) => {
   const [choicesViewKey, setChoicesViewKey] = useState(null);
   const [initialValues, setInitialValues] = useState({id: getNewUUID()});
   const [isShowTemplates, setIsShowTemplates] = useState(false);
-  const [rockKey, setRockKey] = useState(null);
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
   const [survey, setSurvey] = useState({});
   const [templatesHeaderTitle, setTemplatesHeaderTitle] = useState(null);
 
   /* Derived Variables */
 
+  const groupKey = modalKey === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? 'sed' : 'pet';
+  const pageKey = modalKey === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : modalKey;
+  // An igneous rock is keyed by its class. TemplatesPicker needs the key on the first render, before any effect runs.
+  const rockKey = pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS
+    ? modalValues.igneous_rock_class || IGNEOUS_ROCK_CLASSES.PLUTONIC
+    : pageKey;
   // Active templates only count while the key's templates are switched on
   const templatesInUse = getIsTemplateInUse(templates, rockKey) ? getActiveTemplateList(templates, rockKey) : undefined;
   const areMultipleTemplates = templatesInUse?.length > 1;
-  const groupKey = modalKey === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? 'sed' : 'pet';
-  const pageKey = modalKey === PAGE_KEYS.ROCK_TYPE_SEDIMENTARY ? PAGE_KEYS.LITHOLOGIES : modalKey;
 
   /* Side Effects */
 
   useLayoutEffect(() => {
     console.log('ULE AddRockModal [modalValues, pageKey, templates]', modalValues, pageKey, templates);
-    const rockKeyUpdated = pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS
-      ? modalValues.igneous_rock_class || IGNEOUS_ROCK_CLASSES.PLUTONIC
-      : pageKey;
-    if (Object.values(IGNEOUS_ROCK_CLASSES).includes(rockKeyUpdated)) {
-      setSelectedTypeIndex(Object.values(IGNEOUS_ROCK_CLASSES).indexOf(rockKeyUpdated));
+    if (Object.values(IGNEOUS_ROCK_CLASSES).includes(rockKey)) {
+      setSelectedTypeIndex(Object.values(IGNEOUS_ROCK_CLASSES).indexOf(rockKey));
     }
-    setRockKey(rockKeyUpdated);
-    const updatedTemplatesInUse = getIsTemplateInUse(templates, rockKeyUpdated)
-      ? getActiveTemplateList(templates, rockKeyUpdated) : undefined;
-    if (updatedTemplatesInUse?.[0]?.values) setInitialValues({...updatedTemplatesInUse[0].values, id: getNewUUID()});
+    if (templatesInUse?.[0]?.values) setInitialValues({...templatesInUse[0].values, id: getNewUUID()});
     else {
       const initialValuesTemp = !isEmpty(modalValues) ? modalValues
-        : pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? {id: getNewUUID(), igneous_rock_class: rockKeyUpdated}
+        : pageKey === PAGE_KEYS.ROCK_TYPE_IGNEOUS ? {id: getNewUUID(), igneous_rock_class: rockKey}
           : {id: getNewUUID()};
       setInitialValues(initialValuesTemp);
     }
-    const formName = [groupKey, rockKeyUpdated];
+    const formName = [groupKey, rockKey];
     formRef.current?.setStatus({formName: formName});
     setSurvey(getSurvey(formName));
     setChoices(getChoices(formName));
