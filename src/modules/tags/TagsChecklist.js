@@ -24,7 +24,7 @@ import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {TAG_TYPES} from '../project/project.constants';
-import {addedTagToSelectedSpot, setSelectedTag} from '../project/projects.slice';
+import {addedTagToSelectedSpot} from '../project/projects.slice';
 
 const TagsChecklist = ({
                          checkedTagsIds,
@@ -54,8 +54,8 @@ const TagsChecklist = ({
   const formRef = useRef(null);
 
   const [checkedTagsTemp, setCheckedTagsTemp] = useState([]);
-  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [newTag, setNewTag] = useState(null);
   const [searchText, setSearchText] = useState('');
 
   /* Derived Variables */
@@ -81,9 +81,7 @@ const TagsChecklist = ({
   /* Logic Helpers */
 
   const addTag = () => {
-    const newTag = pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: 'concept'};
-    dispatch(setSelectedTag(newTag));
-    setIsDetailModalVisible(true);
+    setNewTag(pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: 'concept'});
   };
 
   const checkTags = (tag) => {
@@ -96,7 +94,7 @@ const TagsChecklist = ({
   };
 
   const closeTagDetailModal = () => {
-    setIsDetailModalVisible(false);
+    setNewTag(null);
     dispatch(addedTagToSelectedSpot(false));
   };
 
@@ -242,7 +240,7 @@ const TagsChecklist = ({
             />
           )}
         </View>
-        {isDetailModalVisible && <TagDetailModal closeModal={closeTagDetailModal}/>}
+        {newTag && <TagDetailModal closeModal={closeTagDetailModal} tag={newTag}/>}
         <Loading isLoading={isSaving}/>
       </>
     );

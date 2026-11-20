@@ -17,7 +17,7 @@ import {setListFilters, setListSort} from '../main-menu-panel/mainMenuPanel.slic
 import {setIsMapExtentFilterActive} from '../maps/maps.slice';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {setSelectedTag, setUseContinuousTagging} from '../project/projects.slice';
+import {setUseContinuousTagging} from '../project/projects.slice';
 
 const Tags = ({
                 closeTagsOverflowMenu,
@@ -39,8 +39,8 @@ const Tags = ({
   /* Local State */
 
   const [isBackupTagsModalVisible, setIsBackupTagsModalVisible] = useState(false);
-  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [isLoadTagsModalVisible, setIsLoadTagsModalVisible] = useState(false);
+  const [newTag, setNewTag] = useState(null);
   const [tagsSorted, setTagsSorted] = useState([]);
 
   /* Derived Variables */
@@ -78,13 +78,7 @@ const Tags = ({
 
   /* Logic Helpers */
 
-  const addTag = () => {
-    const newTag = isGeologicUnits ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: TAG_TYPES.CONCEPT};
-    dispatch(setSelectedTag(newTag));
-    setIsDetailModalVisible(true);
-  };
-
-  const closeDetailModal = () => setIsDetailModalVisible(false);
+  const addTag = () => setNewTag(isGeologicUnits ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: TAG_TYPES.CONCEPT});
 
   const setActiveFilters = filters => dispatch(setListFilters({page: pageKey, value: filters}));
 
@@ -125,7 +119,7 @@ const Tags = ({
       {isBackupTagsModalVisible && (
         <BackupTagsModal closeModal={() => setIsBackupTagsModalVisible(false)} isGeologicUnits={isGeologicUnits}/>
       )}
-      {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}
+      {newTag && <TagDetailModal closeModal={() => setNewTag(null)} tag={newTag}/>}
       {isLoadTagsModalVisible && (
         <LoadTagsModal closeModal={() => setIsLoadTagsModalVisible(false)} isGeologicUnits={isGeologicUnits}/>
       )}

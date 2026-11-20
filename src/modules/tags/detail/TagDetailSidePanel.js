@@ -90,7 +90,7 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
       </View>
 
       {/* Modals */}
-      {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}
+      {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal} tag={selectedTag}/>}
     </View>
   );
 };
