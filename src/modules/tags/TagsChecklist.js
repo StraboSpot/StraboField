@@ -61,8 +61,10 @@ const TagsChecklist = ({
   /* Derived Variables */
 
   const pageVisible = pagesStack.slice(-1)[0];
+  // The geologic unit and sample modals count as well as the page, since a shortcut can switch to the notebook's
+  // Geologic Units modal without changing the page
   const pageKey = pageVisible === PAGE_KEYS.GEOLOGIC_UNITS
-  || activeModal === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
+  || activeModal === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS || activeModal === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
   || activeModal === MODAL_KEYS.NOTEBOOK.SAMPLES || activeModal === MODAL_KEYS.SHORTCUTS.SAMPLE
     ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
