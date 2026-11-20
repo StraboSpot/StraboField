@@ -316,6 +316,9 @@ const useDownload = () => {
         userProfileRes.default_manual_measurement = Boolean(userProfileRes.default_manual_measurement);
       }
 
+      // An account with nothing prepared gets no key at all, so clear any list left from the last sign-in
+      userProfileRes.prepared_projects = userProfileRes.prepared_projects ?? [];
+
       if (Platform.OS === 'web') {
         const userProfileImageBlob = await getProfileImage(encodedLoginScoped);
         if (userProfileImageBlob) {
