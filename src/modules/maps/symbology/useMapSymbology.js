@@ -398,10 +398,8 @@ const useMapSymbology = () => {
       case 'GeometryCollection':
         const geometryCollectionSymbology = [];
         feature.geometry.geometries.forEach((g, i) => {
-          let tempFeature = JSON.parse(JSON.stringify(feature));
-          tempFeature.geometry = g;
-          if (i % 2 === 1) tempFeature.properties.isInterbed = true;
-          geometryCollectionSymbology.push(getSymbology(tempFeature));
+          const properties = i % 2 === 1 ? {...feature.properties, isInterbed: true} : feature.properties;
+          geometryCollectionSymbology.push(getSymbology({...feature, geometry: g, properties}));
         });
         return geometryCollectionSymbology;
       default:
