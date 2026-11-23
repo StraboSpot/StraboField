@@ -3,7 +3,7 @@ import {Image, Text} from 'react-native';
 
 import {configureStore} from '@reduxjs/toolkit';
 import * as turf from '@turf/turf';
-import {Path, Pattern, TextPath} from 'react-native-svg';
+import {Image as SvgImage, Path, Pattern, TextPath} from 'react-native-svg';
 import {Provider} from 'react-redux';
 import ReactTestRenderer from 'react-test-renderer';
 
@@ -13,12 +13,18 @@ import homeReducer from '../../home/home.slice';
 import projectReducer from '../../project/projects.slice';
 import spotReducer from '../../spots/spots.slice';
 import mapReducer from '../maps.slice';
+import {STRAT_PATTERNS} from '../strat-section/stratSection.constants';
 
 jest.mock('../../spots/useSpots', () => () => ({}));
 // The interval fill reads deep into the strat section settings; a test interval names its fill directly
 jest.mock('../strat-section/useStratSectionSymbology', () => () => ({
-  getStratIntervalFill: properties => ({fillPattern: properties.testFillPattern}),
+  getStratIntervalFill: properties => ({
+    fillPattern: properties.isInterbed ? properties.testInterbedPattern : properties.testFillPattern,
+  }),
 }));
+
+const deepFreeze = value => Object.values(Object.freeze(value)).forEach(v => typeof v === 'object' && v
+  && deepFreeze(v));
 
 const renderAvatar = (spot, mapState = {}) => {
   const store = configureStore({
@@ -69,8 +75,6 @@ describe('SpotMapSymbolAvatar', () => {
   });
 
   it('styles a Spot frozen as the store hands it out', () => {
-    const deepFreeze = value => Object.values(Object.freeze(value)).forEach(v => typeof v === 'object' && v
-      && deepFreeze(v));
     const spot = turf.lineString([[-105, 40], [-104.99, 40.01]], {
       id: 8,
       trace: {trace_type: 'geologic_struc', geologic_structure_type: 'fault'},
@@ -134,5 +138,22 @@ describe('SpotMapSymbolAvatar', () => {
 
     const patternId = root.findByType(Pattern).props.id;
     expect(root.findAllByType(Path).some(path => path.props.fill === `url(#${patternId})`)).toBe(true);
+  });
+
+  it('fills the interbed of a frozen strat interval with its own pattern', () => {
+    const bed = turf.polygon([[[0, 0], [10, 0], [10, 2], [0, 2], [0, 0]]]).geometry;
+    const interbed = turf.polygon([[[0, 2], [10, 2], [10, 3], [0, 3], [0, 2]]]).geometry;
+    const interval = turf.feature(turf.geometryCollection([bed, interbed]).geometry, {
+      id: 10,
+      strat_section_id: 9,
+      surface_feature: {surface_feature_type: 'strat_interval'},
+      testFillPattern: 'limestone',
+      testInterbedPattern: 'sandstone',
+    });
+    deepFreeze(interval);
+    const root = renderAvatar(interval, {stratSection: {strat_section_id: 9}});
+
+    const patterns = root.findAllByType(Pattern).map(pattern => pattern.findByType(SvgImage).props.href);
+    expect(patterns).toEqual([STRAT_PATTERNS.limestone, STRAT_PATTERNS.sandstone]);
   });
 });
