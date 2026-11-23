@@ -5,6 +5,14 @@ STRABOSAMPLES
 • Stays in sync: linked data refreshes when a project is downloaded or uploaded, and the PDF downloads again when the project has changed on the server
 • Offline aware: linking and online actions are disabled with a note while you have no connection
 
+PREPARED PROJECTS
+• Prepared projects: projects prepared for you on strabospot.org, like Field Camp Wizard projects, are offered after sign-in and on the welcome screen, ready to download and install
+• Prepared Projects list: StraboField Projects lists your prepared projects, with buttons to open, download again, or get a newer version, and an open project with Spots is never overwritten by its own package
+
+APP UPDATES
+• Faster fixes: app fixes can now arrive without a store update, downloading in the background and asking to restart when ready
+• Checks on return: the app also checks for updates when you come back to it, not only when it starts
+
 MAP LAYERS & OFFLINE MAPS
 • New map layers menu: each map shows a thumbnail, with its own options for an overlay switch, opacity, and centering on the map
 • Offline overlays: save an overlay for offline use, not only the basemap
@@ -28,18 +36,6 @@ NOTEBOOK & FORMS
 • Trace & surface features: a Trace Feature or Surface Feature section on the Overview replaces the switch, opening its form as a subpage
 • Dismiss bar on iPhone: text fields have a Dismiss button above the keyboard to hide it
 • Read-only forms: read-only forms no longer fill in defaults or offer to save
-
-SEDIMENTARY
-• Better sed labels: structures, diagenesis, fossils, and interpretations are labeled from the data they hold
-• Clearer rock names: an untyped sed rock reads Unknown Rock Type, titles add the first composition in parentheses, and "other" shows what you typed
-• Hidden lithology data: a sed rock with Composition, Texture, or Stratification data says so, with a link to open it in Lithologies
-• Cleaner lists: lithologies and sed features show by their titles, and lithologies without rock data are left out of the sed rock lists
-• Composition kept: saving the Lithology tab no longer erases types entered on the Composition tab
-
-NESTING
-• Every dataset: the Nesting page shows Spots nested on image basemaps, strat sections, and nesting lists from every dataset, turning on a dataset when you select its Spot
-• Legacy samples: legacy samples appear on the Nesting page and open on their Spot's Samples page
-• Rich sample parents: a rich sample's parents show again on the Nesting page
 
 Full notes: https://github.com/StraboSpot/StraboField/releases/tag/v2.33.0
 
