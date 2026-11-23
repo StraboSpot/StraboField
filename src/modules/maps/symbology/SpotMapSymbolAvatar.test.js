@@ -68,6 +68,19 @@ describe('SpotMapSymbolAvatar', () => {
     expect(root.findByType(TextPath).props.children).toBe('Fault A');
   });
 
+  it('styles a Spot frozen as the store hands it out', () => {
+    const deepFreeze = value => Object.values(Object.freeze(value)).forEach(v => typeof v === 'object' && v
+      && deepFreeze(v));
+    const spot = turf.lineString([[-105, 40], [-104.99, 40.01]], {
+      id: 8,
+      trace: {trace_type: 'geologic_struc', geologic_structure_type: 'fault'},
+    });
+    deepFreeze(spot);
+    const root = renderAvatar(spot);
+
+    expect(root.findAllByType(Path).find(path => path.props.stroke).props.stroke).toBe('#FF0000');
+  });
+
   it('fills a polygon and outlines it in black, labeled inside', () => {
     const spot = turf.polygon([[[-105, 40], [-104.99, 40], [-104.99, 40.01], [-105, 40.01], [-105, 40]]], {
       id: 3,

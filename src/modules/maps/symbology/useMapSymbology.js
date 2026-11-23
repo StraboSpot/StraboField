@@ -340,13 +340,12 @@ const useMapSymbology = () => {
 
   /* Exported Functions */
 
-  // Add symbology to properties of map features (not to Spots themselves) since data-driven styling
-  // doesn't work for colors by tags and more complex styling
+  // Copies of the features with symbology added to their properties, since data-driven styling doesn't work for
+  // colors by tags and more complex styling. Returns copies, so Spots straight from the store can be passed in.
   const addSymbology = (features) => {
     return features.map((feature) => {
       const symbology = getSymbology(feature);
-      if (!isEmpty(symbology)) feature.properties.symbology = symbology;
-      return feature;
+      return isEmpty(symbology) ? feature : {...feature, properties: {...feature.properties, symbology}};
     });
   };
 

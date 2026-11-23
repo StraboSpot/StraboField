@@ -57,7 +57,7 @@ const SpotMapSymbolAvatar = ({spot}) => {
   const {point, pointColorHalo, sample} = getMapSymbology();
   const scale = SYMBOL_SIZE / (MAP_SYMBOL_IMAGE_SIZE * point.iconSize);
   const textSize = MAP_TEXT_SIZE * scale;
-  const features = getSpotsAsFeatures(addSymbology([{...spot, properties: {...spot.properties}}]));
+  const features = getSpotsAsFeatures(addSymbology([spot]));
   const isPoint = spot.geometry.type === 'Point' || spot.geometry.type === 'MultiPoint';
 
   /* Render Functions */
