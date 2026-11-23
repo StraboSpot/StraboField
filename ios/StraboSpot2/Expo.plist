@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EXUpdatesEnabled</key>
+	<true/>
+	<key>EXUpdatesRuntimeVersion</key>
+	<string>file:fingerprint</string>
+	<key>EXUpdatesCheckOnLaunch</key>
+	<string>ALWAYS</string>
+	<key>EXUpdatesLaunchWaitMs</key>
+	<integer>0</integer>
+	<key>EXUpdatesURL</key>
+	<string>https://strabospot.org/ota/manifest</string>
+	<key>EXUpdatesCodeSigningCertificate</key>
+	<string>-----BEGIN CERTIFICATE-----
+MIIC1zCCAb+gAwIBAgIJGX6gYUWNQNeqMA0GCSqGSIb3DQEBCwUAMBUxEzARBgNV
+BAMTClN0cmFib1Nwb3QwHhcNMjYxMTE4MjAwODM1WhcNMzYxMTE4MjAwODM1WjAV
+MRMwEQYDVQQDEwpTdHJhYm9TcG90MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+CgKCAQEA0AvGMaOkpq4bdRGObkC2wCMv57vqYWh/V7OXSTa2AT+18vXILemfF9kV
+1k5uvJblQeInmJnzxTg58fC2mNztSWZ1RvdwScKCrnhPbm6rkY+7NAjPL7uscHlh
+w/tiudMMx7zYK8FAUdwqEj1fVYwu1tc8sDCxR5hSgeSIgucSs4XQ5Gz4FZLe7VLt
+LziLfPl1qJ+M09Av3BxfbtJjyITM6lqCFA+IJM+gGcbiRvXO4cmNtS9F9Ptu5uux
+lf8RFLVquwHUv8GnCmMkBBkCI9VUUJlAnPvI1nBUowvac1kHH+Q1vu4jpymNGgaP
+ii6/USs8UEA0AJpfJlWAVtiDKGBRAQIDAQABoyowKDAOBgNVHQ8BAf8EBAMCB4Aw
+FgYDVR0lAQH/BAwwCgYIKwYBBQUHAwMwDQYJKoZIhvcNAQELBQADggEBAA0p+cJ4
+/IHNJYrV4MrFQETmWFuwA4d6up6/cFZAHPpei7uXM0CITLFnKqiwILiQQGYYuxBW
+7kp2Mbfc5ebOiY2OASWN7SiRxMslmEfGTSqNFsVngy7jGt2ef9+RlorI//VRYEu0
+8mF3rdePv7QytDzboFBJCwyEjl5qvPfsRPbFFy+aDO/5bmLMcVqtcoobrOIPNeXO
+34ShiLVWMcFHYxqAFNL81hq+lHopztVZzIEbp9KIo9engSmHfxCpbZ4GIop4AXcI
+Z+UGD6cKL1/lcS+Ddrfe4+dCzdx1ilZN1uRXVokLaeh4bhkz6LCasmwBU4PpII9L
+BTGc9FRWpvZw64E=
+-----END CERTIFICATE-----</string>
+	<key>EXUpdatesCodeSigningMetadata</key>
+	<dict>
+		<key>keyid</key>
+		<string>main</string>
+		<key>alg</key>
+		<string>rsa-v1_5-sha256</string>
+	</dict>
+</dict>
+</plist>

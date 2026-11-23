@@ -272,7 +272,7 @@ const useMapsOffline = () => {
     }
     catch (err) {
       console.error('Error Getting Map Tiles.', err);
-      throw new Error(err);
+      throw toError(err);
     }
   };
 
@@ -349,7 +349,7 @@ const useMapsOffline = () => {
     }
     catch (err) {
       console.error('Error moving tiles', err);
-      throw new Error(err);
+      throw toError(err);
     }
   };
 
@@ -416,7 +416,7 @@ const useMapsOffline = () => {
     }
     catch (err) {
       console.error('Error in saveMapZip', err);
-      throw new Error(err);
+      throw toError(err);
     }
   };
 

@@ -1,0 +1,11 @@
+StraboField 2.33.0
+
+• Link samples to StraboSamples
+• Redesigned map layers menu with thumbnails
+• Save overlays and whole custom maps offline
+• Snap to Spots while drawing
+• Never lose unsaved notebook edits
+• Project saved to the device before every sync
+• Plus more fixes and improvements
+
+Thanks for using StraboSpot!

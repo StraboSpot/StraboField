@@ -104,6 +104,14 @@ const useServerRequests = () => {
     return postRequest(PHOTOS, body, null, {}, ROCKD_IMAGE_TIMEOUT);
   };
 
+  // Tells the server a prepared project's package is installed, which sets its installed_version in the profile.
+  // Only the status matters: the body is not read, so a reply that is not JSON cannot fail an install that worked.
+  const postPreparedProjectInstalled = async (id, version) => {
+    const response = await postRequest(`${baseUrl}/projectPackage/${id}/installed`, JSON.stringify({version}),
+      basicAuth(), {'Content-Type': 'application/json'});
+    if (!response.ok) throw new Error(`Server answered ${response.status} when marking the package installed.`);
+  };
+
   // A public endpoint, so no auth - but through getRequest like everything else, for its timeout and the
   // User-Agent identifying the app.
   const getMyMapsBbox = mapUrl => getRequest(mapUrl);
@@ -180,7 +188,8 @@ const useServerRequests = () => {
   const updateDatasetSpots = (datasetId, spotCollection) =>
     postRequest(`${baseUrl}/datasetspots/${datasetId}`, spotCollection, basicAuth(), {}, 300000);
 
-  const updateProfile = data => postRequest(`${baseUrl}/profile`, data, basicAuth());
+  // Prepared projects are the server's own list, so they are never sent back with the rest of the profile
+  const updateProfile = ({prepared_projects, ...data}) => postRequest(`${baseUrl}/profile`, data, basicAuth());
 
   const updateProject = project => postRequest(`${baseUrl}/project`, project, basicAuth());
 
@@ -252,6 +261,7 @@ const useServerRequests = () => {
     convertSpotToMacrostrat,
     postCheckinImageToRockd,
     postCheckinToRockd,
+    postPreparedProjectInstalled,
     registerUser,
     testCustomMapUrl,
     updateDataset,

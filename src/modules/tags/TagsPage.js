@@ -1,9 +1,8 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {FlatList} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import TagDetailModal from './detail/TagDetailModal';
 import FeatureTagsAtSpotList from './FeatureTagsAtSpotList';
 import TagsAtSpotList from './TagsAtSpotList';
 import SectionDivider from '../../shared/ui/SectionDivider';
@@ -11,7 +10,6 @@ import SectionDividerWithRightButton from '../../shared/ui/SectionDividerWithRig
 import {setActiveModal} from '../home/home.slice';
 import PageHeader from '../page/PageHeader';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
-import {addedTagToSelectedSpot} from '../project/projects.slice';
 
 const TagsPage = ({isReadOnly, isSample, openMainMenuPanel, page}) => {
   /* Data Hooks */
@@ -19,21 +17,10 @@ const TagsPage = ({isReadOnly, isSample, openMainMenuPanel, page}) => {
   const dispatch = useDispatch();
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
 
-  /* Local State */
-
-  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
-
   /* Derived Variables */
   const firstDividerText = page.key === PAGE_KEYS.GEOLOGIC_UNITS ? 'Geologic Units'
     : isSample ? 'Sample Tags' : 'Spot Tags';
   const pageVisible = pagesStack.slice(-1)[0];
-
-  /* Logic Helpers */
-
-  const closeTagDetailModal = () => {
-    setIsDetailModalVisible(false);
-    dispatch(addedTagToSelectedSpot(false));
-  };
 
   /* View */
 
@@ -61,7 +48,6 @@ const TagsPage = ({isReadOnly, isSample, openMainMenuPanel, page}) => {
           </>
         }
       />
-      {isDetailModalVisible && <TagDetailModal closeModal={closeTagDetailModal}/>}
     </>
   );
 };

@@ -9,6 +9,7 @@ import {isAuthenticationError} from '../../services/network/serverRequests.helpe
 import {isEmpty} from '../../shared/helpers';
 import useResetState from '../../store/useResetState';
 import {openedMessageModal, setIsProjectLoadSelectionModalVisible, setLoadingStatus} from '../home/home.slice';
+import {offerPreparedProjectAfterSignIn} from '../project/prepared/PreparedProjectOffer';
 import {login, logout} from '../user/userProfile.slice';
 
 const useSignIn = () => {
@@ -38,6 +39,7 @@ const useSignIn = () => {
       await downloadUserProfile(newEncodedLogin);
 
       console.log(`${email} is successfully logged in!`);
+      offerPreparedProjectAfterSignIn();
       dispatch(login());
 
       if (Platform.OS !== 'web') {

@@ -18,7 +18,12 @@ const useStratSection = () => {
   const stratSection = useSelector(state => state.map.stratSection);
 
   const {getSurvey} = useForm();
-  const {deleteSpot, getAllIntervalSpotsOnStratSection, getSpotWithThisStratSection} = useSpots();
+  const {
+    deleteSpot,
+    getAllIntervalSpotsOnStratSection,
+    getReadOnlyDeleteMessage,
+    getSpotWithThisStratSection,
+  } = useSpots();
   const {calculateIntervalGeometry, moveSpotsUpOrDownByPixels} = useStratSectionCalculations();
   const toast = useToast();
 
@@ -117,9 +122,13 @@ const useStratSection = () => {
     return geojsonObj;
   };
 
-  // Move intervals and Spots in column to close gap after target interval deleted
+  // Move intervals and Spots in column to close gap after target interval deleted. The gap is closed first, from the
+  // column as it stands, so only for an interval that deleteSpot will go on to delete - otherwise the column would
+  // shift around an interval still in place.
   const deleteInterval = (targetInterval) => {
-    if (turf.getGeom(targetInterval)) {
+    // deleteSpot refuses when getReadOnlyDeleteMessage has a reason
+    const isDeleteAllowed = !getReadOnlyDeleteMessage(targetInterval);
+    if (isDeleteAllowed && turf.getGeom(targetInterval)) {
       const targetIntervalExtent = turf.bbox(targetInterval);
       const targetIntervalHeight = targetIntervalExtent[3] - targetIntervalExtent[1];
       // For core: move spots below the deleted interval up (less negative) to close the gap.
@@ -133,7 +142,7 @@ const useStratSection = () => {
           -targetIntervalHeight, targetInterval.properties.id);
       }
     }
-    deleteSpot(targetInterval);
+    deleteSpot(targetInterval);  // Called either way: when the delete isn't allowed, it is what tells the user why
   };
 
   const getStratSectionSettings = (stratSectionId) => {

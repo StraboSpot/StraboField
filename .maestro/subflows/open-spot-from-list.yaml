@@ -1,0 +1,7 @@
+# Main menu -> Spots -> tap Spot ${SPOT}; its notebook opens.
+appId: org.StraboSpot2
+---
+- runFlow: open-main-menu.yaml
+- tapOn: "Spots"
+- tapOn: "${SPOT}"
+- assertVisible: "Spot Overview"

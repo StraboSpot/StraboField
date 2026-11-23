@@ -11,8 +11,9 @@ import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../../main-menu-panel/mainMenu.
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
 import SidePanelHeader from '../../main-menu-panel/side-panel/SidePanelHeader';
 import {LeavePageContext} from '../../notebook-panel/LeavePageContext';
-import {MODAL_KEYS, PAGE_KEYS} from '../../page/pageKeys.constants';
+import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import {setSelectedAttributes, setSelectedSpot} from '../../spots/spots.slice';
+import {TAG_TYPES} from '../tags.constants';
 
 const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
   /* Data Hooks */
@@ -27,7 +28,7 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
 
   /* Derived Variables */
 
-  const label = selectedTag.type === PAGE_KEYS.GEOLOGIC_UNITS ? MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS
+  const label = selectedTag.type === TAG_TYPES.GEOLOGIC_UNIT ? MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS
     : MAIN_MENU_ITEMS.PROJECT_DATA.TAGS;
 
   /* Logic Helpers */
@@ -90,7 +91,7 @@ const TagDetailSidePanel = ({openNotebookPanel, openSpotInNotebook}) => {
       </View>
 
       {/* Modals */}
-      {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal}/>}
+      {isDetailModalVisible && <TagDetailModal closeModal={closeDetailModal} tag={selectedTag}/>}
     </View>
   );
 };

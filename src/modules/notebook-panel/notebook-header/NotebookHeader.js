@@ -21,6 +21,7 @@ import {getUtmDisplayString} from '../../maps/maps.helpers';
 import useMapLocation from '../../maps/view/useMapLocation';
 import {PAGE_KEYS} from '../../page/pageKeys.constants';
 import projectStyles from '../../project/project.styles';
+import {getSampleParent} from '../../samples/samples.helpers';
 import {isLineSpot, isPolygonSpot} from '../../spots/spots.helpers';
 import {editedOrCreatedSpot, editedSpotProperties, setSelectedSpot} from '../../spots/spots.slice';
 import useSpots from '../../spots/useSpots';
@@ -41,16 +42,16 @@ const NotebookHeader = ({
                         }) => {
   /* Data Hooks */
 
+  const {confirmLeavePage, goToNotebookPage, hasUnsavedPageChanges} = useContext(LeavePageContext);
+
   const dispatch = useDispatch();
   const isUtmDisplay = useSelector(state => state.user.is_utm_display);
   const selectedAttributes = useSelector(state => state.spot.selectedAttributes);
   const spot = useSelector(state => state.spot.selectedSpot);
-  const {confirmLeavePage, goToNotebookPage, hasUnsavedPageChanges} = useContext(LeavePageContext);
-
-  const navigation = useNavigation();
-  const store = useStore();
+  const spots = useSelector(state => state.spot.spots);
   const {getLabel} = useForm();
   const {getCurrentLocation, showLocationError} = useMapLocation();
+  const navigation = useNavigation();
   const {
     checkSpotName,
     getReadOnlyReason,
@@ -58,10 +59,10 @@ const NotebookHeader = ({
     getSampleSpotIconSource,
     getSpotGeometryIconSource,
     getSpotWithThisImage,
-    getSpotWithThisSample,
     handleSpotSelected,
     isCurrentMapReadOnly,
   } = useSpots();
+  const store = useStore();
 
   /* Local State */
 
@@ -72,14 +73,14 @@ const NotebookHeader = ({
 
   const isLegacySample = selectedAttributes?.[0]?.sample_id_name;
   const headerTitle = isLegacySample ? selectedAttributes?.[0]?.sample_id_name : spot.properties.name || 'Unknown';
+  const spotWithThisImageBasemap = spot.properties?.image_basemap
+    && getSpotWithThisImage(spot.properties.image_basemap);
+  const parentSpot = spot.properties?.isSample ? getSampleParent(spot, spots)
+    : !isEmpty(spotWithThisImageBasemap) ? spotWithThisImageBasemap
+      : null;
   // Whatever the header is naming, so a message about it calls the record what the user sees. A sample is a
   // Spot underneath, and nothing the user reads should give that away
   const spotLabel = spot.properties?.isSample || isLegacySample ? 'Sample' : 'Spot';
-  const spotWithThisImageBasemap = spot.properties?.image_basemap
-    && getSpotWithThisImage(spot.properties.image_basemap);
-  const parentSpot = spot.properties?.isSample ? getSpotWithThisSample(spot.properties.id)
-    : !isEmpty(spotWithThisImageBasemap) ? spotWithThisImageBasemap
-      : null;
 
   /* Event Handlers */
 
@@ -166,14 +167,6 @@ const NotebookHeader = ({
     if (openMainMenuPanel) openMainMenuPanel();
   };
 
-  // Renaming writes the Spot with every keystroke, and a page built from the Spot, such as Geography, starts over
-  // when it changes, so the page's changes are asked about first
-  const startEditingTitle = async () => {
-    if (isReadOnly || isLegacySample) return;
-    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
-    setIsEditingTitle(true);
-  };
-
   // Much of Spot Actions leaves the page on screen, so its changes are asked about as the menu opens
   const openNotebookMenu = async () => {
     if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
@@ -204,6 +197,14 @@ const NotebookHeader = ({
     if (currentLocation.accuracy) editedSpot.properties.gps_accuracy = currentLocation.accuracy;
     dispatch(editedOrCreatedSpot(editedSpot));
     handleSpotSelected(editedSpot);
+  };
+
+  // Renaming writes the Spot with every keystroke, and a page built from the Spot, such as Geography, starts over
+  // when it changes, so the page's changes are asked about first
+  const startEditingTitle = async () => {
+    if (isReadOnly || isLegacySample) return;
+    if (hasUnsavedPageChanges() && !await confirmLeavePage()) return;
+    setIsEditingTitle(true);
   };
 
   /* Render Functions */
@@ -285,7 +286,7 @@ const NotebookHeader = ({
           isReadOnly={isReadOnly}
           isSample={spot.properties.isSample || !isEmpty(selectedSample)}
           overlayStyle={notebookStyles.dialogBoxPosition}
-          parentSpot={parentSpot}
+          selectedSample={selectedSample}
           zoomToSpots={zoomToSpots}
         />
       </>

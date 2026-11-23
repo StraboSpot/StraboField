@@ -1,6 +1,6 @@
 import {createSlice, current, original} from '@reduxjs/toolkit';
 
-import {getUniqueTitle, isEmpty} from '../../shared/helpers';
+import {getUniqueTitle, isEmpty, isSameId} from '../../shared/helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
 
 // The placeholder editedSpotImages gives an image that arrives with no title of its own
@@ -62,7 +62,7 @@ const spotSlice = createSlice({
       console.log('Remaining Spots:', remainingSpots);
       state.selectedSpot = {};
       state.spots = remainingSpots;
-      state.recentViews = state.recentViews.filter(id => id !== action.payload);
+      state.recentViews = state.recentViews.filter(id => !isSameId(id, action.payload));
     }),
     deletedSpots: withModifiedTimestamp((state, action) => {
       const spotIds = action.payload;     // ids of spots to delete
@@ -72,7 +72,7 @@ const spotSlice = createSlice({
       }, {});
       state.selectedSpot = {};
       state.spots = remainingSpotsObj;
-      state.recentViews = state.recentViews.filter(id => !spotIds.includes(id));
+      state.recentViews = state.recentViews.filter(id => !spotIdsStrings.includes(String(id)));
     }),
     // Drops the selection only if it is still the one given, not one the next page has made since - even of the same
     // feature. original(state), because the draft hands back a stand-in that never matches the dispatched array.

@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import {isNegativeAllowed} from '../src/modules/form/form.helpers';
 import useForm from '../src/modules/form/useForm';
 
@@ -136,6 +138,25 @@ describe('isNegativeAllowed', () => {
   it('allows a negative when nothing rules one out, since only a minimum can', () => {
     expect(isNegativeAllowed({})).toBe(true);
     expect(isNegativeAllowed({constraint: '. <= 100'})).toBe(true);
+  });
+});
+
+describe('getLabel', () => {
+  const {getLabel} = useForm();
+
+  afterEach(() => jest.restoreAllMocks());
+
+  // Hermes's Date.parse accepts some long numbers that Node's rejects, so it is made to accept this one
+  it('labels a number Date.parse accepts but new Date cannot represent, with or without a date field', () => {
+    jest.spyOn(Date, 'parse').mockReturnValue(1);
+    expect(getLabel(8700000000000000)).toBe('8700000000000000');
+    expect(getLabel(8700000000000000, [], 'sample_date')).toBe('8700000000000000');
+  });
+
+  it('formats an ISO date for a date field and an ISO time for a time field', () => {
+    const isoString = '2026-11-06T12:00:00.000Z';
+    expect(getLabel(isoString, [], 'sample_date')).toBe(moment(isoString).format('MM/DD/YYYY'));
+    expect(getLabel(isoString, [], 'start_time')).toBe(moment(isoString).format('h:mm:ss a'));
   });
 });
 

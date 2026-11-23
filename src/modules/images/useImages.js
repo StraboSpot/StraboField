@@ -32,11 +32,83 @@ const useImages = () => {
   const spots = useSelector(state => state.spot.spots);
 
   const {getCurrentCameraAngles, startCameraAnglesCapture, stopCameraAnglesCapture} = useCompassCore();
-  const {copyFiles, deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile, readDirectory} = useDevice();
+  const {copyFiles, deleteFromDevice, doesDeviceDirExist, makeDirectory, moveFile} = useDevice();
   const {getImageHeightAndWidth, resizeImageForDevice} = useImageSize();
   const navigation = useNavigation();
   const {hasCameraPermission} = usePermissions();
   const toast = useToast();
+
+  /* Internal Functions */
+
+  const getAllImagesIds = spotsArray => spotsArray.flatMap(
+    spot => (spot.properties.images || []).map(image => image.id));
+
+  const launchCameraLoop = async () => {
+    try {
+      const savedPhoto = await takePicture();
+      dispatch(setLoadingStatus({view: 'home', bool: true}));
+      if (savedPhoto === 'canceled') {
+        if (newImages.length > 0) console.log('ALL PHOTOS SAVED', newImages);
+        else toast.show('No Photos Saved', {duration: 2000, type: 'warning'});
+        dispatch(setLoadingStatus({view: 'home', bool: false}));
+        return newImages;
+      }
+      else {
+        const {height, id, width, ...compassData} = savedPhoto;
+        const photoProperties = {id, image_type: 'photo', height, width, ...compassData};
+        console.log('Photos to Save:', [...newImages, photoProperties]);
+        newImages.push(photoProperties);
+        return launchCameraLoop();
+      }
+    }
+    catch (err) {
+      console.error(`Error Taking Picture: ${err}`);
+      dispatch(openedMessageModal({message: `${err}`, title: 'Error Getting Image!'}));
+      dispatch(setLoadingStatus({view: 'home', bool: false}));
+      return newImages;  // Keep any photos already taken before the error
+    }
+  };
+
+  // Opens the camera and saves one photo. Camera permission is verified upstream in
+  // launchCameraFromNotebook before this loop is entered.
+  const takePicture = async () => {
+    await startCameraAnglesCapture();
+    return new Promise((resolve, reject) => {
+      try {
+        launchCamera({cameraType: 'back', saveToPhotos: true}, async (response) => {
+          console.log('Launch Camera Response:', response);
+          try {
+            if (response.didCancel) {
+              stopCameraAnglesCapture();
+              resolve('canceled');
+            }
+            // react-native-image-picker reports failures as errorCode, not error
+            else if (response.errorCode) throw Error(response.errorMessage || response.errorCode);
+            else {
+              const imageAsset = response.assets[0];
+              const compassReading = getCurrentCameraAngles();
+              stopCameraAnglesCapture();
+              const resizedImage = await resizeImageForDevice(imageAsset);
+              console.log('Resized Image:', resizedImage);
+              const savedFile = await saveFile(resizedImage);
+              resolve({...savedFile, ...compassReading});
+            }
+          }
+          catch (err) {
+            // This callback is async, so a throw escapes the try below, which only guards launchCamera
+            // itself. Uncaught, the Promise never settles and the camera loop hangs with nothing shown.
+            stopCameraAnglesCapture();
+            dispatch(setLoadingStatus({view: 'home', bool: false}));
+            reject(err);
+          }
+        });
+      }
+      catch (err) {
+        dispatch(setLoadingStatus({view: 'home', bool: false}));
+        reject(err);
+      }
+    });
+  };
 
   /* Exported Functions */
 
@@ -90,10 +162,9 @@ const useImages = () => {
   const gatherNeededImages = async (spotsToSearch, dataset) => {
     try {
       let neededImagesIds = [];
-      let imageIds;
       console.log('Gathering Needed Images for dataset', dataset.name, '(' + dataset.id + ') ...');
-      if (dataset?.images?.imageIds) imageIds = dataset.images.imageIds;
-      else imageIds = getAllImagesIds(spotsToSearch);
+      // From the Spots, not the dataset's stored list, which is written only on download and so goes stale
+      const imageIds = getAllImagesIds(spotsToSearch);
 
       if (Platform.OS === 'web') return {imageIds: imageIds};  // Don't care about neededImagesIds on web
       await Promise.all(
@@ -120,15 +191,6 @@ const useImages = () => {
     Object.values(spots).forEach(spot => spot?.properties?.images?.map(image => images.push(image)));
     if (!isEmpty(project.reports)) project.reports.forEach(report => report.images?.map(image => images.push(image)));
     return images;
-  };
-
-  // INTERNAL
-  const getAllImagesIds = (spotsArray) => {
-    let imageIds = [];
-    spotsArray.filter((spot) => {
-      if (spot.properties.images) spot.properties.images.map(image => imageIds.push(image.id));
-    });
-    return imageIds;
   };
 
   const getImageBasemap = (image) => {
@@ -218,32 +280,6 @@ const useImages = () => {
     });
   };
 
-  const launchCameraLoop = async () => {
-    try {
-      const savedPhoto = await takePicture();
-      dispatch(setLoadingStatus({view: 'home', bool: true}));
-      if (savedPhoto === 'canceled') {
-        if (newImages.length > 0) console.log('ALL PHOTOS SAVED', newImages);
-        else toast.show('No Photos Saved', {duration: 2000, type: 'warning'});
-        dispatch(setLoadingStatus({view: 'home', bool: false}));
-        return newImages;
-      }
-      else {
-        const {height, id, width, ...compassData} = savedPhoto;
-        const photoProperties = {id, image_type: 'photo', height, width, ...compassData};
-        console.log('Photos to Save:', [...newImages, photoProperties]);
-        newImages.push(photoProperties);
-        return launchCameraLoop();
-      }
-    }
-    catch (err) {
-      console.error(`Error Taking Picture: ${err}`);
-      dispatch(openedMessageModal({message: `${err}`, title: 'Error Getting Image!'}));
-      dispatch(setLoadingStatus({view: 'home', bool: false}));
-      return newImages;  // Keep any photos already taken before the error
-    }
-  };
-
   // Always resolves to an array — callers read its length
   const launchCameraFromNotebook = async () => {
     try {
@@ -293,18 +329,6 @@ const useImages = () => {
     }
   };
 
-  const saveImageFromDownloadsDir = async (image) => {
-    const exists = await doesDeviceDirExist(APP_DIRECTORIES.IMAGES);
-    console.log('EXISTS', exists);
-    const source = image.fileCopyUri;
-    const dest = APP_DIRECTORIES.IMAGES + image.name;
-    console.log('source:', source, 'dest', dest);
-    await moveFile(source, dest);
-    const imagesInDir = await readDirectory(APP_DIRECTORIES.IMAGES);
-    console.log('images in app directory', imagesInDir);
-    // return imageRes;
-  };
-
   const setAnnotation = (image, annotation, title) => {
     const imageCopy = JSON.parse(JSON.stringify(image));
     imageCopy.annotated = annotation;
@@ -315,47 +339,6 @@ const useImages = () => {
       dispatch(editedSpotProperties({field: 'images', value: updatedImages}));
     }
     if (!imageCopy.annotated) dispatch(setCurrentImageBasemap(undefined));
-  };
-
-  // Opens the camera and saves one photo. Camera permission is verified upstream in
-  // launchCameraFromNotebook before this loop is entered.
-  const takePicture = async () => {
-    await startCameraAnglesCapture();
-    return new Promise((resolve, reject) => {
-      try {
-        launchCamera({cameraType: 'back', saveToPhotos: true}, async (response) => {
-          console.log('Launch Camera Response:', response);
-          try {
-            if (response.didCancel) {
-              stopCameraAnglesCapture();
-              resolve('canceled');
-            }
-            // react-native-image-picker reports failures as errorCode, not error
-            else if (response.errorCode) throw Error(response.errorMessage || response.errorCode);
-            else {
-              const imageAsset = response.assets[0];
-              const compassReading = getCurrentCameraAngles();
-              stopCameraAnglesCapture();
-              const resizedImage = await resizeImageForDevice(imageAsset);
-              console.log('Resized Image:', resizedImage);
-              const savedFile = await saveFile(resizedImage);
-              resolve({...savedFile, ...compassReading});
-            }
-          }
-          catch (err) {
-            // This callback is async, so a throw escapes the try below, which only guards launchCamera
-            // itself. Uncaught, the Promise never settles and the camera loop hangs with nothing shown.
-            stopCameraAnglesCapture();
-            dispatch(setLoadingStatus({view: 'home', bool: false}));
-            reject(err);
-          }
-        });
-      }
-      catch (err) {
-        dispatch(setLoadingStatus({view: 'home', bool: false}));
-        reject(err);
-      }
-    });
   };
 
   // Replaces an image's file but keeps its id, so nothing referring to the image has to be re-pointed;
@@ -379,15 +362,12 @@ const useImages = () => {
     doesImageExistOnDevice,
     gatherNeededImages,
     getAllImages,
-    getAllImagesIds,
     getImageBasemap,
     getImageByImageId,
     getImagesFromCameraRoll,
     launchCameraFromNotebook,
     saveFile,
-    saveImageFromDownloadsDir,
     setAnnotation,
-    takePicture,
     updateImage,
   };
 };

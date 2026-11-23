@@ -1,0 +1,6 @@
+{
+  "platforms": ["apple"],
+  "apple": {
+    "reactDelegateHandlers": ["StraboRootViewControllerHandler"]
+  }
+}

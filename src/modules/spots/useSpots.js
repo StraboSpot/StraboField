@@ -23,6 +23,7 @@ import {
   deletedSpot,
   editedOrCreatedSpot,
   editedOrCreatedSpots,
+  editedSpotProperties,
   restoredSpots,
   setSelectedSpot,
 } from './spots.slice';
@@ -40,15 +41,13 @@ import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
 import {
   addedNewSpotIdsToDataset,
   addedNewSpotIdToDataset,
-  deletedSpotIdFromDatasets,
-  deletedSpotIdFromReports,
-  deletedSpotIdFromTags,
   restoredSpotReferences,
   setActiveDatasets,
   updatedProject,
   updatedProjectPreference,
 } from '../project/projects.slice';
 import useProject from '../project/useProject';
+import {getRichSamples, getSampleParent, getSamplesWithout} from '../samples/samples.helpers';
 import useTags from '../tags/useTags';
 
 const useSpots = () => {
@@ -129,28 +128,13 @@ const useSpots = () => {
   };
 
   // Find Spots that reference any of the given ids in their samples array (e.g. a rich sample's parent Spot),
-  // so an undo can also restore the parent -> sample link that deleteRichSample severs.
+  // so an undo can also restore the parent -> sample link that deleteRichSample severs. Compared with isSameId, as
+  // deleteRichSample takes off a stub holding its id as a string too.
   const getReferencingParentSpots = (deletedSpotIds) => {
+    const isDeletedId = id => deletedSpotIds.some(deletedSpotId => isSameId(deletedSpotId, id));
     return Object.values(spots).filter(
-      spot => !deletedSpotIds.includes(spot.properties.id)
-        && spot.properties.samples?.some(sample => deletedSpotIds.includes(sample.id)),
+      spot => !isDeletedId(spot.properties.id) && spot.properties.samples?.some(sample => isDeletedId(sample.id)),
     );
-  };
-
-  // Collect every rich-sample Spot nested under a Spot (recursively), so a delete + its undo cover them all.
-  const getRichSampleSpots = (spotToDelete) => {
-    const collected = {};
-    const collect = (spot) => {
-      spot.properties?.samples?.forEach((sample) => {
-        const sampleSpot = spots[sample.id];
-        if (sampleSpot && sample.id !== spotToDelete.properties.id && !collected[sample.id]) {
-          collected[sample.id] = sampleSpot;
-          collect(sampleSpot);
-        }
-      });
-    };
-    collect(spotToDelete);
-    return Object.values(collected);
   };
 
   // Every Spot whose dataset can make the given Spot read only. Locking always spreads down from the Spot
@@ -183,13 +167,6 @@ const useSpots = () => {
     return stratSectionId ? getSpotWithThisStratSection(stratSectionId) : undefined;
   };
 
-  const removeSpotAndReferences = (spotId) => {
-    dispatch(deletedSpotIdFromReports(spotId));
-    dispatch(deletedSpotIdFromTags(spotId));
-    dispatch(deletedSpotIdFromDatasets(spotId));
-    dispatch(deletedSpot(spotId));
-  };
-
   const undoDeleteSpot = (undoSnapshot) => {
     dispatch(restoredSpotReferences({
       datasets: undoSnapshot.datasets,
@@ -204,6 +181,8 @@ const useSpots = () => {
   /* Exported Functions */
 
   const checkIsSafeDelete = (spotToDelete) => {
+    const readOnlyDeleteMessage = getReadOnlyDeleteMessage(spotToDelete);
+    if (readOnlyDeleteMessage) return readOnlyDeleteMessage;
     // Check if Spot is manually nested - get the first Spot that has this Spot nested manually in spot.properties.nesting
     const spotWithManualNest = Object.values(spots).find(
       spot => spot.properties?.nesting?.includes(spotToDelete.properties.id));
@@ -380,10 +359,31 @@ const useSpots = () => {
     return newSpot;
   };
 
+  // With a dataset deleted, does what deleting each of its Spots would to samples filed across its edge: their
+  // samples filed elsewhere are deleted with them, and parents in no dataset, which its samples had nowhere to move
+  // to, lose their stubs for them. So no sample is left without a parent, and no parent keeps a stub for a sample
+  // that is gone.
+  // Takes what getSamplesSplitByDataset found, which the caller has already worked out to check and to confirm.
+  const deleteSamplesSplitByDataset = ({parentsToUnlink, samplesToDelete}) => {
+    samplesToDelete.forEach(sampleSpot => dispatch(deletedSpot(sampleSpot.properties.id)));
+    parentsToUnlink.forEach(({parentSpot, sampleIds}) => {
+      const samples = getSamplesWithout(parentSpot, sampleIds);
+      dispatch(editedSpotProperties({field: PAGE_KEYS.SAMPLES, spotId: parentSpot.properties.id, value: samples}));
+    });
+  };
+
+  // Whether the Spot was deleted. The delete modal has already said why not, through checkIsSafeDelete, but nothing in a
+  // read only dataset may change whichever way the delete arrives.
   const deleteSpot = (spotToDelete) => {
+    const readOnlyDeleteMessage = getReadOnlyDeleteMessage(spotToDelete);
+    if (readOnlyDeleteMessage) {
+      toast.show(`Unable to delete ${spotToDelete.properties.name}. ${readOnlyDeleteMessage}`,
+        {placement: 'top', type: 'warning'});
+      return false;
+    }
     const spotId = spotToDelete.properties.id;
     console.log('Deleting Spot ID', spotId, '...');
-    const spotsToDelete = [spotToDelete, ...getRichSampleSpots(spotToDelete)];
+    const spotsToDelete = [spotToDelete, ...getRichSamples(spotToDelete, spots)];
 
     // Undo is native-only: web syncs deletes to the server immediately, so a local-only undo would be misleading.
     // Capture the pre-delete state BEFORE dispatching so the toast's undo can restore it verbatim.
@@ -401,7 +401,8 @@ const useSpots = () => {
       };
     }
 
-    spotsToDelete.forEach(spot => removeSpotAndReferences(spot.properties.id));
+    // One at a time, as on web each is sent to the server on its own. Its datasets, tags and memos let it go with it.
+    spotsToDelete.forEach(spot => dispatch(deletedSpot(spot.properties.id)));
     dispatch(setActiveModal({modal: null}));
 
     if (undoSnapshot) {
@@ -413,6 +414,7 @@ const useSpots = () => {
         type: 'undo',
       });
     }
+    return true;
   };
 
   // Takes back a Spot made ahead of content that never arrived. Unlike deleteSpot it says nothing and offers no
@@ -420,7 +422,7 @@ const useSpots = () => {
   // safe to hand back only because callers hold the screen meanwhile, so nothing else can have claimed it.
   const discardSpot = (spotToDiscard, spotNumberToRestore) => {
     console.log('Discarding unused Spot ID', spotToDiscard.properties.id, '...');
-    removeSpotAndReferences(spotToDiscard.properties.id);
+    dispatch(deletedSpot(spotToDiscard.properties.id));
     dispatch(updatedProjectPreference({key: 'starting_number_for_spot', value: spotNumberToRestore}));
     dispatch(clearedSelectedSpots());
   };
@@ -534,6 +536,22 @@ const useSpots = () => {
     return spotName;
   };
 
+  // Why a delete would change a read only Spot, or null if it wouldn't. A Spot's samples are deleted with it, and
+  // deleting a sample takes its stub off its parent, so any of them being read only blocks the delete - whether by its
+  // own dataset or by a Spot that locks it, such as the one holding the map it sits on.
+  const getReadOnlyDeleteMessage = (spotToDelete) => {
+    if (!isAnythingReadOnly) return null;
+    if (isSpotReadOnly(spotToDelete)) return 'It is read only.';
+    const readOnlySample = getRichSamples(spotToDelete, spots).find(isSpotReadOnly);
+    if (readOnlySample) return `Its Sample ${readOnlySample.properties.name} is read only.`;
+    const parentSpot = spotToDelete.properties.isSample && getSampleParent(spotToDelete, spots);
+    if (parentSpot && isSpotReadOnly(parentSpot)) {
+      return `The Spot it was taken from, ${parentSpot.properties.name}, is read only, and deleting the Sample would `
+        + 'change it.';
+    }
+    return null;
+  };
+
   // Why a Spot is read only, so the notebook can say more than which dataset to unlock. cause is:
   //   dataset      - the Spot sits in the read only dataset itself
   //   stratSection - another Spot on the same strat section does, which locks the section as a whole
@@ -633,10 +651,6 @@ const useSpots = () => {
     return Object.values(getActiveSpotsObj()).filter(spot => !isEmpty(spot.properties[key]));
   };
 
-  const getSpotsWithSamples = () => {
-    return Object.values(spots).filter(spot => !spot.properties?.isSample && !isEmpty(spot.properties.samples));
-  };
-
   // Get all active Spots that contain a strat section
   const getSpotsWithStratSection = () => {
     return Object.values(getActiveSpotsObj()).filter(spot => spot?.properties?.sed?.strat_section);
@@ -648,11 +662,6 @@ const useSpots = () => {
       const spotFound = spot.properties?.images?.find(image => image.id?.toString() === imageId?.toString());
       return spotFound ? spot : undefined;
     });
-  };
-
-  // Get the Spot that Contains a Specific Sample Given the ID of the Sample
-  const getSpotWithThisSample = (sampleId) => {
-    return getSpotsWithSamples().find(spot => spot?.properties?.samples?.find(sample => sample.id === sampleId));
   };
 
   // Get the Spot that Contains a Specific Strat Section Given the ID of the Strat Section
@@ -739,6 +748,7 @@ const useSpots = () => {
     copySpot,
     createRandomSpots,
     createSpot,
+    deleteSamplesSplitByDataset,
     deleteSpot,
     discardSpot,
     getActiveImageBasemaps,
@@ -750,6 +760,7 @@ const useSpots = () => {
     getAllSpotsOnStratSection,
     getMappableSpots,
     getNewSpotName,
+    getReadOnlyDeleteMessage,
     getReadOnlyReason,
     getRecentSpots,
     getRootSpot,
@@ -761,10 +772,8 @@ const useSpots = () => {
     getSpotsByIds,
     getSpotsInMapExtent,
     getSpotsWithKey,
-    getSpotsWithSamples,
     getSpotsWithStratSection,
     getSpotWithThisImage,
-    getSpotWithThisSample,
     getSpotWithThisStratSection,
     getVisibleSpots,
     handleSpotSelected,

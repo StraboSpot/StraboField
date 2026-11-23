@@ -1,0 +1,13 @@
+# Main menu -> Backup -> Upload the open project to the StraboSpot server and wait for "All Uploaded!".
+appId: org.StraboSpot2
+---
+- runFlow: open-main-menu.yaml
+- tapOn: "Backup"
+- tapOn: "Upload"
+- assertVisible: "Upload Project"
+- tapOn: "Upload"
+- extendedWaitUntil:
+    visible: "All Uploaded!"
+    timeout: 120000
+- tapOn: "OK"
+- runFlow: close-side-panels.yaml

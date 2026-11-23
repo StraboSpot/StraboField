@@ -77,6 +77,8 @@ const handleError = async (response, auth) => {
   }
 
   const {isJson, json, text} = await readJsonBody(response);
+  // A third party's outage (Macrostrat) is nothing we can fix, so it still fails the request but goes unreported
+  const isReportable = isStraboApiUrl(response.url);
 
   // A 400 carries the failure detail as its body, which the caller reads rather than treating as an error.
   if (status === 400) return isJson ? json : Promise.reject(describeUnreadableBody(response, text));
@@ -88,14 +90,16 @@ const handleError = async (response, auth) => {
   }
 
   if (!isJson) {
-    Sentry.captureMessage(`ERROR in useServerRequests: unreadable ${status} body from ${response.url}`);
+    if (isReportable) Sentry.captureMessage(`ERROR in useServerRequests: unreadable ${status} body from ${response.url}`);
     return Promise.reject(describeUnreadableBody(response, text));
   }
   // Match the 404 branch and accept either casing. Without a message, report what arrived instead, so these
   // do not all group in Sentry under "undefined".
   const errorMessage = json.Error || json.error;
-  Sentry.captureMessage(errorMessage ? `ERROR in useServerRequests: ${errorMessage}`
-    : `ERROR in useServerRequests: unexpected ${status} body from ${response.url}`);
+  if (isReportable) {
+    Sentry.captureMessage(errorMessage ? `ERROR in useServerRequests: ${errorMessage}`
+      : `ERROR in useServerRequests: unexpected ${status} body from ${response.url}`);
+  }
   return Promise.reject(errorMessage || 'Unknown Error');
 };
 

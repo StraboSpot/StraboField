@@ -12,6 +12,7 @@ import {PersistGate} from 'redux-persist/integration/react';
 import installGlyphs from './src/modules/maps/glyphs/installGlyphs';
 import {clearedOfflineMapPreview} from './src/modules/maps/offline-maps/offlineMaps.slice';
 import ConnectionStatus from './src/modules/status-bar/ConnectionStatus';
+import UpdatePromptListener from './src/modules/updates/UpdatePromptListener';
 import ProfileSyncListener from './src/modules/user/ProfileSyncListener';
 import Routes from './src/routes/Routes';
 import MacrostratAuthRedirectHandler from './src/services/data-intergration/macrostrat/MacrostratAuthRedirectHandler';
@@ -109,6 +110,7 @@ const App = () => {
                 {Platform.OS !== 'ios' && !SMALL_SCREEN && <StatusBar hidden/>}
                 <ConnectionStatus/>
                 <ProfileSyncListener/>
+                <UpdatePromptListener/>
                 <MacrostratAuthRedirectHandler/>
                 <NavigationContainer>
                   <Routes/>

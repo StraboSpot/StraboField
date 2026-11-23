@@ -1,0 +1,15 @@
+# A saved backup is a file on the device: it must still be listed, and restorable, after the app is killed.
+appId: org.StraboSpot2
+name: Saved backup is still restorable after a force-quit
+tags: [data-loss, backup]
+---
+- runFlow: ../subflows/start-guest-project.yaml
+- runFlow: ../subflows/add-point-spot.yaml
+- runFlow: { file: ../subflows/add-note.yaml, env: { NOTE: "Before quit BK-10" } }
+- runFlow: { file: ../subflows/save-backup.yaml, env: { BACKUP_NAME: "E2E-bk10", ZIP: "false" } }
+- runFlow: { file: ../subflows/replace-with-new-project.yaml, env: { PROJECT_NAME: "E2E-empty" } }
+- runFlow: ../subflows/force-quit-and-relaunch.yaml
+- runFlow: { file: ../subflows/restore-saved-backup.yaml, env: { BACKUP_NAME: "E2E-bk10" } }
+- runFlow: { file: ../subflows/assert-dataset-spot-count.yaml, env: { COUNT: "1" } }
+- runFlow: { file: ../subflows/open-spot-from-list.yaml, env: { SPOT: "01" } }
+- assertVisible: "Before quit BK-10"

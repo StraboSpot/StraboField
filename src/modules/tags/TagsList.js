@@ -6,7 +6,7 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import TagColorIcon from './color/TagColorIcon';
 import {TAG_FILTER_LABELS, TAG_FILTERS} from './query/tagQuery.constants';
-import {TAG_COUNT_ICON_SIZE, TAG_SECTIONS} from './tags.constants';
+import {TAG_COUNT_ICON_SIZE, TAG_SECTIONS, TAG_TYPES} from './tags.constants';
 import {getTagTitle} from './tags.helpers';
 import tagsStyles from './tags.styles';
 import useTags from './useTags';
@@ -136,8 +136,8 @@ const TagsList = ({activeFilters = [], tagsSorted, type}) => {
     );
   };
 
-  const filteredTags = type === PAGE_KEYS.GEOLOGIC_UNITS ? tags.filter(t => t.type === PAGE_KEYS.GEOLOGIC_UNITS)
-    : tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS);
+  const filteredTags = type === PAGE_KEYS.GEOLOGIC_UNITS ? tags.filter(t => t.type === TAG_TYPES.GEOLOGIC_UNIT)
+    : tags.filter(t => t.type !== TAG_TYPES.GEOLOGIC_UNIT);
   if (isEmpty(filteredTags)) return <ListEmptyText text={`No ${label} Found`}/>;
   else {
     return (

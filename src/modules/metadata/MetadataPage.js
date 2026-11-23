@@ -13,15 +13,19 @@ import NumberInputField from '../form/inputs/NumberInputField';
 import PageHeader from '../page/PageHeader';
 import {movedSpotIdBetweenDatasets} from '../project/projects.slice';
 import useProject from '../project/useProject';
+import {canMoveSampleToDataset, getSampleParent, getSpotIdsToMove, isSplitFromParent} from '../samples/samples.helpers';
+import {getSpotsCount, isAnySpotIdInReadOnlyDataset, isSpotIdInDataset} from '../spots/spots.helpers';
 
 const MetadataPage = ({isReadOnly, page}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
   const datasets = useSelector(state => state.project.datasets);
+  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds);
   const spot = useSelector(state => state.spot.selectedSpot);
+  const spots = useSelector(state => state.spot.spots);
 
-  const {isReadOnlyDataset} = useProject();
+  const {isReadOnlyDataset, isSpotInReadOnlyDataset} = useProject();
 
   /* Local State */
 
@@ -29,41 +33,67 @@ const MetadataPage = ({isReadOnly, page}) => {
 
   /* Derived Variables */
 
+  // A Spot moves together with its samples, so one of them held by a read only dataset holds the Spot there too.
+  // getSpotIdsToMove lists the Spot's own id first, then its samples'.
+  const spotIdsToMove = getSpotIdsToMove(spot, spots);
+  const hasReadOnlySample = isAnySpotIdInReadOnlyDataset(spotIdsToMove.slice(1), datasets, readOnlyDatasetsIds);
+  const isHeldByReadOnlyDataset = isAnySpotIdInReadOnlyDataset(spotIdsToMove, datasets, readOnlyDatasetsIds);
+
   // A map edit used to add the Spot to the target dataset as well, so it can show as in more than one. Picking any of
   // them then moves it there alone.
-  const isInSeveralDatasets = Object.values(datasets)
-    .filter(dataset => dataset.spotIds?.includes(spot.properties.id)).length > 1;
+  const isInSeveralDatasets = Object.values(datasets).filter(isSpotInDataset).length > 1;
+
+  const isSample = !!spot.properties.isSample;
+  const parentSpot = isSample && getSampleParent(spot, spots);
+  const isSplit = isSample && isSplitFromParent(spot, parentSpot, datasets);
 
   /* Event Handlers */
 
   const handleDatasetChecked = (datasetChecked) => {
-    if (!datasetChecked.spotIds?.includes(spot.properties.id) || isInSeveralDatasets) {
-      dispatch(movedSpotIdBetweenDatasets({toDatasetId: datasetChecked.id, spotId: spot.properties.id}));
+    if (!isSpotInDataset(datasetChecked) || isInSeveralDatasets) {
+      dispatch(movedSpotIdBetweenDatasets({spotIds: spotIdsToMove, toDatasetId: datasetChecked.id}));
     }
   };
+
+  /* Logic Helpers */
+
+  // A split Sample may only go back to its parent's dataset, and when that is read only there is nothing to pick
+  const getDatasetNote = () => {
+    if (isSplit && isSpotInReadOnlyDataset(parentSpot.properties.id)) {
+      return 'This Sample is apart from the Spot it was taken from, whose dataset is read only, so it can\'t be moved.';
+    }
+    if (isSplit) return 'This Sample is apart from the Spot it was taken from. Pick that Spot\'s dataset.';
+    if (isSample) return 'A Sample moves with the Spot it was taken from. Move that Spot to change the dataset.';
+    if (hasReadOnlySample) {
+      return 'A Sample taken from this Spot is in a read only dataset, so the Spot can\'t be moved.';
+    }
+    return null;
+  };
+
+  function isSpotInDataset(dataset) { return isSpotIdInDataset(dataset, spot.properties.id); }
 
   /* Render Functions */
 
   const renderDatasetItem = (dataset) => {
-    const isChecked = dataset.spotIds?.includes(spot.properties.id);
-    // A lock at either end blocks the move - the Spot's own isReadOnly disables every row, a read only
-    // dataset only its own. rn-vui keeps disabled off the radio it draws, hence the fade
+    const isChecked = isSpotInDataset(dataset);
+    // A lock at either end blocks the move - the Spot's own isReadOnly disables every row, a read only dataset only
+    // its own, and a sample held by one every row. Those last two are the halves of canMoveSpotIdsToDataset, so the
+    // rows refuse exactly what the reducer would. A Sample can only be put back with its parent. rn-vui keeps
+    // disabled off the radio it draws, hence the fade
     const isDatasetReadOnly = isReadOnlyDataset(dataset.id);
+    const isBlockedForSample = isSample && !canMoveSampleToDataset(isSplit, parentSpot, dataset);
+    const spotsCount = getSpotsCount(dataset.spotIds, spots);
     return (
       <ListItem containerStyle={commonStyles.listItem} key={dataset.id.toString()}>
         <ListItem.Content>
           <ListItem.Title style={commonStyles.listItemTitle}>{dataset.name}</ListItem.Title>
-          <ListItem.Subtitle>
-            {dataset.spotIds
-              ? `(${dataset.spotIds.length} spot${dataset.spotIds.length !== 1 ? 's' : ''})`
-              : '(0 spots)'}
-          </ListItem.Subtitle>
+          <ListItem.Subtitle>{`(${spotsCount} spot${spotsCount !== 1 ? 's' : ''})`}</ListItem.Subtitle>
         </ListItem.Content>
         {isDatasetReadOnly && <Icon color={MEDIUMGREY} name={'lock-closed'} type={'ionicon'}/>}
         <ListItem.CheckBox
           checked={isChecked}
           checkedIcon={'radiobox-marked'}
-          disabled={isReadOnly || isDatasetReadOnly}
+          disabled={isReadOnly || isBlockedForSample || isDatasetReadOnly || isHeldByReadOnlyDataset}
           disabledStyle={{opacity: 0.5}}
           iconType={'material-community'}
           onPress={() => handleDatasetChecked(dataset)}
@@ -74,9 +104,19 @@ const MetadataPage = ({isReadOnly, page}) => {
   };
 
   const renderDatasets = () => {
+    const datasetNote = getDatasetNote();
     return (
       <>
         <SectionDivider dividerText={'Datasets'}/>
+        {!isReadOnly && datasetNote && (
+          <ListItem containerStyle={commonStyles.listItem}>
+            <ListItem.Content>
+              <ListItem.Subtitle style={commonStyles.listItemSubtitle}>
+                {datasetNote}
+              </ListItem.Subtitle>
+            </ListItem.Content>
+          </ListItem>
+        )}
         <FlatList
           data={Object.values(datasets)}
           renderItem={({item}) => renderDatasetItem(item)}

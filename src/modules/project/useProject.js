@@ -5,7 +5,6 @@ import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.cons
 import {
   addedDataset,
   addedProjectDescription,
-  deletedDataset,
   setActiveDatasets,
   setTargetDataset,
 } from './projects.slice';
@@ -14,15 +13,15 @@ import {AUTO_SAVES_FOLDER} from '../../services/files/directories.constants';
 import useServerRequests from '../../services/network/useServerRequests';
 import {getNewId, isEmpty, isSameId} from '../../shared/helpers';
 import useResetState from '../../store/useResetState';
-import {
-  addedStatusMessage,
-  clearedStatusMessages,
-  removedLastStatusMessage,
-  setIsStatusMessagesModalVisible,
-  setLoadingStatus,
-} from '../home/home.slice';
+import {setLoadingStatus} from '../home/home.slice';
 import {clearedSpotsInMapExtentIds, clearedStratSection, setCurrentImageBasemap} from '../maps/maps.slice';
-import {clearedSelectedSpots, deletedSpots} from '../spots/spots.slice';
+import {
+  getDatasetWithSpotId,
+  isReadOnlyDatasetId,
+  isSpotIdInDataset,
+  isSpotIdInReadOnlyDataset,
+} from '../spots/spots.helpers';
+import {clearedSelectedSpots} from '../spots/spots.slice';
 
 const useProject = () => {
   /* Data Hooks */
@@ -72,20 +71,6 @@ const useProject = () => {
     dispatch(setTargetDataset(defaultDataset.id));
   };
 
-  const getDatasetIdFromSpotId = (spotId) => {
-    let datasetIdFound;
-    for (const dataset of Object.values(datasets)) {
-      const isSpotIdFound = dataset.spotIds?.some(id => isSameId(id, spotId));
-      if (isSpotIdFound) {
-        datasetIdFound = dataset.id;
-        break;
-      }
-    }
-    // A Spot legitimately maps to no dataset at times (e.g. a just-split line before Save Edits adds it
-    // to the target dataset), and both callers handle undefined, so return quietly.
-    return datasetIdFound;
-  };
-
   /* Exported Functions */
 
   const addDataset = async (name) => {
@@ -118,28 +103,7 @@ const useProject = () => {
       date: newDate,
       modified_timestamp: modifiedTimeStamp,
       spotIds: [],
-      images: {
-        imageIds: [],
-      },
     };
-  };
-
-  const destroyDataset = async (id) => {
-    try {
-      if (datasets && datasets[id] && datasets[id].spotIds) {
-        console.log(datasets[id].spotIds.length, 'Spot(s) in Dataset to Delete.');
-        dispatch(deletedSpots(datasets[id].spotIds));     // ToDo Need to delete images for deleted Spots
-      }
-      dispatch(deletedDataset(id));
-    }
-    catch (err) {
-      dispatch(setLoadingStatus({view: 'modal', bool: false}));
-      dispatch(setIsStatusMessagesModalVisible(true));
-      dispatch(clearedStatusMessages());
-      console.error('Error Deleting Dataset.');
-      dispatch(removedLastStatusMessage());
-      dispatch(addedStatusMessage('Error Deleting Dataset.'));
-    }
   };
 
   const getActiveDatasets = () => {
@@ -213,6 +177,10 @@ const useProject = () => {
     }
   };
 
+  // A Spot legitimately maps to no dataset at times (e.g. a just-split line before Save Edits adds it
+  // to the target dataset), and callers handle undefined, so return quietly.
+  const getDatasetIdFromSpotId = spotId => getDatasetWithSpotId(datasets, spotId)?.id;
+
   // No target is a state the app handles, so hand back nothing rather than picking or creating a dataset
   // on the user's behalf - which dataset takes new Spots stays their choice
   const getTargetDatasetFromId = () => datasets[targetDatasetId];
@@ -223,27 +191,29 @@ const useProject = () => {
     return Promise.resolve();
   };
 
-  const isReadOnlyDataset = datasetId => readOnlyDatasetsIds.includes(datasetId);
+  const isReadOnlyDataset = datasetId => isReadOnlyDatasetId(readOnlyDatasetsIds, datasetId);
 
-  // Only the Spot's own dataset. Whether anything else locks it - the Spot holding the map it sits on, or
-  // another Spot on the same strat section - is useSpots' isSpotReadOnly, which is built on this.
-  const isSpotInReadOnlyDataset = (spotId) => {
-    const datasetId = getDatasetIdFromSpotId(spotId);
-    return isReadOnlyDataset(datasetId);
-  };
+  // Only the Spot's own datasets. Whether anything else locks it - the Spot holding the map it sits on, or
+  // another Spot on the same strat section - is useSpots' isSpotReadOnly, which is built on this. Every dataset
+  // holding the Spot is asked, as the reducers and the web listener ask, so a Spot the old map-edit bug left in two
+  // is locked here exactly when a move or delete would be refused.
+  const isSpotInReadOnlyDataset = spotId => isSpotIdInReadOnlyDataset(spotId, datasets, readOnlyDatasetsIds);
+
+  // Compared with isSameId, as the reducers compare the target, so a star or switch never disagrees with them
+  const isTargetDataset = datasetId => isSameId(targetDatasetId, datasetId);
 
   const toggleActiveDataset = async (val, dataset) => {
     try {
       dispatch(setActiveDatasets({bool: val, dataset: dataset.id}));
       // A dataset that is no longer shown cannot go on taking new Spots, so it gives up the target with it. The
       // user only asked to hide it, so they are told.
-      if (!val && dataset.id === targetDatasetId) {
+      if (!val && isTargetDataset(dataset.id)) {
         dispatch(setTargetDataset(undefined));
         toast.show(`Turning off ${dataset.name} also cleared the target dataset.`,
           {type: 'warning', animationType: 'slide-in', duration: 3000, placement: 'top'});
       }
       dispatch(clearedSpotsInMapExtentIds());
-      if (!val && !isEmpty(selectedSpot) && dataset.spotIds?.includes(selectedSpot.properties.id)) {
+      if (!val && !isEmpty(selectedSpot) && isSpotIdInDataset(dataset, selectedSpot.properties.id)) {
         if (currentImageBasemap) dispatch(setCurrentImageBasemap(undefined));
         if (stratSection) dispatch(clearedStratSection());
         dispatch(clearedSelectedSpots());
@@ -257,11 +227,17 @@ const useProject = () => {
   };
 
   const toggleTargetDataset = (datasetId) => {
-    if (datasetId === targetDatasetId) {
+    if (isTargetDataset(datasetId)) {
       toast.show('Target Dataset deselected.',
         {type: 'normal', animationType: 'slide-in', duration: 3000, placement: 'top'});
       toast.hideAll();
       dispatch(setTargetDataset(undefined));
+    }
+    // The dataset lists disable this already, but the reducer would quietly leave no target, so say so rather than
+    // report a switch
+    else if (isReadOnlyDataset(datasetId)) {
+      toast.show(`${datasets[datasetId].name} is read only, so it can't be the target dataset.`,
+        {placement: 'top', type: 'warning'});
     }
     else {
       const datasetName = datasets[datasetId].name;
@@ -276,7 +252,6 @@ const useProject = () => {
     addDataset,
     checkValidDateTime,
     createDataset,
-    destroyDataset,
     getActiveDatasets,
     getAllDeviceProjects,
     getAllServerProjects,
@@ -286,6 +261,7 @@ const useProject = () => {
     isAnythingReadOnly,
     isReadOnlyDataset,
     isSpotInReadOnlyDataset,
+    isTargetDataset,
     toggleActiveDataset,
     toggleTargetDataset,
   };

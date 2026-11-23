@@ -32,22 +32,28 @@ const otherSpot = turf.point([-105, 40], {id: 2});
 const press = {properties: {screenPointX: 100, screenPointY: 200}};
 
 // The Spot being edited is selected, with its edit copy's geometry. Stored without geometry, it is a Spot given its
-// first geometry by Set in Current View.
-const renderHook = ({isNewGeometry}) => {
+// first geometry by Set in Current View. In view mode the same Spot is simply the one selected.
+const renderHook = ({isNewGeometry, mapMode = MAP_MODES.EDIT}) => {
   const storedSpot = isNewGeometry ? {...editedSpot, geometry: undefined} : editedSpot;
   const store = configureStore({
     preloadedState: {spot: {...spotReducer(undefined, {type: ''}), selectedSpot: editedSpot, spots: {1: storedSpot}}},
     reducer: {map: mapReducer, project: projectReducer, spot: spotReducer},
   });
-  const handlers = {editSpot: jest.fn(), setSpotToEditFromPicker: jest.fn()};
+  const handlers = {
+    clearSelectedSpots: jest.fn(),
+    editSpot: jest.fn(),
+    setIsShowSpotsAtPressModal: jest.fn(),
+    setSpotsAtPress: jest.fn(),
+    setSpotToEditFromPicker: jest.fn(),
+  };
   const endMapEditing = jest.fn();
   let hookApi;
   const Probe = () => {
     hookApi = useMapPressEvents({
       ...handlers,
       getEditSession: () => 0,
-      isEditingSpot: true,
-      mapMode: MAP_MODES.EDIT,
+      isEditingSpot: mapMode === MAP_MODES.EDIT,
+      mapMode: mapMode,
       mapRef: {current: null},
     });
     return null;
@@ -67,8 +73,32 @@ const renderHook = ({isNewGeometry}) => {
     mockSpotsAtPress = spotsAtPress;
     await hookApi.handleMapPress(press);
   });
-  return {endMapEditing, handlers, pressMap};
+  return {endMapEditing, handlers, pressMap, store};
 };
+
+describe('handleMapPress in view mode', () => {
+  const pointSpot = turf.point([-105, 40], {id: 3});
+
+  it('selects the Spot a press on several plainly means without asking', async () => {
+    const {handlers, pressMap, store} = renderHook({mapMode: MAP_MODES.VIEW});
+    await pressMap([editedSpot, pointSpot]);
+    expect(store.getState().spot.selectedSpot).toEqual(pointSpot);
+    expect(handlers.setIsShowSpotsAtPressModal).not.toHaveBeenCalled();
+  });
+
+  it('asks which Spot when several tie', async () => {
+    const {handlers, pressMap} = renderHook({mapMode: MAP_MODES.VIEW});
+    await pressMap([otherSpot, pointSpot]);
+    expect(handlers.setSpotsAtPress).toHaveBeenCalledWith([otherSpot, pointSpot]);
+    expect(handlers.setIsShowSpotsAtPressModal).toHaveBeenCalledWith(true);
+  });
+
+  it('clears the selection on a press on empty map', async () => {
+    const {handlers, pressMap} = renderHook({mapMode: MAP_MODES.VIEW});
+    await pressMap([]);
+    expect(handlers.clearSelectedSpots).toHaveBeenCalled();
+  });
+});
 
 // Set in Current View's geometry is the whole edit, so pressing off it ends the edit the way Cancel does
 describe('handleMapPress in edit mode', () => {

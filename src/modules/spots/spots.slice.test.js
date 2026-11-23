@@ -1,4 +1,6 @@
 import spotReducer, {
+  deletedSpot,
+  deletedSpots,
   deselectedAttributes,
   editedOrCreatedSpots,
   restoredIntervalDragSnapshot,
@@ -30,6 +32,25 @@ describe('editedOrCreatedSpots', () => {
     const state = {selectedSpot: otherSpot, spots: {[otherSpot.properties.id]: otherSpot}};
     const {selectedSpot} = spotReducer(state, editedOrCreatedSpots([spotEdited]));
     expect(selectedSpot).toEqual(otherSpot);
+  });
+});
+
+// The project slice matches a deleted Spot's id as a string, so recent views must too, or they keep a Spot that is gone
+describe('recent views of a deleted Spot', () => {
+  const spotId = 1756000000001;
+  const otherSpotId = 1756000000002;
+  const getState = () => ({
+    recentViews: [spotId, otherSpotId],
+    selectedSpot: {},
+    spots: {[spotId]: {properties: {id: spotId}}, [otherSpotId]: {properties: {id: otherSpotId}}},
+  });
+
+  it('drops the Spot deleted by its id as a string', () => {
+    expect(spotReducer(getState(), deletedSpot(spotId.toString())).recentViews).toEqual([otherSpotId]);
+  });
+
+  it('drops the Spots deleted together by their ids as strings', () => {
+    expect(spotReducer(getState(), deletedSpots([spotId.toString()])).recentViews).toEqual([otherSpotId]);
   });
 });
 

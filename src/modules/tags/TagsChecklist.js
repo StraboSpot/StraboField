@@ -6,6 +6,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import TagDetailModal from './detail/TagDetailModal';
+import {TAG_TYPES} from './tags.constants';
 import {getTagTitle} from './tags.helpers';
 import TagsListItem from './TagsListItem';
 import useTags from './useTags';
@@ -23,8 +24,7 @@ import {setActiveModal} from '../home/home.slice';
 import useMapLocation from '../maps/view/useMapLocation';
 import {PRIMARY_PAGES} from '../page/page.constants';
 import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
-import {TAG_TYPES} from '../project/project.constants';
-import {addedTagToSelectedSpot, setSelectedTag} from '../project/projects.slice';
+import {addedTagToSelectedSpot} from '../project/projects.slice';
 
 const TagsChecklist = ({
                          checkedTagsIds,
@@ -54,15 +54,17 @@ const TagsChecklist = ({
   const formRef = useRef(null);
 
   const [checkedTagsTemp, setCheckedTagsTemp] = useState([]);
-  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [newTag, setNewTag] = useState(null);
   const [searchText, setSearchText] = useState('');
 
   /* Derived Variables */
 
   const pageVisible = pagesStack.slice(-1)[0];
+  // The geologic unit and sample modals count as well as the page, since a shortcut can switch to the notebook's
+  // Geologic Units modal without changing the page
   const pageKey = pageVisible === PAGE_KEYS.GEOLOGIC_UNITS
-  || activeModal === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
+  || activeModal === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS || activeModal === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS
   || activeModal === MODAL_KEYS.NOTEBOOK.SAMPLES || activeModal === MODAL_KEYS.SHORTCUTS.SAMPLE
     ? PAGE_KEYS.GEOLOGIC_UNITS : PAGE_KEYS.TAGS;
   const page = PRIMARY_PAGES.find(p => p.key === pageKey);
@@ -79,9 +81,7 @@ const TagsChecklist = ({
   /* Logic Helpers */
 
   const addTag = () => {
-    const newTag = pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? {type: PAGE_KEYS.GEOLOGIC_UNITS} : {type: 'concept'};
-    dispatch(setSelectedTag(newTag));
-    setIsDetailModalVisible(true);
+    setNewTag(pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? {type: TAG_TYPES.GEOLOGIC_UNIT} : {type: TAG_TYPES.CONCEPT});
   };
 
   const checkTags = (tag) => {
@@ -94,13 +94,13 @@ const TagsChecklist = ({
   };
 
   const closeTagDetailModal = () => {
-    setIsDetailModalVisible(false);
+    setNewTag(null);
     dispatch(addedTagToSelectedSpot(false));
   };
 
   const getRelevantTags = () => {
-    return pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? searchTagsByType(PAGE_KEYS.GEOLOGIC_UNITS)
-      : isEmpty(searchText) ? JSON.parse(JSON.stringify(tags.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS)))
+    return pageKey === PAGE_KEYS.GEOLOGIC_UNITS ? searchTagsByType(TAG_TYPES.GEOLOGIC_UNIT)
+      : isEmpty(searchText) ? JSON.parse(JSON.stringify(tags.filter(t => t.type !== TAG_TYPES.GEOLOGIC_UNIT)))
         : searchTagsByType(searchText);
   };
 
@@ -154,7 +154,7 @@ const TagsChecklist = ({
             <ListItem containerStyle={commonStyles.listItemFormField}>
               <ListItem.Content>
                 <SelectInputField
-                  choices={TAG_TYPES.filter(t => t !== PAGE_KEYS.GEOLOGIC_UNITS).map(
+                  choices={Object.values(TAG_TYPES).filter(t => t !== TAG_TYPES.GEOLOGIC_UNIT).map(
                     tagType => ({label: getTagLabel(tagType), value: tagType}))}
                   isSingleSelect={true}
                   label={'Tag Type'}
@@ -240,7 +240,7 @@ const TagsChecklist = ({
             />
           )}
         </View>
-        {isDetailModalVisible && <TagDetailModal closeModal={closeTagDetailModal}/>}
+        {newTag && <TagDetailModal closeModal={closeTagDetailModal} tag={newTag}/>}
         <Loading isLoading={isSaving}/>
       </>
     );

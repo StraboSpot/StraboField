@@ -1,0 +1,7 @@
+# Maestro workspace config. `maestro test .maestro/` runs the offline data-loss suite (Guest, wipes app state).
+# Server tests are run separately and need a signed-in simulator: `maestro test .maestro/server/`
+# (the data-loss flows clear state, which would sign the simulator out).
+flows:
+  - data-loss/*
+executionOrder:
+  continueOnFailure: true

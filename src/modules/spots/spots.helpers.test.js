@@ -1,4 +1,14 @@
-import {calculateMissingOrientations, getSpotOrientations} from './spots.helpers';
+import {
+  calculateMissingOrientations,
+  canMoveSpotIdsToDataset,
+  getDatasetWithSpotId,
+  getImagesCount,
+  getSpotOrientations,
+  getSpotsCount,
+  isAnySpotIdInReadOnlyDataset,
+  isSpotIdInDataset,
+  isSpotIdInReadOnlyDataset,
+} from './spots.helpers';
 import {DEFAULT_ORIENTATION_FIELDS} from '../compass/compass.helpers';
 import {THREE_D_STRUCTURE_ORIENTATION_FIELDS} from '../three-d-structures/threeDStructures.constants';
 
@@ -53,6 +63,43 @@ describe('calculateMissingOrientations', () => {
   });
 });
 
+describe('canMoveSpotIdsToDataset', () => {
+  const datasets = {
+    12: {id: 12, spotIds: [1, 2]},
+    13: {id: 13, spotIds: ['3']},
+  };
+
+  it('moves the Spots when nothing is read only', () => {
+    expect(canMoveSpotIdsToDataset([1, 2, 3], 14, datasets)).toBe(true);
+  });
+
+  it('moves none into a read only dataset', () => {
+    expect(canMoveSpotIdsToDataset([1, 2], 13, datasets, [13])).toBe(false);
+  });
+
+  it('knows a read only dataset to move into by its id as a string', () => {
+    expect(canMoveSpotIdsToDataset([1], '13', datasets, [13])).toBe(false);
+  });
+
+  // Moving the rest would split a Spot from its sample
+  it('moves none when one of them is in a read only dataset, held by its id as a string', () => {
+    expect(canMoveSpotIdsToDataset([1, 3], 12, datasets, [13])).toBe(false);
+  });
+});
+
+describe('getDatasetWithSpotId', () => {
+  const datasets = {12: {id: 12, spotIds: [1]}, 13: {id: 13, spotIds: ['2']}};
+
+  it('finds the dataset holding a Spot by its id as a string, from an object or a list', () => {
+    expect(getDatasetWithSpotId(datasets, 2)).toBe(datasets[13]);
+    expect(getDatasetWithSpotId(Object.values(datasets), 2)).toBe(datasets[13]);
+  });
+
+  it('finds nothing for a Spot no dataset holds', () => {
+    expect(getDatasetWithSpotId(datasets, 3)).toBeUndefined();
+  });
+});
+
 describe('getSpotOrientations', () => {
   const spot = {
     properties: {
@@ -81,5 +128,86 @@ describe('getSpotOrientations', () => {
 
   it('gathers nothing from a Spot holding no such record', () => {
     expect(getSpotOrientations({properties: {name: 'Spot 1'}})).toEqual([]);
+  });
+});
+
+describe('getImagesCount', () => {
+  const spots = {
+    1: {properties: {id: 1, images: [{id: 11}, {id: 12}]}},
+    2: {properties: {id: 2, images: [{id: 21}], isSample: true}},
+    3: {properties: {id: 3}},
+  };
+
+  it('counts the images on the Spots the dataset lists, Sample Spots included', () => {
+    expect(getImagesCount([1, 2, 3], spots)).toBe(3);
+  });
+
+  // The sample's images go with the dataset it is filed in, not its parent's
+  it('counts a sample filed in another dataset there, not with its parent', () => {
+    expect(getImagesCount([1, 3], spots)).toBe(2);
+    expect(getImagesCount([2], spots)).toBe(1);
+  });
+
+  it('leaves out a Spot missing from the device', () => {
+    expect(getImagesCount([1, 4], spots)).toBe(2);
+  });
+
+  it('counts none for a dataset without Spots', () => {
+    expect(getImagesCount(undefined, spots)).toBe(0);
+  });
+});
+
+describe('getSpotsCount', () => {
+  const spots = {1: {properties: {id: 1}}, 2: {properties: {id: 2, isSample: true}}};
+
+  it('leaves out the samples', () => {
+    expect(getSpotsCount([1, 2], spots)).toBe(1);
+  });
+
+  it('leaves out a Spot missing from the device', () => {
+    expect(getSpotsCount([1, 3], spots)).toBe(1);
+  });
+
+  it('counts none for a dataset without Spots', () => {
+    expect(getSpotsCount(undefined, spots)).toBe(0);
+  });
+});
+
+describe('isAnySpotIdInReadOnlyDataset', () => {
+  const datasets = {12: {id: 12, spotIds: [1, 2]}, 13: {id: 13, spotIds: ['3']}};
+
+  it('finds one Spot of several held by a read only dataset', () => {
+    expect(isAnySpotIdInReadOnlyDataset([1, 3], datasets, [13])).toBe(true);
+  });
+
+  it('finds nothing when none of them is', () => {
+    expect(isAnySpotIdInReadOnlyDataset([1, 2], datasets, [13])).toBe(false);
+  });
+});
+
+describe('isSpotIdInDataset', () => {
+  it('finds a Spot the dataset holds by its id as a string', () => {
+    expect(isSpotIdInDataset({id: 12, spotIds: ['1756000000001']}, 1756000000001)).toBe(true);
+  });
+
+  it('finds nothing in a dataset without Spots', () => {
+    expect(isSpotIdInDataset({id: 12}, 1756000000001)).toBe(false);
+  });
+});
+
+describe('isSpotIdInReadOnlyDataset', () => {
+  const datasets = {12: {id: 12, spotIds: [1]}, 13: {id: '13', spotIds: [1, '3']}};
+
+  it('finds a Spot held by a read only dataset, matching ids held as strings', () => {
+    expect(isSpotIdInReadOnlyDataset(3, datasets, [13])).toBe(true);
+  });
+
+  // The old map-edit bug could leave a Spot in two datasets
+  it('finds a Spot when only the second dataset holding it is read only', () => {
+    expect(isSpotIdInReadOnlyDataset(1, datasets, [13])).toBe(true);
+  });
+
+  it('finds nothing when no dataset holding the Spot is read only', () => {
+    expect(isSpotIdInReadOnlyDataset(1, datasets, [14])).toBe(false);
   });
 });

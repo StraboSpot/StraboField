@@ -11,6 +11,7 @@ import {MODAL_TRANSITION_DELAY} from '../../shared/ui/modals/modal.constants';
 import StatusModal from '../../shared/ui/modals/StatusModal';
 import SaveMapsModal from '../maps/offline-maps/SaveMapsModal';
 import InitialProjectLoadModal from '../project/load/InitialProjectLoadModal';
+import PreparedProjectOffer from '../project/prepared/PreparedProjectOffer';
 import ReauthModal from '../sign-in/ReauthModal';
 
 // Web auto-logs in to a fixed project and cannot switch projects, so there is nothing to choose. The
@@ -50,6 +51,7 @@ const ModalsContainer = forwardRef(({
           openMainMenuPanel={openMainMenuPanel}
         />
       )}
+      {!isWeb && <PreparedProjectOffer/>}
       <MessageModal/>
       <StatusModal/>
       <ReauthModal/>

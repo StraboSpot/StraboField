@@ -1,0 +1,15 @@
+# Fresh install -> Guest -> new project with a Default (target) dataset -> back on the map.
+# Guest mode never talks to the server, so these tests touch no real accounts or data.
+appId: org.StraboSpot2
+---
+- launchApp:
+    clearState: true
+    permissions: { all: allow }
+- tapOn: "Continue as Guest"
+- tapOn: "New"
+- tapOn: { id: "project_name" }
+- inputText: ${PROJECT_NAME || 'E2E Project'}
+- hideKeyboard
+- tapOn: "Save New Project"
+- assertVisible: "Project: ${PROJECT_NAME || 'E2E Project'}"
+- runFlow: close-side-panels.yaml

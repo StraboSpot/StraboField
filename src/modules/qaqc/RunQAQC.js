@@ -9,16 +9,18 @@ import useDownload from '../../services/files/useDownload';
 import useUpload from '../../services/files/useUpload';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
+import useProject from '../project/useProject';
 
 const RunQAQC = ({dataset}) => {
   /* Data Hooks */
 
+  const {datasets, project} = useSelector(state => state.project);
+
   const encodedLogin = useSelector(state => state.user.encoded_login);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
-  const {datasets, project} = useSelector(state => state.project);
-  const readOnlyDatasetsIds = useSelector(state => state.project.readOnlyDatasetsIds) || [];
 
   const {initializeDownload} = useDownload();
+  const {isReadOnlyDataset} = useProject();
   const toast = useToast();
   const {initializeUpload} = useUpload();
 
@@ -28,7 +30,7 @@ const RunQAQC = ({dataset}) => {
 
   /* Derived Variables */
 
-  const isDatasetReadOnly = datasets[dataset.id]?.isReadOnly || readOnlyDatasetsIds.includes(dataset.id);
+  const isDatasetReadOnly = datasets[dataset.id]?.isReadOnly || isReadOnlyDataset(dataset.id);
   const isProjectReadOnly = project?.isReadOnly;
 
   /* Event Handlers */

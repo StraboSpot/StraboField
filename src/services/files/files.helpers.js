@@ -1,4 +1,4 @@
-import {PAGE_KEYS} from '../../modules/page/pageKeys.constants';
+import {TAG_TYPES} from '../../modules/tags/tags.constants';
 import {getTemplateKeys, getTemplateList, setTemplateList} from '../../modules/templates/templates.helpers';
 
 export const getImageIds = (images) => {
@@ -13,8 +13,8 @@ export const getImageIds = (images) => {
 export const getTagsToBackup = (tags, isGeologicUnits) => {
   return (tags || []).reduce((acc, tag) => {
     const {spots, features, ...rest} = tag;
-    return (isGeologicUnits && rest.type === PAGE_KEYS.GEOLOGIC_UNITS)
-    || (!isGeologicUnits && rest.type !== PAGE_KEYS.GEOLOGIC_UNITS) ? [...acc, rest] : acc;
+    return (isGeologicUnits && rest.type === TAG_TYPES.GEOLOGIC_UNIT)
+    || (!isGeologicUnits && rest.type !== TAG_TYPES.GEOLOGIC_UNIT) ? [...acc, rest] : acc;
   }, []);
 };
 

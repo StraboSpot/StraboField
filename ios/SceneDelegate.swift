@@ -12,6 +12,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
               let factory = appDelegate.reactNativeFactory else { return }
 
         window = UIWindow(windowScene: windowScene)
+        // expo-updates falls back to the app delegate's window when it swaps in the launched bundle's root view
+        appDelegate.window = window
 
         // Scenes don't receive launchOptions, so pass a cold-start URL through for Linking.getInitialURL()
         var launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil

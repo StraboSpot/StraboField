@@ -20,7 +20,7 @@ import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/main
 import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 import Overview from '../page/Overview';
 import {NOTEBOOK_PAGES, SUBPAGES} from '../page/page.constants';
-import {MODAL_KEYS, PAGE_KEYS} from '../page/pageKeys.constants';
+import {PAGE_KEYS} from '../page/pageKeys.constants';
 import usePage from '../page/usePage';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
 import SpotsList from '../spots/SpotsList';
@@ -32,14 +32,14 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
 
   /* Data Hooks */
 
+  const {goToNotebookPage} = useContext(LeavePageContext);
+
   const dispatch = useDispatch();
   const currentImageBasemap = useSelector(state => state.map.currentImageBasemap);
   const isMultipleFeaturesTaggingEnabled = useSelector(state => state.project.isMultipleFeaturesTaggingEnabled);
-  const isNotebookPanelVisible = useSelector(state => state.notebook.isNotebookPanelVisible);
   const pagesStack = useSelector(state => state.notebook.visibleNotebookPagesStack);
   const projectName = useSelector(state => state.project.project?.description?.project_name);
   const spot = useSelector(state => state.spot.selectedSpot);
-  const {goToNotebookPage} = useContext(LeavePageContext);
 
   const {getAllRelevantPages, getPopulatedPagesKeys} = usePage();
   const {
@@ -74,9 +74,6 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
   useEffect(() => {
     console.log('UE NotebookContent [pageVisible, spot]', pageVisible, spot);
     if (isMultipleFeaturesTaggingEnabled) dispatch(setMultipleFeaturesTaggingEnabled(false));
-    if (isNotebookPanelVisible && spot.properties?.isSample && isEmpty(spot.properties.samples)) {
-      dispatch(setActiveModal({modal: MODAL_KEYS.NOTEBOOK.SAMPLES}));
-    }
     const isRelevantPage = pageVisible === PAGE_KEYS.OVERVIEW
       || getAllRelevantPages().some(p => p.key === pageVisible)
       || SUBPAGES.some(p => p.key === pageVisible);
@@ -89,6 +86,12 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
 
   /* Logic Helpers */
 
+  const openDatasetsPage = () => {
+    dispatch(setSidePanelVisible({bool: false}));
+    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
+    if (openMainMenuPanel) openMainMenuPanel();
+  };
+
   const openPage = async (key) => {
     if (!await goToNotebookPage(key)) return;
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
@@ -99,12 +102,6 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
       else dispatch(setActiveModal({modal: page.key}));
     }
     else dispatch(setActiveModal({modal: null}));
-  };
-
-  const openDatasetsPage = () => {
-    dispatch(setSidePanelVisible({bool: false}));
-    dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.MANAGE_PROJECT.DATASETS}));
-    if (openMainMenuPanel) openMainMenuPanel();
   };
 
   /* Render Functions */

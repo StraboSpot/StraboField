@@ -1,8 +1,21 @@
 import * as turf from '@turf/turf';
 import proj4 from 'proj4';
 
-import {DEFAULT_MAPS, GEO_LAT_LNG_PROJECTION, MAP_MODES, MAP_PROVIDERS, PIXEL_PROJECTION} from './maps.constants';
+import {
+  DEFAULT_MAPS,
+  GEO_LAT_LNG_PROJECTION,
+  GEOMETRY_TYPES_BY_PRESS_PRIORITY,
+  MAP_MODES,
+  MAP_PROVIDERS,
+  PIXEL_PROJECTION,
+} from './maps.constants';
 import {isEmpty} from '../../shared/helpers';
+
+// Rank of a Spot's geometry among GEOMETRY_TYPES_BY_PRESS_PRIORITY, lowest first; anything else ranks last
+const getPressPriority = (spot) => {
+  const priority = GEOMETRY_TYPES_BY_PRESS_PRIORITY.findIndex(types => types.includes(spot.geometry?.type));
+  return priority === -1 ? GEOMETRY_TYPES_BY_PRESS_PRIORITY.length : priority;
+};
 
 // proj4 definition for a UTM zone on the WGS84 datum
 const getUtmProjection = (zoneNumber, isNorthernHemisphere) =>
@@ -86,6 +99,17 @@ export const getClosestSpotDistanceAndIndex = (distancesFromSpot) => {
   }
   return [minDistance, minIndex];
 };
+
+// The Spot a press plainly means: the only one there, or of several, a point over a line and a line over a polygon.
+// Undefined when there is none, or when several tie and the user has to pick.
+export const getSpotMeantAtPress = (spots) => {
+  const topPriority = Math.min(...spots.map(getPressPriority));
+  const topSpots = spots.filter(spot => getPressPriority(spot) === topPriority);
+  return topSpots.length === 1 ? topSpots[0] : undefined;
+};
+
+// The Spots at a press in the order to list them, ranked as getSpotMeantAtPress ranks them
+export const getSpotsAtPressInListOrder = spots => [...spots].sort((a, b) => getPressPriority(a) - getPressPriority(b));
 
 // One-line UTM readout for [lng, lat], e.g. 'UTM 13N  476915 mE  4429457 mN'
 export const getUtmDisplayString = ([lng, lat]) => {

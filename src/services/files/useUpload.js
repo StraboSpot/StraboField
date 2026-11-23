@@ -78,7 +78,7 @@ const useUpload = () => {
       setUploadStatusMessage(`Uploading dataset ${dataset.name}...`);
       let datasetCopy = JSON.parse(JSON.stringify(dataset));
       delete datasetCopy.spotIds;
-      datasetCopy.images && delete datasetCopy.images;
+      delete datasetCopy.images;  // No longer written, but datasets stored before then still carry it
       const resJSON = await updateDataset(datasetCopy);
       if (resJSON.modified_on_server) {
         console.log(dataset.name + ': Dataset that was uploaded:', resJSON);

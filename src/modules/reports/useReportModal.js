@@ -10,6 +10,7 @@ import {MAIN_MENU_ITEMS, SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.con
 import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import {setSelectedTag, updatedProject} from '../project/projects.slice';
+import {TAG_TYPES} from '../tags/tags.constants';
 
 const useReportModal = ({openSpotInNotebook}) => {
   /* Data Hooks */
@@ -129,7 +130,7 @@ const useReportModal = ({openSpotInNotebook}) => {
     closeModal();
     dispatch(setSidePanelVisible({bool: true, view: SIDE_PANEL_VIEWS.TAG_DETAIL}));
     dispatch(setSelectedTag(tag));
-    if (tag.type === 'geologic_unit') {
+    if (tag.type === TAG_TYPES.GEOLOGIC_UNIT) {
       dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS}));
     }
     else dispatch(setMenuSelectionPage({name: MAIN_MENU_ITEMS.PROJECT_DATA.TAGS}));

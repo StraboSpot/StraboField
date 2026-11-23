@@ -36,6 +36,17 @@
       android:supportsRtl="true"
       tools:replace="android:appComponentFactory"
       android:appComponentFactory="whateverString">
+    <!-- expo-updates: the runtime version is the native fingerprint computed at build time, so an OTA update only
+         reaches builds with matching native code. Served from our own server; every update must be
+         signed with the key matching certs/certificate.pem.
+         No channel header is sent, so these builds get the "production" channel. -->
+    <meta-data android:name="expo.modules.updates.ENABLED" android:value="true"/>
+    <meta-data android:name="expo.modules.updates.EXPO_RUNTIME_VERSION" android:value="file:fingerprint"/>
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_CHECK_ON_LAUNCH" android:value="ALWAYS"/>
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATES_LAUNCH_WAIT_MS" android:value="0"/>
+    <meta-data android:name="expo.modules.updates.EXPO_UPDATE_URL" android:value="https://strabospot.org/ota/manifest"/>
+    <meta-data android:name="expo.modules.updates.CODE_SIGNING_CERTIFICATE" android:value="-----BEGIN CERTIFICATE-----&#xA;MIIC1zCCAb+gAwIBAgIJGX6gYUWNQNeqMA0GCSqGSIb3DQEBCwUAMBUxEzARBgNV&#xA;BAMTClN0cmFib1Nwb3QwHhcNMjYxMTE4MjAwODM1WhcNMzYxMTE4MjAwODM1WjAV&#xA;MRMwEQYDVQQDEwpTdHJhYm9TcG90MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB&#xA;CgKCAQEA0AvGMaOkpq4bdRGObkC2wCMv57vqYWh/V7OXSTa2AT+18vXILemfF9kV&#xA;1k5uvJblQeInmJnzxTg58fC2mNztSWZ1RvdwScKCrnhPbm6rkY+7NAjPL7uscHlh&#xA;w/tiudMMx7zYK8FAUdwqEj1fVYwu1tc8sDCxR5hSgeSIgucSs4XQ5Gz4FZLe7VLt&#xA;LziLfPl1qJ+M09Av3BxfbtJjyITM6lqCFA+IJM+gGcbiRvXO4cmNtS9F9Ptu5uux&#xA;lf8RFLVquwHUv8GnCmMkBBkCI9VUUJlAnPvI1nBUowvac1kHH+Q1vu4jpymNGgaP&#xA;ii6/USs8UEA0AJpfJlWAVtiDKGBRAQIDAQABoyowKDAOBgNVHQ8BAf8EBAMCB4Aw&#xA;FgYDVR0lAQH/BAwwCgYIKwYBBQUHAwMwDQYJKoZIhvcNAQELBQADggEBAA0p+cJ4&#xA;/IHNJYrV4MrFQETmWFuwA4d6up6/cFZAHPpei7uXM0CITLFnKqiwILiQQGYYuxBW&#xA;7kp2Mbfc5ebOiY2OASWN7SiRxMslmEfGTSqNFsVngy7jGt2ef9+RlorI//VRYEu0&#xA;8mF3rdePv7QytDzboFBJCwyEjl5qvPfsRPbFFy+aDO/5bmLMcVqtcoobrOIPNeXO&#xA;34ShiLVWMcFHYxqAFNL81hq+lHopztVZzIEbp9KIo9engSmHfxCpbZ4GIop4AXcI&#xA;Z+UGD6cKL1/lcS+Ddrfe4+dCzdx1ilZN1uRXVokLaeh4bhkz6LCasmwBU4PpII9L&#xA;BTGc9FRWpvZw64E=&#xA;-----END CERTIFICATE-----"/>
+    <meta-data android:name="expo.modules.updates.CODE_SIGNING_METADATA" android:value="{&quot;keyid&quot;:&quot;main&quot;,&quot;alg&quot;:&quot;rsa-v1_5-sha256&quot;}"/>
     <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

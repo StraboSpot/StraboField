@@ -6,6 +6,12 @@ import * as forms from '../../assets/forms';
 import {isEmpty, isEqual} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 
+// Whether a value is a date or time as the forms save one, an ISO string. A number is ruled out before parsing:
+// Date.parse reads it as text, and Hermes accepts some long ones that new Date, taking them as milliseconds, finds
+// out of range, so toISOString throws.
+const isIsoDateString = value => typeof value === 'string' && !isNaN(Date.parse(value))
+  && new Date(value).toISOString() === value;
+
 const useForm = () => {
   /* Exported Functions */
 
@@ -63,12 +69,8 @@ const useForm = () => {
         dictionary = Object.values(LABEL_DICTIONARY[category]).reduce((acc, form) => ({...acc, ...form}), {});
       }
       if (dictionary && dictionary[key.toString()]) return dictionary[key.toString()];
-      else if (Date.parse(key) && new Date(key).toISOString() === key && fieldName?.includes('date')) {
-        return moment(key).format('MM/DD/YYYY');
-      }
-      else if (Date.parse(key) && new Date(key).toISOString() === key && fieldName?.includes('time')) {
-        return moment(key).format('h:mm:ss a');
-      }
+      else if (fieldName?.includes('date') && isIsoDateString(key)) return moment(key).format('MM/DD/YYYY');
+      else if (fieldName?.includes('time') && isIsoDateString(key)) return moment(key).format('h:mm:ss a');
       else return key.toString().replace(/_/g, ' ');
     }
     else return 'Unknown';
