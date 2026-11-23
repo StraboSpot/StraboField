@@ -1,6 +1,12 @@
 import {useSelector} from 'react-redux';
 
-import {LAYOUT_PROPERTIES_MAP, LINE_PATTERNS, PAINT_PROPERTIES_MAP} from './mapSymbology.constants';
+import {
+  LAYOUT_PROPERTIES_MAP,
+  LINE_PATTERNS,
+  MAP_DEFAULT_COLOR,
+  MAP_DEFAULT_LINE_WIDTH,
+  PAINT_PROPERTIES_MAP,
+} from './mapSymbology.constants';
 import {getIconImage, getIconRotation, getLabel, getLabelOffset} from './mapSymbology.helpers';
 import {hexToRgb, isEmpty} from '../../../shared/helpers';
 import {MEDIUMGREY, ORANGE} from '../../../shared/styles.constants';
@@ -28,12 +34,12 @@ const useMapSymbology = () => {
   const lineColorExpression = [
     'case', ['all', ['has', 'symbology'], ['has', 'lineColor', ['get', 'symbology']]],
     ['get', 'lineColor', ['get', 'symbology']],
-    '#000000',
+    MAP_DEFAULT_COLOR,
   ];
   const lineWidthExpression = [
     'case', ['all', ['has', 'symbology'], ['has', 'lineWidth', ['get', 'symbology']]],
     ['get', 'lineWidth', ['get', 'symbology']],
-    1,
+    MAP_DEFAULT_LINE_WIDTH,
   ];
 
   const mapStyles = {

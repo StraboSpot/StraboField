@@ -2,6 +2,7 @@ import React from 'react';
 import {Text, View} from 'react-native';
 
 import commonStyles from '../../../shared/common.styles';
+import {MAX_CONTENT_WIDTH} from '../../../shared/styles.constants';
 import FlatListItemSeparator from '../../../shared/ui/FlatListItemSeparator';
 import ModalWrapper from '../../../shared/ui/modals/ModalWrapper';
 import SpotsListItem from '../../spots/SpotsListItem';
@@ -24,6 +25,7 @@ const SelectSpotsAtPressModal = ({closeModal, headerTitle, isVisible, onSpotPres
       closeModal={closeModal}
       headerTitle={headerTitle}
       isVisible={isVisible}
+      overlayStyleOverride={{maxWidth: '95%', width: MAX_CONTENT_WIDTH}}
       showActionButton={false}
       showCancelButton={false}
       showCloseButton={true}
@@ -36,6 +38,7 @@ const SelectSpotsAtPressModal = ({closeModal, headerTitle, isVisible, onSpotPres
           <React.Fragment key={spot.properties.id.toString()}>
             {index > 0 && <FlatListItemSeparator/>}
             <SpotsListItem
+              doShowMapSymbol={true}
               doShowTags={true}
               onPress={handleSpotPressed}
               spot={spot}
