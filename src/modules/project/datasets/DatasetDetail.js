@@ -6,6 +6,7 @@ import {useToast} from 'react-native-toast-notifications';
 import {useDispatch, useSelector} from 'react-redux';
 
 import useDatasetNeededImagesCount from './useDatasetNeededImagesCount';
+import useDeleteDataset from './useDeleteDataset';
 import useDownload from '../../../services/files/useDownload';
 import commonStyles from '../../../shared/common.styles';
 import {isEmpty} from '../../../shared/helpers';
@@ -31,12 +32,15 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
+  // The dataset given is a copy taken when its page opened, so its Spots are read as they are now
+  const spotIds = useSelector(state => state.project.datasets[dataset.id]?.spotIds) || dataset.spotIds;
   const spots = useSelector(state => state.spot.spots);
-  const targetDatasetId = useSelector(state => state.project.targetDatasetId);
 
-  const [neededImagesCount, refreshNeededImagesCount] = useDatasetNeededImagesCount(dataset);
+  const [neededImagesCount, refreshNeededImagesCount, imagesCount] = useDatasetNeededImagesCount(dataset);
+
+  const {deleteDataset, getDatasetDeleteCheck} = useDeleteDataset();
   const {initializeDownloadImages} = useDownload();
-  const {destroyDataset, isReadOnlyDataset} = useProject();
+  const {isReadOnlyDataset, isTargetDataset} = useProject();
   const toast = useToast();
 
   /* Local State */
@@ -50,7 +54,8 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
   /* Derived Variables */
 
   const isReadOnly = isReadOnlyDataset(dataset.id);
-  const spotsCount = getSpotsCount(dataset.spotIds, spots);
+  const isTarget = isTargetDataset(dataset.id);
+  const spotsCount = getSpotsCount(spotIds, spots);
 
   /* Event Handlers */
 
@@ -65,12 +70,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   const handleDeletePressed = () => setIsDeleteConfirmModalVisible(true);
 
-  // The header sits outside the form, so it needs the name as it is typed to say whether there is anything to save
-  const setFieldValueAndTrackName = (name, value) => {
-    nameFormRef.current.setFieldValue(name, value);
-    setDatasetName(value);
-  };
-
   /* Logic Helpers */
 
   const downloadImages = async () => {
@@ -79,17 +78,11 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     closeDetailView();
   };
 
-  const initializeDeleteDataset = () => {
+  const initializeDeleteDataset = async () => {
     setIsDeleteConfirmModalVisible(false);
-    if (dataset && dataset.id) {
-      destroyDataset(dataset.id)
-        .then(closeDetailView())
-        .catch(err => console.error('Error deleting dataset', err));
-    }
-    else console.error('Target dataset or id is undefined!');
+    // A delete refused has said why, and the view stays open
+    if (await deleteDataset(dataset)) closeDetailView();
   };
-
-  const isDisabled = id => targetDatasetId && targetDatasetId === id;
 
   const saveDataset = () => {
     let datasetCopy = JSON.parse(JSON.stringify(dataset));
@@ -98,24 +91,51 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     closeDetailView();
   };
 
+  // The header sits outside the form, so it needs the name as it is typed to say whether there is anything to save
+  const setFieldValueAndTrackName = (name, value) => {
+    nameFormRef.current.setFieldValue(name, value);
+    setDatasetName(value);
+  };
+
   /* Render Functions */
 
   const renderDeleteConfirmationModal = () => {
+    // Samples filed apart from their parents across this dataset's edge, which an old bug could leave
+    const {readOnlyMessage, samplesToDelete, samplesToMove} = getDatasetDeleteCheck(dataset);
     return (
       <DeleteConformationDialogBox
         headerTitle={'Confirm Delete!'}
         isVisible={isDeleteConfirmModalVisible}
         onActionPressed={initializeDeleteDataset}
         onCancelPress={() => setIsDeleteConfirmModalVisible(false)}
+        showActionButton={!readOnlyMessage}
       >
-        <Text style={{textAlign: 'center'}}>Are you sure you want to delete Dataset
-          {dataset && dataset.name && <Text>{'\n' + dataset.name}</Text>}?
-        </Text>
-        <Text style={overlayStyles.statusMessageText}>
-          This will
-          <Text style={commonStyles.importantText}> ERASE </Text>
-          everything in this dataset including Spots, images, and all other data!
-        </Text>
+        {readOnlyMessage ? <Text style={{textAlign: 'center'}}>Unable to delete Dataset.{'\n'}{readOnlyMessage}</Text>
+          : (
+            <>
+              <Text style={{textAlign: 'center'}}>Are you sure you want to delete Dataset
+                {dataset && dataset.name && <Text>{'\n' + dataset.name}</Text>}?
+              </Text>
+              <Text style={overlayStyles.statusMessageText}>
+                This will permanently
+                <Text style={commonStyles.importantText}> DELETE </Text>
+                {`${spotsCount} ${spotsCount === 1 ? 'Spot' : 'Spots'} in this dataset, along with their Samples and `
+                  + 'images. This can\'t be undone.'}
+              </Text>
+              {!isEmpty(samplesToDelete) && (
+                <Text style={overlayStyles.statusMessageText}>
+                  {`${samplesToDelete.length} ${samplesToDelete.length === 1 ? 'Sample' : 'Samples'} filed in other `
+                    + 'datasets, taken at Spots in this one, will be deleted with it.'}
+                </Text>
+              )}
+              {!isEmpty(samplesToMove) && (
+                <Text style={overlayStyles.statusMessageText}>
+                  {`${samplesToMove.length} ${samplesToMove.length === 1 ? 'Sample' : 'Samples'} in this dataset, `
+                    + 'taken at Spots in other datasets, will be moved to the dataset of the Spot each was taken from.'}
+                </Text>
+              )}
+            </>
+          )}
       </DeleteConformationDialogBox>
     );
   };
@@ -125,13 +145,19 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
     return (
       <View style={{paddingBottom: 10}}>
         <DeleteButton
-          disabled={!isDisabled(dataset.id)}
+          disabled={isTarget || isReadOnly}
           onPress={handleDeletePressed}
           title={'Delete Dataset'}
         />
-        {isDisabled(dataset.id) && (
+        {isTarget && (
           <Text style={[commonStyles.importantText, {paddingHorizontal: 30}]}>
-            *{dataset.name} can not be deleted while still set as the target (starred) dataset.
+            {dataset.name} can not be deleted while still set as the target (starred) dataset.
+          </Text>
+        )}
+        {/* A target is never read only, so at most one of these notes shows */}
+        {isReadOnly && (
+          <Text style={[commonStyles.importantText, {paddingHorizontal: 30}]}>
+            {dataset.name} can not be deleted while it is read only.
           </Text>
         )}
       </View>
@@ -140,8 +166,6 @@ const DatasetDetail = ({closeDetailView, dataset}) => {
 
   // Dataset Images Field
   const renderImagesField = () => {
-    const imagesCount = dataset?.images?.imageIds?.length || 0;
-
     return (
       <>
         <ListItem containerStyle={commonStyles.listItemFormField}>

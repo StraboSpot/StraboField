@@ -52,7 +52,7 @@ const SampleModalGeologicUnits = ({checkedTagsIds, handleTagChecked}) => {
         </View>
 
         <View style={{paddingHorizontal: 5}}>
-          {isEmpty(checkedTags) && <ListEmptyText text={'No Tags'}/>}
+          {isEmpty(checkedTags) && <ListEmptyText text={'No Geologic Units'}/>}
           {checkedTags.map(t => (
             <View
               key={t.id.toString()}

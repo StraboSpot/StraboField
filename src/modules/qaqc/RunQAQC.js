@@ -9,17 +9,17 @@ import useDownload from '../../services/files/useDownload';
 import useUpload from '../../services/files/useUpload';
 import ActionButton from '../../shared/ui/buttons/ActionButton';
 import ModalWrapper from '../../shared/ui/modals/ModalWrapper';
-import {isDatasetReadOnly} from '../project/projects.helpers';
+import useProject from '../project/useProject';
 
 const RunQAQC = ({dataset}) => {
   /* Data Hooks */
 
   const encodedLogin = useSelector(state => state.user.encoded_login);
   const isTestingMode = useSelector(state => state.project.isTestingMode);
-  const straboUserId = useSelector(state => state.user.straboUserId);
-  const {datasets, project} = useSelector(state => state.project);
+  const project = useSelector(state => state.project.project);
 
   const {initializeDownload} = useDownload();
+  const {isReadOnlyDataset} = useProject();
   const toast = useToast();
   const {initializeUpload} = useUpload();
 
@@ -29,8 +29,8 @@ const RunQAQC = ({dataset}) => {
 
   /* Derived Variables */
 
-  const isDatasetLocked = isDatasetReadOnly(datasets[dataset.id], straboUserId);
-  const isProjectReadOnly = project?.isReadOnly;
+  // Read only to the user, which a read only project makes every dataset
+  const isReadOnly = isReadOnlyDataset(dataset.id);
 
   /* Event Handlers */
 
@@ -64,7 +64,7 @@ const RunQAQC = ({dataset}) => {
 
   /* View */
 
-  if (!isTestingMode || isProjectReadOnly || isDatasetLocked) return null;
+  if (!isTestingMode || isReadOnly) return null;
 
   return (
     <View style={{paddingBottom: 10}}>

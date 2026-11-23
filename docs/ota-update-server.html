@@ -1,0 +1,218 @@
+<title>StraboField Update Server</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column for a spec handed to a server developer; tables and code scroll inside their own boxes. */
+:root {
+  --bg: #f6f8f8;
+  --surface: #ffffff;
+  --fg: #1b2426;
+  --muted: #56666a;
+  --line: #d6dfe0;
+  --accent: #0f6b6f;
+  --code-bg: #eef3f3;
+  --warn-bg: #fff6e2;
+  --warn-line: #e3b44b;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111719; --surface: #182124; --fg: #e3ebec; --muted: #9aabae; --line: #2b383b;
+    --accent: #5cc3c7; --code-bg: #1d282b; --warn-bg: #2b2412; --warn-line: #a9822c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111719; --surface: #182124; --fg: #e3ebec; --muted: #9aabae; --line: #2b383b;
+  --accent: #5cc3c7; --code-bg: #1d282b; --warn-bg: #2b2412; --warn-line: #a9822c; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+}
+main {
+  max-width: 46rem; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 72px;
+  display: flex; flex-direction: column; gap: 40px;
+}
+header { display: flex; flex-direction: column; gap: 10px; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 0; }
+h1 { font-size: 2rem; line-height: 1.2; font-weight: 600; margin: 0; text-wrap: balance; }
+h2 { font-size: 1.3rem; font-weight: 600; margin: 0; text-wrap: balance; }
+h3 { font-size: 1rem; font-weight: 600; margin: 0; }
+p, ul, ol { margin: 0; }
+ul, ol { padding-left: 1.3rem; display: flex; flex-direction: column; gap: 6px; }
+section { display: flex; flex-direction: column; gap: 14px; }
+.lede { color: var(--muted); font-size: 1.05rem; }
+code { font-family: var(--font-mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.55; }
+pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: none; }
+th { font-weight: 600; color: var(--muted); font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }
+td:first-child { white-space: nowrap; }
+.flow { counter-reset: step; list-style: none; padding: 0; gap: 10px; }
+.flow li { counter-increment: step; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; }
+.flow li::before { content: counter(step); font-family: var(--font-mono); font-size: 13px; color: var(--accent); border: 1px solid var(--accent); border-radius: 50%; width: 24px; height: 24px; display: grid; place-items: center; margin-top: 1px; }
+.note { background: var(--warn-bg); border-left: 3px solid var(--warn-line); padding: 12px 16px; border-radius: 0 6px 6px 0; }
+.asks { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 18px 20px; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<main>
+  <header>
+    <p class="eyebrow">StraboField · over-the-air updates</p>
+    <h1>Hosting StraboField's update server</h1>
+    <p class="lede">StraboField is adding over-the-air (OTA) updates so JavaScript bug fixes reach phones without an App Store or Play Store release. The app side is done. It needs an HTTPS endpoint on our server that speaks the Expo Updates protocol (version 1). This page is everything the server side has to do.</p>
+  </header>
+
+  <section>
+    <h2>What happens on a phone</h2>
+    <ol class="flow">
+      <li><span>The app launches straight away from the JavaScript bundle it already has. It never waits for the network.</span></li>
+      <li><span>In the background it sends one <code>GET</code> to the update URL, saying which platform it is and which native build (runtime version) it is.</span></li>
+      <li><span>The server replies with the newest update for that platform and runtime version, or says there is none.</span></li>
+      <li><span>If there's a newer update, the app downloads its files and verifies their hashes. It starts using them the next time it's opened.</span></li>
+      <li><span>If a new update crashes on launch, the app falls back to its previous working bundle on its own.</span></li>
+    </ol>
+    <p>Geologists often work with no signal, so a request may fail or arrive days late. The app copes with that, and the server needs no special handling for it.</p>
+  </section>
+
+  <section>
+    <h2>1. The manifest endpoint</h2>
+    <p>One URL, for example <code>https://strabospot.org/ota/manifest</code> (the exact path is yours to choose). The app sends a <code>GET</code> with these headers:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Request header</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>expo-platform</code></td><td><code>ios</code> or <code>android</code></td></tr>
+          <tr><td><code>expo-runtime-version</code></td><td>Fingerprint of the installed native build, a 40-character hex hash. Only serve updates published for exactly this value.</td></tr>
+          <tr><td><code>expo-protocol-version</code></td><td><code>1</code></td></tr>
+          <tr><td><code>accept</code></td><td><code>multipart/mixed,application/expo+json,application/json</code></td></tr>
+          <tr><td><code>expo-current-update-id</code></td><td>UUID of the update the phone is running now</td></tr>
+          <tr><td><code>expo-embedded-update-id</code></td><td>UUID of the bundle that shipped inside the store build</td></tr>
+          <tr><td><code>eas-client-id</code></td><td>Random per-install ID. Useful for counting devices and for staged rollouts. Not tied to a user account.</td></tr>
+          <tr><td><code>expo-fatal-error</code></td><td>Only sent after a crash: the error that made the app roll back (up to 1,024 characters). Worth logging.</td></tr>
+          <tr><td><code>expo-expect-signature</code></td><td>Only sent when code signing is on (see section 4)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Responses</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Case</th><th>Reply</th></tr></thead>
+        <tbody>
+          <tr><td>No update for this platform and runtime version</td><td><code>204 No Content</code></td></tr>
+          <tr><td>An update exists</td><td><code>200</code>, <code>content-type: multipart/mixed</code>, with a part named <code>manifest</code> (JSON, below) and optionally a part named <code>extensions</code></td></tr>
+          <tr><td>Roll everyone back to the store build's bundle</td><td><code>200</code> multipart with a part named <code>directive</code>: <code>{"type":"rollBackToEmbedded","parameters":{"commitTime":"&lt;ISO date&gt;"}}</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Every <code>200</code> response also carries <code>expo-protocol-version: 1</code>, <code>expo-sfv-version: 0</code> and <code>cache-control: private, max-age=0</code>. Never let a proxy or CDN cache the manifest response. Each part's headers are <code>content-disposition: form-data; name="manifest"</code> and <code>content-type: application/json; charset=utf-8</code>.</p>
+
+    <h3>Manifest JSON</h3>
+<pre><code>{
+  "id": "6f1c3a2e-9b0d-4c55-8a7e-2d1f0b9e4c11",
+  "createdAt": "2026-11-20T18:04:11.000Z",
+  "runtimeVersion": "8a7a06b7cbdf40f10d16002bae0d61219d60cac8",
+  "launchAsset": {
+    "hash": "Xb9Q3...base64url SHA-256...",
+    "key": "c1e5...md5...",
+    "contentType": "application/javascript",
+    "fileExtension": ".bundle",
+    "url": "https://strabospot.org/ota/assets/ios/8a7a06b7.../index-c1e5.hbc"
+  },
+  "assets": [
+    {
+      "hash": "pN2k...base64url SHA-256...",
+      "key": "4b2f...md5...",
+      "contentType": "image/png",
+      "fileExtension": ".png",
+      "url": "https://strabospot.org/ota/assets/4b2f..."
+    }
+  ],
+  "metadata": {},
+  "extra": { "expoClient": { "...": "contents of npx expo config --type public" } }
+}</code></pre>
+    <ul>
+      <li><code>id</code> is a UUID unique to each published update. Two different updates must never share an ID.</li>
+      <li><code>hash</code> is the file's SHA-256, encoded as base64url with no padding. The app rejects any download that doesn't match.</li>
+      <li><code>key</code> identifies the file (its MD5 hex works well). The app skips downloading any asset whose key it already has.</li>
+      <li><code>launchAsset</code> is the JavaScript bundle, compiled to Hermes bytecode (<code>.hbc</code>). It's about 9 MB per platform.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>2. Asset files</h2>
+    <ul>
+      <li>Plain static files over HTTPS, at the URLs the manifest lists. A CDN or a static directory behind nginx is fine.</li>
+      <li>They never change once published: a new update means new files at new URLs. They can be cached for a long time (<code>cache-control: public, max-age=31536000, immutable</code>).</li>
+      <li>Serve them with the <code>contentType</code> the manifest gives them. Supporting HTTP range requests is a plus, not required.</li>
+      <li>The app sends no authentication. If assets need a token, the app can be configured to send fixed extra headers, so tell us.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>3. Publishing an update</h2>
+    <p>On our side, publishing means running <code>npx expo export</code> and sending the server its output. Each publish hands over:</p>
+    <ul>
+      <li><strong>The <code>dist/</code> folder.</strong> Its <code>metadata.json</code> lists, for each platform, the bundle path and every asset with its file extension. The bundles are under <code>_expo/static/js/&lt;platform&gt;/</code> and the assets under <code>assets/</code>.</li>
+      <li><strong>The runtime version for each platform.</strong> These are separate fingerprints for iOS and Android, and an update must only be offered to the matching one.</li>
+      <li><strong>The public app config</strong> (<code>npx expo config --type public</code>), which goes into <code>extra.expoClient</code>.</li>
+    </ul>
+    <p>The server should store each publish under its platform and runtime version, compute the hashes and keys, and answer manifest requests with the newest one. A layout like <code>updates/&lt;runtimeVersion&gt;/&lt;timestamp&gt;/</code> is enough. Keep older publishes so we can roll back.</p>
+    <p>We need some way to upload a publish. That could be an authenticated upload endpoint, or <code>rsync</code>/<code>scp</code> to a directory the server watches. Whichever is easier for you.</p>
+  </section>
+
+  <section>
+    <h2>4. Code signing (strongly recommended)</h2>
+    <p>Whatever this server sends runs as code on every phone that has the app. If the server or its storage were compromised, an attacker could push code to all of our users. Code signing closes that gap: the app is shipped with a certificate and refuses any manifest that isn't signed by the matching private key.</p>
+    <ul>
+      <li>We generate the key pair (<code>npx expo-updates codesigning:generate</code>) and build the certificate into the app.</li>
+      <li>When a request includes <code>expo-expect-signature</code>, the server signs the manifest part's exact bytes with RSA-SHA256. It adds the signature to that part as an <code>expo-signature</code> header: a structured-header dictionary with <code>sig</code> (base64) and <code>keyid</code> (<code>"main"</code>).</li>
+      <li>Keep the private key out of the web root and out of the repository. Better still, sign at publish time and store the signature with the manifest, so the running server never holds the key.</li>
+    </ul>
+    <div class="note">Code signing has to be in place before the first store release that points at this server. Adding it later needs another store release.</div>
+  </section>
+
+  <section>
+    <h2>5. Rollback and rollouts</h2>
+    <ul>
+      <li><strong>Bad update:</strong> mark it withdrawn, and the server answers with the previous publish (republished under a new <code>id</code>). To go back to the bundle that shipped in the store build, send the <code>rollBackToEmbedded</code> directive.</li>
+      <li><strong>Beta testers first (optional):</strong> the app can send a fixed header such as <code>expo-channel-name: beta</code>, set at build time, and the server serves that channel's newest update. A staged rollout can also hash <code>eas-client-id</code> into buckets.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>6. Load and operations</h2>
+    <ul>
+      <li>One small manifest request per app launch per device. Most of them get <code>204</code>.</li>
+      <li>Downloads happen once per device per update: about 9 MB of bundle plus any changed images.</li>
+      <li>HTTPS with a valid public certificate is required. iOS refuses plain HTTP and self-signed certificates.</li>
+      <li>Useful logs: requests per runtime version and platform (shows which builds are still in use), and any <code>expo-fatal-error</code> values.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Starting points</h2>
+    <ul>
+      <li>Protocol spec: <a href="https://docs.expo.dev/technical-specs/expo-updates-1/">docs.expo.dev/technical-specs/expo-updates-1</a></li>
+      <li>Expo's reference server (Node/Next.js), which implements all of the above including signing: <a href="https://github.com/expo/custom-expo-updates-server">github.com/expo/custom-expo-updates-server</a>. It's small enough to port to whatever our server already runs.</li>
+    </ul>
+  </section>
+
+  <section class="asks">
+    <h2>What we need back</h2>
+    <ul>
+      <li>The final manifest URL. It gets built into the app.</li>
+      <li>How we upload a publish: an endpoint or a directory.</li>
+      <li>Whether you'll sign at request time or at publish time, so we know where the private key goes.</li>
+      <li>Whether you want a beta channel from day one.</li>
+    </ul>
+  </section>
+</main>

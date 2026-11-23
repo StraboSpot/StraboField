@@ -4,6 +4,9 @@ import React from 'react';
 // import './wdyr';
 import {AppRegistry, LogBox, Platform} from 'react-native';
 
+// Lets <Image>/<ImageBackground> find their files when running an OTA update: expo-updates stores an update's assets
+// by hash, not at the bundle-relative paths React Native looks for. No effect when running the built-in bundle.
+import 'expo-asset';
 // import 'react-native-devsettings';   // Not supported in react-native-web
 import {configureReanimatedLogger, ReanimatedLogLevel} from 'react-native-reanimated';
 

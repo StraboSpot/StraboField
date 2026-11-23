@@ -1,8 +1,11 @@
 import {createSlice} from '@reduxjs/toolkit';
 
 import {DEFAULT_GEOLOGIC_TYPES, DEFAULT_RELATIONSHIP_TYPES} from './project.constants';
+import {isDatasetReadOnly} from './projects.helpers';
 import {getNewId, isEmpty, isEqual, isSameId} from '../../shared/helpers';
 import {setNotebookPageVisible} from '../notebook-panel/notebook.slice';
+import {canMoveSpotIdsToDataset, isSpotIdInDataset} from '../spots/spots.helpers';
+import {deletedSpot, deletedSpots} from '../spots/spots.slice';
 import {
   deleteTemplateKey,
   getActiveTemplateList,
@@ -32,6 +35,41 @@ const normalizeProject = (project) => {
   if (!project.useContinuousTagging) project.useContinuousTagging = false;
   if (project.reports) project.reports = migrateReportTimestamps(project.reports);
   return project;
+};
+
+// A Spot deleted, however that came about, takes its id out of the datasets, tags and memos holding it in the same
+// dispatch, so none of them is left pointing at a Spot that is gone. Matched as strings, as isSameId does, through a
+// Set, since a dataset delete takes all its Spots at once and there can be thousands. The tags and memos changed take
+// the delete's own time, which is what the datasets and project are given too.
+const removeDeletedSpotIds = (state, spotIds, timestamp) => {
+  const deletedSpotIds = new Set(spotIds.map(String));
+  const isDeletedId = id => deletedSpotIds.has(String(id));
+  // Only the datasets holding a Spot are written, so the rest are not marked modified
+  Object.values(state.datasets).forEach((dataset) => {
+    if (dataset.spotIds?.some(isDeletedId)) dataset.spotIds = dataset.spotIds.filter(id => !isDeletedId(id));
+  });
+  // Only a memo or tag holding a Spot is written, so the rest, and whatever shows them, are left as they were. A tag
+  // holds Spots in its features too, keyed by Spot id.
+  const removeFrom = (record) => {
+    if (!record) return;
+    const isSpotHeld = record.spots?.some(isDeletedId);
+    const deletedFeatureSpotIds = Object.keys(record.features || {}).filter(isDeletedId);
+    if (!isSpotHeld && isEmpty(deletedFeatureSpotIds)) return;
+    if (isSpotHeld) {
+      record.spots = record.spots.filter(id => !isDeletedId(id));
+      if (isEmpty(record.spots)) delete record.spots;
+    }
+    if (!isEmpty(deletedFeatureSpotIds)) {
+      deletedFeatureSpotIds.forEach(spotId => delete record.features[spotId]);
+      if (isEmpty(record.features)) delete record.features;
+    }
+    record.modified_timestamp = timestamp;
+  };
+  state.project.reports?.forEach(removeFrom);
+  state.project.tags?.forEach(removeFrom);
+  // The tag pages save from this copy, so it is cleaned as a record of its own, whatever the project's copy holds. A
+  // new tag being added has no id yet and holds no Spots, so it is left be.
+  removeFrom(state.selectedTag);
 };
 
 const initialProjectState = {
@@ -93,6 +131,9 @@ const projectSlice = createSlice({
     addedProject(state, action) {
       state.project = normalizeProject(action.payload);
     },
+    addedProjectDescription(state, action) {
+      state.project = action.payload;
+    },
     // The selected tag is a copy the tag pages save from, so it is swapped for the server's merged copy too, or
     // the next save writes it back over the merge
     addedProjectFromServer(state, action) {
@@ -100,9 +141,6 @@ const projectSlice = createSlice({
       if (!isEmpty(state.selectedTag)) {
         state.selectedTag = state.project.tags?.find(tag => tag.id === state.selectedTag.id) || {};
       }
-    },
-    addedProjectDescription(state, action) {
-      state.project = action.payload;
     },
     // A memo holds its own tag ids, so tagging one from the tag's own page writes to the memo. Mapped in place,
     // since an edited memo has to stay where it is in the list
@@ -149,59 +187,15 @@ const projectSlice = createSlice({
     deletedDataset(state, action) {
       const {[action.payload]: deletedDataset, ...datasetsList} = state.datasets;  // Delete key with action.id from object
       state.datasets = datasetsList;
-      state.activeDatasetsIds = state.activeDatasetsIds.filter(activeDatasetId => activeDatasetId !== action.payload);
+      // Compared with isSameId, as a dataset id can be held as a string
+      state.activeDatasetsIds = state.activeDatasetsIds.filter(
+        activeDatasetId => !isSameId(activeDatasetId, action.payload));
     },
     deletedSpotIdFromDataset(state, action) {
       const {datasetId, spotId} = action.payload;
       const dataset = state.datasets[datasetId];
       const updatedSpotIds = dataset.spotIds.filter(id => !isSameId(id, spotId));
       state.datasets = {...state.datasets, [datasetId]: {...dataset, spotIds: updatedSpotIds}};
-    },
-    deletedSpotIdFromDatasets(state, action) {
-      const spotId = action.payload;
-      // Only the datasets holding the Spot are written, so the rest are not marked modified
-      Object.values(state.datasets).forEach((dataset) => {
-        if (dataset.spotIds?.some(id => isSameId(id, spotId))) {
-          dataset.spotIds = dataset.spotIds.filter(id => !isSameId(id, spotId));
-        }
-      });
-    },
-    deletedSpotIdFromReports(state, action) {
-      const spotId = action.payload;
-      if (!isEmpty(state.project.reports)) {
-        const updatedReports = state.project.reports.map((report) => {
-          let updatedReport = JSON.parse(JSON.stringify(report));
-          if (updatedReport.spots?.some(id => isSameId(id, spotId))) {
-            updatedReport.spots = updatedReport.spots.filter(id => !isSameId(id, spotId));
-            if (isEmpty(updatedReport.spots)) delete updatedReport.spots;
-            updatedReport.modified_timestamp = Date.now();
-          }
-          return updatedReport;
-        });
-        state.project.reports = updatedReports;
-      }
-    },
-    deletedSpotIdFromTags(state, action) {
-      const spotId = action.payload;
-      if (!isEmpty(state.project.tags)) {
-        const timestamp = Date.now();
-        const updatedTags = state.project.tags.map((tag) => {
-          let updatedTag = JSON.parse(JSON.stringify(tag));
-          if (updatedTag.spots?.some(id => isSameId(id, spotId))) {
-            updatedTag.spots = updatedTag.spots.filter(id => !isSameId(id, spotId));
-            if (isEmpty(updatedTag.spots)) delete updatedTag.spots;
-            updatedTag.modified_timestamp = timestamp;
-          }
-          if (updatedTag.features && updatedTag.features[spotId]) {
-            delete updatedTag.features[spotId];
-            if (isEmpty(updatedTag.features)) delete updatedTag.features;
-            updatedTag.modified_timestamp = timestamp;
-          }
-          return updatedTag;
-        });
-        state.project.tags = updatedTags;
-        state.selectedTag = updatedTags.find(tag => tag.id === state.selectedTag?.id) || {};
-      }
     },
     deletedTagIdFromReports(state, action) {
       const tagId = action.payload;
@@ -240,13 +234,20 @@ const projectSlice = createSlice({
       state.downloadsDirectory = action.payload;
     },
     movedSpotIdBetweenDatasets(state, action) {
-      const {toDatasetId, spotId} = action.payload;
-      // Only the datasets whose Spots change are written, so the rest are not marked modified
+      // The user moving them comes with the move, as this slice doesn't hold who they are and another user's
+      // dataset is read only to them
+      const {spotIds, straboUserId, toDatasetId} = action.payload;
+      // Nothing is moved into or out of a read only dataset, whatever the caller asked for. The web listener asks the
+      // same question before sending the move to the server.
+      if (!canMoveSpotIdsToDataset(spotIds, toDatasetId, state.datasets, straboUserId)) return;
+      // Only the datasets whose Spots change are written, so the rest are not marked modified. A Spot already in the
+      // dataset it is moved to keeps its place there, rather than going to the end and marking the dataset modified.
       Object.entries(state.datasets).forEach(([datasetId, dataset]) => {
-        const remainingSpotIds = dataset.spotIds?.filter(id => !isSameId(id, spotId)) || [];
-        const updatedSpotIds = datasetId === toDatasetId.toString() ? [...remainingSpotIds, spotId]
-          : remainingSpotIds;
-        if (!isEqual(dataset.spotIds || [], updatedSpotIds)) dataset.spotIds = updatedSpotIds;
+        const currentSpotIds = dataset.spotIds || [];
+        const updatedSpotIds = datasetId === toDatasetId.toString()
+          ? [...currentSpotIds, ...spotIds.filter(spotId => !isSpotIdInDataset(dataset, spotId))]
+          : currentSpotIds.filter(id => !spotIds.some(spotId => isSameId(id, spotId)));
+        if (!isEqual(currentSpotIds, updatedSpotIds)) dataset.spotIds = updatedSpotIds;
       });
     },
     removedChangedImageIds(state, action) {
@@ -265,10 +266,12 @@ const projectSlice = createSlice({
       if (reports) state.project.reports = reports;
       if (tags) state.project.tags = tags;
     },
+    // Compared with isSameId, as a dataset id can be held as a string
     setActiveDatasets(state, action) {
       const {bool, dataset} = action.payload;
-      if (bool) state.activeDatasetsIds = [...new Set([...state.activeDatasetsIds, dataset])];
-      else state.activeDatasetsIds = state.activeDatasetsIds.filter(id => id !== dataset);
+      const isActive = state.activeDatasetsIds.some(id => isSameId(id, dataset));
+      if (bool && !isActive) state.activeDatasetsIds = [...state.activeDatasetsIds, dataset];
+      else if (!bool) state.activeDatasetsIds = state.activeDatasetsIds.filter(id => !isSameId(id, dataset));
     },
     setActiveDatasetsMultiple(state, action) {
       const datasetIds = action.payload;
@@ -276,7 +279,7 @@ const projectSlice = createSlice({
       // Which datasets are shown says nothing about where new Spots belong, and the first of them could well
       // be read only. Drop a target that is no longer among them rather than substituting one - having no
       // target at all is a state the app handles
-      if (!datasetIds.includes(state.targetDatasetId)) state.targetDatasetId = undefined;
+      if (!datasetIds.some(id => isSameId(id, state.targetDatasetId))) state.targetDatasetId = undefined;
     },
     setActiveTemplates(state, action) {
       const {key, templates} = action.payload;
@@ -294,8 +297,11 @@ const projectSlice = createSlice({
     setSelectedTag(state, action) {
       state.selectedTag = action.payload;
     },
+    // New Spots go into the target, so a dataset the server says is read only can't be it. Asking for one leaves no
+    // target, and which dataset takes new Spots is then the user's choice. Whether it is another user's dataset needs
+    // the user, which this slice doesn't hold, so the callers ask that themselves.
     setTargetDataset(state, action) {
-      state.targetDatasetId = action.payload;
+      state.targetDatasetId = isDatasetReadOnly(state.datasets[action.payload]) ? undefined : action.payload;
     },
     setTestingMode(state, action) {
       state.isTestingMode = action.payload;
@@ -314,7 +320,7 @@ const projectSlice = createSlice({
     updatedProject(state, action) {
       const {field, value} = action.payload;
       if (field === 'tags' && !isEmpty(state.selectedTag)) {
-        state.selectedTag = value.find(tag => tag.id === state.selectedTag.id);
+        state.selectedTag = value.find(tag => tag.id === state.selectedTag.id) || {};
       }
       state.project[field] = value;
     },
@@ -331,6 +337,9 @@ const projectSlice = createSlice({
     builder.addCase(setNotebookPageVisible, (state) => {
       state.isMultipleFeaturesTaggingEnabled = false;
     });
+    builder.addCase(deletedSpot, (state, action) => (
+      removeDeletedSpotIds(state, [action.payload], action.meta.timestamp)));
+    builder.addCase(deletedSpots, (state, action) => removeDeletedSpotIds(state, action.payload, action.meta.timestamp));
   },
 });
 
@@ -352,9 +361,6 @@ export const {
   addedTemplates,
   deletedDataset,
   deletedSpotIdFromDataset,
-  deletedSpotIdFromDatasets,
-  deletedSpotIdFromReports,
-  deletedSpotIdFromTags,
   deletedTagIdFromReports,
   deletedTemplate,
   doesBackupDirectoryExist,

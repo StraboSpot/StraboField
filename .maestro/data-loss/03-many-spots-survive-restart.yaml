@@ -1,0 +1,14 @@
+# Several Spots created in a row must all survive a relaunch, not just the latest one.
+appId: org.StraboSpot2
+name: Five Spots survive a force-quit
+tags: [data-loss]
+---
+- runFlow: ../subflows/start-guest-project.yaml
+- runFlow: { file: ../subflows/add-point-spot.yaml, env: { X: "20", Y: "35" } }
+- runFlow: { file: ../subflows/add-point-spot.yaml, env: { X: "40", Y: "45" } }
+- runFlow: { file: ../subflows/add-point-spot.yaml, env: { X: "60", Y: "55" } }
+- runFlow: { file: ../subflows/add-point-spot.yaml, env: { X: "75", Y: "65" } }
+- runFlow: { file: ../subflows/add-point-spot.yaml, env: { X: "30", Y: "75" } }
+- runFlow: { file: ../subflows/assert-dataset-spot-count.yaml, env: { COUNT: "5" } }
+- runFlow: ../subflows/force-quit-and-relaunch.yaml
+- runFlow: { file: ../subflows/assert-dataset-spot-count.yaml, env: { COUNT: "5" } }

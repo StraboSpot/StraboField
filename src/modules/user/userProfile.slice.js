@@ -23,6 +23,8 @@ const initialUserState = {
 
   measurement_convention: 'strike_dip',
   name: null,
+  // Projects set up for this account on the website (a field camp, for one), each with a .zip package to install
+  prepared_projects: [],
   straboUserId: null,
 };
 
@@ -49,6 +51,11 @@ const userProfileSlice = createSlice({
       state.macrostrat.token = action.payload.token;
       state.macrostrat.expires = action.payload.expires;
     },
+    setPreparedProjectInstalled(state, action) {
+      const {id, version} = action.payload;
+      const preparedProject = state.prepared_projects?.find(p => p.id === id);
+      if (preparedProject?.package) preparedProject.package.installed_version = version;
+    },
     setUserData(state, action) {
       Object.assign(state, {...state, ...action.payload});
     },
@@ -64,6 +71,7 @@ export const {
   logout,
   resetUserState,
   setMacrostratToken,
+  setPreparedProjectInstalled,
   setUserData,
   updatedKey,
 } = userProfileSlice.actions;

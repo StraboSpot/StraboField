@@ -1,11 +1,13 @@
+import * as Sentry from '@sentry/react-native';
+
 import {setCustomDatabaseUrl, setDatabaseIsSelected} from '../src/modules/connections/connections.slice';
 import {getDeviceIdHeader, handleResponse} from '../src/services/network/serverRequests.helpers';
 import {store} from '../src/store/ConfigureStore';
 
-const buildResponse = (body, {ok = true, status = 200} = {}) => ({
+const buildResponse = (body, {ok = true, status = 200, url = 'https://strabospot.org/db/projectdatasetsspots'} = {}) => ({
   ok: ok,
   status: status,
-  url: 'https://strabospot.org/db/projectdatasetsspots',
+  url: url,
   headers: {get: () => 'text/html'},
   text: () => Promise.resolve(body),
 });
@@ -27,6 +29,26 @@ describe('handleResponse', () => {
   it('still refuses a body that is only a web page', async () => {
     await expect(handleResponse(buildResponse('<html><body>Sign in {not json}</body></html>'))).rejects
       .toBe('The server returned a web page instead of data. The address may be wrong or the request was redirected.');
+  });
+});
+
+describe('handleError reporting', () => {
+  const BAD_GATEWAY = '<html><body>502 Bad Gateway</body></html>';
+
+  beforeEach(() => Sentry.captureMessage.mockClear());
+
+  it('reports a failed StraboSpot request', async () => {
+    await expect(handleResponse(buildResponse(BAD_GATEWAY, {ok: false, status: 502}))).rejects.toBeDefined();
+    expect(Sentry.captureMessage).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not report a failed request to someone else\'s server', async () => {
+    const url = 'https://macrostrat.org/api/v2/mobile/point?lng=1&lat=2';
+    await expect(handleResponse(buildResponse(BAD_GATEWAY, {ok: false, status: 502, url: url}))).rejects
+      .toBe('The server is unavailable right now. Please try again shortly.');
+    await expect(handleResponse(buildResponse('{"error":"No units"}', {ok: false, status: 500, url: url}))).rejects
+      .toBe('No units');
+    expect(Sentry.captureMessage).not.toHaveBeenCalled();
   });
 });
 

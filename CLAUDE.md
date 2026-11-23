@@ -120,7 +120,7 @@ npm run remove:packages    # clean node_modules + iOS Pods
   `{"mapbox_access_token": "...", "Error_reporting_DSN": "..."}`. Anything imported under
   `src/` gets inlined into the web/Metro bundles, so never put secrets here.
 - `secrets.json` — **build-time** secrets, read only by `scripts/` (never imported under `src/`, so never bundled):
-  `sentry_organization_auth_token`, `android_keystore`, `rockd_access_token`.
+  `sentry_organization_auth_token`, `android_keystore`, `rockd_access_token`, `ota_publish_token`.
 - `dev-test-logins.js` — `export const USERNAME_TEST / PASSWORD_TEST`
 
 **Two helper scripts to know:**
@@ -177,7 +177,7 @@ rc merge) — see [RELEASE.md](RELEASE.md)**, or print them with `npm run start-
 backend via REST. Entry points: `index.js` (mobile), `index.web.js` (web). Web bundles via `webpack.config.js`; mobile
 via `metro.config.js`.
 
-- **Feature modules** — **43 self-contained feature modules** under `/src/modules/`, each with UI components, a
+- **Feature modules** — **44 self-contained feature modules** under `/src/modules/`, each with UI components, a
   `.slice.js` Redux slice, `use[Feature].js` hooks, constants, and `.web.js` platform overrides. Core: `spots/` (the
   central data model), `maps/`, `compass/`, `project/`, `form/` (dynamic form engine), `notebook-panel/`.
 - **State** — Redux Toolkit, 10 slices (`spots`, `projects` (largest), `maps`, `offlineMaps`, `userProfile`, `compass`,
@@ -208,7 +208,8 @@ It is a millisecond timestamp × 10 that steps past the last id issued, so a bur
 sample's id as `properties.id`, then registers it with `addedNewSpotIdToDataset`. Both save paths in
 `useSampleModal.js` and the legacy conversion in `NotebookFooter.js` go through it, so the id is always one of the
 server's keys. The parent Spot keeps only a `{id}` stub in `properties.samples`, and that id is the entire parent/child
-linkage — `useNesting.js` resolves the child as `spots[sampleId]` and `getSpotWithThisSample` walks back the other way.
+linkage — `useNesting.js` resolves the child as `spots[sampleId]` and `getSampleParent` (`samples.helpers.js`) walks back
+the other way.
 
 Records already in the field keep their old numeric ids, so ids are permanently mixed. That needs no coercion by itself
 — an id's type is stable per record — but **never do arithmetic on an id**: sorting tags by `b.id - a.id` silently
@@ -290,7 +291,24 @@ Version lives in `package.json`, `android/app/build.gradle`, and `ios/StraboSpot
 
 ## Testing
 
-Minimal coverage. Jest + React Native preset; basic App render test in `__tests__/`. Run `npm test`.
+Jest 30 + `@react-native/jest-preset`, ~50 test files. Run `npm test`, or `npx jest <path>` for one file. **Not run in
+CI** — nothing catches a failing test unless someone runs it.
+
+- **Where tests live** — next to the code as `[name].test.js` (helpers, slices, hooks) for anything new; `__tests__/`
+  holds the App render test and older cross-cutting tests.
+- **What's covered** — mostly pure helpers, Redux slices (`spots`, `projects`, `offlineMaps`) and hooks (`useSpots`,
+  `useMapEditor`, `useForm`, `useDownload`, the leave-page / unsaved-changes gates), plus
+  `propagateModifiedTimestamps` and a `page.constants` load-order guard. No E2E, sync/upload contract, or
+  persisted-state migration tests yet.
+- **Rendering** — `react-test-renderer`, not Testing Library. Render a hook probe first, then `act` on it: an `act`
+  nested in the render's own `act` leaves the probe unrendered.
+- **Native modules** — stubbed globally in `jest/setup.js` (library mocks where they exist: Mapbox, gesture handler,
+  NetInfo, permissions, Sentry, …) and `jest/mocks/`; `moduleNameMapper` in `jest.config.js` covers RNFS and binary
+  assets. A new native library that throws at import needs a stub there, or the App render test fails.
+- **`transformIgnorePatterns: []`** — all of `node_modules` is transformed (many ESM-only deps), so the first run is
+  slow.
+- **To prove a test catches a regression**, run it against the old code from `git show HEAD:<file>` rather than
+  checking out over the working tree.
 
 ## References
 

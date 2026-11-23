@@ -2,6 +2,8 @@ import {
   convertLatLngToUtm,
   convertUtmToLatLng,
   getClosestSpotDistanceAndIndex,
+  getSpotMeantAtPress,
+  getSpotsAtPressInListOrder,
   getUtmDisplayString,
   hasValidCoords,
   parseUtmZone,
@@ -153,5 +155,37 @@ describe('hasValidCoords', () => {
     expect(hasValidCoords(feature(undefined))).toBe(false);
     expect(hasValidCoords(feature({geometries: [], type: 'GeometryCollection'}))).toBe(false);
     expect(hasValidCoords(feature({coordinates: null, type: 'Point'}))).toBe(false);
+  });
+});
+
+describe('Spots at a press', () => {
+  const spot = (id, type) => ({geometry: {coordinates: [], type}, properties: {id}, type: 'Feature'});
+  const station = spot(1, 'Point');
+  const outcrop = spot(4, 'Polygon');
+  const contact = spot(5, 'LineString');
+
+  describe('getSpotMeantAtPress', () => {
+    it('picks the only Spot', () => {
+      expect(getSpotMeantAtPress([outcrop])).toBe(outcrop);
+    });
+
+    it('picks a point over a line, and a line over a polygon', () => {
+      expect(getSpotMeantAtPress([outcrop, contact, station])).toBe(station);
+      expect(getSpotMeantAtPress([outcrop, contact])).toBe(contact);
+    });
+
+    it('leaves a tie to the user', () => {
+      expect(getSpotMeantAtPress([station, spot(6, 'Point')])).toBeUndefined();
+      expect(getSpotMeantAtPress([outcrop, spot(7, 'Polygon')])).toBeUndefined();
+      expect(getSpotMeantAtPress([])).toBeUndefined();
+    });
+  });
+
+  describe('getSpotsAtPressInListOrder', () => {
+    it('ranks by geometry, keeping the order within a rank', () => {
+      const pointB = spot(6, 'Point');
+      expect(getSpotsAtPressInListOrder([outcrop, pointB, contact, station]))
+        .toEqual([pointB, station, contact, outcrop]);
+    });
   });
 });

@@ -11,7 +11,6 @@ import * as themes from '../../../shared/styles.constants';
 import {WARNING_COLOR} from '../../../shared/styles.constants';
 import SwitchWrapper from '../../../shared/ui/SwitchWrapper';
 import {getSpotsCount} from '../../spots/spots.helpers';
-import {isDatasetReadOnly} from '../projects.helpers';
 import useProject from '../useProject';
 
 const DatasetListItem = ({dataset, setDatasetToView}) => {
@@ -19,19 +18,16 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
 
   const activeDatasetsIds = useSelector(state => state.project.activeDatasetsIds);
   const isReadOnlyProject = useSelector(state => state.project?.project?.isReadOnly);
-  const {targetDatasetId} = useSelector(state => state.project);
   const spots = useSelector(state => state.spot.spots);
-  const straboUserId = useSelector(state => state.user.straboUserId);
 
-  const [imagesNeededCount] = useDatasetNeededImagesCount(dataset);
-  const {toggleActiveDataset, toggleTargetDataset} = useProject();
+  const [imagesNeededCount, , imagesCount] = useDatasetNeededImagesCount(dataset);
+  const {isReadOnlyDataset, isTargetDataset, toggleActiveDataset, toggleTargetDataset} = useProject();
 
   /* Derived Variables */
 
-  const checked = targetDatasetId && targetDatasetId === dataset.id;
-  const imagesCount = dataset?.images?.imageIds?.length || 0;
   const isActive = activeDatasetsIds.includes(dataset.id);
-  const isReadOnly = isDatasetReadOnly(dataset, straboUserId);
+  const isReadOnly = isReadOnlyDataset(dataset.id);
+  const isTarget = isTargetDataset(dataset.id);
   const spotsCount = getSpotsCount(dataset.spotIds, spots);
 
   /* Event Handlers */
@@ -69,11 +65,11 @@ const DatasetListItem = ({dataset, setDatasetToView}) => {
         {/* A read only project takes no new Spots, so it has no target dataset to choose */}
         {!isReadOnlyProject && (
           <Icon
-            color={checked ? themes.PRIMARY_ACCENT_COLOR : isActive || isReadOnly ? themes.MEDIUMGREY
+            color={isTarget ? themes.PRIMARY_ACCENT_COLOR : isActive || isReadOnly ? themes.MEDIUMGREY
               : themes.SECONDARY_BACKGROUND_COLOR}
             disabled={!isActive || isReadOnly}
             disabledStyle={{backgroundColor: themes.SECONDARY_BACKGROUND_COLOR}}
-            name={checked ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
+            name={isTarget ? 'star' : isReadOnly ? 'lock-closed' : 'star-outline'}
             onPress={() => toggleTargetDataset(dataset.id)}
             type={'ionicon'}
           />

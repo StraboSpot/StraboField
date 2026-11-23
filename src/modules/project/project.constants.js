@@ -3,15 +3,6 @@ export const BACKUP_TO_SERVER = 'BACKUP TO SERVER';
 export const CANCEL = 'CANCEL';
 export const OVERWRITE = 'OVERWRITE';
 
-export const TAG_TYPES = [
-  'geologic_unit',
-  'concept',
-  'documentation',
-  'rosetta',
-  'experimental_apparatus',
-  'other',
-];
-
 export const DEFAULT_GEOLOGIC_TYPES = [
   'geomorphic',
   'hydrologic',

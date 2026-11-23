@@ -24,11 +24,12 @@ const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCur
   const preferences = useSelector(state => state.project.project?.preferences) || {};
   const spot = useSelector(state => state.spot.selectedSpot);
 
+  const {getLabel, getLabels, submitAndShowErrors} = useForm();
+
   const {setPointAtCurrentLocation} = useMapLocation();
   const {createRichSample} = useSamples();
   const {checkSampleName, getNewSpotName} = useSpots();
   const {addSpotToTags} = useTags();
-  const {getLabel, getLabels, submitAndShowErrors} = useForm();
   const toast = useToast();
 
   /* Local State */
@@ -119,35 +120,41 @@ const useSampleModal = ({openSpotInNotebook, setIsWarningModalVisible, zoomToCur
         id: newId,
       };
 
+      // Empty when createRichSample refused, having already said why, so nothing below may act as if it was saved
+      let sampleSpot;
       if (activeModal === MODAL_KEYS.SHORTCUTS.SAMPLE) {
         const pointSetAtCurrentLocation = await setPointAtCurrentLocation();
         pointSetAtCurrentLocation.properties.samples = [newSample];
         console.log('pointSetAtCurrentLocation', pointSetAtCurrentLocation);
-        const sampleSpot = createRichSample(pointSetAtCurrentLocation, newSample, sampleImages);
+        sampleSpot = createRichSample(pointSetAtCurrentLocation, newSample, sampleImages);
         setIsLoading(false);
-        // No target dataset means no Sample Spot to open
         if (sampleSpot) openSpotInNotebook(sampleSpot, PAGE_KEYS.SAMPLES);
         closeModal();
         await zoomToCurrentLocation();
-        // The app's own toast, after the modal has gone and the zoom has finished. The modal's Toast unmounts
-        // with it, and is only ever mounted on a small screen, so it showed briefly or not at all.
-        if (Platform.OS !== 'web') toast.show('Sample Saved!', {duration: 2000, placement: 'top', type: 'success'});
       }
       else {
+        // Closed first so that a refusal's toast isn't hidden behind the modal. A refusal loses what was typed, which
+        // is accepted as it should hardly ever happen: the ways into this modal are hidden for a read only Spot, and a
+        // Spot in no dataset while there is no target to file the Sample in is rare.
         dispatch(setActiveModal({modal: null}));
-        createRichSample(spot, newSample, sampleImages);
-        dispatch(updatedProject({
-          field: 'preferences',
-          value: {...preferences, starting_sample_number: namePostfix ? startingNumber : startingNumber + 1},
-        }));
-        if (Platform.OS !== 'web') toast.show('Sample Saved!', {duration: 2000, placement: 'top', type: 'success'});
+        sampleSpot = createRichSample(spot, newSample, sampleImages);
+        if (sampleSpot) {
+          dispatch(updatedProject({
+            field: 'preferences',
+            value: {...preferences, starting_sample_number: namePostfix ? startingNumber : startingNumber + 1},
+          }));
+        }
         setIsLoading(false);
       }
 
-      if (!isEmpty(checkedTagsIds)) addSpotToTags(newId, checkedTagsIds);
-
       dispatch(setLoadingStatus({bool: false, view: 'home'}));
       await formRefCurrent.resetForm();
+      if (!sampleSpot) return;
+
+      // The app's own toast, after the modal has gone and any zoom has finished. The modal's Toast unmounts with it,
+      // and is only ever mounted on a small screen, so it showed briefly or not at all.
+      if (Platform.OS !== 'web') toast.show('Sample Saved!', {duration: 2000, placement: 'top', type: 'success'});
+      if (!isEmpty(checkedTagsIds)) addSpotToTags(newId, checkedTagsIds);
 
       if (newSample.sample_id_name) {
         const foundDuplicateName = await checkSampleName(newSample.sample_id_name);

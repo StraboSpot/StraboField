@@ -11,12 +11,13 @@ import FormikWrapper from '../../form/FormikWrapper';
 import useForm from '../../form/useForm';
 import {MAIN_MENU_ITEMS} from '../../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../../main-menu-panel/mainMenuPanel.slice';
-import {MODAL_KEYS} from '../../page/pageKeys.constants';
 import TagColor from '../color/TagColor';
 import {TAG_FORM_NAMES, TAG_TYPES} from '../tags.constants';
 import useTags from '../useTags';
 
-const TagDetailModal = ({closeModal}) => {
+// Edits the tag it is given rather than selectedTag, so a tag created from a checklist leaves alone the one the tag
+// side panel shows behind it. A new tag holds only its type; an existing one keeps its id, so saving edits it in place.
+const TagDetailModal = ({closeModal, tag}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -24,7 +25,6 @@ const TagDetailModal = ({closeModal}) => {
   const activeModal = useSelector(state => state.home.activeModal);
   const addTagToSelectedSpot = useSelector(state => state.project.addTagToSelectedSpot);
   const selectedSpot = useSelector(state => state.spot.selectedSpot);
-  const selectedTag = useSelector(state => state.project.selectedTag);
 
   const {submitAndShowErrors} = useForm();
   const {deleteTag, saveTag} = useTags();
@@ -34,29 +34,13 @@ const TagDetailModal = ({closeModal}) => {
   const formRef = useRef(null);
 
   const [isFormInvalid, setIsFormInvalid] = useState(false);
-  const [tempColor, setTempColor] = useState(selectedTag?.color);
+  const [tempColor, setTempColor] = useState(tag.color);
 
   /* Derived Variables */
 
-  const actionLabel = Object.keys(selectedTag)?.length > 1 ? 'Edit' : 'Create New';
-  // The modal key alone can't identify a geologic unit: the Add Sample modal hosts its own geologic units
-  // section, so it opens this modal under the 'samples' key. The list that opens this modal always stamps the
-  // type on selectedTag, so check that first and fall back to the geologic unit modal keys.
-  const isGeologicUnit = selectedTag?.type === TAG_TYPES.GEOLOGIC_UNIT
-    || activeModal === MODAL_KEYS.NOTEBOOK.GEOLOGIC_UNITS
-    || activeModal === MODAL_KEYS.SHORTCUTS.GEOLOGIC_UNITS;
-
-  let initialValues = {};
-  let formName = TAG_FORM_NAMES.TAGS;
-  if (activeModal) {
-    if (isGeologicUnit) formName = TAG_FORM_NAMES.GEOLOGIC_UNIT;
-    initialValues = {type: isGeologicUnit ? TAG_TYPES.GEOLOGIC_UNIT : TAG_TYPES.CONCEPT};
-  }
-  else if (!isEmpty(selectedTag)) {
-    formName = isGeologicUnit ? TAG_FORM_NAMES.GEOLOGIC_UNIT : TAG_FORM_NAMES.TAGS;
-    initialValues = selectedTag;
-  }
-  else console.error('Tag Problem. No modals and no selected tag');
+  const actionLabel = tag.id ? 'Edit' : 'Create New';
+  const isGeologicUnit = tag.type === TAG_TYPES.GEOLOGIC_UNIT;
+  const formName = isGeologicUnit ? TAG_FORM_NAMES.GEOLOGIC_UNIT : TAG_FORM_NAMES.TAGS;
   const label = isGeologicUnit ? MAIN_MENU_ITEMS.PROJECT_DATA.GEOLOGIC_UNITS : MAIN_MENU_ITEMS.PROJECT_DATA.TAGS;
   const modalHeight = isGeologicUnit ? '80%' : 475;
 
@@ -65,7 +49,7 @@ const TagDetailModal = ({closeModal}) => {
   const confirmDeleteTag = () => {
     alert(
       'Delete ' + label,
-      'Are you sure you want to delete ' + selectedTag.name + '?',
+      'Are you sure you want to delete ' + tag.name + '?',
       [
         {
           text: 'Cancel',
@@ -84,7 +68,7 @@ const TagDetailModal = ({closeModal}) => {
   const doDeleteTag = () => {
     closeModal();
     dispatch(setSidePanelVisible({bool: false}));
-    deleteTag(selectedTag);
+    deleteTag(tag);
   };
 
   const saveFormAndClose = async () => {
@@ -123,7 +107,7 @@ const TagDetailModal = ({closeModal}) => {
       onCancelPress={closeModal}
       onDeletePress={confirmDeleteTag}
       overlayStyleOverride={{flex: 1, maxHeight: modalHeight}}
-      showDeleteButton={isEmpty(activeModal) && !isEmpty(selectedTag?.id) && !isReadOnlyProject}
+      showDeleteButton={isEmpty(activeModal) && !isEmpty(tag.id) && !isReadOnlyProject}
     >
       <FlatList
         ListHeaderComponent={
@@ -133,7 +117,7 @@ const TagDetailModal = ({closeModal}) => {
               <FormikWrapper
                 enableReinitialize={true}
                 formName={formName}
-                initialValues={initialValues}
+                initialValues={tag}
                 innerRef={formRef}
                 setIsFormInvalid={setIsFormInvalid}
               >

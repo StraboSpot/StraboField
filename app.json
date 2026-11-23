@@ -1,4 +1,25 @@
 {
   "name": "StraboSpot2",
-  "displayName": "StraboSpot2"
+  "displayName": "StraboSpot2",
+  "expo": {
+    "name": "StraboField",
+    "slug": "strabofield",
+    "owner": "strabospot",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "21b380cb-2cd0-48a9-b147-9f44668281c9"
+      }
+    },
+    "updates": {
+      "url": "https://strabospot.org/ota/manifest",
+      "codeSigningCertificate": "./certs/certificate.pem",
+      "codeSigningMetadata": {
+        "keyid": "main",
+        "alg": "rsa-v1_5-sha256"
+      }
+    }
+  }
 }

@@ -1,0 +1,28 @@
+# Signed-in variant of start-guest-project: keeps the app's state (no clearState) so the session survives,
+# then starts a new local project named ${PROJECT_NAME}. Sign in once by hand on the test simulator first.
+appId: org.StraboSpot2
+---
+- launchApp:
+    permissions: { all: allow }
+- extendedWaitUntil:
+    visible: { id: "main-menu-button" }
+    timeout: 30000
+- assertNotVisible: "Continue as Guest"   # signed out -> sign in by hand on this simulator, then rerun
+- runFlow:
+    when:
+      visible: "Welcome to StraboField"
+    commands:
+      - tapOn: "New"
+- runFlow:
+    when:
+      notVisible: "Start New Project"
+    commands:
+      - runFlow: open-project-switcher.yaml
+      - tapOn: "New"
+      - tapOn: "Continue"          # "Overwrite Project ...?" - replaces the open local project only
+- tapOn: { id: "project_name" }
+- inputText: ${PROJECT_NAME}
+- tapOn: "BASIC INFO"   # dismisses the keyboard, which can cover Save New Project in the side panel
+- tapOn: "Save New Project"
+- assertVisible: "Project: ${PROJECT_NAME}"
+- runFlow: close-side-panels.yaml

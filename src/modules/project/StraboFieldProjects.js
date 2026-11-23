@@ -17,11 +17,12 @@ import {SIDE_PANEL_VIEWS} from '../main-menu-panel/mainMenu.constants';
 import {setSidePanelVisible} from '../main-menu-panel/mainMenuPanel.slice';
 import MainMenuPanelListItem from '../main-menu-panel/MainMenuPanelListItem';
 import LogOut from '../user/LogOut';
+import PreparedProjects from './prepared/PreparedProjects';
 
 const importLocationText = Platform.OS === 'ios' ? 'Documents/Strabofield/Distribution'
   : 'Downloads/StraboSpot2/Backups';
 
-const StraboFieldProjects = () => {
+const StraboFieldProjects = ({closeMainMenuPanel}) => {
   /* Data Hooks */
 
   const dispatch = useDispatch();
@@ -81,6 +82,7 @@ const StraboFieldProjects = () => {
                 *The imported project must be a StraboField .zip file in the {importLocationText} folder.
               </Text>
             )}
+            {Platform.OS !== 'web' && <PreparedProjects closeMainMenuPanel={closeMainMenuPanel}/>}
             <Spacer/>
             <SectionDivider dividerText={'Other Project Actions'}/>
             <Text style={overlayStyles.statusMessageText}>

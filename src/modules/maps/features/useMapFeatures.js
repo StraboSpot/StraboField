@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 
 import {isEmpty, isEqualUnordered} from '../../../shared/helpers';
+import {getSampleParent} from '../../samples/samples.helpers';
 import useSpots from '../../spots/useSpots';
 import {setMapSymbols} from '../maps.slice';
 import {isLabelOffsetFurtherRight} from '../symbology/mapSymbology.helpers';
@@ -15,9 +16,10 @@ const useMapFeatures = () => {
   const isShowOnly1stMeas = useSelector(state => state.map.isShowOnly1stMeas);
   const labelTypeOn = useSelector(state => state.map.labelTypeOn);
   const mapSymbols = useSelector(state => state.map.mapSymbols);
+  const spots = useSelector(state => state.spot.spots);
   const stratSection = useSelector(state => state.map.stratSection);
 
-  const {getMappableSpots, getSpotWithThisSample} = useSpots();
+  const {getMappableSpots} = useSpots();
 
   /* Internal Functions */
 
@@ -110,7 +112,7 @@ const useMapFeatures = () => {
 
     // Separate selected Spots and not selected Spots. A Sample Spot isn't drawn, so its parent shows as selected.
     const selectedIds = new Set(selectedSpots.map((spot) => {
-      const parentSpot = spot.properties.isSample && getSpotWithThisSample(spot.properties.id);
+      const parentSpot = spot.properties.isSample && getSampleParent(spot, spots);
       return (parentSpot || spot).properties.id;
     }));
     const selectedMappedSpots = mappedSpots.filter(spot => selectedIds.has(spot.properties.id));

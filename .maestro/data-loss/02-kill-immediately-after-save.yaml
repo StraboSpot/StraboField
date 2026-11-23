@@ -1,0 +1,19 @@
+# Worst case for persistence: kill the app the instant Save is tapped, before any write could settle.
+# redux-persist writes to AsyncStorage asynchronously, so this is where a lost write would show up.
+appId: org.StraboSpot2
+name: Note survives a kill right after Save
+tags: [data-loss]
+---
+- runFlow: ../subflows/start-guest-project.yaml
+- runFlow: ../subflows/add-point-spot.yaml
+- tapOn: { id: "notebook-footer-notes" }
+- tapOn: { id: "note" }
+- inputText: "Kill-after-save E2E-02"
+- tapOn: "Save"
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: { id: "main-menu-button" }
+    timeout: 30000
+- tapOn: "Notebook"
+- assertVisible: "Kill-after-save E2E-02"

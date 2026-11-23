@@ -5,6 +5,7 @@ import {PAGE_KEYS} from './pageKeys.constants';
 import {isEmpty} from '../../shared/helpers';
 import {getReportsAtSpot, getReportsToList} from '../reports/reports.helpers';
 import {hasSedRockData} from '../sed/sed.helpers';
+import {TAG_TYPES} from '../tags/tags.constants';
 import useTags from '../tags/useTags';
 
 const usePage = () => {
@@ -42,12 +43,12 @@ const usePage = () => {
         }
         case PAGE_KEYS.TAGS: {
           const tagsAtSpot = getTagsAtSpot(spot.properties.id);
-          if (!isEmpty(tagsAtSpot.filter(t => t.type !== PAGE_KEYS.GEOLOGIC_UNITS))) isPopulated = true;
+          if (!isEmpty(tagsAtSpot.filter(t => t.type !== TAG_TYPES.GEOLOGIC_UNIT))) isPopulated = true;
           break;
         }
         case PAGE_KEYS.GEOLOGIC_UNITS: {
           const tagsAtSpot = getTagsAtSpot(spot.properties.id);
-          if (!isEmpty(tagsAtSpot.filter(t => t.type === PAGE_KEYS.GEOLOGIC_UNITS))) isPopulated = true;
+          if (!isEmpty(tagsAtSpot.filter(t => t.type === TAG_TYPES.GEOLOGIC_UNIT))) isPopulated = true;
           break;
         }
         case PAGE_KEYS.THREE_D_STRUCTURES:

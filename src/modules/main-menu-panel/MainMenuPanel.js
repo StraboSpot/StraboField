@@ -192,7 +192,7 @@ const MainMenuPanel = forwardRef(({
       case MAIN_MENU_ITEMS.ACCOUNT.PROFILE:
         return <UserProfile/>;
       case MAIN_MENU_ITEMS.ACCOUNT.STRABOFIELD_PROJECTS:
-        return <StraboFieldProjects/>;
+        return <StraboFieldProjects closeMainMenuPanel={closeMainMenuPanel}/>;
       case MAIN_MENU_ITEMS.ACCOUNT.STRABOMICRO_PROJECTS:
         return <MicroProjects/>;
       case MAIN_MENU_ITEMS.ACCOUNT.USER_CONVENTIONS:

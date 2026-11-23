@@ -1,0 +1,96 @@
+# 2.33 release checks: create a tag, tag a Spot, create a geologic unit from the notebook shortcut's
+# checklist, add a sample (its modal says "No Geologic Units"), then delete the Spot: the tag stays
+# but no longer lists it, and the Spot's dataset count drops to 0. Finally, a map press on a Spot
+# selects it outright and a press on empty map deselects it.
+appId: org.StraboSpot2
+name: Tags, geologic units, sample, and Spot delete
+tags: [release]
+---
+- runFlow: ../subflows/start-guest-project.yaml
+- runFlow: ../subflows/add-point-spot.yaml
+# Tag A, created from the Tags page
+- runFlow: ../subflows/open-main-menu.yaml
+- tapOn: "Tags"
+- waitForAnimationToEnd
+- tapOn: "Create New Tag"
+- waitForAnimationToEnd
+- tapOn: { id: "name" }
+- inputText: "Tag A"
+- tapOn: "Dismiss"
+- tapOn: "Save"
+- waitForAnimationToEnd
+- tapOn: "Tag A"
+- waitForAnimationToEnd
+- tapOn: { text: "Add/Remove", index: 0 }
+- waitForAnimationToEnd
+- tapOn: "01"
+- waitForAnimationToEnd
+- tapOn: "Tag A"
+- waitForAnimationToEnd
+- assertVisible: "TAGGED SPOTS \\(1\\)"
+- tapOn: "01"
+- waitForAnimationToEnd
+- assertVisible: "Spot Overview"
+# Geologic unit created from the checklist the footer shortcut opens
+- tapOn: { point: "7%,93%" }
+- waitForAnimationToEnd
+- tapOn: "Assign/Remove"
+- waitForAnimationToEnd
+- tapOn: "Create New Geologic Unit"
+- waitForAnimationToEnd
+- tapOn: { id: "name" }
+- inputText: "Unit X"
+- tapOn: { id: "unit_label_abbreviation" }
+- inputText: "UX"
+- tapOn: "Dismiss"
+- tapOn: "Save"
+- waitForAnimationToEnd
+- assertVisible: "Unit X"
+- tapOn: "Unit X"
+- tapOn: { point: "93%,9%" }
+- waitForAnimationToEnd
+- assertVisible: "Unit X"
+# Sample: the modal's units section reads "No Geologic Units"; the overview renders after Save
+- tapOn: { point: "76%,93%" }
+- waitForAnimationToEnd
+- tapOn: { point: "94%,29%" }
+- waitForAnimationToEnd
+- assertVisible: "Add a Sample"
+- scrollUntilVisible: { element: "Add/Remove Geologic Units", direction: DOWN }
+- assertVisible: "No Geologic Units"
+- tapOn: "Save"
+- waitForAnimationToEnd
+- assertVisible: "Sample Overview"
+# Delete the Spot: confirmation names the sample; the tag survives without it
+- tapOn: { point: "9%,22%" }   # "← 01" back link to the parent Spot
+- waitForAnimationToEnd
+- tapOn: { point: "95%,24%" }
+- waitForAnimationToEnd
+- tapOn: "Delete this Spot"
+- waitForAnimationToEnd
+- assertVisible: ".*Its Sample 01 will be deleted with it.*"
+- tapOn: "Delete"
+- waitForAnimationToEnd
+- runFlow: ../subflows/close-side-panels.yaml
+- runFlow:
+    file: ../subflows/assert-dataset-spot-count.yaml
+    env: { COUNT: "0" }
+- runFlow: ../subflows/open-main-menu.yaml
+- tapOn: "Tags"
+- waitForAnimationToEnd
+- tapOn: "Tag A"
+- waitForAnimationToEnd
+- assertVisible: "No Spots"
+# Map press selects a Spot outright; empty map deselects
+- tapOn: "Tags"
+- waitForAnimationToEnd
+- runFlow: ../subflows/close-side-panels.yaml
+- runFlow: ../subflows/add-point-spot.yaml
+- runFlow: ../subflows/close-side-panels.yaml
+- tapOn: { point: "60%,75%" }
+- waitForAnimationToEnd
+- assertVisible: "Spot Navigator.*"
+- tapOn: { point: "30%,40%" }
+- waitForAnimationToEnd
+- assertVisible: "02.*"
+- assertNotVisible: "Select.*Spot.*"

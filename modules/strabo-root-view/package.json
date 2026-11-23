@@ -1,0 +1,6 @@
+{
+  "name": "strabo-root-view",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Supplies StraboField's RootViewController to Expo so the native status bar setup survives expo-updates swapping in a bundle."
+}

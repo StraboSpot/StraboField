@@ -591,7 +591,7 @@ const MapContainer = forwardRef(({
         {isShowSpotsAtPressModal && (
           <SelectSpotsAtPressModal
             closeModal={() => setIsShowSpotsAtPressModal(false)}
-            headerTitle={isSpotsAtPressForEdit ? 'Select Spot to Edit' : `${spotsAtPress.length} Spots Here`}
+            headerTitle={isSpotsAtPressForEdit ? 'Select Spot to Edit' : 'Select a Spot'}
             isVisible={isShowSpotsAtPressModal}
             onSpotPress={handleSpotAtPressSelected}
             spots={spotsAtPress}

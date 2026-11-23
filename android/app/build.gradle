@@ -24,6 +24,9 @@ react {
     // debuggableVariants = ["liteDebug", "liteDebugOptimized", "prodDebug", "prodDebugOptimized"]
 
     /* Bundling */
+    // Bundle with Expo CLI (export:embed) so the embedded bundle and the expo-updates manifest match OTA updates
+    cliFile = new File(["node", "--print", "require.resolve('@expo/cli', { paths: [require.resolve('expo/package.json')] })"].execute(null, rootDir).text.trim())
+    bundleCommand = "export:embed"
     //   A list containing the node command and its flags. Default is just 'node'.
     // nodeExecutableAndArgs = ["node"]
     //
@@ -95,7 +98,7 @@ android {
         applicationId "com.strabospot2"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1092
+        versionCode 1093
         versionName "2.33.0"
     }
     signingConfigs {
@@ -146,6 +149,14 @@ configurations.all {
     // react-native-pdf pins pdfiumandroid 1.0.32, whose getPageLinks drops every link with a valid rectangle, so no
     // link in a PDF can be tapped. 1.0.33 fixes that check without adding dependencies.
     resolutionStrategy.force "io.legere:pdfiumandroid:1.0.33"
+}
+
+// expo-updates writes the build's runtime version (the native fingerprint) in its create<Variant>UpdatesResources
+// task, which declares no file inputs, so Gradle counts it as up to date and keeps the first fingerprint it ever
+// wrote. A build then reports a stale runtime version that no update is published for, and silently gets none.
+// Always rerun it; it takes a few seconds. iOS reruns its equivalent build phase every time.
+tasks.matching { it.name ==~ /create.*UpdatesResources/ }.configureEach {
+    outputs.upToDateWhen { false }
 }
 
 dependencies {

@@ -1,3 +1,6 @@
+# Expo modules autolinking (expo, expo-updates, and the local modules/ folder)
+require File.join(File.dirname(`node --print "require.resolve('expo/package.json')"`), "scripts/autolinking")
+
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command('node', ['-p',
   'require.resolve(
@@ -9,7 +12,7 @@ project 'StraboSpot2.xcodeproj'
 
 source 'https://github.com/CocoaPods/Specs.git'
 
-MIN_IOS_OVERRIDE = '15.5'
+MIN_IOS_OVERRIDE = '16.4' # Expo SDK 58 (expo-updates) requires iOS 16.4
 if Gem::Version.new(MIN_IOS_OVERRIDE) > Gem::Version.new(min_ios_version_supported)
       min_ios_version_supported = MIN_IOS_OVERRIDE
 end
@@ -35,6 +38,7 @@ if linkage != nil
 end
 
 target 'StraboSpot2' do
+  use_expo_modules!
   config = use_native_modules!
 
   use_react_native!(

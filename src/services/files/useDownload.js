@@ -279,10 +279,6 @@ const useDownload = () => {
       }
       else {
         const spotsDownloaded = featureCollection.features;
-        const spotImages = await findNeededImages(spotsDownloaded, dataset);
-        if (spotImages) {
-          datasetsObjToSave[dataset.id] = {...datasetsObjToSave[dataset.id], images: {imageIds: spotImages.imageIds}};
-        }
         spotsToSave.push(...spotsDownloaded);
         const spotIds = Object.values(spotsDownloaded).map(spot => spot.properties.id);
         datasetsObjToSave[dataset.id] = {...datasetsObjToSave[dataset.id], spotIds: spotIds};
@@ -292,25 +288,6 @@ const useDownload = () => {
       console.error(dataset.name, ':', 'Error Downloading Spots.', err);
       dispatch(addedStatusMessage('Error Downloading Spots.' + err));
       throw err;
-    }
-  };
-
-  const findNeededImages = async (spotsDownloaded, dataset) => {
-    try {
-      const spotImages = await gatherNeededImages(spotsDownloaded, dataset);
-      if (spotImages?.imageIds.length > 0) {
-        // neededImagesIds is only returned on native — web doesn't cache images locally.
-        console.log(dataset.name + ': Images needed', spotImages.neededImagesIds?.length || 0, 'of',
-          spotImages.imageIds.length);
-        return spotImages;
-      }
-      else {
-        console.log(dataset.name + ': No Images in dataset.');
-        return undefined;
-      }
-    }
-    catch (err) {
-      console.error(dataset.name, ':', 'Error Gathering Images. Error:', err);
     }
   };
 
@@ -369,6 +346,9 @@ const useDownload = () => {
       if ('default_manual_measurement' in userProfileRes) {
         userProfileRes.default_manual_measurement = Boolean(userProfileRes.default_manual_measurement);
       }
+
+      // An account with nothing prepared gets no key at all, so clear any list left from the last sign-in
+      userProfileRes.prepared_projects = userProfileRes.prepared_projects ?? [];
 
       if (Platform.OS === 'web') {
         const userProfileImageBlob = await getProfileImage(encodedLoginScoped);
