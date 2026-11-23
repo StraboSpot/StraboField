@@ -57,6 +57,36 @@ const RELEASE_NOTES = [
         ],
       },
       {
+        title: 'Prepared projects',
+        items: [
+          {
+            text: 'Prepared projects: projects prepared for you on strabospot.org, like Field Camp Wizard projects, are offered after sign-in and on the welcome screen, ready to download and install',
+            commit: 'd1a13648b',
+            play: 'Install projects prepared on strabospot.org',
+          },
+          {
+            text: 'Prepared Projects list: StraboField Projects lists your prepared projects, with buttons to open, download again, or get a newer version, and an open project with Spots is never overwritten by its own package',
+            commit: '5f59b35eb',
+          },
+        ],
+      },
+      {
+        title: 'App updates',
+        items: [
+          {
+            text: 'Faster fixes: app fixes can now arrive without a store update, downloading in the background and asking to restart when ready',
+            commit: 'fda735cf3',
+            play: 'Fixes arrive without waiting for a store update',
+            platforms: ['ios', 'android'],
+          },
+          {
+            text: 'Checks on return: the app also checks for updates when you come back to it, not only when it starts',
+            commit: 'a0ccaace6',
+            platforms: ['ios', 'android'],
+          },
+        ],
+      },
+      {
         title: 'Map layers & offline maps',
         items: [
           {
@@ -231,8 +261,67 @@ const RELEASE_NOTES = [
         ],
       },
       {
+        title: 'Samples & datasets',
+        items: [
+          {
+            text: 'Samples stay with their Spot: moving a Spot moves its samples too, and a new sample is filed in its parent\'s dataset',
+            commit: '0cfcfb562',
+          },
+          {
+            text: 'Safer dataset deletes: deleting a dataset moves samples whose parent is elsewhere to their parent\'s dataset, cleans its Spots out of tags and memos, and the confirmation says what will change',
+            commit: '825328523',
+          },
+          {
+            text: 'Clear delete prompts: deleting a Spot names the samples deleted with it, and the notebook menu deletes only an open legacy sample, not its whole Spot',
+            commit: 'fd5e1864d',
+          },
+          {
+            text: 'Read-only respected: read-only datasets and Spots can no longer be changed by moves, deletes, or downloads, and Delete Dataset is disabled for them',
+            commit: '3f90702b5',
+          },
+          {
+            text: 'Dataset image counts: a dataset\'s image count stays correct as Spots and photos change',
+            commit: '47fbf0078',
+          },
+        ],
+      },
+      {
         title: 'Fixes',
         items: [
+          {
+            text: 'Selecting Spots: pressing a point inside a polygon selects the point instead of asking which Spot you meant; the picker only opens when Spots truly overlap',
+            commit: 'cbd9712bc',
+            play: 'Smarter Spot selection on the map',
+          },
+          {
+            text: 'Failed image uploads: an upload with failed images ends on "Uploaded With Errors!" saying how many failed, instead of "All Uploaded!"',
+            commit: '9779857ed',
+          },
+          {
+            text: 'View angle: an image\'s view angle (plunge) is limited to 0–90, matching what photo capture records',
+            commit: '4f08fa150',
+          },
+          {
+            text: 'Tags: creating a tag from a checklist no longer replaces the tag shown in the side panel, and a tag being added isn\'t wiped when a Spot is deleted',
+            commit: '733adac3d',
+          },
+          {
+            text: 'Geologic Units shortcut: the notebook\'s Geologic Units modal lists geologic units when opened from a shortcut',
+            commit: 'b6c570559',
+          },
+          {
+            text: 'Samples overview: no longer crashes on some long number values',
+            commit: 'caf0f411d',
+          },
+          {
+            text: 'Save Map: the zoom wheel no longer crashes on iOS when tapped during an update, and a failed save shows its error without an "Error:" prefix',
+            commit: '4d4142349',
+          },
+          {
+            text: 'Web edits: deleting a sample or editing an image on web sends the right Spot to the server, and deletes are sent in order with one message per batch',
+            commit: 'd7222baff',
+            platforms: ['web'],
+          },
           {
             text: 'Compass shortcut: the Measurement shortcut no longer shows a blank screen when no Spot is selected',
             commit: '43279fd0d',
