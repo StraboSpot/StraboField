@@ -34,13 +34,13 @@ const FeaturesLayers = ({mapMode, spotsNotSelected, spotsSelected}) => {
   // Get selected and not selected Spots as map features, split into multiple features if multiple orientations
   const featuresNotSelected = useMemo(() => {
       console.log('Getting Spots Not Selected as Features...');
-      return getSpotsAsFeatures(addSymbology(spotsNotSelected.map(s => ({...s, properties: {...s.properties}}))));
+      return getSpotsAsFeatures(addSymbology(spotsNotSelected));
     },
     [spotsNotSelected, stratSection, featureTypesOff, geometryTypesOff, isShowOnly1stMeas, labelTypeOn, tagTypeForColor]);
 
   const featuresSelected = useMemo(() => {
     console.log('Getting Spots Selected as Features...');
-    return getSpotsAsFeatures(addSymbology(spotsSelected.map(s => ({...s, properties: {...s.properties}}))));
+    return getSpotsAsFeatures(addSymbology(spotsSelected));
   }, [spotsSelected, stratSection, featureTypesOff, geometryTypesOff, isShowOnly1stMeas, labelTypeOn, tagTypeForColor]);
 
   // Selected point Spots need to be shown in the Unselected Features Layer

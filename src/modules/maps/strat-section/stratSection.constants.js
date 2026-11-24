@@ -7,6 +7,8 @@ export const CARBONATE_KEYS = ['dunham_classification'];
 export const LITHOLOGIES_KEYS = ['primary_lithology'];
 export const BASIC_LITHOLOGIES_LABELS = ['other', 'coal', 'mudstone', 'sandstone', 'conglomerate/breccia', 'limestone/dolostone'];
 
+export const STRAT_PATTERN_IMAGE_SIZE = 300;  // Width and height in pixels of every image in STRAT_PATTERNS
+
 export const STRAT_PATTERNS = {
   // Limestone / Dolostone / Misc. Lithologies
   limestone: require('../../../assets/symbols/sed/basic/LimeSimple.png'),

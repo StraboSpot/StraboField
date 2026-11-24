@@ -152,7 +152,7 @@ const useMapFeatures = () => {
       }
       else mappedFeatures.push(spot);
     });
-    console.log('Mapped Features:', mappedFeatures);
+    // console.log('Mapped Features:', mappedFeatures);
     return hideRepeatedSpotNameLabels(filterFeatures(mappedFeatures));
   };
 
