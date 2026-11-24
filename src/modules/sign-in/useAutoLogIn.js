@@ -1,5 +1,3 @@
-import {useRef} from 'react';
-
 import {Base64} from 'js-base64';
 import {useDispatch} from 'react-redux';
 
@@ -14,10 +12,6 @@ const useAutoLogIn = () => {
 
   const {initializeDownload} = useDownload();
   const {signIn} = useSignIn();
-
-  /* Local State */
-
-  const project = useRef(null);
 
   /* Internal Functions */
 
@@ -40,28 +34,21 @@ const useAutoLogIn = () => {
   const autoLogIn = async () => {
     console.log('Performing Auto Login...');
 
+    // Read off the raw URL: URLSearchParams would turn a "+" in the Base64 credentials into a space
     const url = new URL(window.location).href;
     const credentialsRegEx = new RegExp('[?&]' + 'credentials' + '=([^&]+).*$');
     const credentialsEncoded = url.match(credentialsRegEx)?.[1];
     const projectIdRegEx = new RegExp('[?&]' + 'projectid' + '=([^&]+).*$');
     const projectId = url.match(projectIdRegEx)?.[1];
-    project.current = {id: projectId};
+    if (!credentialsEncoded) throw Error('Credentials not found.');
 
-    if (credentialsEncoded) {
-      try {
-        const credentials = atob(credentialsEncoded);
-        const email = credentials.split('*****')[0];
-        const password = credentials.split('*****')[1];
-        console.log('Got Credentials:', credentialsEncoded, '\nGot Project Id:', projectId);
-        await signIn(email, password);
-        const newEncodedLogin = Base64.encode(email + ':' + password);
-        await loadProjectWeb(projectId, newEncodedLogin);
-      }
-      catch (err) {
-        throw err;
-      }
-    }
-    else throw Error('Credentials not found.');
+    const credentials = Base64.decode(credentialsEncoded);
+    const email = credentials.split('*****')[0];
+    const password = credentials.split('*****')[1];
+    console.log('Got Project Id:', projectId);
+    await signIn(email, password);
+    const newEncodedLogin = Base64.encode(email + ':' + password);
+    await loadProjectWeb(projectId, newEncodedLogin);
   };
 
   return {
