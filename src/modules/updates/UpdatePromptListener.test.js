@@ -4,11 +4,7 @@ import {AppState} from 'react-native';
 import * as Updates from 'expo-updates';
 import ReactTestRenderer from 'react-test-renderer';
 
-import UpdatePromptListener, {
-  downloadNewUpdate,
-  FOREGROUND_CHECK_INTERVAL_MS,
-  restartIntoUpdate,
-} from './UpdatePromptListener';
+import UpdatePromptListener, {downloadNewUpdate, FOREGROUND_CHECK_INTERVAL_MS} from './UpdatePromptListener';
 import alert from '../../shared/ui/alert';
 import {persistor} from '../../store/ConfigureStore';
 
@@ -19,8 +15,18 @@ jest.mock('expo-updates', () => ({
   fetchUpdateAsync: jest.fn(() => Promise.resolve({isNew: true})),
   reloadAsync: jest.fn(() => Promise.resolve()),
 }));
+const mockAutoSaveNow = jest.fn(() => Promise.resolve({hasFailed: false, hasSaved: true}));
+const mockIsAutoSaveNeeded = jest.fn(() => false);
+jest.mock('../../services/files/useAutoSave', () => ({
+  isAutoSaveNeeded: () => mockIsAutoSaveNeeded(),
+  useAutoSaveNow: () => ({autoSaveNow: mockAutoSaveNow}),
+}));
 jest.mock('../../shared/ui/alert', () => jest.fn());
-jest.mock('../../store/ConfigureStore', () => ({persistor: {flush: jest.fn(() => Promise.resolve())}}));
+let mockOpenProject;
+jest.mock('../../store/ConfigureStore', () => ({
+  persistor: {flush: jest.fn(() => Promise.resolve())},
+  store: {getState: () => ({project: {project: mockOpenProject}})},
+}));
 
 // An OTA update downloads in the background and only applies on a cold start, so once one is ready the user is
 // offered a restart, once per update
@@ -61,6 +67,23 @@ describe('UpdatePromptListener', () => {
     expect(buttons.map(({text}) => text)).toEqual(['Later', 'Restart']);
   });
 
+  it('says whether the open project has changes to back up before restarting', () => {
+    mockOpenProject = {description: {project_name: 'Field Trip'}};
+    mockIsAutoSaveNeeded.mockReturnValueOnce(true);
+    renderWith(true, 'update-1');
+    expect(alert.mock.calls[0][1]).toContain('changes is automatically saved to the device first');
+    expect(alert.mock.calls[0][1]).toContain('save a backup of your project first from Backup in the main menu');
+
+    renderWith(true, 'update-2');
+    expect(alert.mock.calls[1][1]).toContain('no backup is needed');
+  });
+
+  it('says nothing about a backup when no project is open', () => {
+    mockOpenProject = {};
+    renderWith(true, 'update-1');
+    expect(alert.mock.calls[0][1]).not.toContain('backup');
+  });
+
   it('offers a newer update even after "Later" on an earlier one', () => {
     renderWith(true, 'update-1');
     renderWith(true, 'update-2');
@@ -97,11 +120,46 @@ describe('UpdatePromptListener', () => {
     await expect(downloadNewUpdate()).resolves.toBeUndefined();
   });
 
-  it('saves the store before reloading into the update', async () => {
+  // Resolves once the restart has finished
+  const pressRestart = () => {
+    renderWith(true, 'update-1');
+    return alert.mock.calls[0][2].find(({text}) => text === 'Restart').onPress();
+  };
+
+  it('auto saves the project and the store before reloading into the update', async () => {
     const order = [];
+    mockAutoSaveNow.mockImplementationOnce(async () => order.push('autoSave'));
     persistor.flush.mockImplementation(async () => order.push('flush'));
     Updates.reloadAsync.mockImplementation(async () => order.push('reload'));
-    await restartIntoUpdate();
-    expect(order).toEqual(['flush', 'reload']);
+    await pressRestart();
+    expect(order).toEqual(['autoSave', 'flush', 'reload']);
+  });
+
+  // The Backup Failed alert is the second one shown, after Update Ready; pressing its button settles the restart
+  const pressRestartAndAnswerBackupFailed = async (text) => {
+    mockAutoSaveNow.mockResolvedValueOnce({hasFailed: true, hasSaved: false});
+    const restarting = pressRestart();
+    await Promise.resolve();   // Lets the failed auto save settle so the Backup Failed alert is up
+    const [title, , buttons] = alert.mock.calls[1];
+    expect(title).toBe('Backup Failed');
+    buttons.find(button => button.text === text).onPress();
+    await restarting;
+  };
+
+  it('asks before restarting when the auto save fails, and restarts on Restart Anyway', async () => {
+    await pressRestartAndAnswerBackupFailed('Restart Anyway');
+    expect(Updates.reloadAsync).toHaveBeenCalledTimes(1);
+  });
+
+  it('stays on the current version when the user cancels after a failed auto save', async () => {
+    await pressRestartAndAnswerBackupFailed('Cancel');
+    expect(persistor.flush).not.toHaveBeenCalled();
+    expect(Updates.reloadAsync).not.toHaveBeenCalled();
+  });
+
+  it('restarts without asking when the auto save succeeds', async () => {
+    await pressRestart();
+    expect(alert).toHaveBeenCalledTimes(1);
+    expect(Updates.reloadAsync).toHaveBeenCalledTimes(1);
   });
 });

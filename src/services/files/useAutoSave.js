@@ -11,6 +11,11 @@ import {isEmpty} from '../../shared/helpers';
 import {store} from '../../store/ConfigureStore';
 import useDevice from '../device/useDevice';
 
+export const isAutoSaveNeeded = () => {
+  const {connections, project: projectDb} = store.getState();
+  return connections.isLocalSaveNeeded && !isEmpty(projectDb.project);
+};
+
 // Saves the open project to the device if it has changed since the last save. Upload and download run it first,
 // whatever the auto-save frequency, so a download never replaces changes that exist nowhere else.
 export const useAutoSaveNow = () => {
@@ -18,8 +23,8 @@ export const useAutoSaveNow = () => {
   const {pruneOldProjectSaves, saveProjectToDevice} = useDevice();
 
   const autoSaveNow = async () => {
-    const {connections, map, project: projectDb, spot} = store.getState();
-    if (!connections.isLocalSaveNeeded || isEmpty(projectDb.project)) return {hasFailed: false, hasSaved: false};
+    if (!isAutoSaveNeeded()) return {hasFailed: false, hasSaved: false};
+    const {map, project: projectDb, spot} = store.getState();
     try {
       dispatch(setAutoSaving(true));
       const snapshot = {
