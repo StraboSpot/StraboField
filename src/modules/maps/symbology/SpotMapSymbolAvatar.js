@@ -24,7 +24,7 @@ import {
 } from './mapSymbology.helpers';
 import useMapSymbology from './useMapSymbology';
 import {isEmpty, isEqual} from '../../../shared/helpers';
-import {BLACK, MEDIUMGREY} from '../../../shared/styles.constants';
+import {BLACK, LIGHTGREY, MEDIUMGREY} from '../../../shared/styles.constants';
 import {isLineSpot, isOnGeoMap, isPolygonSpot} from '../../spots/spots.helpers';
 import useMapFeatures from '../features/useMapFeatures';
 import {getFeaturesWithSamples} from '../layers/layers.helpers';
@@ -232,6 +232,7 @@ const SpotMapSymbolAvatar = ({spot}) => {
   return (
     <View
       style={{
+        backgroundColor: LIGHTGREY,
         borderColor: MEDIUMGREY,
         borderWidth: FRAME_BORDER_WIDTH,
         height: FRAME_SIZE,
