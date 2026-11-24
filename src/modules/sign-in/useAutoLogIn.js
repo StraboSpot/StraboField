@@ -5,7 +5,7 @@ import useSignIn from './useSignIn';
 import useDownload from '../../services/files/useDownload';
 import {setLoadingStatus} from '../home/home.slice';
 
-const CREDENTIALS_STORAGE_KEY = 'strabofield-web-credentials';
+const CREDENTIALS_STORAGE_KEY = 'strabofield-web-credentials';  // Also written by index.html
 
 const useAutoLogIn = () => {
   /* Data Hooks */
@@ -19,6 +19,7 @@ const useAutoLogIn = () => {
 
   // The temporary login strabospot.org passes in the URL grants the whole account until it expires, so it is moved out
   // of the address bar, where a copied link would carry it, into this tab's sessionStorage, where a reload finds it.
+  // index.html does the same before the bundle loads, so this usually finds it already stored.
   const takeCredentials = (url) => {
     const credentialsInUrl = url.match(/[?&]credentials=([^&#]+)/)?.[1];
     if (!credentialsInUrl) return window.sessionStorage.getItem(CREDENTIALS_STORAGE_KEY);
