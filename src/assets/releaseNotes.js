@@ -49,16 +49,6 @@ const RELEASE_NOTES = [
         ],
       },
       {
-        title: 'Prepared projects',
-        items: [
-          {
-            text: 'Prepared projects: projects prepared for you on strabospot.org, like Field Camp Wizard projects, are offered after sign-in and on the welcome screen, ready to download and install',
-            commit: 'd1a13648b',
-            play: 'Install projects prepared on strabospot.org',
-          },
-        ],
-      },
-      {
         title: 'App updates',
         items: [
           {
