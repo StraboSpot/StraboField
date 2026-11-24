@@ -5,6 +5,8 @@ import useSignIn from './useSignIn';
 import useDownload from '../../services/files/useDownload';
 import {setLoadingStatus} from '../home/home.slice';
 
+const CREDENTIALS_STORAGE_KEY = 'strabofield-web-credentials';
+
 const useAutoLogIn = () => {
   /* Data Hooks */
 
@@ -14,6 +16,24 @@ const useAutoLogIn = () => {
   const {signIn} = useSignIn();
 
   /* Internal Functions */
+
+  // The temporary login strabospot.org passes in the URL grants the whole account until it expires, so it is moved out
+  // of the address bar, where a copied link would carry it, into this tab's sessionStorage, where a reload finds it.
+  const takeCredentials = (url) => {
+    const credentialsInUrl = url.match(/[?&]credentials=([^&#]+)/)?.[1];
+    if (!credentialsInUrl) return window.sessionStorage.getItem(CREDENTIALS_STORAGE_KEY);
+    try {
+      window.sessionStorage.setItem(CREDENTIALS_STORAGE_KEY, credentialsInUrl);
+      // Edited as text: the link puts its parameters after the "#" route, out of reach of URL.searchParams
+      const urlWithoutCredentials = url.replace(/([?&])credentials=[^&#]*(&?)/,
+        (match, separator, nextSeparator) => nextSeparator ? separator : '');
+      window.history.replaceState(window.history.state, '', urlWithoutCredentials);
+    }
+    catch (err) {
+      console.warn('Could not move the credentials out of the address bar. Leaving them there.', err);
+    }
+    return credentialsInUrl;
+  };
 
   const loadProjectWeb = async (projectId, newEncodedLogin) => {
     try {
@@ -36,8 +56,7 @@ const useAutoLogIn = () => {
 
     // Read off the raw URL: URLSearchParams would turn a "+" in the Base64 credentials into a space
     const url = new URL(window.location).href;
-    const credentialsRegEx = new RegExp('[?&]' + 'credentials' + '=([^&]+).*$');
-    const credentialsEncoded = url.match(credentialsRegEx)?.[1];
+    const credentialsEncoded = takeCredentials(url);
     const projectIdRegEx = new RegExp('[?&]' + 'projectid' + '=([^&]+).*$');
     const projectId = url.match(projectIdRegEx)?.[1];
     if (!credentialsEncoded) throw Error('Credentials not found.');
