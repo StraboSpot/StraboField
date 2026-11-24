@@ -33,7 +33,7 @@ Print this checklist anytime with `npm run start-rc`.
 2. **Bump the version:** `npm run bump-patch` (or `bump-minor` / `bump-major`).
 3. **Commit & push** to the rc branch → triggers the **draft release**.
 4. **Stabilize:** bug fixes land directly on `rc-{version}`; each push auto-updates the draft. Each new **test build** of this same version (TestFlight / closed testing) needs a fresh build number — run `npm run bump-build` (build number only). **Do not** `bump-patch` again; that starts a new marketing version.
-5. **Update What's New:** add this release's highlights to [`src/assets/releaseNotes.js`](src/assets/releaseNotes.js) (drives the in-app What's New modal).
+5. **Update What's New:** add this release's highlights to [`src/assets/releaseNotes.js`](src/assets/releaseNotes.js) (drives the in-app What's New modal). Keep it short — only what users will notice or need to know, not every fix; the GitHub changelog lists everything. `npm run release-notes` warns past 30 items. Once a new minor version ships, delete the previous minor's entries.
 6. **Generate store notes:** `npm run release-notes` regenerates the App Store + Play files from `releaseNotes.js`; commit `releaseNotes.js` and the `.txt` files. Do **not** hand-edit the `.txt` files — the script overwrites them. Run this **before** any `npm run deploy-beta` — the `beta` lane reads `release_notes.txt` for TestFlight's "What to Test".
 7. **Cut it:** when the version is finalized, run `npm run cut-rc` → tags `v{version}-rc` and freezes its draft. New commits on the branch now roll into the next version's draft.
 8. **Merge** `rc-{version}` → `master` and push.
