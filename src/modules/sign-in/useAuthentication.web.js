@@ -8,6 +8,7 @@ import useServerRequests from '../../services/network/useServerRequests';
 import {logout} from '../user/userProfile.slice';
 
 const CHECK_INTERVAL = 1000 * 60 * 5;  // 5 minutes
+const RECHECK_ON_RETURN_AFTER = 1000 * 60;  // Switching between tabs checks at most once a minute
 
 // Re-checks the temporary login strabospot.org passes in the URL, which the server expires 24 hours after issuing it.
 // Only an explicit refusal logs out: logging out unmounts the app, so a failed request leaves the session alone.
@@ -25,7 +26,9 @@ const useAuthentication = () => {
   useEffect(() => {
     if (!encodedLogin || isOnline === false) return;
     let isCanceled = false;  // An answer for a login since replaced would log out the one now in use
+    let lastCheckTime;
     const checkCurrentLogin = async () => {
+      lastCheckTime = Date.now();
       const isRefused = await isLoginRefused();
       if (isRefused && !isCanceled) {
         console.error('Authentication refused. Logging out.');
@@ -36,7 +39,8 @@ const useAuthentication = () => {
     const interval = setInterval(checkCurrentLogin, CHECK_INTERVAL);
     // Browsers throttle or freeze a background tab's timers, so also check as soon as the user is back
     const checkWhenVisible = () => {
-      if (document.visibilityState === 'visible') checkCurrentLogin();
+      const isRecentlyChecked = Date.now() - lastCheckTime < RECHECK_ON_RETURN_AFTER;
+      if (document.visibilityState === 'visible' && !isRecentlyChecked) checkCurrentLogin();
     };
     document.addEventListener('visibilitychange', checkWhenVisible);
     return () => {

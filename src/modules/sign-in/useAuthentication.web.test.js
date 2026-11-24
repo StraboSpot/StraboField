@@ -11,6 +11,7 @@ import connectionsReducer, {setOnlineStatus} from '../connections/connections.sl
 import userReducer, {logout, updatedKey} from '../user/userProfile.slice';
 
 const CHECK_INTERVAL = 1000 * 60 * 5;
+const AWAY_FOR = 1000 * 60 * 2;  // Long enough that returning to the tab checks again, short of the 5-minute check
 
 const mockServer = {authenticateUser: jest.fn()};
 
@@ -92,7 +93,7 @@ describe('useAuthentication (web)', () => {
 
   it('checks as soon as the tab is shown again, but not when it is hidden', async () => {
     renderHook();
-    await flush();
+    await advance(AWAY_FOR);
     mockServer.authenticateUser.mockClear();
 
     await setVisibility('hidden');
@@ -101,9 +102,22 @@ describe('useAuthentication (web)', () => {
     expect(mockServer.authenticateUser).toHaveBeenCalledTimes(1);
   });
 
+  it('checks once however quickly the user switches back and forth between tabs', async () => {
+    renderHook();
+    await advance(AWAY_FOR);
+    mockServer.authenticateUser.mockClear();
+
+    for (let i = 0; i < 3; i++) {
+      await setVisibility('hidden');
+      await setVisibility('visible');
+      await advance(1000 * 10);
+    }
+    expect(mockServer.authenticateUser).toHaveBeenCalledTimes(1);
+  });
+
   it('logs out when the tab comes back after the login expired', async () => {
     const store = renderHook();
-    await flush();
+    await advance(AWAY_FOR);
     mockServer.authenticateUser.mockResolvedValue({valid: 'false'});
 
     await setVisibility('hidden');
