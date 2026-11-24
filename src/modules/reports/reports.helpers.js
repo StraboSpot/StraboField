@@ -1,6 +1,9 @@
 // The memos referencing a Spot
 export const getReportsAtSpot = (reports, spotId) => (reports || []).filter(r => r.spots?.includes(spotId));
 
+// The memos with an edited one put back in its own place, so saving an edit doesn't move it to the end
+export const replaceReport = (reports, editedReport) => reports.map(r => r.id === editedReport.id ? editedReport : r);
+
 // The memos this user may see. A memo marked only_me is its author's alone. One saved before authorship was
 // recorded names no author, so there is nobody to keep it from and it stays listed
 export const getVisibleReports = (reports, straboUserId) => (reports || []).filter(
