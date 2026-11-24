@@ -1,5 +1,5 @@
-import {PAGES_SECTIONS, PRIMARY_PAGES, SAMPLE_OVERVIEW_DEFAULT_PAGES} from './page.constants';
-import {getOverviewSections} from './page.helpers';
+import {NOTEBOOK_PAGES, PAGES_SECTIONS, PRIMARY_PAGES, SAMPLE_OVERVIEW_DEFAULT_PAGES} from './page.constants';
+import {getModalForOpenedPage, getOverviewSections} from './page.helpers';
 import {PAGE_KEYS} from './pageKeys.constants';
 
 // The More Pages menu renders PAGES_SECTIONS as-is, so flattening it is the order the Overview has to match
@@ -16,6 +16,33 @@ const isInMenuOrder = (sectionKeys) => {
   return !menuPositions.includes(-1)
     && menuPositions.every((position, i) => i === 0 || position > menuPositions[i - 1]);
 };
+
+describe('getModalForOpenedPage', () => {
+  const memosPage = NOTEBOOK_PAGES.find(page => page.key === PAGE_KEYS.REPORTS);
+  const otherPagesWithModal = NOTEBOOK_PAGES.filter(page => page.modal_component && page.key !== PAGE_KEYS.REPORTS);
+  const pagesWithoutModal = NOTEBOOK_PAGES.filter(page => !page.modal_component);
+
+  // Its modal would open over the page's Create New Memo button with no Spot checked, so the memo it saved
+  // wouldn't be on the Spot it was started from
+  it('opens Memos without its modal, even with no memos yet', () => {
+    expect(memosPage.modal_component).toBeDefined();
+    expect(getModalForOpenedPage(memosPage, [])).toBeNull();
+  });
+
+  it('opens the add modal of any other empty page that has one', () => {
+    expect(otherPagesWithModal.length).toBeGreaterThan(0);
+    otherPagesWithModal.forEach(page => expect(getModalForOpenedPage(page, [])).toBe(page.key));
+  });
+
+  it('opens no modal on a page that already holds data', () => {
+    otherPagesWithModal.forEach(page => expect(getModalForOpenedPage(page, [page.key])).toBeNull());
+  });
+
+  it('opens no modal on a page without one', () => {
+    expect(pagesWithoutModal.length).toBeGreaterThan(0);
+    pagesWithoutModal.forEach(page => expect(getModalForOpenedPage(page, [])).toBeNull());
+  });
+});
 
 // A section's order is the whole point of the Overview reading PAGES_IN_MENU_ORDER rather than gathering its pages
 // itself: someone scanning the notebook should find a Spot's data where the menu just said it would be
