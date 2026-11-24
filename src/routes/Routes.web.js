@@ -3,7 +3,6 @@ import React, {useEffect, useState} from 'react';
 import {useSelector} from 'react-redux';
 
 import AppStack from './AppStack';
-import useAuthentication from '../modules/sign-in/useAuthentication.web';
 import useAutoLogIn from '../modules/sign-in/useAutoLogIn';
 import AuthenticationErrorSplashScreen from '../modules/splash-screen/AuthenticationErrorSplashScreen';
 import LoadingSplashScreen from '../modules/splash-screen/LoadingSplashScreen.web';
@@ -15,7 +14,6 @@ const Routes = () => {
 
   const isAuthenticated = useSelector(state => state.user.isAuthenticated);
 
-  useAuthentication();
   const {autoLogIn} = useAutoLogIn();
 
   /* Local State */
