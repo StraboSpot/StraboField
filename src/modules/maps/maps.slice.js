@@ -24,6 +24,8 @@ const initialMapsState = {
   intervalDragSnapshot: null,
   intervalDragState: null,
   isDragIntervalMode: false,
+  // A Spot is being drawn or its geometry edited on the map; holds the OTA Update Ready prompt until it ends
+  isMapEditing: false,
   labelTypeOn: 'dipOrName',
   isMapExtentFilterActive: false,
   isScaleBarMetric: true,
@@ -141,6 +143,9 @@ const mapsSlice = createSlice({
         }
       }
     },
+    setIsMapEditing(state, action) {
+      state.isMapEditing = action.payload;
+    },
     setIsMapExtentFilterActive(state, action) {
       state.isMapExtentFilterActive = action.payload;
     },
@@ -221,6 +226,7 @@ export const {
   setGeometryTypesOff,
   setIntervalDragState,
   setIntervalDragTargetSlot,
+  setIsMapEditing,
   setIsMapExtentFilterActive,
   setIsScaleBarMetric,
   setIsShowOnly1stMeas,

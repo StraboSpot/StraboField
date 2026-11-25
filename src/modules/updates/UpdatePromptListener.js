@@ -2,8 +2,9 @@ import {useEffect, useRef} from 'react';
 import {AppState} from 'react-native';
 
 import * as Updates from 'expo-updates';
+import {useSelector} from 'react-redux';
 
-import {isAutoSaveNeeded, useAutoSaveNow} from '../../services/files/useAutoSave';
+import {useAutoSaveNow} from '../../services/files/useAutoSave';
 import {isEmpty} from '../../shared/helpers';
 import alert from '../../shared/ui/alert';
 import {persistor, store} from '../../store/ConfigureStore';
@@ -19,27 +20,35 @@ export const FOREGROUND_CHECK_INTERVAL_MS = 30 * 60 * 1000;
 // Spot; a newer update published later is offered in turn.
 const UpdatePromptListener = () => {
   const {downloadedUpdate, isUpdatePending} = Updates.useUpdates();
+  const isMapEditing = useSelector(state => state.map.isMapEditing);
   const promptedUpdateIdRef = useRef(undefined);
   const lastCheckedRef = useRef(Date.now());
 
   const {autoSaveNow} = useAutoSaveNow();
 
-  // The prompt promised a backup, so a failed one is the user's call. Nothing is lost without it: the project is in
-  // the store, which is written below and carries over, as an update replaces only the app's code.
-  const confirmRestartWithoutBackup = () => new Promise((resolve) => {
-    alert('Backup Failed',
-      'A backup of your project couldn\'t be saved to the device. Your project is still on the device and carries'
-      + ' over to the new version.',
+  // Backed up before the prompt shows, so the project is safe whichever the user picks: Restart reloads now and
+  // Later on the next launch, and neither makes a backup of its own
+  const showUpdatePrompt = async () => {
+    const {hasFailed, hasSaved} = await autoSaveNow();
+    const isProjectOpen = !isEmpty(store.getState().project.project);
+    // With no changes since the last auto save, none is made, so don't claim a new one
+    const backupNote = !isProjectOpen ? ''
+      : hasFailed ? '\n\nYour project couldn\'t be auto-saved to the device. Save a backup from'
+        + ` ${MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP} in the main menu.`
+        : hasSaved ? '\n\nYour project was just auto-saved to the device.'
+          : '\n\nYour project has no changes since its last auto save.';
+    alert('Update Ready',
+      'A new version of StraboField is ready. Restart to use it now, or tap Later to use it the next time'
+      + ` StraboField opens.${backupNote}`,
       [
-        {onPress: () => resolve(false), style: 'cancel', text: 'Cancel'},
-        {onPress: () => resolve(true), text: 'Restart Anyway'},
-      ]);
-  });
+        {text: 'Later', style: 'cancel'},
+        {text: 'Restart', onPress: restartIntoUpdate},
+      ],
+    );
+  };
 
   const restartIntoUpdate = async () => {
     try {
-      const {hasFailed} = await autoSaveNow();
-      if (hasFailed && !await confirmRestartWithoutBackup()) return;
       // Redux Persist writes on a short delay; write the latest state now so the reload can't drop the last change
       await persistor.flush();
       await Updates.reloadAsync();
@@ -61,27 +70,12 @@ const UpdatePromptListener = () => {
 
   useEffect(() => {
     const updateId = downloadedUpdate?.updateId;
-    if (!isUpdatePending || promptedUpdateIdRef.current === updateId) return;
+    // A Spot being drawn or edited on the map isn't saved yet, so the backup made before the prompt wouldn't keep it.
+    // Wait for the user to save or cancel it; this runs again then.
+    if (!isUpdatePending || isMapEditing || promptedUpdateIdRef.current === updateId) return;
     promptedUpdateIdRef.current = updateId;
-    const isProjectOpen = !isEmpty(store.getState().project.project);
-    // After "Later" the update applies on the next launch, which makes no backup, so point the user to their own
-    const laterBackupNote = isProjectOpen ? ', so when you\'re done, save a backup of your project first from'
-      + ` ${MAIN_MENU_ITEMS.MANAGE_PROJECT.BACKUP} in the main menu` : '';
-    // Restart backs up the open project first, but only if it has changed; say which, so neither case is a surprise
-    const restartBackupNote = !isProjectOpen ? ''
-      : isAutoSaveNeeded() ? ' A backup of your project\'s changes is automatically saved to the device first.'
-        : ' Your project has no changes since its last backup, so no backup is needed.';
-    alert('Update Ready',
-      'A new version of StraboField has been downloaded.\n\n'
-      + 'If you\'re in the middle of an edit, tap Later to keep working. The new version is used the next time'
-      + ` StraboField opens${laterBackupNote}.\n\n`
-      + `Otherwise, tap Restart to close and reopen StraboField with the new version.${restartBackupNote}`,
-      [
-        {text: 'Later', style: 'cancel'},
-        {text: 'Restart', onPress: restartIntoUpdate},
-      ],
-    );
-  }, [downloadedUpdate, isUpdatePending]);
+    showUpdatePrompt();
+  }, [downloadedUpdate, isMapEditing, isUpdatePending]);
 
   return null;
 };

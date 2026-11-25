@@ -11,10 +11,12 @@ release.
   have passed since the last check (`FOREGROUND_CHECK_INTERVAL_MS` in
   `src/modules/updates/UpdatePromptListener.js`).
 - **What the user sees:** once an update has downloaded, an "Update Ready" alert offers **Later** or **Restart**.
-  Restart saves the Redux store, then reloads into the new version. Later doesn't ask again about that update for
-  the rest of the session, and the next cold start opens straight into it. A newer update published later in the
-  session gets its own prompt. The same prompt appears whether the check came from a cold start or from returning
-  to the app.
+  Before the alert shows, the open project is backed up to the device if it has changed since its last backup, and the
+  alert says it was (or that the backup failed). Restart saves the Redux store and reloads into the new version. Later
+  doesn't ask again about that update for the rest of the session, and the next cold start opens straight into it. The
+  prompt waits while a Spot is being drawn or edited on the map, and appears once that edit is saved or canceled. A
+  newer update published later in the session gets its own prompt. The same prompt appears whether the check came from
+  a cold start or from returning to the app.
 - **Offline:** a failed check is silent and is retried next time.
 - **Runtime version:** each build has a runtime version, a fingerprint of its native code. An update only reaches
   builds whose runtime version matches the one it was published for. `npm run ota:publish` works it out for you.
