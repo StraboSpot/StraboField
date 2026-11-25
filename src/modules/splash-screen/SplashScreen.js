@@ -9,6 +9,7 @@ import {VERSION_NUMBER} from '../../shared/app.constants';
 import {getFontSizeByWindowWidth} from '../../shared/helpers';
 import Loading from '../../shared/ui/Loading';
 import {useWindowSize} from '../../shared/ui/useWindowSize';
+import TestingMode from '../preferences/TestingMode';
 import BatteryInfo from '../status-bar/BatteryInfo';
 import ConnectionStatusIcon from '../status-bar/ConnectionStatusIcon';
 import VersionCheckLabel from '../version-check/VersionCheckLabel';
@@ -16,6 +17,7 @@ import VersionCheckLabel from '../version-check/VersionCheckLabel';
 const SplashScreen = ({children}) => {
   /* Data Hooks */
 
+  const isTestingMode = useSelector(state => state.project.isTestingMode);
   const loading = useSelector(state => state.home.loading.home);
 
   const {width, height} = useWindowSize();
@@ -61,6 +63,12 @@ const SplashScreen = ({children}) => {
         {/*  </View>*/}
         {/*)}*/}
       </ScrollView>
+      <View style={splashScreenStyles.testingModeContainer}>
+        <TestingMode
+          isTestingMode={isTestingMode}
+          textStyles={splashScreenStyles.testingModeText}
+        />
+      </View>
       <VersionCheckLabel/>
       {Platform.OS !== 'web' && <Text style={splashScreenStyles.buildNumberText}>
         Build: {DeviceInfo.getBuildNumber()}

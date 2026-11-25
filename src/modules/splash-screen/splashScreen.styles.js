@@ -37,6 +37,18 @@ const splashScreenStyles = StyleSheet.create({
     fontWeight: themes.TEXT_WEIGHT_500,
     padding: 50,
   },
+  testingModeContainer: {
+    bottom: 10,
+    left: 10,
+    opacity: 0.7,
+    position: 'absolute',
+  },
+  testingModeText: {
+    color: 'white',
+    fontSize: 14,
+    marginRight: 8,
+    ...shadow,
+  },
   title: {
     color: 'black',
     ...shadow,
