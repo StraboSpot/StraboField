@@ -1,6 +1,13 @@
 import {PAGES_IN_MENU_ORDER, PRIMARY_PAGES, SAMPLE_OVERVIEW_DEFAULT_PAGES} from './page.constants';
 import {PAGE_KEYS} from './pageKeys.constants';
 
+// The modal to open with a page picked in the notebook footer, or null. An empty page opens straight into its add
+// modal, since adding is all there is to do there. Memos is the exception: its modal starts with no Spot checked, while
+// the page's own Create New Memo button adds this Spot, so the page opens alone with that button in view.
+export const getModalForOpenedPage = (page, populatedPagesKeys) => (
+  page.modal_component && page.key !== PAGE_KEYS.REPORTS && !populatedPagesKeys.includes(page.key) ? page.key : null
+);
+
 // The Spot Overview's sections: the pages shown for this Spot that have something to render there, in the same
 // order as the notebook's More Pages menu - except on a sample, where Samples leads. Which pages hold data is
 // passed in, since only the Spot itself can say.

@@ -3,6 +3,7 @@ import {View} from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 
+import {replaceReport} from './reports.helpers';
 import {getUniqueTitle, isEmpty} from '../../shared/helpers';
 import SectionDivider from '../../shared/ui/SectionDivider';
 import AddImageButtons from '../images/AddImageButtons';
@@ -56,9 +57,7 @@ const ReportImages = ({isReadOnly, setUpdatedImages, updatedImages}) => {
     editedReport.modified_timestamp = Date.now();
     if (isEmpty(filteredImages)) delete editedReport.images;
     else editedReport.images = filteredImages;
-    let updatedReports = reports.filter(r => r.id !== editedReport.id);
-    updatedReports.push({...editedReport});
-    dispatch(updatedProject({field: 'reports', value: updatedReports}));
+    dispatch(updatedProject({field: 'reports', value: replaceReport(reports, editedReport)}));
     await deleteImageFile(imageId);
   };
 

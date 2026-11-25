@@ -4,6 +4,7 @@ import {ListItem} from '@rn-vui/base';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {REPORT_FORM_NAME} from './reports.constants';
+import {replaceReport} from './reports.helpers';
 import commonStyles from '../../shared/common.styles';
 import {isEmpty} from '../../shared/helpers';
 import {PRIMARY_TEXT_COLOR} from '../../shared/styles.constants';
@@ -64,9 +65,7 @@ const ReportsListItem = ({
     const editedReport = JSON.parse(JSON.stringify(report));
     editedReport.modified_timestamp = Date.now();
     editedReport.spots = reportSpotsIds;
-    let updatedReports = reports.filter(r => r.id !== editedReport.id);
-    updatedReports.push({...editedReport});
-    dispatch(updatedProject({field: 'reports', value: updatedReports}));
+    dispatch(updatedProject({field: 'reports', value: replaceReport(reports, editedReport)}));
   };
 
   /* Render Functions */

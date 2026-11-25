@@ -6,6 +6,26 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
   <title>RN Web</title>
   <script>
+    // Moves the temporary login strabospot.org passes in the URL out of the address bar before the app's bundle
+    // downloads, so it isn't on screen meanwhile. Mirrors takeCredentials in src/modules/sign-in/useAutoLogIn.js
+    // (same storage key and patterns), which finds it in sessionStorage, or in the URL if this failed.
+    (function () {
+      var credentials = window.location.href.match(/[?&]credentials=([^&#]+)/);
+      if (!credentials) return;
+      try {
+        window.sessionStorage.setItem('strabofield-web-credentials', credentials[1]);
+        var urlWithoutCredentials = window.location.href.replace(/([?&])credentials=[^&#]*(&?)/,
+          function (match, separator, nextSeparator) {
+            return nextSeparator ? separator : '';
+          });
+        window.history.replaceState(window.history.state, '', urlWithoutCredentials);
+      }
+      catch (err) {
+        console.warn('Could not move the credentials out of the address bar before the app loaded.', err);
+      }
+    })();
+  </script>
+  <script>
     // Global require polyfill - must be loaded before any other scripts
     console.log('Loading require polyfill...');
     console.log('Current require status:', typeof require);

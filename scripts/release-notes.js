@@ -49,6 +49,7 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 const APP_STORE_LIMIT = 4000; // hard cap enforced by App Store Connect
 const PLAY_LIMIT = 500; // hard cap enforced by Google Play
+const ITEM_LIMIT = 30; // past this, users stop reading What's New and miss what matters - every change is on GitHub
 const FOOTER = 'Thanks for using StraboSpot!';
 const IOS_BUNDLE_ID = 'org.StraboSpot2'; // for the public App Store version lookup
 
@@ -279,6 +280,11 @@ async function main() {
   console.log(`\n📝 Store notes for v${target} (versionCode ${versionCode}) from src/assets/releaseNotes.js`);
   console.log(`   Store version: ${storeVersion || 'unknown'} (via ${sinceSource}) · covering ${range} · entries: ${covered}\n`);
   if (!storeVersion) console.log('⚠️  Could not determine the store version — generated notes for the shipping version only. Pass --since=X.Y.Z to set the range.\n');
+  const itemCount = RELEASE_NOTES.find(r => r.version === target).groups.reduce((sum, g) => sum + g.items.length, 0);
+  if (itemCount > ITEM_LIMIT) {
+    console.log(`⚠️  ${target} has ${itemCount} What's New items (limit ${ITEM_LIMIT}). Keep only what users will notice;`
+      + ' fixes and details stay in the GitHub changelog.\n');
+  }
   console.log(`── App Store Connect ── ${rel(appFile)}   [${appStore.length}/${APP_STORE_LIMIT} chars]`);
   console.log(appStore);
   console.log(`\n── Google Play ── ${rel(playFile)}   [${play.length}/${PLAY_LIMIT} chars]`);

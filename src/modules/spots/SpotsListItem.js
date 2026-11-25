@@ -10,10 +10,12 @@ import {isEmpty} from '../../shared/helpers';
 import {SAMPLES_COLOR} from '../../shared/styles.constants';
 import SpotGeometryAvatar from '../../shared/ui/avatars/SpotGeometryAvatar';
 import CheckboxList from '../../shared/ui/CheckboxList';
+import SpotMapSymbolAvatar from '../maps/symbology/SpotMapSymbolAvatar';
 import useTags from '../tags/useTags';
 
 const SpotsListItem = ({
                          canPickReadOnly,
+                         doShowMapSymbol,
                          doShowSamples,
                          doShowTags,
                          isCheckedList,
@@ -66,6 +68,7 @@ const SpotsListItem = ({
       keyExtractor={(item, index) => item?.properties?.id?.toString() || index.toString()}
       onPress={() => onPress && ((isCheckedList && !isReadOnly) || !isCheckedList) && onPress(spot)}
     >
+      {doShowMapSymbol && <SpotMapSymbolAvatar spot={spot}/>}
       <SpotGeometryAvatar spot={spot}/>
       <ListItem.Content>
         <ListItem.Title style={commonStyles.listItemTitle}>{spot?.properties?.name}</ListItem.Title>

@@ -5,7 +5,7 @@ import {useDispatch, useStore} from 'react-redux';
 
 import {MAP_EDIT_CHOICES} from './editing/editing.constants';
 import {MAP_MODES} from './maps.constants';
-import {canceledIntervalDrag, savedIntervalDragReordering} from './maps.slice';
+import {canceledIntervalDrag, savedIntervalDragReordering, setIsMapEditing} from './maps.slice';
 import useDeviceOrientation from '../../services/device/useDeviceOrientation';
 import {isEmpty} from '../../shared/helpers';
 import {SMALL_SCREEN} from '../../shared/styles.constants';
@@ -92,6 +92,8 @@ const useMapMode = ({mapComponentRef}) => {
   const setMapMode = (mode) => {
     mapModeRef.current = mode;
     setMapModeState(mode);
+    // Drawing or editing a Spot (measuring changes nothing); UpdatePromptListener waits for it to end
+    dispatch(setIsMapEditing(![MAP_MODES.VIEW, MAP_MODES.DRAW.MEASURE].includes(mode)));
   };
 
   return {

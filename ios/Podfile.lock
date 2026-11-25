@@ -2595,6 +2595,53 @@ PODS:
     - React
   - RNSoundPlayer (0.14.5):
     - React-Core
+  - RNSVG (15.16.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - RNSVG/common (= 15.16.1)
+    - Yoga
+  - RNSVG/common (15.16.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - RNVectorIcons (10.3.0):
     - hermes-engine
     - RCTRequired
@@ -2859,6 +2906,7 @@ DEPENDENCIES:
   - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - "RNSketchCanvas (from `../node_modules/@StraboSpot/react-native-sketch-canvas`)"
   - RNSoundPlayer (from `../node_modules/react-native-sound-player`)
+  - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - RNWorklets (from `../node_modules/react-native-worklets`)
   - RNZipArchive (from `../node_modules/react-native-zip-archive`)
@@ -3143,6 +3191,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@StraboSpot/react-native-sketch-canvas"
   RNSoundPlayer:
     :path: "../node_modules/react-native-sound-player"
+  RNSVG:
+    :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   RNWorklets:
@@ -3299,6 +3349,7 @@ SPEC CHECKSUMS:
   RNSentry: 21d98c50f71f88a0197966f41c4529e044a9f11c
   RNSketchCanvas: f7da2786bf042a29d5ca7a65571507d5c3108a29
   RNSoundPlayer: 7961678d02c7339d9e9cfb78b9f3e8fde17f9df2
+  RNSVG: 0851af4352d2e692b44aada9dd7a1d361c18fcfc
   RNVectorIcons: 8e7890bf2ce85e41df79133e7778070c37dc8d70
   RNWorklets: c05b04d721cccc1d44182425cd09efeddb6b1bbe
   RNZipArchive: 86d0d8fa9a19b530a47725b8c58468dc0392ad02
@@ -3311,4 +3362,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 50f041750560a8b9d89095034b52ffd4d3b46392
 
-COCOAPODS: 1.16.2
+COCOAPODS: 1.15.2

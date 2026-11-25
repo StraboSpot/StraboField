@@ -13,13 +13,14 @@ export const offerPreparedProjectAfterSignIn = () => {
   isOfferPending = true;
 };
 
-// Headless (mounted in ModalsContainer, native only). After a sign-in, asks whether to install a project prepared
-// for the account on the website and not installed yet. Declining leaves it in StraboField Projects to install
-// later.
+// Headless (mounted in ModalsContainer, native only, testing mode only). After a sign-in, asks whether to install
+// a project prepared for the account on the website and not installed yet. Declining leaves it in StraboField
+// Projects to install later.
 const PreparedProjectOffer = () => {
   /* Data Hooks */
 
   const isAuthenticated = useSelector(state => state.user.isAuthenticated);
+  const isTestingMode = useSelector(state => state.project.isTestingMode);
   const preparedProjects = useSelector(state => state.user.prepared_projects);
 
   const {installPreparedProject} = usePreparedProjects();
@@ -29,6 +30,7 @@ const PreparedProjectOffer = () => {
   useEffect(() => {
     if (!isOfferPending || !isAuthenticated) return;
     isOfferPending = false;
+    if (!isTestingMode) return; // After clearing, so turning testing mode on later makes no stale offer
     const preparedProject = getPreparedProjectToOffer(preparedProjects);
     if (!preparedProject) return;
     // Give the screen a moment to settle after signing in, so the question isn't lost in the transition

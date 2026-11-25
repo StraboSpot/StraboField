@@ -62,6 +62,19 @@ describe('confirmEndMapEditing', () => {
     return hasEnded;
   };
 
+  // UpdatePromptListener holds the OTA restart prompt while this is set, so it has to clear on Save and Cancel alike
+  it('flags the map as being edited until the edit ends', async () => {
+    const {getHook, store} = renderHook({hasPendingEdits: true});
+    startEditing(getHook);
+    expect(store.getState().map.isMapEditing).toBe(true);
+    await callConfirmEndMapEditing(getHook, UNSAVED_CHANGES_CHOICES.SAVE);
+    expect(store.getState().map.isMapEditing).toBe(false);
+    ReactTestRenderer.act(() => getHook().setMapMode(MAP_MODES.DRAW.LINE));
+    expect(store.getState().map.isMapEditing).toBe(true);
+    ReactTestRenderer.act(() => getHook().setMapMode(MAP_MODES.DRAW.MEASURE));
+    expect(store.getState().map.isMapEditing).toBe(false);
+  });
+
   it('goes ahead without asking when nothing is being edited', async () => {
     const {getHook, map} = renderHook({hasPendingEdits: true});
     expect(await callConfirmEndMapEditing(getHook)).toBe(true);

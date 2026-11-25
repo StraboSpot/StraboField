@@ -20,6 +20,7 @@ import {setMenuSelectionPage, setSidePanelVisible} from '../main-menu-panel/main
 import mainMenuPanelStyles from '../main-menu-panel/mainMenuPanel.styles';
 import Overview from '../page/Overview';
 import {NOTEBOOK_PAGES, SUBPAGES} from '../page/page.constants';
+import {getModalForOpenedPage} from '../page/page.helpers';
 import {PAGE_KEYS} from '../page/pageKeys.constants';
 import usePage from '../page/usePage';
 import {setMultipleFeaturesTaggingEnabled} from '../project/projects.slice';
@@ -96,12 +97,7 @@ const NotebookContent = ({closeNotebookPanel, createDefaultGeom, openMainMenuPan
     if (!await goToNotebookPage(key)) return;
     const page = NOTEBOOK_PAGES.find(p => p.key === key);
     if (SMALL_SCREEN || isReadOnly) dispatch(setActiveModal({modal: null}));
-    else if (page.modal_component) {
-      const populatedPagesKeys = getPopulatedPagesKeys(spot);
-      if (populatedPagesKeys.includes(page.key)) dispatch(setActiveModal({modal: null}));
-      else dispatch(setActiveModal({modal: page.key}));
-    }
-    else dispatch(setActiveModal({modal: null}));
+    else dispatch(setActiveModal({modal: getModalForOpenedPage(page, getPopulatedPagesKeys(spot))}));
   };
 
   /* Render Functions */

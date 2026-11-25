@@ -24,11 +24,12 @@ import useIsConnectionAvailable from '../../connections/useConnectionStatus';
 // 'field_camp' -> 'Field Camp'. The kind is only shown: every kind installs the same way.
 const getKindLabel = kind => kind?.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
-// Projects prepared for this account on the website, each with a package to install. Shown only when there are
-// some, below the ways to load a project in StraboField Projects.
+// Projects prepared for this account on the website, each with a package to install. Shown only in testing mode and
+// when there are some, below the ways to load a project in StraboField Projects.
 const PreparedProjects = ({closeMainMenuPanel}) => {
   /* Data Hooks */
 
+  const isTestingMode = useSelector(state => state.project.isTestingMode);
   const openProjectId = useSelector(state => state.project.project?.id);
   const preparedProjects = useSelector(state => state.user.prepared_projects);
 
@@ -127,7 +128,7 @@ const PreparedProjects = ({closeMainMenuPanel}) => {
 
   /* View */
 
-  if (readyPreparedProjects.length === 0) return null;
+  if (!isTestingMode || readyPreparedProjects.length === 0) return null;
 
   return (
     <>

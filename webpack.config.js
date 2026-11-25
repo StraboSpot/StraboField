@@ -154,6 +154,10 @@ module.exports = (env, argv) => {
         '@sentry/react-native': path.resolve(__dirname, 'src/web/stubs/sentry.web.js'),
         'react-native-fs': path.resolve(__dirname,
           'src/web/stubs/react-native-fs.web.js'),
+        // react-native-svg's web build imports the asset registry react-native stopped shipping in 0.87; the one in
+        // react-native-web has the same getAssetByID
+        '@react-native/assets-registry/registry': path.resolve(__dirname,
+          'node_modules/react-native-web/dist/modules/AssetRegistry'),
         '@react-native-async-storage/async-storage': path.resolve(__dirname,
           'node_modules/@react-native-async-storage/async-storage'),
         'react-native-tab-view': path.resolve(__dirname, 'node_modules/react-native-tab-view/src/index.tsx'),

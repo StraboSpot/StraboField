@@ -1,6 +1,12 @@
 import {useSelector} from 'react-redux';
 
-import {LAYOUT_PROPERTIES_MAP, LINE_PATTERNS, PAINT_PROPERTIES_MAP} from './mapSymbology.constants';
+import {
+  LAYOUT_PROPERTIES_MAP,
+  LINE_PATTERNS,
+  MAP_DEFAULT_COLOR,
+  MAP_DEFAULT_LINE_WIDTH,
+  PAINT_PROPERTIES_MAP,
+} from './mapSymbology.constants';
 import {getIconImage, getIconRotation, getLabel, getLabelOffset} from './mapSymbology.helpers';
 import {hexToRgb, isEmpty} from '../../../shared/helpers';
 import {MEDIUMGREY, ORANGE} from '../../../shared/styles.constants';
@@ -28,12 +34,12 @@ const useMapSymbology = () => {
   const lineColorExpression = [
     'case', ['all', ['has', 'symbology'], ['has', 'lineColor', ['get', 'symbology']]],
     ['get', 'lineColor', ['get', 'symbology']],
-    '#000000',
+    MAP_DEFAULT_COLOR,
   ];
   const lineWidthExpression = [
     'case', ['all', ['has', 'symbology'], ['has', 'lineWidth', ['get', 'symbology']]],
     ['get', 'lineWidth', ['get', 'symbology']],
-    1,
+    MAP_DEFAULT_LINE_WIDTH,
   ];
 
   const mapStyles = {
@@ -334,13 +340,12 @@ const useMapSymbology = () => {
 
   /* Exported Functions */
 
-  // Add symbology to properties of map features (not to Spots themselves) since data-driven styling
-  // doesn't work for colors by tags and more complex styling
+  // Copies of the features with symbology added to their properties, since data-driven styling doesn't work for
+  // colors by tags and more complex styling. Returns copies, so Spots straight from the store can be passed in.
   const addSymbology = (features) => {
     return features.map((feature) => {
       const symbology = getSymbology(feature);
-      if (!isEmpty(symbology)) feature.properties.symbology = symbology;
-      return feature;
+      return isEmpty(symbology) ? feature : {...feature, properties: {...feature.properties, symbology}};
     });
   };
 
@@ -393,10 +398,8 @@ const useMapSymbology = () => {
       case 'GeometryCollection':
         const geometryCollectionSymbology = [];
         feature.geometry.geometries.forEach((g, i) => {
-          let tempFeature = JSON.parse(JSON.stringify(feature));
-          tempFeature.geometry = g;
-          if (i % 2 === 1) tempFeature.properties.isInterbed = true;
-          geometryCollectionSymbology.push(getSymbology(tempFeature));
+          const properties = i % 2 === 1 ? {...feature.properties, isInterbed: true} : feature.properties;
+          geometryCollectionSymbology.push(getSymbology({...feature, geometry: g, properties}));
         });
         return geometryCollectionSymbology;
       default:
