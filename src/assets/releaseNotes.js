@@ -62,6 +62,11 @@ const RELEASE_NOTES = [
             commit: 'a0ccaace6',
             platforms: ['ios', 'android'],
           },
+          {
+            text: 'Backed up before updating: the open project is auto saved before the update prompt appears, and the prompt waits while you\'re drawing or editing a Spot on the map',
+            commit: '44f9cb49d',
+            platforms: ['ios', 'android'],
+          },
         ],
       },
       {
@@ -187,6 +192,14 @@ const RELEASE_NOTES = [
           {
             text: 'Missing images: an image that\'s missing can be deleted from the memo or sample that holds it',
             commit: '5eccfe586',
+          },
+          {
+            text: 'Memos keep their place: adding Spots to a memo or deleting one of its images no longer moves it to the end of the memo list',
+            commit: 'ba35f7cde',
+          },
+          {
+            text: 'Memo button: on a large screen, the memo button for a Spot with no memos opens the Memos page instead of a blank new-memo form not linked to the Spot',
+            commit: 'adda2d2b7',
           },
         ],
       },
